@@ -34,6 +34,16 @@ test('the Stats layout check also previews Stats', () => {
   assert.equal(parseArgs(['--preview-stats']).verifyStats, undefined);
 });
 
+test('preview Tools and the full-screen break in the offscreen renderer', () => {
+  const tools = parseArgs(['--preview=tools.png', '--preview-tools']);
+  assert.equal(tools.previewToolView, 'tools');
+  assert.equal(tools.preview, 'tools.png');
+  const rest = parseArgs(['--preview-frames=break', '--preview-break', '--preview-portrait']);
+  assert.equal(rest.previewToolView, 'break');
+  assert.equal(rest.preview, path.join('break', 'frame-000.png'));
+  assert.equal(rest.portrait, true);
+});
+
 test('verification and measurement flags', () => {
   const opts = parseArgs(['--verify-deck-swipe', '--verify-audio-faders', '--measure-deck', '--editor', '--windowed']);
   assert.equal(opts.verifySwipe, true);

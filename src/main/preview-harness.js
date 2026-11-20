@@ -1,4 +1,6 @@
 // @ts-check
+/// <reference lib="dom" />
+/* global document, getComputedStyle, innerHeight, innerWidth */
 'use strict';
 
 // Offscreen preview for `--preview=<png>`: renders the deck with sample readings into a 2560×720
@@ -12,8 +14,137 @@ const { DEFAULT_APPEARANCE } = require('./deck-appearance');
 const { packs } = require('./shortcut-packs');
 const { webPacks, chromiumWebAppId } = require('./shortcut-packs-web');
 const { StatsMonitor } = require('./stats');
+const { setTimeout: pause } = require('node:timers/promises');
 
 const RENDER_TIMEOUT_MS = 12000;
+
+async function capturePreview(devtools, file, width, height, x = 0, y = 0) {
+  const { data } = await devtools.sendCommand('Page.captureScreenshot', {
+    captureBeyondViewport: true, clip: { x, y, width, height, scale: 1 },
+  });
+  fs.writeFileSync(file, Buffer.from(data, 'base64'));
+}
+
+function inspectToolbar() {
+  const grid = document.getElementById('keys');
+  const { gridTemplateColumns, columnGap } = getComputedStyle(grid);
+  const tracks = gridTemplateColumns.split(' ').map((track) => parseFloat(track));
+  const gridWidth = tracks.reduce((total, track) => total + track, 0) + (tracks.length - 1) * parseFloat(columnGap);
+  const gridBounds = grid.getBoundingClientRect();
+  const inset = (grid.offsetWidth - gridWidth) / 2 * (gridBounds.width / grid.offsetWidth);
+  const nav = document.getElementById('page-nav').getBoundingClientRect();
+  const home = document.getElementById('home-page').getBoundingClientRect();
+  const buttons = ['quick-tools-open', 'emoji-tab', 'page-lock'].map((id) => document.getElementById(id));
+  if (buttons.some((button) => {
+    const { width, height } = button.getBoundingClientRect();
+    return !width || Math.abs(width - home.width) > 1 || Math.abs(height - home.height) > 1
+      || ![...button.querySelectorAll('svg')].some((icon) => icon.getBoundingClientRect().width > 0);
+  })) throw new Error('Tools, Emoji and Lock must have visible icons and match the Home button size.');
+  const actions = buttons[0].parentElement.getBoundingClientRect();
+  const aligned = Number.isFinite(inset) && Math.abs(nav.left - (gridBounds.left + inset)) < 2
+    && Math.abs(nav.right - (gridBounds.right - inset)) < 2 && Math.abs(actions.right - nav.right) < 2;
+  if (!aligned) throw new Error('The Deck Keys toolbar does not align with the key grid.');
+  const x = Math.max(0, Math.floor(actions.left) - 12);
+  const y = Math.max(0, Math.floor(actions.top) - 12);
+  return { x, y, width: Math.min(innerWidth, Math.ceil(actions.right) + 12) - x,
+    height: Math.min(innerHeight, Math.ceil(actions.bottom) + 8) - y };
+}
+
+function previewControls(devtools) {
+  const evaluate = async (/** @type {string} */ expression) => {
+    const result = await devtools.sendCommand('Runtime.evaluate', { expression, returnByValue: true });
+    if (result.exceptionDetails) throw new Error(result.exceptionDetails.exception?.description ?? 'Demo view failed to render.');
+    return result.result.value;
+  };
+  async function waitFor(ready, message) {
+    for (let attempt = 0; attempt < 36; attempt++) {
+      if (await evaluate(ready)) return;
+      await pause(75);
+    }
+    throw new Error(message);
+  }
+  const click = (/** @type {string} */ id) => evaluate(`document.getElementById(${JSON.stringify(id)}).click()`);
+  return { evaluate, waitFor, click };
+}
+
+async function openPreviewTools(devtools) {
+  const { click, waitFor } = previewControls(devtools);
+  await click('quick-tools-open');
+  await waitFor(`document.getElementById('quick-tools').open
+    && document.querySelector('#tools-timers .widget-timer-list li')
+    && !document.getElementById('tools-pomodoro-primary')?.disabled`, 'The sample Tools and Pomodoro did not open.');
+}
+
+async function startPreviewBreak(devtools) {
+  const { click, waitFor } = previewControls(devtools);
+  await click('tools-pomodoro-primary');
+  await waitFor(`(() => {
+    const dialog = document.getElementById('pomodoro-break');
+    const { x, y, width, height } = dialog.getBoundingClientRect();
+    return dialog.open && x === 0 && y === 0 && width === innerWidth && height === innerHeight;
+  })()`, 'The sample Pomodoro break did not fill the viewport.');
+}
+
+async function captureDemo({ devtools, send, directory, width, height, shortcutPack, toolView }) {
+  fs.mkdirSync(directory, { recursive: true });
+  const frames = [];
+  async function capture(seconds, name = `frame-${String(frames.length).padStart(3, '0')}`) {
+    const file = `${name}.png`;
+    await capturePreview(devtools, path.join(directory, file), width, height);
+    frames.push({ file, seconds });
+  }
+  const { evaluate, waitFor, click } = previewControls(devtools);
+  async function navigate(view, selector) {
+    send('deck:navigation', { view });
+    await waitFor(`Boolean(document.querySelector(${JSON.stringify(selector)})?.getBoundingClientRect().width)`, 'The preview did not open ' + view + '.');
+    await pause(100);
+  }
+  if (shortcutPack) {
+    const label = await evaluate(`document.getElementById('page-count').textContent`);
+    await capture(1.6);
+    await evaluate(`document.getElementById('next').focus({ preventScroll: true })`);
+    await capture(0.28);
+    await evaluate(`document.getElementById('next').click()`);
+    const before = JSON.stringify(label);
+    await waitFor(`document.getElementById('page-count').textContent !== ${before}`, 'This shortcut preview needs at least two generated pages.');
+    await capture(1.84);
+    await evaluate(`document.getElementById('previous').focus({ preventScroll: true })`);
+    await capture(0.28);
+    await evaluate(`document.getElementById('previous').click()`);
+    await waitFor(`document.getElementById('page-count').textContent === ${before}`, 'The shortcut preview could not return to the first page.');
+    await capture(0.84);
+  } else if (toolView) {
+    await capture(1.1);
+    await openPreviewTools(devtools);
+    await capture(2.4);
+    await startPreviewBreak(devtools);
+    for (const time of ['05:00', '04:59', '04:58']) {
+      await waitFor(`document.getElementById('pomodoro-break-time').textContent === '${time}'`, 'The sample break did not count down.');
+      await capture(1);
+    }
+    await click('pomodoro-break-close');
+    await waitFor(`!document.getElementById('pomodoro-break').open && document.getElementById('quick-tools').open`,
+      'Closing the sample break did not return to Tools.');
+    await capture(1.5);
+    await click('quick-tools-close');
+    await waitFor(`!document.getElementById('quick-tools').open`, 'Closing the sample Tools did not return to Deck Keys.');
+    await capture(0.75);
+  } else {
+    await capture(1.75);
+    await navigate('emoji', '#emoji-panel .emoji-key');
+    await capture(1.1);
+    for (let step = 1; step <= 10; step++) {
+      await evaluate(`document.getElementById('emoji-grid').scrollTop = ${step * 65}`);
+      await pause(50);
+      await capture(step === 10 ? 1 : 0.1);
+    }
+    await navigate('dashboard', '#dashboard-panel:not([hidden])');
+    await capture(2, 'dashboard');
+    await navigate('stats', '#stats-readings .stats-card');
+    await capture(2.3);
+  }
+  fs.writeFileSync(path.join(directory, 'frames.json'), JSON.stringify(frames));
+}
 
 async function verifyPreviewSwipe(devtools) {
   const read = async (expression) => (await devtools.sendCommand('Runtime.evaluate', {
@@ -111,6 +242,12 @@ function previewTelemetry(now) {
 function previewStats({ sample, history, verify }) {
   const { sampleStatsHardware } = require('./stats-preview');
   const hardware = sampleStatsHardware();
+  for (const sensor of hardware.filter(({ kind }) => kind === 'Cpu')) {
+    for (let offset = 58; offset > 0; offset--) {
+      const at = sample.hardwareAt - offset * 1_000;
+      history.recordPoint('lhm:' + sensor.id, at, sensor.value * (.9 + Math.sin(offset * .3) * .08), sample.hardwareAt);
+    }
+  }
   // The sample readers are synchronous; StatsMonitor awaits whatever they return.
   return new StatsMonitor(/** @type {any} */ ({
     sample: () => ({ sample, history: history.series, hardware }),
@@ -161,7 +298,17 @@ async function startPreview({ opts, ipcMain, BrowserWindow, quit, fail, log, ren
   const { pages, send } = deck;
   const store = loadPreviewProfile({ opts, defaultProfile, pages });
   deck.setStore(store);
-  ipcMain.handle('profile:get', () => deck.currentView());
+  let previewSheet = 0;
+  const previewView = () => ({ ...deck.currentView(), followsApps: true, deckSheet: previewSheet });
+  function publishPreview() {
+    pages.revision++;
+    send('profile', previewView());
+  }
+  ipcMain.handle('profile:get', previewView);
+  ipcMain.handle('page:lock', () => {
+    pages.toggleLock(store.current);
+    publishPreview();
+  });
   let previewPresses = 0;
   ipcMain.handle('key:press', () => {
     previewPresses++;
@@ -169,9 +316,14 @@ async function startPreview({ opts, ipcMain, BrowserWindow, quit, fail, log, ren
   });
   ipcMain.handle('page:select', (_event, id) => {
     pages.select(store.current, id);
-    deck.refreshPage();
+    previewSheet = 0;
+    publishPreview();
   });
-  ipcMain.handle('page:repaginate', (_event, sheet) => deck.repaginatePage(sheet));
+  ipcMain.handle('page:repaginate', (_event, sheet) => {
+    if (!Number.isSafeInteger(sheet) || sheet < 0) throw new Error('Invalid deck screen.');
+    previewSheet = sheet;
+    publishPreview();
+  });
   ipcMain.handle('deck:badges:read', () => ({}));
   /** @type {{ output: any, microphone: any, version: number, inputs?: any[] }} */
   const previewAudio = {
@@ -199,7 +351,8 @@ async function startPreview({ opts, ipcMain, BrowserWindow, quit, fail, log, ren
     { id: 'stopwatch', label: 'Stopwatch', kind: 'stopwatch', status: 'paused', valueMs: 725_000, anchorAt: null, endedAt: null },
   ] } }));
   const { history, sample } = previewTelemetry(Date.now());
-  const stats = opts.stats ? previewStats({ sample, history, verify: opts.verifyStats }) : null;
+  const demo = opts.previewFrames && !opts.previewPack && !opts.previewToolView;
+  const stats = opts.stats || demo ? previewStats({ sample, history, verify: opts.verifyStats }) : null;
   if (stats) {
     deck.setStats(stats);
     stats.snapshot();
@@ -208,6 +361,35 @@ async function startPreview({ opts, ipcMain, BrowserWindow, quit, fail, log, ren
     ipcMain.handle('stats:tab', () => {});
     ipcMain.handle('stats:incidents', () => ({ ok: true, timeline: { events: [], dashboard: null } }));
     ipcMain.handle('view:set', () => {});
+  }
+  if (demo) {
+    const { EMOJI_GROUPS, EMOJI_KEYS } = require('../shared/emoji-catalog');
+    ipcMain.handle('emoji:catalog', () => ({ groups: EMOJI_GROUPS, entries: EMOJI_KEYS, frequent: [], tones: {} }));
+    ipcMain.handle('media:snapshot', () => ({ status: 'ready', sessionId: 'preview', trackId: 'warm-up',
+      title: 'Warm-up', album: 'Studio Sessions', artist: 'Lastra Demo', source: 'Spotify',
+      sampledAt: Date.now(), playback: 'playing', durationMs: 241_000, positionMs: 83_000,
+      seekMinMs: 0, seekMaxMs: 241_000, canPause: true, canPrevious: true, canNext: true }));
+    ipcMain.handle('dashboard:agenda', () => ({ ok: true, state: { status: 'ready', selected: true,
+      event: { title: 'Studio review', startAt: Date.now() + 60 * 60 * 1_000 } } }));
+    ipcMain.handle('dashboard:pomodoro:read', () => ({ ok: true, state: { phase: 'focus', status: 'idle', remainingMs: 25 * 60 * 1_000 } }));
+  }
+  if (opts.previewToolView) {
+    let breakStartedAt = null;
+    const durationMs = 5 * 60_000;
+    const snapshot = () => breakStartedAt === null
+      ? { phase: 'focus', status: 'complete', durationMs: 25 * 60_000, remainingMs: 0, revision: 1 }
+      : { phase: 'break', status: 'running', durationMs, remainingMs: durationMs - (Date.now() - breakStartedAt), revision: 2 };
+    ipcMain.handle('dashboard:pomodoro:read', () => ({ ok: true, state: snapshot() }));
+    ipcMain.handle('tools:pomodoro:change', (_event, command) => {
+      if (command?.type !== 'start' || command.revision !== 1 || breakStartedAt !== null) return { ok: false };
+      breakStartedAt = Date.now();
+      const state = snapshot();
+      send('pomodoro:changed', state);
+      return { ok: true, state };
+    });
+    const { DEFAULT_CHOICES } = require('../shared/decisions');
+    ipcMain.handle('tools:choices', () => DEFAULT_CHOICES);
+    ipcMain.handle('sounds:read', () => ({ ok: true, state: { revision: 1, playing: [] } }));
   }
 
   const width = opts.portrait ? 720 : 2560;
@@ -223,7 +405,7 @@ async function startPreview({ opts, ipcMain, BrowserWindow, quit, fail, log, ren
   });
   deck.setWindow(win);
   const devtools = win.webContents.debugger;
-  const deadline = setTimeout(() => fail(new Error('Timed out rendering the preview')), RENDER_TIMEOUT_MS);
+  const deadline = setTimeout(() => fail(new Error('Timed out rendering the preview')), opts.previewFrames ? 30_000 : RENDER_TIMEOUT_MS);
 
   ipcMain.once('renderer:ready', async () => {
     try {
@@ -234,6 +416,15 @@ async function startPreview({ opts, ipcMain, BrowserWindow, quit, fail, log, ren
       send('sensors', { ...sample, history: history.series });
       send('audio', previewAudio);
       await new Promise((r) => setTimeout(r, 1000));
+      if (opts.previewToolbar) {
+        const toolbar = await devtools.sendCommand('Runtime.evaluate', {
+          expression: '(' + inspectToolbar.toString() + ')()', returnByValue: true,
+        });
+        if (toolbar.exceptionDetails) throw new Error(toolbar.exceptionDetails.exception?.description ?? 'Toolbar verification failed.');
+        const { x, y, width, height } = toolbar.result.value;
+        await capturePreview(devtools, path.resolve(opts.previewToolbar), width, height, x, y);
+        log('Deck Keys toolbar icons and grid alignment verified.');
+      }
       if (opts.verifySwipe) {
         const [, expected] = store.current.pages;
         if (!expected) throw new Error('Swipe verification requires a profile with at least two pages.');
@@ -247,13 +438,13 @@ async function startPreview({ opts, ipcMain, BrowserWindow, quit, fail, log, ren
         log('Horizontal and vertical audio faders verified.');
       }
       if (opts.verifyStats) {
-        const { inspectStatsLayout, inspectCustomOverview } = require('./stats-preview');
+        const { inspectStatsLayout, inspectCustomOverview, inspectChartSeries } = require('./stats-preview');
         const check = await devtools.sendCommand('Runtime.evaluate', {
           expression: '(' + inspectStatsLayout.toString() + ')()', returnByValue: true,
         });
         if (check.exceptionDetails) throw new Error(check.exceptionDetails.exception?.description ?? 'Stats verification failed');
         log('Stats preview verified:', check.result.value);
-        const { overview } = stats.snapshot({ refresh: false });
+        const { overview, readings } = stats.snapshot({ refresh: false });
         const selected = ['gpu', 'cpu', 'ram'].map((id) => overview.find((item) => item.id === id));
         const preferences = { layout: 'cards', style: 'line' };
         send('stats:preferences', { ...preferences, revision: 1, selected, wide: ['gpu'] });
@@ -261,16 +452,30 @@ async function startPreview({ opts, ipcMain, BrowserWindow, quit, fail, log, ren
           expression: '(' + inspectCustomOverview.toString() + ')()', returnByValue: true, awaitPromise: true,
         });
         if (arranged.result?.value !== true) throw new Error('Custom Stats card order or width did not match the preferences');
-        send('stats:preferences', { ...preferences, revision: 2, selected: null, wide: null });
         log('Custom Stats card order and widths verified.');
+        const core = readings.find(({ name }) => name === 'CPU Core Max');
+        const extras = ['lhm:/intelcpu/0/power/0', 'lhm:/intelcpu/0/clock/0'].map((id) => readings.find((row) => row.id === id));
+        extras.push({ id: 'lhm:/intelcpu/0/temperature/99', name: 'Disconnected CPU sensor', group: 'cpu', unit: '°C' });
+        send('stats:preferences', { ...preferences, revision: 2, selected: [core, ...selected], wide: [core.id],
+          series: [{ id: core.id, readings: extras }] });
+        const series = await devtools.sendCommand('Runtime.evaluate', {
+          expression: '(' + inspectChartSeries.toString() + ')()', returnByValue: true, awaitPromise: true,
+        });
+        if (series.result?.value !== true) throw new Error('Stats did not render the configured CPU chart series');
+        send('stats:preferences', { ...preferences, revision: 3, selected: null, wide: null });
+        log('CPU Core Max, CPU watts, clock, and an unavailable chart series verified.');
       }
-      const { data } = await devtools.sendCommand('Page.captureScreenshot', {
-        captureBeyondViewport: true,
-        clip: { x: 0, y: 0, width, height, scale: 1 },
-      });
-      const out = path.resolve(opts.preview);
-      fs.writeFileSync(out, Buffer.from(data, 'base64'));
-      log('Preview saved to', out);
+      if (opts.previewFrames) {
+        const directory = path.resolve(opts.previewFrames);
+        await captureDemo({ devtools, send, directory, width, height, shortcutPack: opts.previewPack, toolView: opts.previewToolView });
+        log('Preview frames saved to', directory);
+      } else {
+        if (opts.previewToolView) await openPreviewTools(devtools);
+        if (opts.previewToolView === 'break') await startPreviewBreak(devtools);
+        const out = path.resolve(opts.preview);
+        await capturePreview(devtools, out, width, height);
+        log('Preview saved to', out);
+      }
       quit();
     } catch (err) {
       fail(err);

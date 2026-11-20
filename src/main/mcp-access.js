@@ -18,6 +18,7 @@ const SCOPES = Object.freeze({ layout: 'Deck layout', providers: 'Provider avail
   'project-actions': 'Request registered project commands',
   'workspace-targets': 'Request opening or focusing saved Windows apps',
   'workspace-external': 'Request opening saved PowerToys workspaces',
+  'agent-choices': 'Request choices on the Lastra deck',
   'alert-actions': 'Request alert acknowledgements', 'obs-actions': 'Request OBS scene and source changes',
   'audio-actions': 'Request Windows audio level changes',
   'audio-mute': 'Request Windows speaker or microphone mute changes',
@@ -27,7 +28,8 @@ const SCOPES = Object.freeze({ layout: 'Deck layout', providers: 'Provider avail
   'media-actions': 'Request Windows playback changes',
   'spotify-control': 'Request Spotify Connect playback changes',
   [RUN_SCOPE]: 'Publish agent run activity' });
-const activityScope = (scope) => ['layout', 'drafts', 'apply', 'navigate', 'actions', 'workspace-targets', 'workspace-external', 'projects', 'project-actions', RUN_SCOPE].includes(scope);
+const activityScope = (scope) => ['layout', 'drafts', 'apply', 'navigate', 'actions', 'workspace-targets', 'workspace-external',
+  'agent-choices', 'projects', 'project-actions', RUN_SCOPE].includes(scope);
 const LIMIT = 24;
 const MAX_GRANT_DURATION_MS = 24 * 60 * 60_000;
 const TEMPORARY_GRANT_MS = 15 * 60_000;

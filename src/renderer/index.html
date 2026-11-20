@@ -133,10 +133,32 @@
             <p id="activity-profile-error" role="alert"></p>
           </div>
         </div>
-        <button id="quick-tools-open" type="button" aria-haspopup="dialog" aria-controls="quick-tools" aria-expanded="false" hidden>Tools</button>
-        <button id="obs-tab" type="button" aria-controls="obs-panel" aria-expanded="false" hidden>OBS</button>
-        <button id="emoji-tab" type="button" aria-controls="emoji-panel" aria-expanded="false">Emoji</button>
-        <button id="page-lock" type="button" aria-pressed="false" hidden>Follow apps</button>
+        <div class="page-actions">
+          <button id="quick-tools-open" class="dashboard-icon-button" type="button" aria-label="Tools" title="Tools"
+            aria-haspopup="dialog" aria-controls="quick-tools" aria-expanded="false" hidden>
+            <svg class="dashboard-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.1-3.1a6 6 0 0 1-7.3 7.3l-7.9 7.9a2.1 2.1 0 0 1-3-3l7.9-7.9a6 6 0 0 1 7.3-7.3z"/>
+            </svg>
+          </button>
+          <button id="obs-tab" type="button" aria-controls="obs-panel" aria-expanded="false" hidden>OBS</button>
+          <button id="emoji-tab" class="dashboard-icon-button" type="button" aria-label="Emoji" title="Emoji"
+            aria-controls="emoji-panel" aria-expanded="false">
+            <svg class="dashboard-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <circle cx="12" cy="12" r="9"/>
+              <path d="M8 14a4 4 0 0 0 8 0M9 9v1m6-1v1"/>
+            </svg>
+          </button>
+          <button id="page-lock" class="dashboard-icon-button" type="button" aria-label="Lock page" title="Lock page" aria-pressed="false" hidden>
+            <svg class="dashboard-icon page-lock-unlocked" viewBox="0 0 24 24" aria-hidden="true">
+              <rect x="4" y="10" width="16" height="11" rx="2"/>
+              <path d="M8 10V7a4 4 0 0 1 7.5-2M12 15v2"/>
+            </svg>
+            <svg class="dashboard-icon page-lock-locked" viewBox="0 0 24 24" aria-hidden="true">
+              <rect x="4" y="10" width="16" height="11" rx="2"/>
+              <path d="M8 10V7a4 4 0 0 1 8 0v3m-4 5v2"/>
+            </svg>
+          </button>
+        </div>
       </nav>
       <section id="keys" aria-label="Deck keys"></section>
       <section id="obs-panel" aria-label="OBS control" hidden>
@@ -488,23 +510,23 @@
   <dialog id="quick-tools" aria-labelledby="quick-tools-title" closedby="any">
     <header class="tools-heading">
       <h2 id="quick-tools-title">Tools</h2>
-      <button id="quick-tools-close" type="button" autofocus>Deck keys</button>
+      <button id="quick-tools-close" class="tools-dismiss" type="button" aria-label="Close Tools" title="Close Tools" autofocus>
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg>
+      </button>
     </header>
     <div id="tools-content">
-      <section class="tools-column" aria-label="Time tools">
-        <div id="tools-timers"></div>
+      <div id="tools-timers"></div>
+      <div class="tools-column">
         <section id="tools-pomodoro" aria-label="Pomodoro" hidden></section>
-      </section>
-      <section class="tools-column" aria-label="Decision and sound tools">
         <section id="tools-decisions" class="tools-card" aria-label="Quick decision">
           <div id="tools-decision-card"></div>
         </section>
-        <section id="tools-soundboard" class="tools-card" aria-labelledby="tools-soundboard-title">
-          <h3 id="tools-soundboard-title">Soundboard</h3>
-          <p id="tools-sound-state" role="status"></p>
-          <div id="tools-sound-clips"></div>
-          <button id="tools-sound-stop" type="button" disabled>Stop all sounds</button>
-        </section>
+      </div>
+      <section id="tools-soundboard" class="tools-card" aria-labelledby="tools-soundboard-title">
+        <h3 id="tools-soundboard-title">Soundboard</h3>
+        <p id="tools-sound-state" role="status"></p>
+        <div id="tools-sound-clips"></div>
+        <button id="tools-sound-stop" type="button" disabled>Stop all sounds</button>
       </section>
       <section id="quick-tools-actions" class="tools-card" aria-labelledby="tools-controls-title">
         <h3 id="tools-controls-title">Deck controls</h3>
@@ -515,6 +537,18 @@
         <button type="button" id="quick-tools-backlight" data-quick-tool="backlight">Display backlight<small hidden></small></button>
         <button type="button" id="quick-tools-desktop" data-quick-tool="desktop">Reveal desktop<small hidden></small></button>
       </section>
+    </div>
+  </dialog>
+  <dialog id="pomodoro-break" aria-labelledby="pomodoro-break-title" closedby="closerequest">
+    <button id="pomodoro-break-close" class="tools-dismiss" type="button" aria-label="Close full-screen break"
+      title="Close full-screen break" autofocus>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg>
+    </button>
+    <div class="pomodoro-break-content">
+      <h2 id="pomodoro-break-title">Pomodoro break</h2>
+      <output id="pomodoro-break-time" role="timer" aria-live="off" aria-label="Pomodoro time remaining">–:––</output>
+      <progress id="pomodoro-break-progress" value="0" max="1" aria-label="Break elapsed"></progress>
+      <p id="pomodoro-break-paused" hidden>Timer paused</p>
     </div>
   </dialog>
   <dialog id="deck-backlight" aria-labelledby="deck-backlight-title" closedby="any">

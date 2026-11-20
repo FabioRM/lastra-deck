@@ -3,7 +3,7 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const path = require('node:path');
-const { StatsSelection } = require('../src/main/stats-selection');
+const { StatsSelection, readingChoices } = require('../src/main/stats-selection');
 const { chartPaths } = require('../src/shared/stats-chart');
 const { SensorWidgetSamples, checkedSensorIds } = require('../src/main/sensor-widget-samples');
 const { normalizeWidgetInstances } = require('../src/main/widgets');
@@ -77,6 +77,30 @@ test('Stats preferences select distinct devices, preserve disconnected slots, an
   assert.throws(() => preferences.save(['cpu'], snapshot, 'line', 'cards', [GPU_TWO]), /selected readings/);
   assert.deepEqual(preferences.save(['cpu'], snapshot).wide, []);
   assert.equal(preferences.save(null).wide, null);
+});
+
+test('Overview charts keep independently selected series when a device disconnects', (t) => {
+  const core = { id: 'lhm:/intelcpu/0/load/0', name: 'CPU Core Max', group: 'cpu', unit: '%', status: 'live' };
+  const watts = { id: 'lhm:/intelcpu/0/power/0', name: 'CPU Package', group: 'cpu', unit: 'W', status: 'live' };
+  const clock = { id: 'lhm:/intelcpu/0/clock/0', name: 'CPU Core #1', group: 'cpu', unit: 'MHz', status: 'unavailable' };
+  const snapshot = { overview: [], readings: [core, watts, clock] };
+  const file = localFile(t);
+  let preferences = new StatsSelection(file);
+  assert.deepEqual(preferences.read().series, []);
+  const series = [{ id: core.id, readings: [watts.id, clock.id] }];
+  preferences.save([core.id], snapshot, 'line', 'cards', null, series);
+  preferences = new StatsSelection(file);
+  const saved = preferences.read().series[0];
+  assert.deepEqual(saved.readings.map(({ id, unit }) => [id, unit]), [[watts.id, 'W'], [clock.id, 'MHz']]);
+  const disconnected = { overview: [], readings: [core] };
+  assert.equal(readingChoices(disconnected, saved.readings).find(({ id }) => id === watts.id).status, 'unavailable');
+  assert.deepEqual(preferredOverview(disconnected, saved.readings).map(({ status, points }) => [status, points]),
+    [['unavailable', []], ['unavailable', []]]);
+  assert.deepEqual(preferences.save([core.id], disconnected).series, [saved]);
+  for (const readings of [[core.id], [watts.id, watts.id], ['unknown']]) {
+    assert.throws(() => preferences.save([core.id], snapshot, 'line', 'cards', null, [{ id: core.id, readings }]));
+  }
+  assert.deepEqual(preferences.save(null).series, []);
 });
 
 test('Stats chart styles preserve missing intervals and the original line geometry', () => {

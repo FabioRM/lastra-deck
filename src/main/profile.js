@@ -20,6 +20,7 @@ const { normalizeWebApp, chromiumWebAppId } = require('./shortcut-packs-web');
 const { READOUTS } = require('../shared/key-readouts');
 const { validShortcutGuard, shortcutNeedsConfirmation } = require('./shortcut-guards');
 const { validateShortcutOverrides } = require('./shortcut-overrides');
+const { validateShortcutLayouts } = require('../shared/shortcut-layouts');
 const { CONTROL_FIELDS, MAX_CONTROLS, canRepeatTap, controlFields, sceneTarget } = require('../shared/linked-controls');
 const { MacroError } = require('../shared/parameterized-macros');
 const { ExpressionError } = require('../shared/value-expressions');
@@ -383,6 +384,7 @@ function validateProfile(raw) {
   const barKeys = validateKeys(raw.bar?.keys === undefined ? [] : raw.bar.keys, BAR_GRID, 'persistent bar, ', controlIds, resolver);
   const webApps = validateWebApps(raw.webApps);
   const shortcutOverrides = validateShortcutOverrides(raw.shortcutOverrides);
+  const shortcutLayouts = validateShortcutLayouts(raw.shortcutLayouts);
   const widgetPresets = normalizeCompositionPresets(raw.widgetPresets);
   return {
     version: paged ? 2 : 1,
@@ -391,6 +393,7 @@ function validateProfile(raw) {
     ...(raw.shortcutLanguage ? { shortcutLanguage: raw.shortcutLanguage } : {}),
     ...(webApps.length ? { webApps } : {}),
     ...(Object.keys(shortcutOverrides).length ? { shortcutOverrides } : {}),
+    ...(Object.keys(shortcutLayouts).length ? { shortcutLayouts } : {}),
     ...(widgetPresets.length ? { widgetPresets } : {}),
     ...(controlBindings.length ? { controlBindings } : {}),
     ...(macros.definitions.length ? { macros: macros.definitions } : {}),

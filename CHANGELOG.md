@@ -1,5 +1,16 @@
 # Lastra changelog
 
+## 0.2.5 · 2026-11-20
+
+- Enlarge the Tools panel and its touch controls. Close it with the red × in the top-right corner.
+- Show a Pomodoro break full-screen on the XENEON EDGE. The red × returns to the previous view while the timer continues.
+- Configure multiple shortcut pages per app. Add, reorder, hide, or remove commands. New packs cover Notepad, Paint, and SumatraPDF.
+- Align the Tools, Emoji, and page lock buttons with the Deck Keys grid. Refresh the site screenshots and animations.
+- Resize and reorder Stats cards, combine up to four readings on one chart, and show supported CPU power, clock, voltage, and current readings.
+- Extend the review flow for local agent requests and PowerToys workspaces.
+
+[Windows downloads](https://github.com/FabioRM/lastra-deck/releases/tag/v0.2.5) · [Project site](https://fabiorm.github.io/lastra-deck/)
+
 ## 0.2.4 · 2026-11-20
 
 - First public Windows x64 installer. Installs per user and receives updates from GitHub Releases.

@@ -274,7 +274,7 @@ main {
 #stats-settings-form { margin-block: 12px; }
 #stats-chart-sample { flex: 1 1 160px; align-self: end; }
 #stats-chart-sample .widget-graph { display: block; height: 48px; background: var(--surface); border-radius: 6px; }
-#stats-settings-readings {
+#stats-settings-readings, #stats-series-readings {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
   gap: 6px;
@@ -319,6 +319,9 @@ main {
 .overview-layout-card strong { overflow-wrap: anywhere; cursor: grab; }
 .overview-layout-actions { display: flex; flex-wrap: wrap; gap: 4px; }
 .overview-layout-actions button { min-height: 30px; padding: 3px 6px; }
+.overview-layout-actions button[aria-expanded='true'] { border-color: var(--accent); background: var(--selected-surface); }
+#stats-series-editor { padding: 12px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); }
+#agent-draft-offer { display: grid; gap: 7px; padding-block-start: 7px; }
 #stats-overview-board > p { grid-column: 1 / -1; }
 @media (max-width: 1040px) { #stats-overview-board { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 .deck-settings-heading { justify-content: space-between; }
@@ -770,6 +773,30 @@ legend { padding: 0 5px; color: var(--ink); font-weight: 600; }
   align-items: start;
   gap: 12px;
 }
+#shortcut-page-config {
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+}
+#shortcut-page-config summary { cursor: pointer; }
+[data-shortcut-pages] { display: grid; gap: 8px; padding-block-start: 8px; }
+.shortcut-page-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.shortcut-page-actions select, .shortcut-page-actions input { min-inline-size: 0; max-inline-size: 240px; }
+.shortcut-page-keys { display: grid; gap: 3px; max-block-size: 180px; overflow: auto; margin: 0; padding: 0; list-style: none; }
+.shortcut-page-keys li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) repeat(4, auto);
+  gap: 5px;
+  align-items: center;
+  padding: 3px 6px;
+  background: var(--card-surface);
+  border-radius: 6px;
+}
+.shortcut-page-key-title { min-width: 0; overflow-wrap: anywhere; }
+.shortcut-page-key-title code { display: inline-block; margin-inline-start: 8px; color: var(--muted-text); }
+.shortcut-page-keys li[data-hidden-shortcut] .shortcut-page-key-title { color: var(--muted-text); }
+.shortcut-page-keys button { min-block-size: 28px; padding: 3px 6px; }
 #shortcut-pack-keys {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(205px, 100%), 1fr));

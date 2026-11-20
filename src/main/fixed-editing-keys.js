@@ -86,6 +86,9 @@ function editBinding(command, pack, settings) {
   }
   const reviewed = reviewedBinding(command, pack, settings);
   if (reviewed) return reviewed;
+  if (pack.id === 'sumatrapdf' && command !== 'copy') {
+    return { unavailable: 'No verified editing shortcut is available in the SumatraPDF reader.' };
+  }
   const variant = packKeys(pack, { ...context, shortcutLanguage, shortcutOverrides })
     .find(({ id, action }) => id === command && action?.type === 'hotkey');
   const chord = variant?.action.keys ?? (command === 'redo' && SHIFT_REDO.has(pack.id) ? 'Ctrl+Shift+Z' : STANDARD_EDITING_CHORDS[command]);

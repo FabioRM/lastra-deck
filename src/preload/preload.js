@@ -22,6 +22,7 @@ contextBridge.exposeInMainWorld('lastra', {
   onDeckPageIcon: (callback) => subscribe('deck:page-icon', callback),
   openDashboardCalendar: () => ipcRenderer.invoke('dashboard:calendar:open'),
   readDashboardPomodoro: () => ipcRenderer.invoke('dashboard:pomodoro:read'),
+  onPomodoroChanged: (callback) => subscribe('pomodoro:changed', callback),
   changeDashboardPomodoro: (command) => ipcRenderer.invoke('dashboard:pomodoro:change', command),
   changeToolsPomodoro: (command) => ipcRenderer.invoke('tools:pomodoro:change', command),
   getToolChoices: () => ipcRenderer.invoke('tools:choices'),

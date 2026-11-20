@@ -327,7 +327,7 @@ test('MCP capability discovery types results, paginates tools, and exposes versi
   }
   assert.ok(listed.every(({ name, inputSchema, outputSchema, annotations }) =>
     inputSchema && outputSchema && annotations.readOnlyHint ===
-      !['profile_draft', 'app_view_draft', 'monitoring_draft', 'profile_changes', 'profile_activity', 'deck_navigation', 'gesture_fixture', 'registered_action',
+      !['profile_draft', 'app_view_draft', 'monitoring_draft', 'profile_changes', 'profile_activity', 'agent_choice', 'deck_navigation', 'gesture_fixture', 'registered_action',
         'workspace_apply', 'workspace_target', 'workspace_external', 'project_command', 'alert_acknowledge', 'obs_action', 'obs_output', 'agent_run', 'audio_action', 'audio_mute', 'audio_route', 'audio_app_level',
         'media_action', 'spotify_action'].includes(name)));
   assert.equal((await request('tools/list', { cursor: 'other:tools:4' })).error.code, -32602);
@@ -344,6 +344,7 @@ test('MCP capability discovery types results, paginates tools, and exposes versi
   assert.equal(tools.app_view_draft.status, 'unavailable');
   assert.equal(tools.monitoring_draft.permission, 'drafts and telemetry');
   assert.equal(tools.profile_activity.permission, 'profile-switch');
+  assert.equal(tools.agent_choice.permission, 'agent-choices');
   assert.equal(tools.workspace_target.permission, 'workspace-targets and workspaces');
   assert.equal(tools.workspace_external.permission, 'workspace-external and workspaces');
   assert.equal(tools.project_command.permission, 'project-actions and projects');

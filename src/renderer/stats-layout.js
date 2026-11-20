@@ -35,10 +35,10 @@
     });
   }
 
-  function statsScales(readings) {
+  function statsScales(readings, keyFor = scaleKey) {
     const scales = new Map();
     for (const item of readings) {
-      const id = scaleKey(item);
+      const id = keyFor(item);
       const scale = scales.get(id) ?? { low: 0, high: 1 };
       if (item.unit === '%') {
         scales.set(id, { low: 0, high: 100 });
@@ -52,7 +52,7 @@
       scales.set(id, scale);
     }
     for (const [id, scale] of scales) {
-      if (id.endsWith(':%')) continue;
+      if (id === '%' || id.endsWith(':%')) continue;
       const increment = Math.pow(10, Math.floor(Math.log10(scale.high - scale.low))) / 2;
       scale.low = Math.floor(scale.low / increment) * increment;
       scale.high = Math.ceil(scale.high / increment) * increment;

@@ -6,9 +6,11 @@ Lastra turns the **CORSAIR XENEON EDGE** into a touchscreen macro deck for Windo
 
 ![Lastra Deck Keys showing an example Home layout with shortcuts, audio controls, and sample telemetry](docs/preview-home.png)
 
-Bring an app like Visual Studio Code to the foreground and Deck Keys opens its shortcut page. Assign your own pages in the editor or use the included shortcut packs.
+![Deck Keys toolbar with the Tools, Emoji, and page lock icons](docs/preview-toolbar.png)
 
-[Getting started](#getting-started) · [Deck views](#deck-views) · [Profile editor](#profile-editor) · [Local MCP integration](#local-mcp-integration) · [License](#license)
+Bring an app like Visual Studio Code to the foreground and Deck Keys opens its shortcut page. Create multiple pages, rearrange the commands, and hide the ones you rarely use. [Configure app shortcut pages](docs/shortcut-packs.md#configure-app-shortcut-pages) · [Watch pages switch](docs/preview-shortcuts.gif)
+
+[Getting started](#getting-started) · [Tools and Pomodoro](#tools-and-pomodoro) · [Deck views](#deck-views) · [Profile editor](#profile-editor) · [Local MCP integration](#local-mcp-integration) · [License](#license)
 
 <details>
 <summary>Visual Studio Code, Dashboard, and portrait previews</summary>
@@ -57,12 +59,22 @@ In **Lastra → Settings → System → Diagnostics and deck maintenance**, **To
 
 Use **Export diagnostics…** under **Settings → System → Diagnostics and deck maintenance** to save a JSON report for troubleshooting. It includes display geometry and touch mapping, audio mute and volume status, sensor availability, and integration status. Service health appears as totals. The report omits device names and IDs, file paths, URLs, credentials, media titles, and profile contents. Export reads the current state without starting providers or sending the report anywhere.
 
+## Tools and Pomodoro
+
+Tap the wrench in **Deck Keys** to open **Tools**. The larger touch controls provide quick access to countdowns, the stopwatch, Pomodoro, Quick decision, the soundboard, and deck controls. Close the panel with the red **×** in the top-right corner.
+
+![Tools overlay in landscape with larger touch controls and a red close button](docs/preview-tools.png)
+
+Start a **Pomodoro break** from Tools or Dashboard to fill the XENEON EDGE with the countdown. The red **×** returns you to the previous view while the break continues. The full-screen view closes when the countdown reaches zero. [Pomodoro guide](docs/pomodoro.md) · [Watch the Tools and break demo](docs/preview-tools.gif)
+
+![Full-screen Pomodoro break countdown with a red close button in the top-right corner](docs/preview-pomodoro-break.png)
+
 ## Deck views
 
 - **Deck Keys** combines app-aware shortcut pages, a persistent widget bar, and Windows audio controls. The default **Home** fits the 19 shortcuts and five fixed editing keys on one screen in either orientation. [Shortcut packs](docs/shortcut-packs.md) · [Macros](docs/macros.md) · [Widgets](docs/widgets.md)
 - **Tools** opens a dedicated screen from Deck Keys with countdowns, a stopwatch, Pomodoro, Quick decision, the soundboard, and deck controls. Open **Pages** or **Apps** from Tools. Set the Quick decision pick list in **Tools settings** in the desktop editor.
 - **Dashboard** shows a clock, calendar, Pomodoro timer, and Now Playing for the default Windows media session. Use **Previous**, **Play or Pause**, and **Next**, or drag the progress bar to seek when supported. [Now Playing](docs/now-playing.md) · [Pomodoro](docs/pomodoro.md)
-- **Stats** shows current readings and one-minute graphs for the processor, graphics, memory, displays, app frame performance, storage, and cooling. [Telemetry guide](docs/telemetry.md)
+- **Stats** shows current readings and one-minute graphs. Reorder or resize overview cards and configure up to four readings on one chart, such as CPU load in percent and package power in watts. [Telemetry guide](docs/telemetry.md)
 - **OBS** shows live recording and streaming status and provides controls for scenes and sources. [OBS setup](docs/obs.md)
 - **Apps** offers searchable, pinnable views for Spotify, Docker and Compose, Kubernetes, GitHub Checks, WSL, Windows Terminal, and custom apps. **Action history** shows up to 100 completed command attempts from the current session. [App views](docs/app-views.md) · [Kubernetes](docs/kubernetes.md) · [GitHub Checks](docs/github-checks.md)
 - **Emoji** puts frequently used emoji at the top of one vertically scrollable grid. Swipe up or down, use the mouse wheel, or search with the touch keyboard. Tap an emoji to insert it into the active text field.
@@ -257,9 +269,13 @@ npm run preview
 npm run preview:states
 npm start -- --preview=preview-portrait.png --preview-portrait
 npm start -- --preview=preview-stats.png --preview-stats
+npm start -- --preview=preview-tools.png --preview-tools
+npm start -- --preview=preview-pomodoro-break.png --preview-break
 ```
 
 The PNG preview commands render the deck offscreen with sample readings and save the captures in the current directory. They work without the XENEON EDGE connected.
+
+Run `node scripts/refresh-previews.js` with FFmpeg on `PATH` to regenerate the screenshots and GIFs used by the site and README. The script checks toolbar alignment and verifies the full-screen break in landscape and portrait.
 
 Use `--verify-deck-swipe` with a preview profile that has two pages and starts with a wide key to verify that a swipe changes the page without running that key. Add `--preview-portrait` to run the gesture in portrait.
 

@@ -272,18 +272,30 @@
 #stats-readings[data-combined-power] {
   grid-template-columns: repeat(2, minmax(0, 1fr));
   grid-template-rows: minmax(0, 1fr);
-  --power-series: var(--system);
 }
 .portrait #stats-readings[data-mode='power'][data-combined-power] { grid-template-columns: minmax(0, 1fr); }
-.stats-comparison-legend { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 5px 14px; margin-top: 8px; }
-.stats-comparison-legend span { display: inline-flex; align-items: center; gap: 8px; color: var(--text); font-size: calc(19px * var(--text-scale)); }
-.stats-comparison-legend span::before { content: ''; width: 24px; flex: none; border-block-start: 3px solid var(--series); }
-.stats-comparison-legend .stats-power-legend::before { border-block-start: 3px dashed var(--power-series); }
+.stats-card { --overlay-one: var(--system); --overlay-two: var(--media); --overlay-three: var(--warn); }
+.stats-card[data-group='gpu'], .stats-card[data-group='display'] { --overlay-one: var(--app); }
+.stats-card[data-group='power'], .stats-card[data-group='cooling'], .stats-card[data-group='frames'] { --overlay-two: var(--app); }
+.stats-card :is(.stats-series-key, .widget-graph-overlay)[data-series='1'] { --overlay: var(--overlay-one); --chart-dash: 8 5; }
+.stats-card :is(.stats-series-key, .widget-graph-overlay)[data-series='2'] { --overlay: var(--overlay-two); --chart-dash: 2 5; }
+.stats-card :is(.stats-series-key, .widget-graph-overlay)[data-series='3'] { --overlay: var(--overlay-three); --chart-dash: 12 3 2 3; }
+.stats-comparison-legend { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr)); gap: 5px 14px; margin-top: 6px; }
+.stats-chart:has(.stats-comparison-legend:not([hidden])) .widget-graph { min-height: 22px; }
+.stats-series-key { display: flex; min-width: 0; align-items: center; gap: 5px; color: var(--text); font-size: calc(15px * var(--text-scale)); }
+.stats-series-key::before { content: ''; width: 14px; flex: none; border-block-start: 3px solid var(--overlay, var(--series)); }
+.stats-series-key[data-series='1']::before, .stats-series-key[data-series='3']::before { border-block-start-style: dashed; }
+.stats-series-key[data-series='2']::before { border-block-start-style: dotted; }
+.stats-series-key[data-state='unavailable'] { color: var(--muted-text); }
+.stats-series-key[data-state='stale'] .stats-series-value { color: var(--warn); }
+.stats-series-name { min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.stats-series-value { margin-inline-start: auto; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.stats-comparison-legend[data-power] .stats-series-key { font-size: calc(19px * var(--text-scale)); }
 .widget-graph-overlay {
-  stroke: var(--power-series);
+  stroke: var(--overlay);
   fill: none;
   stroke-width: 3;
-  stroke-dasharray: 8 5;
+  stroke-dasharray: var(--chart-dash);
   vector-effect: non-scaling-stroke;
 }
 .widget-graph-overlay[data-style='points'] { stroke-dasharray: none; stroke-linecap: round; stroke-width: 5; }

@@ -8,11 +8,12 @@ const { DraftRequestError } = require('./mcp-drafts');
 const ID = /^[a-f0-9]{24}$/;
 const VERSION = /^[a-f0-9]{64}$/;
 const TIMEOUT = 90_000;
-const COMMANDS = ['compare', 'backups', 'apply', 'restore', 'status', 'cancel'];
+const PAGE = /^[a-zA-Z0-9_-]{1,40}$/;
+const COMMANDS = ['compare', 'backups', 'apply', 'restore', 'open-editor', 'status', 'cancel'];
 const applyInput = {
   type: 'object', required: ['command'], additionalProperties: false, properties: {
     command: { enum: COMMANDS }, draft: { type: 'string' }, revision: { type: 'integer', minimum: 1 },
-    backup: { type: 'string' }, baseVersion: { type: 'string' }, request: { type: 'string' },
+    backup: { type: 'string' }, baseVersion: { type: 'string' }, request: { type: 'string' }, page: { type: 'string', pattern: PAGE.source },
   },
 };
 const applyOutput = {
@@ -28,8 +29,8 @@ function applyParams(value) {
       || Object.keys(value).some((key) => !Object.hasOwn(applyInput.properties, key))) {
     throw new DraftRequestError('Choose a profile revision command.');
   }
-  const { command, draft, revision, backup, baseVersion, request } = value;
-  if (['compare', 'apply'].includes(command) &&
+  const { command, draft, revision, backup, baseVersion, request, page } = value;
+  if (['compare', 'apply', 'open-editor'].includes(command) &&
       (typeof draft !== 'string' || !ID.test(draft) || !Number.isSafeInteger(revision) || revision < 1)) {
     throw new DraftRequestError('Choose the draft ID and its current revision.');
   }
@@ -38,7 +39,10 @@ function applyParams(value) {
   if (['status', 'cancel'].includes(command) && (typeof request !== 'string' || !ID.test(request))) {
     throw new DraftRequestError('Choose an approval request ID.');
   }
-  return { command, draft, revision, backup, baseVersion, request };
+  if (page !== undefined && (!['apply', 'open-editor'].includes(command) || typeof page !== 'string' || !PAGE.test(page))) {
+    throw new DraftRequestError('Choose a page from the current draft.');
+  }
+  return { command, draft, revision, backup, baseVersion, request, page };
 }
 
 function diffValues(before, after, route = '', rows = []) {
@@ -52,7 +56,7 @@ function diffValues(before, after, route = '', rows = []) {
 }
 
 // Fields that decide what a key runs, which app it targets, or which file it loads.
-const EFFECT_SEGMENTS = new Set(['action', 'hold', 'double', 'macros', 'controlBindings', 'apps', 'targetApps', 'windowsApps',
+const EFFECT_SEGMENTS = new Set(['action', 'hold', 'double', 'macros', 'controlBindings', 'shortcutLayouts', 'apps', 'targetApps', 'windowsApps',
   'image', 'workspaces', 'rules']);
 
 /**
@@ -70,11 +74,12 @@ function report(entry) {
 }
 
 class AgentProfileApply {
-  constructor({ drafts, approve, readContext, history, timeout = TIMEOUT }) {
+  constructor({ drafts, approve, readContext, history, timeout = TIMEOUT, openEditor = null }) {
     this.drafts = drafts;
     this.approve = approve;
     this.readContext = readContext;
     this.history = history;
+    this.openEditor = openEditor;
     this.timeout = timeout;
     this.requests = new Map();
   }
@@ -99,7 +104,9 @@ class AgentProfileApply {
     }
     const normalize = ({ keys, version, ...rest }) => rest;
     const changes = diffValues(normalize(base.profile), normalize(next));
-    return { activity, label, store, changes, next, baseVersion: base.token, params };
+    const page = params.page ? next.pages.find(({ id }) => id === params.page) : next.pages[0];
+    if (!page) throw new DraftRequestError('The requested draft page is unavailable.');
+    return { activity, label, store, changes, next, baseVersion: base.token, params, page };
   }
 
   change(client, params, authorized) {
@@ -109,18 +116,20 @@ class AgentProfileApply {
       if (params.command === 'cancel' && entry.status === 'awaiting_confirmation') this.finish(entry, 'cancelled', 'The client cancelled the request.');
       return report(entry);
     }
+    const editorOnly = params.command === 'open-editor';
+    if (editorOnly && !this.openEditor) throw new DraftRequestError('The editor handoff is unavailable.');
     const plan = this.plan(client, params);
     if (params.command === 'backups') return plan;
     const changed = plan.changes.slice(0, 100).map(({ field }) => field);
     const changeCount = plan.changes.length;
-    if (params.command === 'compare' || !changed.length) {
+    if (params.command === 'compare' || (!editorOnly && !changed.length)) {
       return { activity: plan.activity, status: changed.length ? 'different' : 'unchanged', changed, changeCount, baseVersion: plan.baseVersion };
     }
     if (this.pending || this.approve.isOpen?.()) throw new DraftRequestError('Another approval is already open on the deck.');
     const entry = {
       request: randomBytes(12).toString('hex'), owner: client.id, activity: plan.activity, status: 'awaiting_confirmation',
       changed, changeCount, baseVersion: plan.baseVersion, controller: new AbortController(), authorized,
-      check: () => this.revalidate(client, plan), restoring: params.command === 'restore',
+      check: () => this.revalidate(client, plan), restoring: params.command === 'restore', editorOnly,
     };
     this.requests.set(entry.request, entry);
     while (this.requests.size > 24) this.requests.delete(this.requests.keys().next().value);
@@ -142,7 +151,8 @@ class AgentProfileApply {
     entry.check = undefined;
     if (this.pending === entry) this.pending = null;
     recordAgentReview(this.history, { owner: entry.owner, status, updatedAt: Date.now() },
-      entry.restoring ? 'Restore approved profile' : 'Apply approved profile', entry.activity, status === 'applied');
+      status === 'sent-to-editor' || entry.editorOnly ? 'Open agent draft in editor' : entry.restoring ? 'Restore approved profile' : 'Apply approved profile',
+      entry.activity, status === 'applied' || status === 'sent-to-editor');
   }
 
   checkPending() {
@@ -163,17 +173,26 @@ class AgentProfileApply {
 
   async review(entry, client, plan) {
     const restoring = plan.params.command === 'restore';
+    const allowEditor = !restoring && Boolean(this.openEditor);
     const accepted = await this.approve({
-      caller: client.id.slice(0, 8), target: plan.label, operation: restoring ? 'Restore saved profile version' : 'Apply agent draft',
+      caller: client.id.slice(0, 8), target: plan.label,
+      operation: entry.editorOnly ? 'Review agent draft in editor' : restoring ? 'Restore saved profile version' : 'Apply agent draft',
+      ...(allowEditor ? { allowEditor, editorOnly: entry.editorOnly, page: plan.page.name } : {}),
       changes: prioritizeChanges(plan.changes), signal: entry.controller.signal,
     });
     if (entry.status !== 'awaiting_confirmation') return;
-    if (!accepted) return this.finish(entry, 'declined', 'The profile change was declined.');
+    const handoff = accepted === 'editor' && allowEditor;
+    if (!handoff && (accepted !== true || entry.editorOnly)) return this.finish(entry, 'declined', 'The profile change was declined.');
     if (!entry.authorized()) return this.finish(entry, 'cancelled', 'The agent grant or target changed.');
 
     const checked = entry.check();
     if (!checked) return this.finish(entry, 'conflict', 'The saved profile or draft changed. Review a new comparison.');
     if (!entry.authorized()) return this.finish(entry, 'cancelled', 'The agent grant or target changed.');
+    if (handoff) {
+      const delivered = this.openEditor(checked);
+      return delivered ? this.finish(entry, 'sent-to-editor', 'The draft was sent to the editor for local review.')
+        : this.finish(entry, 'unavailable', 'The editor is unavailable for the reviewed activity.');
+    }
 
     entry.committing = true;
     try {

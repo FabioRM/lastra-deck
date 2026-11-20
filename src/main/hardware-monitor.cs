@@ -102,7 +102,9 @@ internal static class Program
                 var gpuTemp = Read(gpu, SensorType.Temperature, "GPU Core", "GPU Temperature");
                 var readings = (from device in devices
                                 from sensor in device.Sensors
-                                where Detailed(sensor)
+                                let supplemental = Supplemental(device, sensor)
+                                where supplemental || Detailed(sensor)
+                                orderby supplemental
                                 select new
                                 {
                                     id = sensor.Identifier.ToString(), device = device.Name,
@@ -159,6 +161,22 @@ internal static class Program
             case "SmallData":
             case "Throughput":
                 return true;
+            default:
+                return false;
+        }
+    }
+
+    private static bool Supplemental(IHardware device, ISensor sensor)
+    {
+        if (device.HardwareType != HardwareType.Cpu) return false;
+        switch (sensor.SensorType.ToString())
+        {
+            case "Voltage":
+            case "Current":
+                return true;
+            case "Temperature":
+            case "Power":
+                return sensor.Name.StartsWith("CPU Core #", StringComparison.OrdinalIgnoreCase);
             default:
                 return false;
         }

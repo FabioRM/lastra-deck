@@ -7,6 +7,9 @@ const path = require('node:path');
  * @typedef {object} LaunchOptions
  * @property {boolean} windowed Open a focusable development window instead of the XENEON EDGE deck.
  * @property {string | null} preview Render the deck offscreen to this PNG file and quit.
+ * @property {string} [previewFrames] Capture the demo views into a directory of PNG frames.
+ * @property {string} [previewToolbar] Verify the Deck Keys toolbar and capture its icon buttons to this PNG.
+ * @property {'tools' | 'break'} [previewToolView] Open Tools or start a full-screen break in a preview.
  * @property {boolean} states Preview the renderer's demo states.
  * @property {boolean} portrait Preview a portrait panel.
  * @property {boolean} stats Preview the Stats view.
@@ -36,7 +39,14 @@ function parseArgs(argv, { cwd } = {}) {
     if (arg === '--windowed') opts.windowed = true;
     else if (arg === '--preview') opts.preview = 'preview.png';
     else if (arg.startsWith('--preview=')) opts.preview = arg.slice('--preview='.length);
+    else if (arg.startsWith('--preview-frames=')) {
+      opts.previewFrames = arg.slice('--preview-frames='.length);
+      if (opts.previewFrames) opts.preview = path.join(opts.previewFrames, 'frame-000.png');
+    }
     else if (arg === '--preview-states') opts.states = true;
+    else if (arg.startsWith('--preview-toolbar=')) opts.previewToolbar = arg.slice('--preview-toolbar='.length);
+    else if (arg === '--preview-tools') opts.previewToolView = 'tools';
+    else if (arg === '--preview-break') opts.previewToolView = 'break';
     else if (arg === '--preview-portrait') opts.portrait = true;
     else if (arg === '--preview-stats') opts.stats = true;
     else if (arg === '--preview-large-keys') opts.previewLargeKeys = true;

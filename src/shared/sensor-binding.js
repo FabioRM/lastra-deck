@@ -18,6 +18,11 @@
         group === 'memory' && 'RAM',
         group === 'storage' && 'disk drive',
         /^\/nvme\//i.test(deviceId ?? '') && 'SSD',
+        unit === 'W' && 'power watt watts potenza',
+        unit === '°C' && 'temperature temperatura',
+        unit === 'MHz' && 'clock frequency frequenza',
+        unit === 'V' && 'voltage volt tensione',
+        unit === 'A' && 'current ampere corrente',
       ];
       const text = [name, device, deviceId, source, group, unit, ...aliases].filter(Boolean).join(' ').toLowerCase();
       return words.every((word) => text.includes(word));

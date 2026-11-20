@@ -8,6 +8,7 @@ if (process.isMainFrame) contextBridge.exposeInMainWorld('lastraEditor', {
   setLanguage: (preference) => ipcRenderer.invoke('editor:language:set', preference),
   openDesktopMenu: (group) => ipcRenderer.invoke('editor:desktop-menu', group),
   onDesktopSection: (callback) => ipcRenderer.on('editor:section', (_event, value) => callback(value)),
+  onAgentDraft: (callback) => ipcRenderer.on('editor:agent-draft', (_event, value) => callback(value)),
   getGrafanaSettings: () => ipcRenderer.invoke('editor:grafana:get'),
   setGrafanaSettings: (url) => ipcRenderer.invoke('editor:grafana:set', url),
   calendarSettings: (type) => ipcRenderer.invoke('editor:agenda:settings', type),

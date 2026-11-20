@@ -19,7 +19,7 @@ const GIB = 1024 ** 3;
 const MIB = 1024 ** 2;
 const LHM_TYPES = {
   clock: 'MHz', power: 'W', temperature: '°C', load: '%', fan: 'RPM',
-  data: 'GiB', smalldata: 'MiB', throughput: 'MiB/s', timing: 'ns',
+  data: 'GiB', smalldata: 'MiB', throughput: 'MiB/s', timing: 'ns', voltage: 'V', current: 'A',
 };
 
 function reading(group, id, name, unit, value, source, at, maxAge, device = '', deviceId = '') {
@@ -28,6 +28,7 @@ function reading(group, id, name, unit, value, source, at, maxAge, device = '', 
 
 function hardwareGroup(kind, type, name) {
   if (type === 'fan') return 'cooling';
+  if (['voltage', 'current'].includes(type)) return /cpu$/i.test(kind) ? 'cpu' : null;
   if (/^(gpu|gpu-)/i.test(kind)) return 'gpu';
   if (/cpu$/i.test(kind)) return ['temperature', 'power', 'clock', 'load'].includes(type) ? 'cpu' : null;
   if (/^(memory|ram|spd)/i.test(kind) || type === 'timing') return 'memory';
@@ -164,8 +165,8 @@ class StatsMonitor {
     return target;
   }
 
-  /** @param {{ refresh?: boolean, range?: number }} [options] `range` is a retained-history window in ms. */
-  snapshot({ refresh = true, range } = {}) {
+  /** @param {{ refresh?: boolean, range?: number, chartIds?: Set<string> }} [options] `range` is a retained-history window in ms. */
+  snapshot({ refresh = true, range, chartIds } = {}) {
     const target = refresh ? this.refreshSources() : null;
     const now = this.now();
     const { sample = {}, hardware, history = {} } = this.sample() ?? {};
@@ -318,7 +319,8 @@ class StatsMonitor {
     const historyOptions = this.retained?.options() ?? [];
     const retainedRange = historyOptions.find(({ ms }) => ms === range);
     return {
-      groups: GROUPS, overview: Object.values(overview).map((item) => serialize(item, retainedRange)), readings: items.map((item) => serialize(item)),
+      groups: GROUPS, overview: Object.values(overview).map((item) => serialize(item, retainedRange)),
+      readings: items.map((item) => serialize(item, chartIds?.has(item.id) ? retainedRange : undefined)),
       ...(historyOptions.length ? { historyOptions } : {}),
       frameStatus: !this.framesExecutable ? 'Set up PresentMon to measure the foreground app.'
         : !target ? 'Bring an app to the foreground to measure frame performance.'

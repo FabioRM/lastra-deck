@@ -11,7 +11,7 @@ const DRAFT_ID = /^[a-f0-9]{24}$/;
 const MAX_DRAFTS = 24;
 const MAX_CLIENT_DRAFTS = 6;
 const MAX_EDITS = 32;
-const PROFILE_SETTINGS = new Set(['name', 'locale', 'shortcutLanguage', 'gestures', 'webApps', 'macros', 'variables']);
+const PROFILE_SETTINGS = new Set(['name', 'locale', 'shortcutLanguage', 'shortcutLayouts', 'gestures', 'webApps', 'macros', 'variables']);
 const PAGE_SETTINGS = new Set(['name', 'apps', 'appIds', 'windowTitle', 'priority', 'variables', 'folder']);
 const EMPTY = { version: 2, pages: [{ id: 'home', name: 'Home', keys: [] }] };
 const COMMANDS = ['create', 'inspect', 'edit', 'preview', 'discard'];
@@ -30,7 +30,7 @@ const draftInput = {
       type: 'object', required: ['op'], additionalProperties: false, properties: {
         op: { enum: EDITS }, id: TEXT, newId: TEXT, name: TEXT, source: TEXT, page: TEXT, surface: TEXT, toSurface: TEXT, folder: FOLDER,
         slot: SLOT, toSlot: SLOT, grid: GRID, span: GRID, key: { type: 'object' }, widget: { type: 'object' },
-        settings: { type: 'object', properties: { folder: FOLDER } }, layout: { ...GRID, required: ['column', 'row', 'cols', 'rows'],
+        settings: { type: 'object', properties: { folder: FOLDER, shortcutLayouts: { type: 'object' } } }, layout: { ...GRID, required: ['column', 'row', 'cols', 'rows'],
           properties: { ...GRID.properties, column: { type: 'integer' }, row: { type: 'integer' } } },
         ids: { type: 'array', items: TEXT },
       },

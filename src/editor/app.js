@@ -17,6 +17,8 @@ const selectGroup = document.getElementById('select-key-group');
 const pasteGroup = document.getElementById('paste-key-group');
 const inspector = document.getElementById('inspector');
 const status = document.getElementById('status');
+const agentDraftOffer = document.getElementById('agent-draft-offer');
+const agentDraftOpen = document.getElementById('agent-draft-open');
 const editorMenu = document.querySelector('.editor-menu');
 const save = document.getElementById('save');
 const reload = document.getElementById('reload');
@@ -73,6 +75,17 @@ const packWebApp = document.getElementById('shortcut-web-app');
 const packManifest = document.getElementById('shortcut-manifest');
 const packAttach = document.getElementById('attach-shortcut-web-app');
 const packWebApps = document.getElementById('shortcut-web-apps');
+const shortcutPageEditor = window.createShortcutPageEditor(document.getElementById('shortcut-page-config'), {
+  read: (pack) => draft?.shortcutLayouts?.[pack],
+  write(pack, layout) {
+    const next = window.LastraShortcutLayouts.validateShortcutLayouts({ ...draft.shortcutLayouts, [pack]: layout });
+    edit(() => { draft.shortcutLayouts = next; });
+  },
+  updated() {
+    const row = catalogRows.find((item) => shortcutIdentity(item) === selectedShortcut);
+    if (!shortcutDetail.hidden && row) renderShortcutDetail({ ...row, key: withShortcutOverride(row.key, draft.shortcutOverrides) });
+  },
+});
 let availablePacks = [];
 let catalogRows = [];
 let selectedShortcut;
@@ -102,6 +115,7 @@ let selected = 0;
 let groupSelection = null;
 let dirty = false;
 let busy = false;
+let pendingAgentDraft;
 let diskWarning = null;
 let dragSource = null;
 let gestureOptions = {};
@@ -175,6 +189,9 @@ function updateControls() {
   backupVersions.inert = busy;
   undo.disabled = busy || !editHistory.canUndo;
   redo.disabled = busy || !editHistory.canRedo;
+  agentDraftOffer.hidden = !pendingAgentDraft;
+  agentDraftOpen.disabled = busy;
+  if (!busy && !dirty && pendingAgentDraft && !document.querySelector('dialog[open]')) queueMicrotask(() => void acceptAgentDraft());
   livePreview.update(draft, pageId === BAR_PAGE_ID ? draft?.pages[0]?.id : pageId, pageId !== BAR_PAGE_ID);
   refreshProfileGrid?.();
   refreshPageGrid?.();
@@ -783,6 +800,18 @@ function renderShortcutDetail(row) {
     controls.append(open);
   }
   if (copyableShortcut(key)) {
+    if (pack.starterIds) {
+      const reason = packChoice.value === pack.id ? shortcutPageEditor.addStatus(key.id) : undefined;
+      const add = button(t('Add to shortcut page'), () => {
+        if (packChoice.value !== pack.id) {
+          packChoice.value = pack.id;
+          renderShortcutPack();
+        }
+        shortcutPageEditor.add(key.id);
+      }, { className: 'primary', disabled: Boolean(reason), title: reason && t(reason) });
+      controls.append(add);
+      if (reason) controls.append(node('span', 'muted', t(reason)));
+    }
     controls.append(button(t('Copy to this page'), () => {
       try {
         copyShortcutToPage(key);
@@ -879,6 +908,7 @@ function selectShortcutRow(row, control) {
 
 function renderShortcutPack() {
   const pack = availablePacks.find(({ id }) => id === packChoice.value);
+  shortcutPageEditor.render(pack);
   const visible = filterShortcutRows(catalogRows, {
     app: packChoice.value, platform: shortcutPlatform.value, context: shortcutContext.value,
     query: shortcutSearch.value, overrides: draft.shortcutOverrides,
@@ -928,6 +958,7 @@ async function showShortcutPacks() {
   shortcutSearch.value = '';
   selectedShortcut = undefined;
   catalogRows = [];
+  shortcutPageEditor.render();
   renderShortcutDetail();
   packWebApp.reset();
   packChoice.replaceChildren();
@@ -1063,7 +1094,7 @@ function renderPage() {
   const paste = button(t('Paste page'), () => pasteFromClipboard('page', insertPage), { className: 'quiet' });
   const pageWidgets = button('Widgets', () => showWidgets('page'));
   pageWidgets.id = 'page-widgets';
-  const shortcutPacks = button(t('Shortcut packs'), showShortcutPacks, { className: 'quiet' });
+  const shortcutPacks = button(t('App shortcuts'), showShortcutPacks, { className: 'quiet' });
   pageActions.replaceChildren(shortcutPacks, pageWidgets);
   duplicate.disabled = paste.disabled = draft.pages.length >= 16;
   tools.append(button(t('Copy page'), () => copyToClipboard('page', { ...page, grid: currentGrid() }), { className: 'quiet' }),
@@ -2098,12 +2129,12 @@ function renderInspector() {
 }
 
 function makeDraft(profile) {
-  const { name, locale, shortcutLanguage, grid, gestures, pages, bar, webApps, shortcutOverrides, widgetPresets } = profile;
+  const { name, locale, shortcutLanguage, grid, gestures, pages, bar, webApps, shortcutOverrides, shortcutLayouts, widgetPresets } = profile;
   return { name, locale, shortcutLanguage, grid, gestures, pages, bar: { keys: [], widgets: [], ...bar },
     controlBindings: profile.controlBindings ?? [],
     macros: profile.macros ?? [],
     ...(profile.variables?.length ? { variables: profile.variables } : {}),
-    webApps: webApps ?? [], shortcutOverrides: shortcutOverrides ?? {}, widgetPresets: widgetPresets ?? [] };
+    webApps: webApps ?? [], shortcutOverrides: shortcutOverrides ?? {}, shortcutLayouts: shortcutLayouts ?? {}, widgetPresets: widgetPresets ?? [] };
 }
 
 function readSnapshot(snapshot, savedFrom = null) {
@@ -2140,6 +2171,38 @@ async function load() {
     busy = false;
     updateControls();
   }
+}
+
+async function acceptAgentDraft(explicit = false) {
+  if (!pendingAgentDraft || busy || (dirty && !explicit) || document.querySelector('dialog[open]')) return;
+  const proposal = pendingAgentDraft;
+  pendingAgentDraft = null;
+  busy = true;
+  updateControls();
+  try {
+    const saved = await api.load();
+    if (saved.active === false || saved.warning || saved.token !== proposal.baseVersion || (dirty && token !== saved.token)) {
+      throw new Error(t('The saved profile changed. Request a fresh agent draft.'));
+    }
+    if (!draft || token !== saved.token) readSnapshot(saved);
+  } catch (error) {
+    notice(error.message, 'error');
+    return;
+  } finally {
+    busy = false;
+    updateControls();
+  }
+  editHistory.endGroup();
+  edit(() => {
+    draft = makeDraft(proposal.profile);
+    pageId = proposal.page;
+    selected = 0;
+    groupSelection = null;
+    dragSource = null;
+    renderProfileSettings();
+    renderPage();
+  });
+  notice(t(dirty ? 'Agent draft opened with unsaved changes.' : 'Agent draft page opened.'));
 }
 
 function actionProblem(action) {
@@ -2324,6 +2387,12 @@ window.addEventListener('keydown', (e) => {
     e.preventDefault();
     stepHistory(key === 'y' || e.shiftKey);
   }
+});
+agentDraftOpen.addEventListener('click', () => void acceptAgentDraft(true));
+document.addEventListener('close', () => { if (pendingAgentDraft) updateControls(); }, true);
+api.onAgentDraft((proposal) => {
+  pendingAgentDraft = proposal;
+  updateControls();
 });
 window.addEventListener('beforeunload', (e) => {
   if (dirty) {

@@ -6,7 +6,7 @@
   <meta name="description" content="Lastra is a touchscreen macro deck for the CORSAIR XENEON EDGE. It automatically switches shortcuts with the active Windows app and shows audio controls and live PC stats.">
   <meta name="theme-color" content="#151b20">
   <title>Lastra · A Windows macro deck for XENEON EDGE</title>
-  <link rel="stylesheet" href="site.css?v=2">
+  <link rel="stylesheet" href="site.css?v=3">
   <link rel="icon" href="data:,">
 </head>
 <body>
@@ -15,6 +15,7 @@
     <a class="wordmark" href="./">Lastra<span>.</span></a>
     <nav aria-label="Main navigation">
       <a href="#features">Features</a>
+      <a href="#tools">Tools and Pomodoro</a>
       <a href="#setup">Setup</a>
       <a href="https://github.com/FabioRM/lastra-deck">GitHub</a>
     </nav>
@@ -29,11 +30,15 @@
           <a class="button" href="https://github.com/FabioRM/lastra-deck/releases/latest">Download for Windows</a>
           <a class="text-link" href="https://github.com/FabioRM/lastra-deck#readme">Read the documentation</a>
         </div>
-        <p class="requirements">Windows 10 or 11 · x64 · Open source under MIT</p>
+        <p class="requirements">Windows 10 or 11 · x64 · Open source under MIT · <a href="https://github.com/FabioRM/lastra-deck/releases/tag/v0.2.5">What’s new in v0.2.5</a></p>
       </div>
       <figure class="deck">
         <a href="preview-home.png"><img src="preview-home.png" width="2560" height="720" alt="Lastra Home showing touchscreen shortcut keys, Windows audio controls, and CPU, RAM, and GPU readings."></a>
         <figcaption>Deck Keys with an example Home layout and sample telemetry</figcaption>
+      </figure>
+      <figure class="toolbar-detail">
+        <a href="preview-toolbar.png"><img src="preview-toolbar.png" width="277" height="96" loading="lazy" alt="The Tools, Emoji, and page lock icons in the Deck Keys toolbar."></a>
+        <figcaption>Tools, Emoji, and page lock</figcaption>
       </figure>
     </section>
     <section class="features" id="features" aria-labelledby="features-title">
@@ -43,8 +48,8 @@
           <div class="feature-copy">
             <h3>Shortcuts for the active app</h3>
             <div>
-              <p>Bring Visual Studio Code to the foreground and the example layout switches to this page automatically. Lastra opens the page you assigned to the app, its built-in shortcut pack, or a page with common shortcuts. Use the visual editor to assign your own shortcuts and multi-step macros.</p>
-              <a href="https://github.com/FabioRM/lastra-deck#pages-and-keys">See how automatic pages work</a>
+              <p>Bring Visual Studio Code to the foreground and the deck switches to its shortcut page. Use the editor to create multiple pages for an app, add and rearrange commands, or hide the ones you rarely use.</p>
+              <a href="https://github.com/FabioRM/lastra-deck/blob/main/docs/shortcut-packs.md#configure-app-shortcut-pages">Configure app shortcut pages</a> · <a href="preview-shortcuts.gif">Watch the page switcher</a>
             </div>
           </div>
           <a class="feature-image" href="preview-vscode.png"><img src="preview-vscode.png" width="2560" height="720" loading="lazy" alt="The automatic Visual Studio Code page with Command Palette, Quick Open, Find in Files, Source Control, Terminal, and other shortcuts."></a>
@@ -57,13 +62,25 @@
               <a href="https://github.com/FabioRM/lastra-deck#deck-views">Explore the deck views</a>
             </div>
           </div>
-          <a class="feature-image" href="preview-dashboard.png"><img src="preview-dashboard.png" width="1536" height="432" loading="lazy" alt="Dashboard showing the calendar, an active Pomodoro timer, and playback controls for a sample track."></a>
+          <a class="feature-image" href="preview-dashboard.png"><img src="preview-dashboard.png" width="2560" height="720" loading="lazy" alt="Dashboard showing the calendar, Pomodoro controls, and playback controls for a sample track."></a>
+        </article>
+        <article class="feature" id="tools">
+          <div class="feature-copy">
+            <h3>Tools and full-screen Pomodoro</h3>
+            <div>
+              <p>Tap the wrench on Deck Keys to open timers, the stopwatch, Pomodoro, the soundboard, and deck controls. The larger buttons are designed for touch. Close Tools with the red ×.</p>
+              <p>Start a Pomodoro break to fill the XENEON EDGE with the countdown. Tap the red × to return to your previous view while the break continues.</p>
+              <a href="preview-tools.gif">Watch the Tools and break demo</a> · <a href="https://github.com/FabioRM/lastra-deck/blob/main/docs/pomodoro.md">Read the Pomodoro guide</a>
+            </div>
+          </div>
+          <a class="feature-image" href="preview-tools.png"><img src="preview-tools.png" width="2560" height="720" loading="lazy" alt="The larger Tools panel with readable buttons and a red close control."></a>
+          <a class="feature-image" href="preview-pomodoro-break.png"><img src="preview-pomodoro-break.png" width="2560" height="720" loading="lazy" alt="Full-screen Pomodoro break countdown with a red close control in the top-right corner."></a>
         </article>
         <article class="feature">
           <div class="feature-copy">
             <h3>Live PC stats</h3>
             <div>
-              <p>Arrange readings for CPU, GPU, memory, temperatures, and power when available. Switch between cards, charts, and a readings list to see what’s happening now and how it’s changing.</p>
+              <p>Resize and rearrange Stats cards for CPU, GPU, memory, temperatures, and power. Put load in percent and measured watts on the same chart with separate scales when the hardware reports both values.</p>
               <a href="https://github.com/FabioRM/lastra-deck/blob/main/docs/telemetry.md">Read the telemetry guide</a>
             </div>
           </div>

@@ -124,6 +124,7 @@ const { describeLayoutView } = require('./mcp-layout');
 const { profileSnapshot } = require('./mcp-snapshot');
 const { providerStatus } = require('./mcp-catalog');
 const { AgentDrafts, DraftRequestError } = require('./mcp-drafts');
+const { AgentChoices } = require('./mcp-choices');
 const { AgentAppViewDrafts } = require('./mcp-app-view-drafts');
 const { AgentMonitoringDrafts } = require('./mcp-monitoring-drafts');
 const { AgentGestureFixtures } = require('./mcp-gesture-fixtures');
@@ -264,6 +265,7 @@ let agentDrafts = null;
 let agentGestureFixtures = null;
 let agentActions = null;
 let agentApply = null;
+let agentChoices = null;
 let agentActivitySwitch = null;
 let agentRuns = null;
 let editorProfile = null;
@@ -649,6 +651,7 @@ function createDeckWindow(display = deckDisplay()) {
   deck.on('hide', cancelDeckActions);
   deck.on('hide', () => {
     processTelemetry?.stop();
+    agentChoices?.checkPending();
     if (win === deck) kubernetesView?.stop();
     agentActivitySwitch?.checkPending();
     agentAppAudio?.checkPending();
@@ -656,6 +659,7 @@ function createDeckWindow(display = deckDisplay()) {
   });
   deck.on('minimize', () => {
     if (win === deck) kubernetesView?.stop();
+    agentChoices?.checkPending();
     agentActivitySwitch?.checkPending();
     agentAppAudio?.checkPending();
     agentSpotifyActions?.checkPending();
@@ -672,6 +676,7 @@ function createDeckWindow(display = deckDisplay()) {
       sensorWidgets?.select([]);
       nowPlaying?.stop();
       win = null;
+      agentChoices?.checkPending();
       agentActivitySwitch?.checkPending();
       agentAppAudio?.checkPending();
       agentSpotifyActions?.checkPending();
@@ -723,6 +728,7 @@ function syncWebEmbedSuspension() {
 
 function revealDesktop() {
   if (deckSession.blocked || !win || win.isDestroyed() || !deckReveal.begin(revealDisplay())) return false;
+  agentChoices?.checkPending();
   agentActivitySwitch?.checkPending();
   agentAppAudio?.checkPending();
   displayBacklight.invalidate();
@@ -794,6 +800,21 @@ function openEditor(section = 'settings') {
   window.webContents.once('did-finish-load', () => window.webContents.send('editor:section', section));
   window.once('closed', () => { editor = editorProfile = null; });
   window.loadFile(EDITOR, { query: { language: interfaceLanguage.language } });
+}
+
+function offerEditorDraft(approved) {
+  if (edgeExit || deckSession.blocked || store !== approved.store || (editorProfile && editorProfile.store !== store)) return false;
+  openEditor('profile');
+  const owner = editor;
+  const deliver = () => {
+    if (owner !== editor || owner.isDestroyed() || deckSession.blocked || store !== approved.store
+        || store.editorSnapshot().token !== approved.baseVersion) return;
+    owner.webContents.send('editor:section', 'profile');
+    owner.webContents.send('editor:agent-draft', { profile: approved.next, page: approved.page.id, baseVersion: approved.baseVersion });
+  };
+  if (owner.webContents.isLoadingMainFrame()) owner.webContents.once('did-finish-load', deliver);
+  else deliver();
+  return true;
 }
 
 function collectDiagnostics() {
@@ -883,6 +904,7 @@ function switchActivity(id) {
   if (activities.current.id !== id) {
     activateActivity(id);
     agentApply?.checkPending();
+    agentChoices?.checkPending();
     agentActivitySwitch?.checkPending();
     navigation.setActivity(id);
     refreshPage(true);
@@ -1024,6 +1046,7 @@ function setViewOnly(enabled) {
     productionModes?.interrupt();
   }
   choicePrompts.check();
+  agentChoices?.checkPending();
   agentActivitySwitch?.checkPending();
   agentAppAudio?.checkPending();
   agentWorkspaceApply?.checkPending();
@@ -1267,7 +1290,11 @@ function registerIpc() {
     const guard = () => viewGuard() ?? (navigation.current.view !== 'emoji' ? 'Open the Emoji view to insert an emoji.' : undefined);
     return insertEmoji(id, { readTarget: () => readForeground.textTarget?.(), run: runner.run, usage: emojiUsage, guard });
   });
-  deck('stats:read', (range) => ({ ...stats.snapshot({ range }), preferences: statsSelection.read() }));
+  deck('stats:read', (range) => {
+    const preferences = statsSelection.read();
+    const chartIds = new Set(preferences.series.flatMap(({ id, readings }) => [id, ...readings.map((row) => row.id)]));
+    return { ...stats.snapshot({ range, chartIds }), preferences };
+  });
   deck('stats:processes', (command) => {
     if (command?.type === 'stop') return processTelemetry.stop();
     if (command?.type !== 'read' || navigation.current.view !== 'stats' || deckReveal.active
@@ -1356,12 +1383,12 @@ function registerIpc() {
     const snapshot = await stats.settingsSnapshot();
     const preferences = statsSelection.read();
     return { ...preferences, defaults: snapshot.overview.filter(({ status }) => status !== 'unavailable').map(({ id }) => id),
-      choices: readingChoices(snapshot, preferences.selected) };
+      choices: readingChoices(snapshot, [...(preferences.selected ?? []), ...preferences.series.flatMap(({ readings }) => readings)]) };
   });
-  edit('editor:stats-settings:set', ({ ids, style, layout, wide }) => {
+  edit('editor:stats-settings:set', ({ ids, style, layout, wide, series }) => {
     try {
       const snapshot = ids === null ? null : stats.snapshot({ refresh: false });
-      const preferences = statsSelection.save(ids, snapshot, style, layout, wide);
+      const preferences = statsSelection.save(ids, snapshot, style, layout, wide, series);
       send('stats:preferences', preferences);
       return { ok: true, ...preferences };
     } catch (error) {
@@ -1628,6 +1655,7 @@ function registerIpc() {
   ipcMain.on('renderer:ready', (event) => {
     if (!fromWindow(event, win, RENDERER)) return;
     send('deck:appearance', appearance.current);
+    send('pomodoro:changed', pomodoro.snapshot());
     if (panelMeasurement?.run) send('measurement:state', panelMeasurement.run.state);
     if (liveSensors) send('sensors', { ...liveSensors, history: sensors.history.series });
     if (liveAudio) send('audio', liveAudio);
@@ -1674,7 +1702,7 @@ function start() {
   navigation = new DeckNavigation(path.join(userData, 'deck-navigation.json'), log);
   const power = createPowerEvents(powerMonitor, { log });
   disposables.add('power events', () => power.dispose());
-  pomodoro = new Pomodoro(path.join(userData, 'pomodoro.json'));
+  pomodoro = new Pomodoro(path.join(userData, 'pomodoro.json'), { onChange: (snapshot) => send('pomodoro:changed', snapshot) });
   disposables.add('Pomodoro', () => pomodoro.close());
   power.on('pomodoro', 'resume', () => pomodoro.restoreClock());
   dashboardAgenda = new DashboardAgenda(path.join(userData, 'dashboard-agenda.json'), {
@@ -2056,8 +2084,12 @@ function start() {
       return { x: area.x + Math.round((area.width - width) / 2), y: area.y + Math.round((area.height - height) / 2), width, height };
     } });
     agentApply = new AgentProfileApply({
-      drafts: agentDrafts, history: actionHistory, approve,
+      drafts: agentDrafts, history: actionHistory, approve, openEditor: offerEditorDraft,
       readContext: () => ({ activity: activities.current.id, store, label: ACTIVITIES[activities.current.id] + ' profile' }),
+    });
+    agentChoices = new AgentChoices({ approve, history: actionHistory,
+      canReview: () => Boolean(win && !win.isDestroyed() && win.isVisible() && !win.isMinimized()
+        && !deckSession.blocked && !deckReveal.active && !viewOnly.enabled),
     });
     agentActivitySwitch = new AgentActivitySwitch({ activities, approve, history: actionHistory,
       canReview: () => win && !win.isDestroyed() && win.isVisible() && !win.isMinimized()
@@ -2147,6 +2179,7 @@ function start() {
       projectAllowed: (binding) => agentProjects.grantCurrent(binding),
       onChange() {
         agentApply.checkPending();
+        agentChoices.checkPending();
         agentActivitySwitch.checkPending();
         agentActions.checkPending();
         agentWorkspaceApply.checkPending();
@@ -2197,6 +2230,7 @@ function start() {
           return result;
         },
         profile_changes: (parameters, client, authorized) => agentApply.change(client, parameters, authorized),
+        agent_choice: (parameters, client, authorized) => agentChoices.change(parameters, client, authorized),
         profile_activity: (parameters, client, authorized) => agentActivitySwitch.change(client, parameters, authorized),
         app_view_draft: (parameters, client) => agentAppViewDrafts.change(client.id, activities.current.id, parameters),
         monitoring_draft: (parameters, client) => agentMonitoringDrafts.change(client.id, activities.current.id, parameters),
@@ -2243,6 +2277,7 @@ function start() {
     const setAgentLocked = (locked) => {
       if (locked) agentRuns.clear();
       agentService.setLocked(locked);
+      agentChoices.checkPending();
       agentWorkspaceApply.checkPending();
       agentAudioActions.checkPending();
       agentAudioMuteActions.checkPending();

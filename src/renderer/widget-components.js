@@ -24,7 +24,7 @@
     const svg = document.createElementNS(ns, 'svg');
     const area = document.createElementNS(ns, 'path');
     const line = document.createElementNS(ns, 'path');
-    let overlay;
+    const overlays = [];
     const { chartPaths } = window.LastraStatsChart;
     svg.classList.add('widget-graph');
     area.classList.add('widget-graph-area');
@@ -42,20 +42,21 @@
         area.setAttribute('d', paths.area);
         svg.dataset.chartStyle = style;
       },
-      setOverlay(points, high, expiresAfter, range, style = 'line', stale = false) {
-        if (!points.length) {
-          overlay?.remove();
-          overlay = undefined;
-          return;
+      setOverlays(series) {
+        while (overlays.length > series.length) overlays.pop().remove();
+        for (const [index, { points, high, expiresAfter, range, style, stale }] of series.entries()) {
+          let overlay = overlays[index];
+          if (!overlay) {
+            overlay = document.createElementNS(ns, 'path');
+            overlay.classList.add('widget-graph-overlay');
+            overlay.dataset.series = String(index + 1);
+            svg.append(overlay);
+            overlays.push(overlay);
+          }
+          overlay.dataset.style = style;
+          overlay.toggleAttribute('data-stale', stale);
+          overlay.setAttribute('d', chartPaths(points, high, expiresAfter, range, style).line);
         }
-        if (!overlay) {
-          overlay = document.createElementNS(ns, 'path');
-          overlay.classList.add('widget-graph-overlay');
-          svg.append(overlay);
-        }
-        overlay.dataset.style = style;
-        overlay.toggleAttribute('data-stale', stale);
-        overlay.setAttribute('d', chartPaths(points, high, expiresAfter, range, style).line);
       },
     };
   }

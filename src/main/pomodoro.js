@@ -39,10 +39,11 @@ function readTimer(file) {
 }
 
 class Pomodoro {
-  constructor(file, { wall = Date.now, monotonic = () => performance.now() } = {}) {
+  constructor(file, { wall = Date.now, monotonic = () => performance.now(), onChange = (_state) => {} } = {}) {
     this.file = file;
     this.wall = wall;
     this.monotonic = monotonic;
+    this.onChange = onChange;
     Object.assign(this, readTimer(file));
     if (this.state.status === 'running') this.restoreClock();
   }
@@ -67,6 +68,7 @@ class Pomodoro {
     const remaining = this.due === undefined ? persisted : Math.min(this.remaining(), persisted);
     this.due = this.monotonic() + remaining;
     this.arm();
+    this.onChange(this.snapshot());
   }
 
   arm() {
@@ -79,6 +81,7 @@ class Pomodoro {
       catch { this.warning = writeFailure; }
       this.state = current;
       this.due = undefined;
+      this.onChange(this.snapshot());
     }, Math.max(1, this.remaining())).unref();
   }
 
@@ -122,7 +125,9 @@ class Pomodoro {
     this.due = due;
     this.warning = null;
     this.arm();
-    return this.snapshot();
+    const snapshot = this.snapshot();
+    this.onChange(snapshot);
+    return snapshot;
   }
 
   close() { clearTimeout(this.timer); }

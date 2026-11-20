@@ -8,6 +8,7 @@ const { snapshotInput, snapshotOutput, snapshotParams } = require('./mcp-snapsho
 const { draftInput, draftOutput, draftParams } = require('./mcp-drafts');
 const { appViewDraftInput, appViewDraftOutput, appViewDraftParams } = require('./mcp-app-view-drafts');
 const { applyInput, applyOutput, applyParams } = require('./mcp-apply');
+const { choiceInput, choiceOutput, choiceParams, SCOPE: CHOICES_SCOPE } = require('./mcp-choices');
 const { activitySwitchInput, activitySwitchOutput, activitySwitchParams } = require('./mcp-activity-switch');
 const { scenarioInput, scenarioOutput } = require('./mcp-simulate');
 const { eventInput, eventOutput, eventParams, EventRequestError } = require('./mcp-events');
@@ -129,7 +130,7 @@ const LIVE_OPERATIONS = Object.freeze({
   profile_changes: {
     label: 'Manage profile revisions', target: 'Saved activity profile', scope: 'apply', outputSchema: applyOutput,
     inputSchema: applyInput, parameters: applyParams, example: { command: 'backups' }, effect: 'Request reviewed profile change',
-    description: 'Compare a draft with the active profile or request approval for applying a draft or restoring a backup.',
+    description: 'Compare a draft with the active profile or request approval for applying it, opening its page as an unsaved editor draft, or restoring a backup.',
     destructive: true,
   },
   profile_activity: {
@@ -137,6 +138,13 @@ const LIVE_OPERATIONS = Object.freeze({
     inputSchema: activitySwitchInput, outputSchema: activitySwitchOutput, parameters: activitySwitchParams,
     example: { command: 'inspect' }, effect: 'Request reviewed activity switch',
     description: 'List available activities, request a switch against its inspected revision, and check a caller-owned review outcome.',
+  },
+  agent_choice: {
+    label: 'Request a user decision', target: 'Lastra deck', scope: CHOICES_SCOPE,
+    inputSchema: choiceInput, outputSchema: choiceOutput, parameters: choiceParams,
+    example: { command: 'status', request: '000000000000000000000000' },
+    effect: 'Display an attributed question and return the selected option ID',
+    description: 'Ask a short question with two to five options and their stated effects. Check the answer or cancel by request ID. A selection does not execute an action.',
   },
   events_since: {
     label: 'Read deck events', target: 'Deck events', requiresEvents: true, anyScopes: ['layout', 'providers'], outputSchema: eventOutput,

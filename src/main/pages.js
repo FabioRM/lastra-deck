@@ -4,6 +4,7 @@
 const path = require('node:path');
 const { createHash } = require('node:crypto');
 const { packFor, groupedPackKeys, isInstalledWebApp } = require('./shortcut-packs');
+const { applyShortcutPages } = require('../shared/shortcut-layouts');
 
 const SHORTCUTS = [
   ['find', 'Find', 'search', 'Ctrl+F'],
@@ -59,7 +60,7 @@ function displayName(context) {
   return (spaced[0].toUpperCase() + spaced.slice(1)).slice(0, 48);
 }
 
-function generatedPage(context, grid, { shortcutLanguage, shortcutOverrides }, pack) {
+function generatedPage(context, grid, { shortcutLanguage, shortcutOverrides }, pack, custom) {
   const id = 'auto:' + createHash('sha256').update(context.identity).digest('hex').slice(0, 20);
   const choices = TERMINALS.has(context.executable) ? TERMINAL_SHORTCUTS : SHORTCUTS;
   const generic = () => choices.map(([key, label, icon, chord]) => ({
@@ -67,7 +68,8 @@ function generatedPage(context, grid, { shortcutLanguage, shortcutOverrides }, p
   }));
   const keys = pack ? groupedPackKeys(pack, { ...context, shortcutLanguage, shortcutOverrides }) : generic().slice(0, grid.cols * grid.rows);
   return { id, name: pack?.name ?? displayName(context), pack: pack?.id,
-    apps: context.executable ? [context.executable] : [], keys, widgets: [],
+    apps: context.executable ? [context.executable] : [], keys: custom ? applyShortcutPages(custom, keys) : keys, widgets: [],
+    ...(custom ? { shortcutPages: custom.map(({ id, name }) => ({ id, name })) } : {}),
     generated: true, target: context.identity };
 }
 
@@ -146,8 +148,11 @@ class Pages {
   automaticPage(profile, app) {
     const { cols, rows } = profile.grid;
     const pack = packFor(app, profile.webApps);
-    const key = JSON.stringify([app.identity, cols, rows, app.keyboardLayout, app.mode, profile.shortcutLanguage, pack?.id, profile.shortcutOverrides]);
-    if (this.generated?.key !== key) this.generated = { key, page: generatedPage(app, profile.grid, profile, pack) };
+    const custom = pack && profile.shortcutLayouts?.[pack.id];
+    if (custom?.enabled === false || (this.contextOnly && custom?.enabled !== true)) return null;
+    const key = JSON.stringify([app.identity, cols, rows, app.keyboardLayout, app.mode, profile.shortcutLanguage, pack?.id,
+      profile.shortcutOverrides, custom?.pages]);
+    if (this.generated?.key !== key) this.generated = { key, page: generatedPage(app, profile.grid, profile, pack, custom?.pages) };
     return this.generated.page;
   }
 
@@ -155,7 +160,7 @@ class Pages {
     if (this.locked) {
       if (this.lockedContext) {
         if (sameWindow(this.lockedContext, this.foreground)) this.lockedContext = this.foreground;
-        return { page: this.automaticPage(profile, this.lockedContext), reason: 'locked' };
+        return { page: this.automaticPage(profile, this.lockedContext) ?? this.manualPage(profile), reason: 'locked' };
       }
       return { page: profile.pages.find((page) => page.id === this.lockedId) ?? this.manualPage(profile), reason: 'locked' };
     }
@@ -172,9 +177,9 @@ class Pages {
       this.returningFromContext = true;
       return { page: linked, reason: linked.windowTitle ? 'title' : linked.appIds?.includes(this.foreground.appId) ? 'app-id' : 'executable' };
     }
-    if (this.contextOnly) return { page: this.contextFallback(profile), reason: 'manual' };
-    this.returningFromContext = true;
     const page = this.automaticPage(profile, this.foreground);
+    if (!page) return { page: this.contextFallback(profile), reason: 'manual' };
+    this.returningFromContext = true;
     return { page, reason: page.pack ? 'pack' : 'generic' };
   }
 

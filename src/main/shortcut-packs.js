@@ -286,13 +286,16 @@ function previewPacks(shortcutLanguage) {
     covered.add(owner);
     const starter = starterPackKeys(pack, { shortcutLanguage, mode: pack.previewMode });
     return { id, name, apps: pack.pathContains || pack.windowMode ? [] : pack.executables, appIds: pack.appIds ?? [],
+      starterIds: starter.map((key) => key.id),
       keys: reviewedPackKeys(pack, owner, starter, shortcutLanguage).map((key) => annotateShortcut(pack, key)), catalogVersion: catalog.version,
       source: pack.source, ...(MANIFEST_PACKS.has(id) ? { revision: MANIFEST_REVISION } : id === 'spotify' ? { revision: null } : {}) };
   });
   const web = webPacks.map((pack) => {
     covered.add(pack.id);
-    const keys = reviewedPackKeys(pack, pack.id, starterPackKeys(pack, { shortcutLanguage }), shortcutLanguage);
+    const starter = starterPackKeys(pack, { shortcutLanguage });
+    const keys = reviewedPackKeys(pack, pack.id, starter, shortcutLanguage);
     return { id: pack.id, name: pack.name, apps: [], appIds: [], installedWebApp: true, manifestExample: pack.manifestExample ?? pack.manifests[0],
+      starterIds: starter.map((key) => key.id),
       source: pack.source, catalogVersion: catalog.version, keys: keys.map((key) => ({
         ...annotateShortcut(pack, key), unavailable: key.unavailable ?? 'Available in the matching installed web app.',
       })) };

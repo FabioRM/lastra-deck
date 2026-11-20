@@ -3,8 +3,10 @@
 'use strict';
 
 function sampleStatsHardware() {
-  const cpu = { id: '/intelcpu/0/power/0', kind: 'Cpu', device: 'Example CPU', type: 'Power', name: 'CPU Package', value: 42 };
-  return [cpu, ...[0, 1].flatMap((index) => {
+  const cpu = [
+    ['load', 'CPU Core Max', 84], ['power', 'CPU Package', 42], ['clock', 'CPU Core #1', 4200], ['temperature', 'CPU Package', 61],
+  ].map(([type, name, value]) => ({ id: `/intelcpu/0/${type}/0`, kind: 'Cpu', device: 'Example CPU', type, name, value }));
+  return [...cpu, ...[0, 1].flatMap((index) => {
     const id = '/gpu-nvidia/' + index;
     const row = (type, name, value, sensor = 0) => ({
       id: `${id}/${type}/${sensor}`, kind: 'GpuNvidia', device: 'Example GPU', type, name, value,
@@ -184,4 +186,33 @@ function inspectCustomOverview() {
   }));
 }
 
-module.exports = { sampleStatsHardware, inspectStatsLayout, inspectCustomOverview };
+function inspectChartSeries() {
+  return new Promise((resolve, reject) => requestAnimationFrame(() => {
+    const chart = document.querySelector('#stats-readings .stats-card');
+    const measure = () => {
+      const [primary, power, clock, temperature] = /** @type {NodeListOf<HTMLElement>} */ (chart.querySelectorAll('.stats-series-key'));
+      const overlays = [...chart.querySelectorAll('.widget-graph-overlay')];
+      const area = chart.getBoundingClientRect();
+      const legend = chart.querySelector('.stats-comparison-legend').getBoundingClientRect();
+      return chart.querySelector('h3').textContent === 'CPU Core Max' && !primary.hidden && !power.hidden && !clock.hidden
+        && primary.textContent.includes('0–100 %') && power.textContent.includes(' W') && clock.textContent.includes(' MHz')
+        && !temperature.hidden && temperature.dataset.state === 'unavailable' && overlays.length === 3
+        && overlays.slice(0, 2).every((path) => path.getAttribute('d')) && !overlays[2].getAttribute('d')
+        && legend.height > 0 && legend.bottom <= area.bottom && chart.scrollHeight <= chart.clientHeight + 1;
+    };
+    const root = document.documentElement;
+    const original = root.dataset.textScale;
+    try {
+      const normal = measure();
+      root.dataset.textScale = '125';
+      resolve(normal && measure());
+    } catch (error) {
+      reject(error);
+    } finally {
+      if (original === undefined) delete root.dataset.textScale;
+      else root.dataset.textScale = original;
+    }
+  }));
+}
+
+module.exports = { sampleStatsHardware, inspectStatsLayout, inspectCustomOverview, inspectChartSeries };

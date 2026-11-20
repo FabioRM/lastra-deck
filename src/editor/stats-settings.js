@@ -16,12 +16,18 @@
   const status = byId('stats-settings-status');
   const loadStatus = byId('stats-settings-load');
   const apply = form.querySelector('[type="submit"]');
-  const { style, layout, search } = form.elements;
+  const { style, layout, search, seriesSearch } = form.elements;
+  const seriesEditor = byId('stats-series-editor');
+  const seriesTitle = byId('stats-series-title');
+  const seriesList = byId('stats-series-readings');
+  const seriesCount = byId('stats-series-count');
   const sample = graph(t('Sample of the selected Stats chart style'));
   byId('stats-chart-sample').append(sample.element);
   let settings;
   let selection = new Set();
   let wide = null;
+  let series = new Map();
+  let seriesFor;
   let dragId;
   let defaults = true;
 
@@ -36,7 +42,7 @@
   localizeOptions();
   document.addEventListener('lastra-language', () => {
     localizeOptions();
-    if (settings) { renderList(); renderBoard(); }
+    if (settings) { renderList(); renderBoard(); renderSeries(); }
   });
 
   function updateChart() {
@@ -48,9 +54,13 @@
     const { limit } = settings;
     count.textContent = t('{count} of {limit} selected', { count: selection.size, limit }) + (defaults ? ' · ' + t('Default readings') : '');
     apply.disabled = !defaults && !selection.size;
-    for (const input of list.querySelectorAll('input')) {
-      input.checked = selection.has(input.value);
-      input.disabled = !input.checked && selection.size >= limit;
+    updateListChecks(list, selection, limit);
+  }
+
+  function updateListChecks(container, picked, limit) {
+    for (const input of container.querySelectorAll('input')) {
+      input.checked = picked.has(input.value);
+      input.disabled = !input.checked && picked.size >= limit;
     }
   }
 
@@ -82,7 +92,18 @@
         const control = { earlier, later, size: resize }[focusAction];
         target = control && !control.disabled ? control : resize;
       }
-      actions.append(earlier, later, resize);
+      const seriesButton = button(t('Chart series') + (series.get(id)?.size ? ` (${series.get(id).size})` : ''), () => {
+        const opening = seriesFor !== id;
+        seriesFor = opening ? id : undefined;
+        seriesSearch.value = '';
+        renderSeries();
+        renderBoard(id, 'series');
+        if (opening) seriesSearch.focus();
+      }, { label: t('Edit chart series for {name}', { name }) });
+      seriesButton.setAttribute('aria-expanded', String(seriesFor === id));
+      seriesButton.setAttribute('aria-controls', seriesEditor.id);
+      if (id === focusId && focusAction === 'series') target = seriesButton;
+      actions.append(earlier, later, resize, seriesButton);
       card.append(element('strong', { text: name, title: name }), actions);
       card.addEventListener('dragstart', (event) => {
         dragId = id;
@@ -124,8 +145,7 @@
     renderBoard(id, focusAction);
   }
 
-  function renderList() {
-    const matches = searchSensors(settings.choices, search.value);
+  function renderReadings(container, matches) {
     const selectable = (row) => {
       const label = element('label', 'stats-settings-reading');
       label.toggleAttribute('data-unavailable', row.status === 'unavailable');
@@ -139,11 +159,34 @@
     };
     const available = matches.filter((row) => row.status !== 'unavailable');
     const unavailable = matches.filter((row) => row.status === 'unavailable');
-    list.replaceChildren(...available.map(selectable));
-    if (unavailable.length) list.append(element('h4', 'stats-unavailable-heading', t('Unavailable readings')),
+    container.replaceChildren(...available.map(selectable));
+    if (unavailable.length) container.append(element('h4', 'stats-unavailable-heading', t('Unavailable readings')),
       ...unavailable.map(selectable));
-    if (!matches.length) list.append(element('p', 'muted', t('No matching readings.')));
+    if (!matches.length) container.append(element('p', 'muted', t('No matching readings.')));
+  }
+
+  function renderList() {
+    renderReadings(list, searchSensors(settings.choices, search.value));
     updateChecks();
+  }
+
+  function renderSeries() {
+    const primary = settings.choices.find(({ id }) => id === seriesFor);
+    seriesEditor.hidden = !primary || !selection.has(seriesFor);
+    if (seriesEditor.hidden) return;
+    seriesTitle.textContent = t('Chart series for {name}', { name: t(primary.name) });
+    const picked = series.get(seriesFor) ?? new Set();
+    const rank = (row) => picked.has(row.id) ? 0
+      : primary.deviceId && row.deviceId === primary.deviceId ? 1 : row.group === primary.group ? 2 : 3;
+    const rows = searchSensors(settings.choices.filter(({ id }) => id !== seriesFor), seriesSearch.value)
+      .sort((a, b) => rank(a) - rank(b));
+    renderReadings(seriesList, rows);
+    updateSeriesChecks(picked);
+  }
+
+  function updateSeriesChecks(picked) {
+    seriesCount.textContent = t('{count} of {limit} additional readings', { count: picked.size, limit: settings.seriesLimit });
+    updateListChecks(seriesList, picked, settings.seriesLimit);
   }
 
   async function load({ keepDraft = false } = {}) {
@@ -155,12 +198,14 @@
         defaults = settings.selected === null;
         selection = new Set(defaults ? settings.defaults : settings.selected.map(({ id }) => id));
         wide = Array.isArray(settings.wide) ? new Set(settings.wide) : null;
+        series = new Map(settings.series.map(({ id, readings }) => [id, new Set(readings.map((row) => row.id))]));
         style.value = settings.style;
         layout.value = settings.layout;
       } else if (defaults) selection = new Set(settings.defaults);
       updateChart();
       renderList();
       renderBoard();
+      renderSeries();
       status.textContent = settings.warning ?? '';
       loadStatus.textContent = '';
     } catch {
@@ -173,29 +218,50 @@
   details.addEventListener('toggle', () => { if (details.open && !settings) void load(); });
   style.addEventListener('change', updateChart);
   search.addEventListener('input', renderList);
+  seriesSearch.addEventListener('input', renderSeries);
+  seriesList.addEventListener('change', ({ target }) => {
+    const picked = series.get(seriesFor) ?? new Set();
+    if (target.checked && picked.size < settings.seriesLimit) picked.add(target.value);
+    else picked.delete(target.value);
+    if (picked.size) series.set(seriesFor, picked);
+    else series.delete(seriesFor);
+    defaults = false;
+    updateChecks();
+    updateSeriesChecks(picked);
+    renderBoard();
+  });
   list.addEventListener('change', ({ target }) => {
     defaults = false;
     if (target.checked && selection.size < settings.limit) selection.add(target.value);
     else {
       selection.delete(target.value);
       wide?.delete(target.value);
+      series.delete(target.value);
+      if (seriesFor === target.value) seriesFor = undefined;
     }
     updateChecks();
     renderBoard();
+    renderSeries();
   });
   byId('stats-settings-clear').addEventListener('click', () => {
     defaults = false;
     selection.clear();
     wide = null;
+    series.clear();
+    seriesFor = undefined;
     renderList();
     renderBoard();
+    renderSeries();
   });
   byId('stats-settings-defaults').addEventListener('click', () => {
     defaults = true;
     selection = new Set(settings.defaults);
     wide = null;
+    series.clear();
+    seriesFor = undefined;
     renderList();
     renderBoard();
+    renderSeries();
   });
   byId('stats-settings-refresh').addEventListener('click', () => void load({ keepDraft: true }));
   form.addEventListener('submit', async (event) => {
@@ -204,7 +270,7 @@
     form.inert = true;
     try {
       const result = await api.setStatsSettings({ ids: defaults ? null : [...selection], style: style.value, layout: layout.value,
-        wide: wide === null ? null : [...wide] });
+        wide: wide === null ? null : [...wide], series: [...series].map(([id, readings]) => ({ id, readings: [...readings] })) });
       if (!result.ok) throw new Error(result.message);
       status.textContent = window.LastraI18n.t('Stats settings saved and applied to the deck.');
     } catch (error) {

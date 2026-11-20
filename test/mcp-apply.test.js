@@ -14,7 +14,7 @@ const { tempDir } = require('./helpers/temp-dir');
 const client = { id: 'agent123-fixture' };
 const initial = { version: 2, name: 'Original', pages: [{ id: 'home', keys: [] }] };
 
-function fixture(t, { timeout } = {}) {
+function fixture(t, { timeout, openEditor } = {}) {
   let store;
   t.after(() => store?.close());
   const dir = tempDir(t, 'lastra-profile-approval-');
@@ -27,7 +27,7 @@ function fixture(t, { timeout } = {}) {
   const reviews = [];
   let grant = true;
   const changes = new AgentProfileApply({
-    drafts, history, timeout,
+    drafts, history, timeout, openEditor,
     readContext: () => ({ activity: 'main', label: 'Main profile', store }),
     approve: (proposal) => new Promise((resolve) => {
       reviews.push({ proposal, answer: resolve });
@@ -71,6 +71,32 @@ test('a reviewed draft applies exactly once and a validated backup can restore t
   assert.equal(store.current.name, 'Original');
   assert.equal(history.snapshot().entries.length, 2);
   assert.doesNotMatch(JSON.stringify(history.snapshot()), /Revised|Original/);
+});
+
+test('the editor handoff stages the reviewed page and current draft revision with no profile write', async (t) => {
+  const opened = [];
+  const { store, drafts, reviews, command } = fixture(t, { openEditor: (plan) => opened.push(plan) });
+  const original = store.editorSnapshot();
+  const draft = drafts.create(client.id, 'main', original.profile, original.token);
+  const edited = drafts.edit(client.id, 'main', draft.id, draft.revision, [{ op: 'add-page', id: 'research', name: 'Research' }]);
+  const params = { command: 'open-editor', draft: edited.id, revision: edited.revision, page: 'research' };
+  assert.throws(() => command({ ...params, page: 'missing' }), /page is unavailable/);
+  const pending = command(params);
+  assert.equal(reviews[0].proposal.editorOnly, true);
+  assert.equal(reviews[0].proposal.page, 'Research');
+  reviews[0].answer('editor');
+  await turn();
+  assert.equal(command({ command: 'status', request: pending.request }).status, 'sent-to-editor');
+  assert.equal(opened[0].page.id, 'research');
+  assert.equal(store.editorSnapshot().token, original.token);
+  assert.equal(store.current.pages.length, 1);
+
+  const stale = command(params);
+  drafts.edit(client.id, 'main', draft.id, edited.revision, [{ op: 'remove-page', page: 'research' }]);
+  reviews[1].answer('editor');
+  await turn();
+  assert.equal(command({ command: 'status', request: stale.request }).status, 'conflict');
+  assert.equal(opened.length, 1);
 });
 
 test('a changed disk revision or a revoked grant closes review before writing', async (t) => {

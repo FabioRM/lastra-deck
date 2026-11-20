@@ -64,6 +64,7 @@
         ...(reason ? { unavailable: reason } : {}),
         ...(key.span ? { span: key.span } : {}),
         ...(shortcutGroups && !prefix && key.group ? { group: key.group } : {}),
+        ...(shortcutGroups && !prefix && key.shortcutPage ? { shortcutPage: key.shortcutPage } : {}),
         audio,
         ...(key.controlId ? { controlId: key.controlId } : {}),
         ...(liveSource ? { liveSource } : {}),
@@ -85,6 +86,7 @@
     return {
       name: profile.name, locale: profile.locale, grid, gestures: profile.gestures,
       ...(shortcutGroups ? { shortcutGroups } : {}),
+      ...(page.shortcutPages ? { shortcutPages: page.shortcutPages } : {}),
       slots, editingKeys: editingKeys.map((key) => surfaceKey(key)), widgets: (page.widgets ?? []).map(surfaceWidget), bar: {
         keys: (profile.bar?.keys ?? []).map((key) => surfaceKey(effectiveKey(key), 'bar:')),
         widgets: (profile.bar?.widgets ?? []).map(surfaceWidget),

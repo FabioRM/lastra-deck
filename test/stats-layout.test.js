@@ -37,3 +37,15 @@ test('combined power graphs preserve separately scaled readings and match only c
   assert.deepEqual(scales.get('power:%'), { low: 0, high: 100 });
   assert.deepEqual(scales.get('power:W'), { low: 0, high: 200 });
 });
+
+test('custom chart series share scales by unit even across different Stats groups', () => {
+  const rows = [
+    { group: 'cpu', unit: '%', value: 39, points: [[0, 95]] },
+    { group: 'cpu', unit: 'W', value: 24, points: [[0, 46]] },
+    { group: 'gpu', unit: 'W', value: 145, points: [[0, 188]] },
+    { group: 'cpu', unit: 'MHz', value: 4100, points: [[0, 4210]] },
+  ];
+  assert.deepEqual([...statsScales(rows, ({ unit }) => unit)], [
+    ['%', { low: 0, high: 100 }], ['W', { low: 0, high: 200 }], ['MHz', { low: 0, high: 4500 }],
+  ]);
+});

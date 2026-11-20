@@ -5,7 +5,8 @@ const { toView, validateProfile } = require('./profile');
 const { projectEditingPage, projectShortcutGroups } = require('../shared/editing-keys');
 
 function describeLayoutView(view, page, portrait, largeKeys = false) {
-  const { cols, rows, editing, sheets } = view.shortcutGroups ? projectShortcutGroups(view.grid, view.slots, portrait, largeKeys)
+  const { cols, rows, editing, sheets } = view.shortcutGroups
+    ? projectShortcutGroups(view.grid, view.slots, portrait, largeKeys, view.shortcutPages)
     : projectEditingPage(view.grid, view.slots, view.widgets, portrait, largeKeys);
   return {
     page, orientation: portrait ? 'portrait' : 'landscape', grid: { cols, rows },

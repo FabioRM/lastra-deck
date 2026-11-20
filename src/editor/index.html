@@ -129,6 +129,12 @@
           <h3>Overview layout</h3>
           <p class="muted">Drag the cards or use the arrows to reorder them. A wide card spans two columns.</p>
           <div id="stats-overview-board" role="group" aria-label="Overview layout"></div>
+          <section id="stats-series-editor" aria-labelledby="stats-series-title" hidden>
+            <h3 id="stats-series-title">Chart series</h3>
+            <label class="field">Find chart readings<input name="seriesSearch" type="search" placeholder="Power, temperature, frequency…"></label>
+            <p id="stats-series-count" class="muted" aria-live="polite"></p>
+            <div id="stats-series-readings" role="group" aria-labelledby="stats-series-title"></div>
+          </section>
           <div class="deck-settings-fields">
             <button id="stats-settings-clear" type="button">Clear selection</button>
             <button id="stats-settings-defaults" type="button">Use default readings</button>
@@ -188,6 +194,10 @@
       <div class="page-sidebar-heading">
         <h2 id="editor-profile-name">Profile</h2>
         <p id="status" role="status"></p>
+        <div id="agent-draft-offer" hidden>
+          <p class="muted">An agent draft is ready to review.</p>
+          <button id="agent-draft-open" type="button">Open agent draft</button>
+        </div>
       </div>
       <div class="page-sidebar-list">
         <div class="page-sidebar-title"><h3>Pages</h3><button id="add-page" type="button" title="New page" aria-label="New page">+</button></div>
@@ -399,7 +409,7 @@
   </dialog>
   <dialog id="shortcut-packs" aria-labelledby="shortcut-packs-title">
     <div class="palette-heading">
-      <h2 id="shortcut-packs-title">Shortcut packs</h2>
+      <h2 id="shortcut-packs-title">App shortcuts</h2>
       <button id="close-shortcut-packs" class="quiet" type="button">Close</button>
     </div>
     <div class="shortcut-library-filters">
@@ -410,6 +420,11 @@
       <label class="field">Platform<select id="shortcut-platform" disabled></select></label>
       <label class="field">Context<select id="shortcut-context" disabled></select></label>
     </div>
+    <details id="shortcut-page-config" hidden>
+      <summary>Configure app shortcut pages</summary>
+      <div data-shortcut-pages></div>
+      <p role="status" class="muted"></p>
+    </details>
     <div class="shortcut-pack-details">
       <div class="shortcut-library-results">
         <ul id="shortcut-pack-keys" aria-label="Matching shortcuts"></ul>
@@ -516,6 +531,8 @@
   <script src="preview-layout.js"></script>
   <script src="preview-layout-controls.js"></script>
   <script src="../shared/shortcut-library.js"></script>
+  <script src="../shared/shortcut-layouts.js"></script>
+  <script src="shortcut-pages.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

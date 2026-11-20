@@ -35,6 +35,24 @@ test('hardware throughput keeps the same unit across managed and HTTP sources', 
   assert.equal(http.unit, 'MiB/s');
 });
 
+test('CPU voltage and current retain their units and values as independent readings', () => {
+  const sample = { hardwareAt: 1_000 };
+  const expected = [['V', 1.235], ['A', 32.9]];
+  const rows = (entries) => entries.map(({ unit, value }) => [unit, value]);
+  const sensors = [
+    { id: '/intelcpu/0/voltage/0', kind: 'Cpu', type: 'Voltage', name: 'CPU Core', value: 1.235 },
+    { id: '/intelcpu/0/current/0', kind: 'Cpu', type: 'Current', name: 'CPU Core', value: 32.9 },
+  ];
+  const managed = hardwareReadings(sample, sensors).entries;
+  assert.deepEqual(rows(managed), expected);
+  assert.ok(managed.every(({ deviceId, group }) => deviceId === '/intelcpu/0' && group === 'cpu'));
+  const http = parseLhmReadings({ Children: [
+    { SensorId: sensors[0].id, Text: 'CPU Core', Value: '1,235 V' },
+    { SensorId: sensors[1].id, Text: 'CPU Core', Value: '32,9 A' },
+  ] });
+  assert.deepEqual(rows(hardwareReadings({ ...sample, hardwareSource: 'http' }, http).entries), expected);
+});
+
 test('Stats shows actual watts separately from load and avoids pairing sensors from different GPUs', () => {
   let now = 5_000;
   const sample = { cpu: .21, gpu: .63, sampledAt: 5_000, hardwareAt: 5_000 };

@@ -34,8 +34,10 @@
   const { STATS_LAYOUTS, hasStatsLayout } = window.LastraStatsChart;
   const cards = new Map();
   const buttons = new Map();
-  const numberFormat = () => new Intl.NumberFormat(document.documentElement.lang, { maximumFractionDigits: 1 });
+  const numberFormat = (maximumFractionDigits = 1) => new Intl.NumberFormat(document.documentElement.lang, { maximumFractionDigits });
   let formatter = numberFormat();
+  let voltageFormatter = numberFormat(3);
+  const formatValue = ({ value, unit }) => (unit === 'V' ? voltageFormatter : formatter).format(value);
   let group = 'overview';
   let selectedDevice;
   let page = 0;
@@ -79,24 +81,30 @@
     chartFooter.append(dashboard, scale);
     const chart = element('div', 'stats-chart');
     const comparisonLegend = element('div', 'stats-comparison-legend');
-    const loadLegend = element('span', 'stats-load-legend');
-    const wattsLegend = element('span', 'stats-power-legend');
+    const legendRows = Array.from({ length: 4 }, (_, index) => {
+      const root = element('span', 'stats-series-key');
+      root.dataset.series = String(index);
+      const name = element('span', 'stats-series-name');
+      const value = element('span', 'stats-series-value');
+      root.append(name, value);
+      return { root, name, value };
+    });
     comparisonLegend.hidden = true;
-    comparisonLegend.append(loadLegend, wattsLegend);
+    comparisonLegend.append(...legendRows.map(({ root }) => root));
     chart.append(history.element, comparisonLegend, chartFooter);
     const root = element('article', 'stats-card');
     root.append(title, device, headline, chart, source, freshness);
     const value = { root, title, device, number, unit, watts, source, freshness, summary, sampleTime, history, scale, dashboard,
-      comparisonLegend, loadLegend, wattsLegend };
+      comparisonLegend, legendRows };
     dashboard.addEventListener('click', () => { void timeline?.openDashboard(value.range); });
     cards.set(item.id, value);
     return value;
   }
 
-  function updateCard(item, now, distinguishDevice = false, comparison) {
+  function updateCard(item, now, distinguishDevice = false, overlays = [], powerView = false) {
     const current = card(item);
     const { root, title, device, number, unit, watts, source, freshness, summary, sampleTime, history, scale, dashboard,
-      comparisonLegend, loadLegend, wattsLegend } = current;
+      comparisonLegend, legendRows } = current;
     const available = item.status !== 'unavailable';
     root.dataset.state = item.status;
     root.dataset.group = item.group;
@@ -106,9 +114,9 @@
     const deviceLabel = distinguishDevice ? `${item.device} · ${item.deviceId}` : item.device ?? '';
     text(device, group === 'overview' || group === 'power' ? deviceLabel : '');
     if (device.title !== deviceLabel) device.title = deviceLabel;
-    text(number, available ? formatter.format(item.value) : 'N/A');
+    text(number, available ? formatValue(item) : 'N/A');
     text(unit, available ? item.unit : '');
-    const power = comparison ?? item.watts;
+    const power = powerView ? overlays[0] : overlays.some(({ unit }) => unit === 'W') ? null : item.watts;
     watts.hidden = !power || power.status === 'unavailable';
     if (!watts.hidden) {
       const value = formatter.format(power.value) + ' W';
@@ -118,8 +126,7 @@
       watts.title = [t('Measured power') + freshness, lastReading(power.sampledAt ?? power.at)].filter(Boolean).join(' · ');
       watts.setAttribute('aria-label', watts.title + ' · ' + value);
     }
-    const detailText = available ? item.source : comparison?.status !== 'unavailable' && comparison?.source
-      ? comparison.source : t(item.reason || 'The selected sensor is disconnected.');
+    const detailText = available ? item.source : t(item.reason || 'The selected sensor is disconnected.');
     text(source, detailText);
     source.title = detailText;
     const cached = item.status === 'stale';
@@ -139,30 +146,52 @@
       summary.removeAttribute('title');
       summary.removeAttribute('aria-description');
     }
-    const values = item.points.map(([, value]) => value).filter(Number.isFinite);
-    const comparePoints = comparison?.points ?? [];
-    const countCompared = comparePoints.filter(([, value]) => Number.isFinite(value)).length;
+    const compared = overlays.length > 0;
+    const series = [item, ...overlays];
+    const unitScales = compared ? statsScales(series, ({ unit }) => unit) : null;
+    const windowMs = Math.max(60_000, ...series.map(({ chartWindow }) => chartWindow ?? 60_000));
+    current.range = chartRange(now, windowMs);
+    const lines = series.map((reading, index) => {
+      const points = reading.points;
+      const count = points.filter(([, value]) => Number.isFinite(value)).length;
+      const { low, high } = (compared ? unitScales.get(reading.unit) : scales.get(scaleKey(reading))) ?? { low: 0, high: 1 };
+      const style = compared && count === 1 ? 'points' : index ? 'line' : preferences.style;
+      return { points, count, low, high, style, stale: reading.status === 'stale',
+        range: { low, ...current.range }, expiresAfter: reading.chartGap ?? reading.maxAge };
+    });
+    const first = lines[0];
     const singleSample = preferences.style === 'bars' || preferences.style === 'points';
-    history.element.toggleAttribute('data-empty', !countCompared && values.length < (singleSample || comparison ? 1 : 2));
-    const { low, high } = scales.get(scaleKey(item)) ?? { low: 0, high: item.unit === '%' ? 100 : 1 };
-    scale.hidden = Boolean(comparison) || values.length < 2;
-    text(scale, `${formatter.format(low)} – ${formatter.format(high)} ${item.unit}`);
-    const chartLabel = item.chartLabel ? `${item.chartLabel.toLowerCase()}, averages` : 'last 60 seconds';
-    current.range = chartRange(now, item.chartWindow);
-    history.update(item.points, high, item.chartGap ?? item.maxAge, { low, ...current.range },
-      comparison && values.length === 1 ? 'points' : preferences.style);
-    comparisonLegend.hidden = !comparison;
-    if (comparison) {
-      const wattsScale = scales.get(scaleKey(comparison)) ?? { low: 0, high: 1 };
-      history.setOverlay(comparePoints, wattsScale.high, comparison.chartGap ?? comparison.maxAge,
-        { low: wattsScale.low, ...current.range }, countCompared > 1 ? 'line' : 'points', comparison.status === 'stale');
-      text(loadLegend, t('Load') + ' · 0–100 %');
-      const range = `${formatter.format(wattsScale.low)}–${formatter.format(wattsScale.high)} W`;
-      text(wattsLegend, countCompared ? t('Power') + ' · ' + range : t('Power history unavailable'));
-    } else history.setOverlay([]);
+    history.element.toggleAttribute('data-empty', !lines.slice(1).some(({ count }) => count) && first.count < (singleSample || compared ? 1 : 2));
+    scale.hidden = compared || first.count < 2;
+    const scaleLabel = (line, unit) => `${formatter.format(line.low)}–${formatter.format(line.high)} ${unit}`;
+    text(scale, scaleLabel(first, item.unit));
+    const rangeLabel = series.find(({ chartLabel }) => chartLabel)?.chartLabel;
+    const chartLabel = rangeLabel ? `${t(rangeLabel)}, ${t('Averages')}` : t('Last minute');
+    history.update(first.points, first.high, first.expiresAfter, first.range, first.style);
+    history.setOverlays(lines.slice(1));
+    comparisonLegend.hidden = !compared;
+    comparisonLegend.toggleAttribute('data-power', powerView);
+    const legends = [];
+    for (const [index, entry] of legendRows.entries()) {
+      const reading = series[index];
+      entry.root.hidden = !compared || !reading;
+      if (entry.root.hidden) continue;
+      const name = powerView ? t(index ? 'Power' : 'Load') : t(reading.name);
+      const value = Number.isFinite(reading.value) && reading.status !== 'unavailable'
+        ? `${formatValue(reading)} ${reading.unit}` : t('Unavailable');
+      const axis = lines[index].count ? scaleLabel(lines[index], reading.unit) : t('History unavailable');
+      const freshness = reading.status === 'stale' ? t('Cached') : '';
+      const recent = windowMs > 60_000 && !reading.chartWindow ? t('Last minute') : '';
+      const detail = [name, reading.device, value, axis, freshness, recent].filter(Boolean).join(' · ');
+      text(entry.name, name);
+      text(entry.value, powerView ? axis : lines[index].count ? `${value} · ${axis}` : value);
+      if (entry.root.title !== detail) entry.root.title = detail;
+      entry.root.dataset.state = reading.status;
+      legends.push(detail);
+    }
     const events = timeline?.draw(history.element, current.range) ?? 0;
     const annotations = events ? `, ${events} timeline ${events === 1 ? 'event' : 'events'}` : '';
-    const scalesLabel = comparison ? loadLegend.textContent + '. ' + wattsLegend.textContent : scale.textContent;
+    const scalesLabel = compared ? legends.join('. ') : scale.textContent;
     history.element.setAttribute('aria-label', `${label}, ${chartLabel}, ${scalesLabel}${annotations}`);
     dashboard.hidden = !timeline?.canOpenDashboard;
     if (!dashboard.hidden) dashboard.setAttribute('aria-label', `Open ${label}, ${chartLabel}, in Grafana`);
@@ -285,7 +314,9 @@
     if (group === 'overview') {
       const preferred = preferredOverview(snapshot, preferences.selected);
       const items = preferences.selected === null ? visibleItems(preferred) : preferred;
-      timeline?.setRange(chartRange(now, Math.max(60_000, ...items.map((item) => item.chartWindow ?? 60_000))));
+      const comparisons = new Map((preferences.series ?? []).map(({ id, readings }) => [id, preferredOverview(snapshot, readings)]));
+      const graphed = [...items, ...[...comparisons.values()].flat()];
+      timeline?.setRange(chartRange(now, Math.max(60_000, ...graphed.map((item) => item.chartWindow ?? 60_000))));
       detailControls.hidden = true;
       readings.toggleAttribute('data-compact-selection', !customOverview && items.length < 5);
       readings.style.setProperty('--stats-selection-columns', String(Math.max(1, items.length)));
@@ -293,7 +324,7 @@
       syncChildren(readings, items.map((item) => {
         const sameName = item.device && item.deviceId
           && items.some((other) => item.device === other.device && other.deviceId && item.deviceId !== other.deviceId);
-        const card = updateCard(item, now, sameName);
+        const card = updateCard(item, now, sameName, comparisons.get(item.id));
         card.toggleAttribute('data-wide', customOverview && preferences.wide.includes(item.id));
         return card;
       }));
@@ -304,7 +335,7 @@
       const items = snapshot.readings.filter((item) => item.group === 'power');
       syncChildren(readings, combined
         ? powerPairs(items).filter(({ load, watts }) => visibleItems([load, watts]).length)
-          .map(({ load, watts }) => updateCard(load, now, false, watts))
+          .map(({ load, watts }) => updateCard(load, now, false, [watts], true))
         : visibleItems(items).map((item) => updateCard(item, now)));
     } else {
       readings.removeAttribute('data-compact-selection');
@@ -339,7 +370,12 @@
 
   const feed = window.createVisibleFeed(() => api.readStats(group === 'overview' ? Number(historySelect.value) : undefined), render,
     { interval: 1_000, error: 'Could not read telemetry.' });
-  document.addEventListener('lastra-language', () => { formatter = numberFormat(); localizeLayouts(); render(snapshot); });
+  document.addEventListener('lastra-language', () => {
+    formatter = numberFormat();
+    voltageFormatter = numberFormat(3);
+    localizeLayouts();
+    render(snapshot);
+  });
   historySelect.addEventListener('change', () => feed.reload());
   let visible = false;
   let sessionBlocked = document.getElementById('windows-session-cover').open;

@@ -103,6 +103,7 @@ function grantDetail(scopes, { profile, durationMs, project }) {
     + (scopes.includes('workspace-actions') ? '\nEach arrangement of existing windows needs your approval on the deck.' : '')
     + (scopes.includes('workspace-targets') ? '\nEach request to open a saved app or focus a reviewed window needs your approval on the deck.' : '')
     + (scopes.includes('workspace-external') ? '\nEach PowerToys workspace needs your approval before it can open apps or move windows.' : '')
+    + (scopes.includes('agent-choices') ? '\nThe client can ask a question on the deck and receive your answer.' : '')
     + '\n\nLastra will copy the local MCP configuration for this Windows user.';
 }
 
@@ -171,7 +172,7 @@ function agentMenu({ agent, activity, dialog, clipboard, root, refresh }) {
       { label: agentService.locked ? 'Windows session unavailable' : `${connected.size} connected`, enabled: false },
       {
         label: 'Grant access', enabled: grantEnabled,
-        submenu: [['layout'], ['providers'], ['layout', 'providers'], ['drafts'], ['layout', 'drafts'], ['drafts', 'apply'], ['drafts', 'telemetry'],
+        submenu: [['layout'], ['providers'], ['layout', 'providers'], ['drafts'], ['layout', 'drafts'], ['drafts', 'apply'], ['drafts', 'telemetry'], ['agent-choices'],
           ['profile-switch'], ['layout', 'navigate'], ['layout', 'actions'], ['telemetry'], ['audio'], ['media'], ['spotify'], ['obs'],
           ['telemetry', 'alert-actions'], ['obs', 'obs-actions'], ['obs', 'obs-output-actions'],
           ['audio', 'audio-actions'], ['audio', 'audio-mute'], ['audio', 'audio-routing'], ['audio', 'audio-app-level'], ['workspaces'],

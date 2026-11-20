@@ -122,7 +122,9 @@ The tool works on drafts supplied by the client under its current activity grant
 
 Grant **Draft edits and Request profile changes** to a client that needs to submit a profile for review. Fork the active saved profile and keep its draft revision. Call `profile_changes` with `command:"compare"`, `draft`, and `revision` to read the affected fields.
 
-Call `profile_changes` with `command:"apply"` and the same draft and revision. Lastra opens a local review on the deck with the client, activity, and current and proposed values. Select **Approve once** to save or **Cancel** to decline. The request expires after 90 seconds. A disk revision, draft, activity, connection, or grant change cancels the approval or reports a conflict.
+Call `profile_changes` with `command:"apply"` and the same draft and revision. Lastra opens a local review on the deck with the client, activity, and current and proposed values. Select **Approve once** to save, **Open in editor** to review without saving, or **Cancel** to decline. For an editor-only request, use `command:"open-editor"`. Both requests accept an optional `page` ID to select the affected page. The request expires after 90 seconds. A disk revision, draft, activity, connection, or grant change cancels the approval or reports a conflict.
+
+For a standalone decision, grant **Request choices on the Lastra deck** for the activity and call `agent_choice` with `command: "request"`, a `question`, a named `target`, and two to five `choices`. Each choice has an `id`, `label`, and intended `effect`. The deck displays the agent, target and options. Lastra returns the selected ID to the requesting client. A separate reviewed action is required to make a change. Call `agent_choice` with `command: "status"` or `"cancel"` and the returned `request` ID. The request closes after 60 seconds or when the grant, session or deck becomes unavailable.
 
 #### Switch the active activity
 

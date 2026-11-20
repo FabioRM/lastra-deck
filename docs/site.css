@@ -47,6 +47,9 @@ h1 { margin-block: .65rem 1.25rem; font-size: clamp(2.65rem, 7vw, 5.5rem); lette
 .deck a, .feature-image { display: block; border-radius: .7rem; }
 .deck img, .feature-image img { width: 100%; border: 1px solid #53636d; border-radius: inherit; box-shadow: 0 16px 40px #0004; }
 .deck figcaption { margin-top: .65rem; color: var(--muted); font-size: .875rem; }
+.toolbar-detail { display: flex; flex-wrap: wrap; align-items: center; gap: .65rem 1.15rem; margin-top: 1rem; color: var(--muted); font-size: .875rem; }
+.toolbar-detail img { border: 1px solid var(--border); border-radius: .5rem; }
+.feature-image + .feature-image { margin-top: 1.15rem; }
 
 .features { background: var(--surface); border-block: 1px solid var(--border); padding-block: clamp(2.75rem, 5vw, 5rem); }
 h2 { font-size: clamp(1.85rem, 4.5vw, 3rem); letter-spacing: -.055em; }

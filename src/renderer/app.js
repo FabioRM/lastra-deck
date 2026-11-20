@@ -409,7 +409,7 @@
   function gridSignature() {
     if (signedProfile !== profile) {
       signedProfile = profile;
-      profileSignature = JSON.stringify([window.LastraI18n.language, !api && profile.editorLayout, profile.shortcutGroups, profile.grid, profile.slots,
+      profileSignature = JSON.stringify([window.LastraI18n.language, !api && profile.editorLayout, profile.shortcutGroups, profile.shortcutPages, profile.grid, profile.slots,
         profile.widgets, profile.editingKeys, profile.gestures, profile.viewOnly, profile.page, profile.activity?.active]);
     }
     return profileSignature;
@@ -438,7 +438,7 @@
         const placement = projectPage(profile.grid, profile.slots, profile.widgets ?? [], profile.grid.cols);
         quickLayout = { ...profile.grid, sheets: [placement], editing: [] };
       } else if (profile.shortcutGroups) {
-        quickLayout = projectShortcutGroups(profile.grid, profile.slots, portrait, large);
+        quickLayout = projectShortcutGroups(profile.grid, profile.slots, portrait, large, profile.shortcutPages);
       } else {
         quickLayout = projectEditingPage(profile.grid, profile.slots, profile.widgets ?? [], portrait, large);
       }
@@ -452,14 +452,16 @@
     updatePageNavigation();
     const { cols, rows } = quickLayout;
     const { rowGap, columnGap } = getComputedStyle(keysEl);
+    const horizontalGap = parseFloat(columnGap);
     const gridHeight = deck.clientHeight - pageNav.offsetHeight;
     const key = Math.min((gridHeight - (rows - 1) * parseFloat(rowGap)) / rows,
-      (deck.clientWidth - (cols - 1) * parseFloat(columnGap)) / cols);
+      (deck.clientWidth - (cols - 1) * horizontalGap) / cols);
     const cell = Math.max(1, Math.floor(key));
     keysEl.style.setProperty('--cols', cols);
     keysEl.style.setProperty('--key', `${cell}px`);
+    pageNav.style.setProperty('--key-grid-width', `${cols * cell + (cols - 1) * horizontalGap}px`);
     if (!api && profile.editorLayout) viewSource.updateGeometry(keysEl, {
-      cols, rows, cell, rowGap: parseFloat(rowGap), columnGap: parseFloat(columnGap), scale, revision: profile.revision,
+      cols, rows, cell, rowGap: parseFloat(rowGap), columnGap: horizontalGap, scale, revision: profile.revision,
     });
   }
 
@@ -1234,11 +1236,13 @@
     const automatic = profile.generatedPage === true;
     const count = quickLayout?.sheets.length ?? 1;
     const group = quickLayout?.sheets[quickSheet]?.group;
-    const part = count > 1 ? [group, `Keys ${quickSheet + 1} / ${count}`].filter(Boolean).join(' · ') : '';
+    const part = count > 1 ? [group, t('Keys {index} / {count}', { index: quickSheet + 1, count })].filter(Boolean).join(' · ')
+      : profile.shortcutPages ? group || '' : '';
     pageCount.textContent = profile.targetUnavailable ? [t('Target inactive'), part].filter(Boolean).join(' · ')
       : part || (automatic ? t('Auto') : profile.pages.length > 1 ? `${index + 1} / ${profile.pages.length}`
         : ['title', 'app-id', 'executable'].includes(profile.pageMatch?.reason) ? 'Rule' : '');
     pageCount.hidden = !pageCount.textContent;
+    pageCount.title = pageCount.textContent;
     previous.disabled = !api || !(quickSheet > 0 || automatic || index > 0);
     next.disabled = !api || !(quickSheet + 1 < count || automatic || index < profile.pages.length - 1);
     previous.hidden = next.hidden = profile.pages.length === 1 && count === 1 && !automatic;
@@ -1300,7 +1304,9 @@
     directoryOpen.hidden = !api || !view.pageShortcuts;
     renderPageDirectory();
     lock.hidden = !view.followsApps;
-    lock.textContent = view.locked ? window.LastraI18n.t('Unlock page') : window.LastraI18n.t('Lock page');
+    const lockLabel = t(view.locked ? 'Unlock page' : 'Lock page');
+    lock.title = lockLabel;
+    lock.setAttribute('aria-label', lockLabel);
     lock.setAttribute('aria-pressed', String(view.locked));
     fitStage();
     if (audio) renderAudio(audio);

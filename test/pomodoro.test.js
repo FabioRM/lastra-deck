@@ -19,8 +19,8 @@ function fixture(t) {
   const file = path.join(root, 'pomodoro.json');
   let wall = 1_750_000_000_000;
   let monotonic = 100;
-  const create = () => {
-    const timer = new Pomodoro(file, { wall: () => wall, monotonic: () => monotonic });
+  const create = (onChange) => {
+    const timer = new Pomodoro(file, { wall: () => wall, monotonic: () => monotonic, onChange });
     instances.push(timer);
     return timer;
   };
@@ -105,4 +105,25 @@ test('bad persistence does not start or mutate a round, and view-only still read
   assert.deepEqual(timer.snapshot(), idle);
   assert.equal(deckRequestAllowed('dashboard:pomodoro:read'), true);
   assert.equal(deckRequestAllowed('dashboard:pomodoro:change', { type: 'start' }), false);
+});
+
+test('Pomodoro reports break start, pause, resume and completion to the deck', async (t) => {
+  const { create, elapsed, wallJump } = fixture(t);
+  const states = [];
+  const timer = create((state) => states.push(state));
+  apply(timer, 'start');
+  elapsed(FOCUS);
+  apply(timer, 'start');
+  elapsed(10_000);
+  apply(timer, 'pause');
+  apply(timer, 'resume');
+  assert.deepEqual(states.map(({ phase, status }) => [phase, status]), [
+    ['focus', 'running'], ['break', 'running'], ['break', 'paused'], ['break', 'running'],
+  ]);
+  wallJump(BREAK);
+  timer.restoreClock();
+  await wait(20);
+  assert.equal(states.at(-1).status, 'complete');
+  assert.equal(states.at(-1).phase, 'break');
+  assert.equal(states.at(-1).remainingMs, 0);
 });

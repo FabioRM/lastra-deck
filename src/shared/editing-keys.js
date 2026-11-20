@@ -98,19 +98,24 @@
     }) };
   }
 
-  function projectShortcutGroups(grid, slots, portrait, largeKeys = false) {
+  function projectShortcutGroups(grid, slots, portrait, largeKeys = false, pages) {
     const groups = new Map();
+    if (pages) for (const page of pages) groups.set(page.id, { name: page.name, indices: [] });
     slots.forEach((key, index) => {
       if (!key) return;
+      if (pages) {
+        groups.get(key.shortcutPage)?.indices.push(index);
+        return;
+      }
       const category = key.group?.replaceAll('-', ' ');
       const group = category ? category[0].toUpperCase() + category.slice(1) : 'Quick actions';
-      if (!groups.has(group)) groups.set(group, []);
-      groups.get(group).push(index);
+      if (!groups.has(group)) groups.set(group, { name: group, indices: [] });
+      groups.get(group).indices.push(index);
     });
     if (!groups.size) return projectEditingPage(grid, [], [], portrait, largeKeys);
     let layout;
     const grouped = [];
-    for (const [group, indices] of groups) {
+    for (const { name: group, indices } of groups.values()) {
       layout = projectEditingPage(grid, indices.map((index) => slots[index]), [], portrait, largeKeys);
       for (const sheet of layout.sheets) {
         grouped.push({ ...sheet, group, keys: sheet.keys.map((key) => ({ ...key,

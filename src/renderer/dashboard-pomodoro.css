@@ -33,3 +33,40 @@
 .pomodoro-controls button:disabled { color: var(--muted-text); }
 #pomodoro-feedback, #tools-pomodoro-feedback { grid-column: 1 / -1; color: var(--err); font-size: calc(15px * var(--text-scale)); overflow-wrap: anywhere; }
 .portrait #dashboard-pomodoro { grid-template-columns: auto auto minmax(0, 1fr); }
+
+#quick-tools #tools-pomodoro {
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px;
+  padding: var(--tools-gap);
+  border-radius: 16px;
+}
+#tools-pomodoro .pomodoro-controls { grid-column: 1 / -1; gap: 10px; }
+#tools-pomodoro .pomodoro-controls button { flex: 1 1 auto; }
+#quick-tools #tools-pomodoro-phase, #quick-tools #tools-pomodoro-feedback { font-size: .85em; }
+#quick-tools #tools-pomodoro-time { font-size: 1.65em; }
+
+#pomodoro-break {
+  position: fixed;
+  inset: 0;
+  inline-size: 100%;
+  block-size: 100%;
+  max-inline-size: none;
+  max-block-size: none;
+  padding: clamp(24px, 5vmin, 60px);
+  border: 0;
+  background: radial-gradient(ellipse at center, var(--selected-surface), var(--background) 70%);
+  color: var(--text);
+}
+#pomodoro-break[open] { display: grid; place-items: center; }
+#pomodoro-break::backdrop { background: var(--background); }
+#pomodoro-break-close { position: absolute; inset-block-start: 20px; inset-inline-end: 20px; }
+.pomodoro-break-content { display: grid; justify-items: center; text-align: center; gap: clamp(14px, 3vmin, 36px); }
+#pomodoro-break-title { font-size: calc(clamp(28px, 6vmin, 72px) * var(--text-scale)); font-weight: 500; }
+#pomodoro-break-time {
+  color: var(--app);
+  font: 400 clamp(85px, 37vmin, 420px)/.9 'Barlow Condensed', sans-serif;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+#pomodoro-break-progress { inline-size: min(54vmin, 520px); block-size: 12px; accent-color: var(--app); }
+#pomodoro-break-paused { color: var(--muted-text); font-size: calc(clamp(20px, 3vmin, 34px) * var(--text-scale)); }
