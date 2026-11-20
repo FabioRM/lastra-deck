@@ -59,6 +59,7 @@ jobs:
             Write-Host "A release already exists for $tag with its assets and notes."
             exit 0
           }
-          gh release create $tag @files `
-            --repo $env:GITHUB_REPOSITORY --draft --verify-tag --title "Lastra $tag" --notes-from-tag
+          git for-each-ref --format='%(contents)' "refs/tags/$tag" |
+            gh release create $tag @files --repo $env:GITHUB_REPOSITORY --draft --verify-tag `
+              --title "Lastra $tag" --notes-file -
           exit $LASTEXITCODE

@@ -51,8 +51,9 @@ If Actions is unavailable, build from a clean checkout with `-Tag`, then attach 
 $version = (Get-Content package.json -Raw | ConvertFrom-Json).version
 $tag = "v$version"
 $installer = "out/Lastra-Setup-$version.exe"
-gh release create $tag $installer "$installer.blockmap" "$installer.sha256" out/latest.yml `
-  --repo FabioRM/lastra-deck --draft --verify-tag --title "Lastra $tag" --notes-from-tag
+git for-each-ref --format='%(contents)' "refs/tags/$tag" |
+  gh release create $tag $installer "$installer.blockmap" "$installer.sha256" out/latest.yml `
+    --repo FabioRM/lastra-deck --draft --verify-tag --title "Lastra $tag" --notes-file -
 ```
 
 GitHub Pages serves [the project site](https://fabiorm.github.io/lastra-deck/) from `/docs` on `main`. The site links to the latest release, so the download link follows new public versions automatically.
