@@ -1,19 +1,21 @@
 # Lastra
 
-Lastra turns the **CORSAIR XENEON EDGE** into a touchscreen macro deck for Windows 10 and 11. It follows the foreground app, runs shortcuts and macros, and puts the Windows mixer, media controls, and system telemetry within reach. It runs on Electron and works while iCUE is closed.
+Lastra turns the **CORSAIR XENEON EDGE** into a touchscreen macro deck for Windows 10 and 11. **Switch apps and Lastra automatically loads the shortcuts for the new foreground app.** Run macros and keep the Windows mixer, media controls, and system telemetry within reach. Lastra runs on Electron and works while iCUE is closed.
 
 [Download for Windows x64](https://github.com/FabioRM/lastra-deck/releases/latest) · [Project site](https://fabiorm.github.io/lastra-deck/) · [Changelog](CHANGELOG.md) · [Report an issue](https://github.com/FabioRM/lastra-deck/issues)
 
-![Lastra demo showing the scrolling Emoji grid, Dashboard playback, and Stats graphs](docs/preview-demo.gif)
+![Lastra Deck Keys showing an example Home layout with shortcuts, audio controls, and sample telemetry](docs/preview-home.png)
 
-The loop opens **Emoji** from **Home**, then shows **Dashboard** and **Stats** full screen. Follow the playback controls, the system overview, and the GPU graphs before the deck returns to Home. Media and telemetry use sample data.
+Bring an app like Visual Studio Code to the foreground and Deck Keys opens its shortcut page. Assign your own pages in the editor or use the included shortcut packs.
 
 [Getting started](#getting-started) · [Deck views](#deck-views) · [Profile editor](#profile-editor) · [Local MCP integration](#local-mcp-integration) · [License](#license)
 
 <details>
-<summary>Static deck previews</summary>
+<summary>Visual Studio Code, Dashboard, and portrait previews</summary>
 
-![Landscape Deck Keys with gesture feedback, telemetry, and the Windows mixer](docs/preview-states.png)
+![The automatically selected Visual Studio Code shortcut page](docs/preview-vscode.png)
+
+![Dashboard with a calendar, Pomodoro timer, and sample playback](docs/preview-dashboard.png)
 
 <a href="docs/preview-portrait.png"><img src="docs/preview-portrait.png" alt="Deck Keys in portrait with the mixer above the macro grid" width="225"></a>
 

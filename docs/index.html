@@ -3,10 +3,10 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Lastra turns the CORSAIR XENEON EDGE into a touchscreen macro deck for Windows, with app-aware shortcuts, audio controls, and live system stats.">
+  <meta name="description" content="Lastra is a touchscreen macro deck for the CORSAIR XENEON EDGE. It automatically switches shortcuts with the active Windows app and shows audio controls and live PC stats.">
   <meta name="theme-color" content="#151b20">
   <title>Lastra · A Windows macro deck for XENEON EDGE</title>
-  <link rel="stylesheet" href="site.css">
+  <link rel="stylesheet" href="site.css?v=2">
   <link rel="icon" href="data:,">
 </head>
 <body>
@@ -23,8 +23,8 @@
     <section class="hero shell" aria-labelledby="hero-title">
       <div class="hero-copy">
         <p class="platform">CORSAIR XENEON EDGE <span aria-hidden="true">/</span> Windows</p>
-        <h1 id="hero-title">Your shortcuts.<br>On your touchscreen.</h1>
-        <p>Lastra turns the XENEON EDGE into a macro deck that follows the app you’re using. Tap to run a shortcut, adjust the Windows mixer, or check what your PC is doing.</p>
+        <h1 id="hero-title">Switch apps.<br>Your shortcuts follow.</h1>
+        <p>When you switch to another Windows app, Lastra automatically loads its shortcuts on your XENEON EDGE. Build your own macro pages and keep the Windows mixer and live PC stats within reach.</p>
         <div class="hero-links">
           <a class="button" href="https://github.com/FabioRM/lastra-deck/releases/latest">Download for Windows</a>
           <a class="text-link" href="https://github.com/FabioRM/lastra-deck#readme">Read the documentation</a>
@@ -32,35 +32,43 @@
         <p class="requirements">Windows 10 or 11 · x64 · Open source under MIT</p>
       </div>
       <figure class="deck">
-        <img src="preview-states.png" width="2560" height="720" alt="Lastra Home showing touchscreen shortcut keys, Windows audio controls, and CPU, RAM, and GPU readings.">
-        <figcaption>Deck Keys in landscape, with sample telemetry</figcaption>
+        <a href="preview-home.png"><img src="preview-home.png" width="2560" height="720" alt="Lastra Home showing touchscreen shortcut keys, Windows audio controls, and CPU, RAM, and GPU readings."></a>
+        <figcaption>Deck Keys with an example Home layout and sample telemetry</figcaption>
       </figure>
     </section>
     <section class="features" id="features" aria-labelledby="features-title">
       <div class="shell">
-        <h2 id="features-title">What you can put on the panel</h2>
-        <div class="feature-grid">
-          <article>
-            <h3>App-aware shortcuts</h3>
-            <p>Build pages in the visual editor, assign them to Windows apps, and run shortcuts or multi-step macros with a tap, hold, or double tap.</p>
-            <a href="https://github.com/FabioRM/lastra-deck#profile-editor">Explore the editor</a>
-          </article>
-          <article>
-            <h3>Audio and media</h3>
-            <p>Adjust Windows output and app volumes, mute microphones, or use push-to-talk. Dashboard brings playback, the calendar, and a Pomodoro timer together.</p>
-            <a href="https://github.com/FabioRM/lastra-deck#deck-views">See the deck views</a>
-          </article>
-          <article>
+        <h2 id="features-title">Lastra on the panel</h2>
+        <article class="feature">
+          <div class="feature-copy">
+            <h3>Shortcuts for the active app</h3>
+            <div>
+              <p>Bring Visual Studio Code to the foreground and the example layout switches to this page automatically. Lastra opens the page you assigned to the app, its built-in shortcut pack, or a page with common shortcuts. Use the visual editor to assign your own shortcuts and multi-step macros.</p>
+              <a href="https://github.com/FabioRM/lastra-deck#pages-and-keys">See how automatic pages work</a>
+            </div>
+          </div>
+          <a class="feature-image" href="preview-vscode.png"><img src="preview-vscode.png" width="2560" height="720" loading="lazy" alt="The automatic Visual Studio Code page with Command Palette, Quick Open, Find in Files, Source Control, Terminal, and other shortcuts."></a>
+        </article>
+        <article class="feature">
+          <div class="feature-copy">
+            <h3>Dashboard and media</h3>
+            <div>
+              <p>Control playback, check the calendar, and run a Pomodoro timer from Dashboard. Deck Keys also keeps Windows volume, mute, and push-to-talk controls within reach.</p>
+              <a href="https://github.com/FabioRM/lastra-deck#deck-views">Explore the deck views</a>
+            </div>
+          </div>
+          <a class="feature-image" href="preview-dashboard.png"><img src="preview-dashboard.png" width="1536" height="432" loading="lazy" alt="Dashboard showing the calendar, an active Pomodoro timer, and playback controls for a sample track."></a>
+        </article>
+        <article class="feature">
+          <div class="feature-copy">
             <h3>Live PC stats</h3>
-            <p>Track CPU, GPU, memory, temperatures, and available power readings in an overview you can arrange. Open charts to see how readings change over time.</p>
-            <a href="https://github.com/FabioRM/lastra-deck/blob/main/docs/telemetry.md">Read the telemetry guide</a>
-          </article>
-        </div>
-        <details class="demo">
-          <summary>Watch the deck demo</summary>
-          <img src="preview-demo.gif" width="900" height="254" loading="lazy" alt="Lastra switches between Home, app views, Dashboard, Stats, and the scrollable emoji picker.">
-          <p>The demo uses sample media and telemetry.</p>
-        </details>
+            <div>
+              <p>Arrange readings for CPU, GPU, memory, temperatures, and power when available. Switch between cards, charts, and a readings list to see what’s happening now and how it’s changing.</p>
+              <a href="https://github.com/FabioRM/lastra-deck/blob/main/docs/telemetry.md">Read the telemetry guide</a>
+            </div>
+          </div>
+          <a class="feature-image" href="preview-stats.png"><img src="preview-stats.png" width="2560" height="720" loading="lazy" alt="Stats overview with sample CPU power, GPU and memory load, display refresh rate, frame rate, disk activity, and temperature."></a>
+        </article>
       </div>
     </section>
     <section class="setup shell" id="setup" aria-labelledby="setup-title">
