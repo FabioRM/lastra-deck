@@ -17,7 +17,7 @@ The script runs `npm ci`, lint, type checks, and tests, then builds the x64 inst
 - `Lastra-Setup-<version>.exe.blockmap`
 - `latest.yml`
 
-Add `-Tag v0.2.3` to require a clean checkout of that tag and matching versions in the package files. For a quick packaging check, use `npm run dist:dir` after installing dependencies. Run `out\win-unpacked\Lastra.exe --preview=preview.png` to check the packaged app without the panel. Git ignores `out/`.
+Add `-Tag v0.2.4` to require a clean checkout of that tag and matching versions in the package files. For a quick packaging check, use `npm run dist:dir` after installing dependencies. Run `out\win-unpacked\Lastra.exe --preview=preview.png` to check the packaged app without the panel. Git ignores `out/`.
 
 ## Packaged layout
 
@@ -39,7 +39,7 @@ GitHub generates source archives from the tag. The installer bundles all catalog
 ## Publishing a release
 
 1. Run `npm version <version> --no-git-tag-version`, update the [changelog](../CHANGELOG.md), and commit the changes to `main`.
-2. Create an annotated tag with release notes in Markdown, for example `git tag -a v0.2.4 -F release-notes.md`. Push `main` and the tag to `origin`.
+2. Create an annotated tag with release notes in Markdown, for example `git tag -a v0.2.5 -F release-notes.md`. Push `main` and the tag to `origin`.
 3. The [Windows release workflow](../.github/workflows/release.yml) builds the tag and attaches the four files and the tag notes to a GitHub draft release.
 4. Check the installer and notes, then publish the draft. Installed copies find the update at their next check.
 

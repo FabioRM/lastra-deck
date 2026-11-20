@@ -14,6 +14,8 @@ The [MIT License](LICENSE) grants rights in the original Lastra material. The co
 | IntelliJ Platform keymaps and English action labels | Apache 2.0. Lastra converted the upstream XML descriptors and action resources to JSON and added coverage metadata. [License](licenses/Apache-2.0.txt) · [JetBrains NOTICE](licenses/IntelliJ-Platform-NOTICE.txt) |
 | Codex CLI TUI defaults and slash commands | Apache 2.0. Lastra converted the entries from `rust-v0.150.1` to JSON and added labels. [License](licenses/Apache-2.0.txt) · [Codex NOTICE](licenses/Codex-CLI-NOTICE.txt) |
 | ical.js 2.2.1 | Mozilla Public License 2.0. Lastra bundles the upstream npm package. The corresponding source is available from the tagged upstream release and in the package's `lib/` directory. [License](https://www.mozilla.org/en-US/MPL/2.0/) · [Corresponding source](https://github.com/kewisch/ical.js/tree/v2.2.1) |
+| lazy-val 1.0.5 | MIT, as declared by package author Vladimir Krivosheev. [License text](licenses/Lazy-Val-MIT.txt) · [Upstream package metadata](https://github.com/develar/lazy-val/blob/b69ad4119f1b19bdab13c61ee2fcc88d46b89071/package.json) |
+| Koffi and its Windows x64 native binary | MIT, copyright Niels Martignène. The license text is shipped in `node_modules/koffi/LICENSE.txt`. [Upstream license](https://github.com/Koromix/koffi/blob/master/LICENSE.txt) |
 | Other npm dependencies and Electron | Each package carries its own license. Electron includes separate notices for its bundled components. [Dependency versions](package-lock.json) · [Electron license](https://github.com/electron/electron/blob/main/LICENSE) |
 
 Keep the applicable license texts and copyright notices with any copies or bundles that include these components.
