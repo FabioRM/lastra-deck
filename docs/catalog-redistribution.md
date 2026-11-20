@@ -1,6 +1,6 @@
 # Redistribuzione dei cataloghi di Lastra
 
-La verifica del 19 novembre 2026 definisce i cataloghi inclusi anche nel repository pubblico e nell'installer Windows di Lastra 0.2.2. Il materiale originale di Lastra usa la licenza MIT. Le parti riprese da fonti terze conservano le rispettive licenze.
+La verifica del 19 novembre 2026 definisce i cataloghi inclusi anche nel repository pubblico e nell'installer Windows di Lastra. Il materiale originale di Lastra usa la licenza MIT. Le parti riprese da fonti terze conservano le rispettive licenze.
 
 ## Materiale incluso
 
