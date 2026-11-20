@@ -1,0 +1,16 @@
+#deck:has(.action-history) { min-height: 0; }
+#app-view-detail:has(.action-history) { overflow: auto; touch-action: pan-y; }
+.action-history-list { display: grid; gap: 8px; list-style: none; }
+.action-history-entry {
+  padding: 10px 14px;
+  background: var(--pressed-surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow-wrap: anywhere;
+}
+.action-history-entry header { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 4px 12px; }
+.action-history-outcome { color: var(--ok); font-size: 21px; }
+.action-history-outcome[data-outcome="failed"] { color: var(--err); }
+.action-history-steps summary { padding: 8px 0; cursor: pointer; }
+.action-history-step-list { list-style: none; }
+.action-history-step-list li { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; padding: 4px 0; }

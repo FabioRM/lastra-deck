@@ -1,0 +1,521 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'none'; script-src 'self'; style-src 'self'; font-src 'self'; img-src data:; frame-src lastra-preview:;">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Lastra</title>
+  <link rel="stylesheet" href="../renderer/theme.css">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="integration-setup.css">
+  <link rel="stylesheet" href="../renderer/widgets.css">
+  <link rel="stylesheet" href="../renderer/virtual-dial.css">
+  <link rel="stylesheet" href="../renderer/obs.css">
+  <link rel="stylesheet" href="../renderer/obs-modes.css">
+</head>
+<body>
+  <header class="toolbar">
+    <div class="desktop-brand"><span class="desktop-mark" aria-hidden="true"></span><h1>Lastra</h1></div>
+    <nav id="desktop-tabs" aria-label="Lastra">
+      <button type="button" data-desktop-tab="profile" aria-pressed="false">Editor</button>
+      <button type="button" data-desktop-tab="settings" aria-pressed="true">Settings</button>
+    </nav>
+    <div class="toolbar-actions" id="profile-toolbar" hidden>
+      <div class="history-actions" role="group" aria-label="Edit history">
+        <button id="undo" type="button" title="Undo (Ctrl+Z)" aria-keyshortcuts="Control+Z" disabled>Undo</button>
+        <button id="redo" type="button" title="Redo (Ctrl+Y or Ctrl+Shift+Z)" aria-keyshortcuts="Control+Y Control+Shift+Z" disabled>Redo</button>
+      </div>
+      <details class="editor-menu">
+        <summary>More</summary>
+        <div>
+          <button id="backups" type="button" disabled>Backups</button>
+          <button id="import-exchange" type="button" disabled>Import…</button>
+          <button id="export-exchange" type="button" disabled>Export profile…</button>
+          <button id="integration-setup-open" type="button" aria-haspopup="dialog" aria-controls="integration-setup">Integration setup</button>
+          <button id="open-live-variables" type="button" disabled>Live variables</button>
+          <button id="reload" type="button">Reload from disk</button>
+        </div>
+      </details>
+      <button id="save" class="primary" type="button" aria-keyshortcuts="Control+S" title="Save profile (Ctrl+S)" disabled>Save profile</button>
+    </div>
+  </header>
+  <main id="desktop-settings" aria-label="Settings">
+    <nav id="desktop-settings-nav" aria-label="Settings categories">
+      <button type="button" data-settings-section="appearance-settings">Display</button>
+      <button type="button" data-settings-section="stats-settings">Stats</button>
+      <button type="button" data-settings-section="tool-settings">Tools</button>
+      <button type="button" data-settings-section="deck-shortcut-settings">Keyboard shortcuts</button>
+      <button type="button" data-settings-section="production-settings">OBS production</button>
+      <button type="button" data-settings-section="system-settings">System</button>
+    </nav>
+    <div id="desktop-settings-content">
+      <details class="profile" id="appearance-settings" data-settings-panel>
+        <summary>Deck settings</summary>
+        <form id="appearance-controls" class="deck-settings" inert>
+          <p class="muted deck-settings-note">Changes apply immediately to the deck and its live preview.</p>
+          <section class="deck-settings-card" aria-labelledby="display-settings-heading">
+            <h3 id="display-settings-heading">Display</h3>
+            <fieldset class="theme-palette">
+              <legend>Theme</legend>
+              <div id="theme-options" class="theme-options"></div>
+            </fieldset>
+            <div class="deck-settings-fields">
+              <label class="field">Text size<select name="textScale"></select></label>
+              <label class="field">Accent color<input name="accent" type="color" value="#619fd8"></label>
+              <button id="reset-accent" type="button" class="quiet" disabled>Use theme accent</button>
+            </div>
+            <label class="check"><input type="checkbox" name="highContrast">High contrast</label>
+            <label class="check"><input type="checkbox" name="largeKeys">Large Deck Keys</label>
+          </section>
+          <section class="deck-settings-card" aria-labelledby="clock-settings-heading">
+            <h3 id="clock-settings-heading">Clock and idle</h3>
+            <div class="deck-settings-fields">
+              <label class="field">Idle screen after<select name="idleScreenSeconds"></select></label>
+              <label class="field">Night dimming<select name="screenDim"></select></label>
+            </div>
+            <label class="check"><input type="checkbox" name="showClockSeconds">Show clock seconds</label>
+          </section>
+          <section class="deck-settings-card deck-telemetry-settings" aria-labelledby="telemetry-settings-heading">
+            <div class="deck-settings-heading">
+              <h3 id="telemetry-settings-heading">Telemetry</h3>
+              <label class="check"><input type="checkbox" name="showPercentSigns">Show percent signs</label>
+            </div>
+            <div id="appearance-readouts"></div>
+          </section>
+        </form>
+        <p id="appearance-status" role="status"></p>
+        <div class="desktop-menu-buttons">
+          <button type="button" data-desktop-menu="navigation">Display, activity and navigation options</button>
+          <button type="button" data-desktop-menu="organization">Deck organization</button>
+        </div>
+        <section id="calendar-settings" class="deck-settings-card">
+          <h3>Dashboard calendar file</h3>
+          <div class="deck-settings-fields">
+            <button type="button" id="settings-calendar-pick">Choose .ics file</button>
+            <button type="button" id="settings-calendar-clear" disabled>Clear file</button>
+          </div>
+          <p id="settings-calendar-status" class="muted" role="status"></p>
+        </section>
+      </details>
+      <details class="profile" id="deck-shortcut-settings" data-settings-panel hidden>
+        <summary>Deck keyboard shortcuts</summary>
+        <p class="muted">Assign a function key or a combination such as Ctrl+Alt+Right. Clear a shortcut and apply to release it.</p>
+        <div id="deck-shortcut-rows"></div>
+        <p id="deck-shortcut-status" role="status"></p>
+      </details>
+      <details class="profile" id="tool-settings" data-settings-panel hidden>
+        <summary>Tools settings</summary>
+        <form id="tool-choices-form" class="deck-settings-card" inert>
+          <label class="field">Quick decision pick list
+            <textarea name="choices" rows="4" maxlength="600" required></textarea>
+          </label>
+          <button type="submit">Save pick list</button>
+          <p id="tool-choices-status" role="status"></p>
+        </form>
+      </details>
+      <details class="profile" id="stats-settings" data-settings-panel hidden>
+        <summary>Stats settings</summary>
+        <form id="stats-settings-form" class="deck-settings-card" inert>
+          <div class="deck-settings-fields">
+            <label class="field">Stats layout<select name="layout"></select></label>
+            <label class="field">Chart style<select name="style"></select></label>
+            <div id="stats-chart-sample"></div>
+          </div>
+          <h3>Overview readings</h3>
+          <label class="field">Find readings<input name="search" type="search" placeholder="GPU, memory, fan, drive…"></label>
+          <p id="stats-settings-count" class="muted" aria-live="polite"></p>
+          <div id="stats-settings-readings" role="group" aria-label="Available readings"></div>
+          <h3>Overview layout</h3>
+          <p class="muted">Drag the cards or use the arrows to reorder them. A wide card spans two columns.</p>
+          <div id="stats-overview-board" role="group" aria-label="Overview layout"></div>
+          <div class="deck-settings-fields">
+            <button id="stats-settings-clear" type="button">Clear selection</button>
+            <button id="stats-settings-defaults" type="button">Use default readings</button>
+            <button id="stats-settings-refresh" type="button">Refresh readings</button>
+            <button type="submit" class="primary">Save Stats settings</button>
+          </div>
+          <p id="stats-settings-status" role="status"></p>
+        </form>
+        <p id="stats-settings-load" class="muted" role="status"></p>
+        <div class="desktop-menu-buttons">
+          <button type="button" data-desktop-menu="monitoring">History and refresh options</button>
+          <button type="button" data-desktop-menu="watchlist">Watchlist readings</button>
+        </div>
+        <form id="grafana-settings-form" class="deck-settings-card" inert>
+          <label class="field">Grafana dashboard URL
+            <input type="url" name="url" maxlength="2048" spellcheck="false" autocomplete="off">
+          </label>
+          <button type="submit">Save Grafana link</button>
+          <p id="grafana-settings-status" class="muted" role="status"></p>
+        </form>
+      </details>
+      <details class="profile" id="production-settings" data-settings-panel hidden>
+        <summary>OBS production</summary>
+        <div class="desktop-production">
+          <section class="deck-settings-card">
+            <label class="check"><input id="settings-obs-enabled" type="checkbox" disabled>Show OBS controls on the deck</label>
+            <p id="settings-obs-status" role="status"></p>
+          </section>
+          <section id="desktop-production-timers" class="deck-settings-card"><h3>Countdown and rundown</h3></section>
+          <section id="desktop-production-modes" class="deck-settings-card"><h3>Production modes</h3></section>
+        </div>
+      </details>
+      <details class="profile" id="system-settings" data-settings-panel hidden>
+        <summary>System</summary>
+        <section class="deck-settings-card">
+          <label class="field" for="interface-language">Interface language</label>
+          <select id="interface-language" disabled>
+            <option value="system">System language</option>
+            <option value="it" lang="it">Italiano</option>
+            <option value="en" lang="en">English</option>
+          </select>
+          <p class="muted" id="language-status" role="status"></p>
+        </section>
+        <div class="desktop-menu-buttons">
+          <button type="button" id="settings-integrations">Integration setup</button>
+          <button type="button" data-desktop-menu="agents">Agent access</button>
+          <button type="button" data-desktop-menu="diagnostics">Diagnostics and deck maintenance</button>
+          <button type="button" data-desktop-menu="updates">Updates</button>
+          <button type="button" data-desktop-menu="files">Profile files</button>
+        </div>
+      </details>
+      <p id="desktop-menu-status" role="status"></p>
+    </div>
+  </main>
+  <main id="workspace" aria-label="Profile editor" inert hidden>
+    <aside class="page-sidebar" aria-label="Page navigation">
+      <div class="page-sidebar-heading">
+        <h2 id="editor-profile-name">Profile</h2>
+        <p id="status" role="status"></p>
+      </div>
+      <div class="page-sidebar-list">
+        <div class="page-sidebar-title"><h3>Pages</h3><button id="add-page" type="button" title="New page" aria-label="New page">+</button></div>
+        <nav id="pages" aria-label="Pages"></nav>
+      </div>
+      <button id="profile-templates-open" type="button">Browse templates</button>
+    </aside>
+    <section class="layout" aria-labelledby="editor-page-name">
+      <div class="canvas-heading">
+        <div><h2 id="editor-page-name"></h2><p id="editor-page-size" class="muted"></p></div>
+        <div id="page-actions"></div>
+      </div>
+      <div class="editor-canvas">
+        <div id="slots" role="group" aria-label="Page layout"></div>
+        <div id="key-group-tools" class="clipboard-tools" role="group" aria-label="Key group controls">
+          <button id="select-key-group" type="button" class="quiet" aria-pressed="false">Select keys</button>
+          <button id="paste-key-group" type="button" class="quiet" title="Use the selected slot as the group's upper-left corner">Paste group here</button>
+        </div>
+      </div>
+      <details id="live-preview">
+        <summary>Live preview</summary>
+        <div class="preview-controls">
+          <label class="field">Layout
+            <select id="preview-source">
+              <option value="draft">Draft page</option>
+              <option value="active">Active Deck Keys</option>
+            </select>
+          </label>
+          <label class="field">Orientation
+            <select id="preview-orientation">
+              <option value="landscape">Landscape · 2560 × 720</option>
+              <option value="portrait">Portrait · 720 × 2560</option>
+            </select>
+          </label>
+          <label class="check"><input id="preview-live-readings" type="checkbox">Live readings</label>
+          <label class="check"><input id="preview-edit-layout" type="checkbox">Edit draft layout</label>
+        </div>
+        <p class="muted preview-status" id="preview-live-status" role="status"></p>
+        <p class="muted preview-status" id="preview-layout-status" role="status"></p>
+        <div class="preview-viewport">
+          <iframe id="preview-frame" title="Read-only deck preview" sandbox="allow-scripts" tabindex="-1" inert></iframe>
+          <div id="preview-layout-overlay" role="group" aria-label="Draft layout controls" hidden></div>
+        </div>
+      </details>
+      <details id="page-settings" class="canvas-details">
+        <summary>Page settings</summary>
+        <div id="page-fields"></div>
+      </details>
+      <details class="canvas-details">
+        <summary>Profile settings</summary>
+        <div class="profile-fields" id="profile-fields"></div>
+      </details>
+    </section>
+    <section id="inspector" aria-label="Key settings"></section>
+  </main>
+  <dialog id="integration-setup" aria-labelledby="integration-setup-title">
+    <div class="palette-heading">
+      <h2 id="integration-setup-title">Integration setup</h2>
+      <div class="row">
+        <button type="button" data-setup-refresh>Refresh status</button>
+        <button type="button" class="quiet" data-setup-close>Close</button>
+      </div>
+    </div>
+    <p data-setup-status role="status"></p>
+    <div class="integration-setup-body">
+      <nav data-setup-choices aria-label="Integrations"></nav>
+      <section data-setup-detail aria-label="Integration details"></section>
+    </div>
+  </dialog>
+  <dialog id="live-variables" aria-labelledby="live-variables-title">
+    <div class="palette-heading">
+      <h2 id="live-variables-title">Live variables</h2>
+      <button type="button" class="quiet">Close</button>
+    </div>
+    <section data-variable-preview aria-label="Selected control preview" hidden></section>
+    <label class="field">Search variables<input type="search"></label>
+    <p role="status" class="muted"></p>
+    <div class="variable-list">
+      <table aria-label="Current provider values">
+        <thead><tr><th scope="col">Variable</th><th scope="col">Provider</th><th scope="col">Value</th><th scope="col">Last update</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </dialog>
+  <dialog id="action-palette" aria-labelledby="palette-heading">
+    <div class="palette-heading">
+      <h2 id="palette-heading">Action palette</h2>
+      <button class="palette-close quiet" type="button">Cancel</button>
+    </div>
+    <div class="palette-filters">
+      <label class="field">Search actions
+        <input type="search" placeholder="Name, category or example" autocomplete="off">
+      </label>
+      <label class="field">Category<select></select></label>
+    </div>
+    <div class="palette-results" aria-label="Matching actions"></div>
+    <p class="palette-empty muted" role="status" hidden>No matching actions.</p>
+  </dialog>
+  <dialog id="expression-editor" aria-labelledby="expression-editor-heading">
+    <div class="dialog-title"><h2 id="expression-editor-heading"></h2></div>
+    <p id="expression-instructions" class="muted" data-expression-instructions></p>
+    <label class="field"><span>JSON</span><textarea rows="10" spellcheck="false" aria-describedby="expression-instructions"></textarea></label>
+    <p class="status" role="status" aria-live="polite"></p>
+    <div class="dialog-actions">
+      <button type="button" class="quiet" data-expression-reset>Use literal value</button>
+      <button type="button" class="quiet" data-expression-close>Cancel</button>
+      <button type="button" class="quiet" data-expression-preview>Preview value</button>
+      <button type="button" class="primary" data-expression-apply>Apply to draft</button>
+    </div>
+  </dialog>
+
+  <dialog id="macro-library" aria-labelledby="macro-library-heading">
+    <div class="palette-heading">
+      <h2 id="macro-library-heading">Shared macros</h2>
+      <button type="button" class="quiet" data-macro-close>Close</button>
+    </div>
+    <div class="row">
+      <label class="field">Saved macro<select name="macro"></select></label>
+      <button type="button" data-macro-new>New macro</button>
+    </div>
+    <label class="field">Definition (JSON)<textarea rows="15" spellcheck="false"></textarea></label>
+    <div class="row">
+      <button type="button" class="primary" data-macro-apply>Apply to draft</button>
+      <button type="button" class="danger" data-macro-remove>Delete macro</button>
+    </div>
+    <p class="muted" role="status"></p>
+  </dialog>
+  <dialog id="profile-backups" aria-labelledby="backups-heading">
+    <div class="palette-heading">
+      <h2 id="backups-heading">Profile backups</h2>
+      <button id="close-backups" class="quiet" type="button">Close</button>
+    </div>
+    <div id="backup-versions" aria-label="Saved profile versions"></div>
+    <p id="backup-status" class="muted" role="status"></p>
+  </dialog>
+  <dialog id="profile-exchange" aria-labelledby="exchange-title">
+    <h2 id="exchange-title"></h2>
+    <section data-exchange-details></section>
+    <p data-exchange-status role="status"></p>
+    <div class="row exchange-buttons">
+      <button type="button" class="quiet" data-exchange-cancel>Close</button>
+      <button type="button" class="primary" data-exchange-confirm hidden></button>
+    </div>
+  </dialog>
+  <dialog id="profile-templates" aria-labelledby="templates-heading">
+    <div class="palette-heading">
+      <h2 id="templates-heading">Profile templates</h2>
+      <button id="template-close" class="quiet" type="button">Close</button>
+    </div>
+    <div class="template-main">
+      <div id="template-choices" aria-label="Available templates"></div>
+      <section id="template-detail" hidden>
+        <h3 id="template-name"></h3>
+        <p id="template-description"></p>
+        <ul id="template-requirements" class="muted"></ul>
+        <div class="template-controls">
+          <label class="field">Page<select id="template-page"></select></label>
+          <label class="field">Orientation
+            <select id="template-orientation">
+              <option value="landscape">Landscape</option>
+              <option value="portrait">Portrait</option>
+            </select>
+          </label>
+        </div>
+        <p id="template-counts" class="muted"></p>
+        <div id="template-board" role="img" aria-label="Page preview"></div>
+      </section>
+    </div>
+    <p id="template-message" class="muted" role="status"></p>
+    <button id="template-add" class="primary" type="button" disabled>Add pages to draft</button>
+  </dialog>
+  <dialog id="image-library" aria-labelledby="image-library-heading">
+    <div class="palette-heading">
+      <h2 id="image-library-heading">Icon and image library</h2>
+      <button id="image-library-close" class="quiet" type="button">Close</button>
+    </div>
+    <div class="image-library-tools">
+      <button id="image-library-icons" class="quiet" type="button" aria-pressed="true">Lucide icons</button>
+      <button id="image-library-apps" class="quiet" type="button" aria-pressed="false">Installed apps</button>
+      <button id="image-library-file" class="quiet" type="button">Choose image file</button>
+      <button id="image-library-exe" class="quiet" type="button">Choose application file</button>
+    </div>
+    <div class="image-library-body">
+      <section class="image-library-picker" aria-label="Find an asset">
+        <label class="field">Search<input id="image-library-search" type="search" maxlength="120" autocomplete="off"></label>
+        <div id="image-library-results" aria-label="Matching assets"></div>
+        <div class="image-library-tools" id="image-library-pages" hidden>
+          <button id="image-library-previous" type="button">Previous</button>
+          <span id="image-library-position"></span>
+          <button id="image-library-next" type="button">Next</button>
+        </div>
+      </section>
+      <section id="image-library-selection" aria-label="Asset preview" hidden>
+        <h3 id="image-library-label"></h3>
+        <div id="image-library-icon-preview" hidden></div>
+        <div id="image-library-crop" hidden>
+          <div class="image-library-source"><img id="image-library-original" alt="Original image"><span id="image-library-frame" aria-hidden="true"></span></div>
+          <canvas id="image-library-canvas" width="128" height="128" aria-label="Cropped image preview"></canvas>
+          <div class="image-library-sliders">
+            <label class="field">Zoom<input id="image-library-zoom" type="range" min="100" max="400" value="100"></label>
+            <label class="field">Horizontal position<input id="image-library-horizontal" type="range" min="0" max="100" value="50"></label>
+            <label class="field">Vertical position<input id="image-library-vertical" type="range" min="0" max="100" value="50"></label>
+          </div>
+        </div>
+        <button id="image-library-use" class="primary" type="button">Use icon</button>
+      </section>
+    </div>
+    <p id="image-library-status" class="muted" role="status"></p>
+  </dialog>
+  <dialog id="shortcut-packs" aria-labelledby="shortcut-packs-title">
+    <div class="palette-heading">
+      <h2 id="shortcut-packs-title">Shortcut packs</h2>
+      <button id="close-shortcut-packs" class="quiet" type="button">Close</button>
+    </div>
+    <div class="shortcut-library-filters">
+      <label class="field shortcut-search">Search shortcuts
+        <input id="shortcut-search" type="search" placeholder="Action, alias or chord" autocomplete="off">
+      </label>
+      <label class="field">App<select id="shortcut-pack-choice" disabled></select></label>
+      <label class="field">Platform<select id="shortcut-platform" disabled></select></label>
+      <label class="field">Context<select id="shortcut-context" disabled></select></label>
+    </div>
+    <div class="shortcut-pack-details">
+      <div class="shortcut-library-results">
+        <ul id="shortcut-pack-keys" aria-label="Matching shortcuts"></ul>
+        <section id="shortcut-detail" aria-label="Shortcut variant" hidden></section>
+      </div>
+      <form id="shortcut-web-app" hidden>
+        <label class="field" for="shortcut-manifest">Installed web app manifest ID</label>
+        <div class="shortcut-web-row">
+          <input id="shortcut-manifest" type="url" maxlength="512" required aria-describedby="shortcut-manifest-help">
+          <button id="attach-shortcut-web-app" type="submit">Attach</button>
+        </div>
+        <small id="shortcut-manifest-help" class="muted">Copy the manifest ID from chrome://web-app-internals or edge://web-app-internals. Save the profile to apply changes.</small>
+        <ul id="shortcut-web-apps" aria-label="Attached manifest IDs"></ul>
+      </form>
+    </div>
+    <p id="shortcut-pack-status" class="muted" role="status"></p>
+    <button id="copy-shortcut-pack" class="primary" type="button" disabled>Copy pack to a new page</button>
+  </dialog>
+  <dialog id="key-test" aria-labelledby="key-test-title">
+    <div class="palette-heading">
+      <h2 id="key-test-title">Test key</h2>
+      <button id="close-key-test" class="quiet" type="button">Close</button>
+    </div>
+    <form id="key-test-form">
+      <label class="field">Gesture<select id="key-test-gesture"></select></label>
+      <div id="key-test-states"></div>
+      <div class="row"><button id="simulate-key" class="primary" type="submit">Simulate</button></div>
+    </form>
+    <p class="muted">Simulation checks the draft with sample states. To see results from a live run, use the saved key on the deck and open Apps → Action history.</p>
+    <p id="key-test-status" role="status"></p>
+    <ol id="key-test-steps" aria-label="Step results"></ol>
+  </dialog>
+  <dialog id="widget-picker" aria-labelledby="widget-picker-title">
+    <div class="palette-heading">
+      <h2 id="widget-picker-title">Widgets</h2>
+      <button id="close-widgets" class="quiet" type="button">Done</button>
+    </div>
+    <div class="widget-editor-body">
+      <section class="widget-editor-library" aria-label="Widget catalog">
+        <h3>Catalog</h3>
+        <label class="field">Search widgets
+          <input id="widget-search" type="search" placeholder="Name or provider" autocomplete="off">
+        </label>
+        <div id="widget-catalog"></div>
+        <h3 id="widget-presets-heading" hidden>Saved compositions</h3>
+        <div id="widget-presets"></div>
+        <h3>Placed widgets</h3>
+        <div id="widget-instances"></div>
+      </section>
+      <section id="widget-options" aria-label="Widget settings"></section>
+    </div>
+  </dialog>
+  <script src="../shared/i18n-it.js"></script>
+  <script src="../shared/i18n.js"></script>
+  <script src="../shared/dom.js"></script>
+  <script src="history.js"></script>
+  <script src="action-palette.js"></script>
+  <script src="../shared/decisions.js"></script>
+  <script src="../shared/widget-layout.js"></script>
+  <script src="../shared/sensor-binding.js"></script>
+  <script src="../shared/widget-composition.js"></script>
+  <script src="../shared/action-flow.js"></script>
+  <script src="../shared/timers.js"></script>
+  <script src="../shared/sounds.js"></script>
+  <script src="../shared/value-expressions.js"></script>
+  <script src="../shared/parameterized-macros.js"></script>
+  <script src="macro-library.js"></script>
+  <script src="expression-editor.js"></script>
+  <script src="../shared/key-readouts.js"></script>
+  <script src="../shared/linked-controls.js"></script>
+  <script src="../shared/profile-keys.js"></script>
+  <script src="../shared/editing-keys.js"></script>
+  <script src="../shared/deck-view.js"></script>
+  <script src="../renderer/now-playing.js"></script>
+  <script src="../renderer/reading-time.js"></script>
+  <script src="../renderer/key-live-state.js"></script>
+  <script src="live-variables.js"></script>
+  <script src="../shared/stats-chart.js"></script>
+  <script src="../renderer/widget-components.js"></script>
+  <script src="../renderer/widget-composition.js"></script>
+  <script src="../renderer/audio-fader.js"></script>
+  <script src="../renderer/virtual-dial.js"></script>
+  <script src="widget-composition-editor.js"></script>
+  <script src="widget-editor.js"></script>
+  <script src="live-preview.js"></script>
+  <script src="action-test.js"></script>
+  <script src="key-groups.js"></script>
+  <script src="../shared/appearance.js"></script>
+  <script src="appearance.js"></script>
+  <script src="deck-shortcuts.js"></script>
+  <script src="tool-settings.js"></script>
+  <script src="stats-settings.js"></script>
+  <script src="../renderer/obs-modes.js"></script>
+  <script src="../renderer/obs-production.js"></script>
+  <script src="desktop-settings.js"></script>
+  <script src="grid-resize.js"></script>
+  <script src="../shared/asset-crop.js"></script>
+  <script src="image-library.js"></script>
+  <script src="../shared/profile-template-import.js"></script>
+  <script src="profile-templates.js"></script>
+  <script src="stream-deck-import.js"></script>
+  <script src="profile-exchange.js"></script>
+  <script src="integration-setup.js"></script>
+  <script src="preview-layout.js"></script>
+  <script src="preview-layout-controls.js"></script>
+  <script src="../shared/shortcut-library.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,12 @@
+PackageName: Example.Background
+Name: Background fixture
+WindowFilter: "Background helper.exe;Background alternative.exe"
+BackgroundProcess: true
+Shortcuts:
+  - SectionName: Application
+    Properties:
+      - Name: Activate helper
+        Shortcut:
+          - Win: true
+            Ctrl: true
+            Keys: [F8]

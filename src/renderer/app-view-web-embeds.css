@@ -1,0 +1,5 @@
+#app-view-detail:has(.web-embeds) { min-height: 0; overflow: auto; touch-action: pan-y; }
+.web-embeds, .web-embeds-list { display: grid; gap: 12px; }
+.web-embeds > .app-view-secondary:empty { display: none; }
+.web-embeds-list { grid-template-columns: repeat(auto-fit, minmax(min(340px, 100%), 1fr)); }
+.web-embed-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }

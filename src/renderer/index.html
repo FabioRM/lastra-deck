@@ -1,0 +1,645 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data:; font-src 'self';">
+  <title>Lastra</title>
+  <link rel="stylesheet" href="theme.css">
+  <link rel="stylesheet" href="activity-profile.css">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="obs.css">
+  <link rel="stylesheet" href="obs-modes.css">
+  <link rel="stylesheet" href="idle-screen.css">
+  <link rel="stylesheet" href="navigation-badges.css">
+  <link rel="stylesheet" href="key-live-state.css">
+  <link rel="stylesheet" href="dashboard.css">
+  <link rel="stylesheet" href="dashboard-pomodoro.css">
+  <link rel="stylesheet" href="dashboard-agenda.css">
+  <link rel="stylesheet" href="stats.css">
+  <link rel="stylesheet" href="stats-timeline.css">
+  <link rel="stylesheet" href="stats-processes.css">
+  <link rel="stylesheet" href="microphone-mixer.css">
+  <link rel="stylesheet" href="app-views.css">
+  <link rel="stylesheet" href="app-view-claude.css">
+  <link rel="stylesheet" href="app-view-chatgpt.css">
+  <link rel="stylesheet" href="app-view-vscode.css">
+  <link rel="stylesheet" href="app-view-projects.css">
+  <link rel="stylesheet" href="app-view-github.css">
+  <link rel="stylesheet" href="widgets.css">
+  <link rel="stylesheet" href="control-modes.css">
+  <link rel="stylesheet" href="virtual-dial.css">
+  <link rel="stylesheet" href="app-view-wsl.css">
+  <link rel="stylesheet" href="app-view-service-health.css">
+  <link rel="stylesheet" href="app-view-syncthing.css">
+  <link rel="stylesheet" href="app-view-prometheus.css">
+  <link rel="stylesheet" href="app-view-kubernetes.css">
+  <link rel="stylesheet" href="app-view-alerts.css">
+  <link rel="stylesheet" href="app-view-audio-presets.css">
+  <link rel="stylesheet" href="app-view-action-history.css">
+  <link rel="stylesheet" href="app-view-agent-activity.css">
+  <link rel="stylesheet" href="app-view-web-embeds.css">
+  <link rel="stylesheet" href="app-view-docker.css">
+  <link rel="stylesheet" href="app-view-spotify.css">
+  <link rel="stylesheet" href="app-view-streaming.css">
+  <link rel="stylesheet" href="app-view-terminal.css">
+  <link rel="stylesheet" href="app-view-notes.css">
+  <link rel="stylesheet" href="app-view-clipboard-pins.css">
+  <link rel="stylesheet" href="app-view-resources.css">
+  <link rel="stylesheet" href="app-view-power.css">
+  <link rel="stylesheet" href="app-view-watchlist.css">
+  <link rel="stylesheet" href="view-only.css">
+  <link rel="stylesheet" href="quick-tools.css">
+  <link rel="stylesheet" href="emoji-view.css">
+</head>
+<body>
+  <main id="stage">
+    <p id="view-only-status" role="status" hidden><strong>View only</strong> · Switch off from the Lastra tray menu</p>
+    <div id="deck-audio-controls" role="group" aria-label="Windows audio">
+      <div class="dashboard-audio-buttons">
+        <button class="dashboard-icon-button" type="button" data-dashboard-audio="output" aria-label="Speakers" aria-describedby="dashboard-output-state"
+          aria-controls="speaker-output-picker" aria-expanded="false" aria-haspopup="dialog" disabled>
+          <svg class="dashboard-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M11 4.7a.7.7 0 0 0-1.2-.5L6.4 7.6A1.4 1.4 0 0 1 5.4 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.4a1.4 1.4 0 0 1 1 .4l3.4 3.4a.7.7 0 0 0 1.2-.5z"/>
+            <path class="dashboard-icon-live" d="M16 9a5 5 0 0 1 0 6m3.4 3.4a9 9 0 0 0 0-12.8"/>
+            <path class="dashboard-icon-muted" d="m16.5 14.5 5-5m-5 0 5 5"/>
+          </svg>
+        </button>
+        <button class="dashboard-icon-button" type="button" data-dashboard-audio="microphone" aria-label="Windows microphones" aria-describedby="dashboard-microphone-state" disabled>
+          <svg class="dashboard-icon dashboard-icon-live" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 19v3m7-12v2a7 7 0 0 1-14 0v-2"/>
+            <rect x="9" y="2" width="6" height="13" rx="3"/>
+          </svg>
+          <svg class="dashboard-icon dashboard-icon-muted" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12 19v3m3-12.66V5a3 3 0 0 0-5.68-1.33m7.63 13.28A7 7 0 0 1 5 12v-2m13.89 3.23A7 7 0 0 0 19 12v-2M2 2l20 20M9 9v3a3 3 0 0 0 5.12 2.12"/>
+          </svg>
+          <span class="dashboard-icon-mixed" aria-hidden="true">−</span>
+        </button>
+      </div>
+      <span id="dashboard-output-state" class="dashboard-sr-only">Reading…</span>
+      <span id="dashboard-microphone-state" class="dashboard-sr-only">Reading…</span>
+      <p id="dashboard-audio-status" role="status"></p>
+      <section id="speaker-output-picker" role="dialog" aria-labelledby="speaker-output-title" hidden>
+        <header>
+          <h2 id="speaker-output-title">Audio output</h2>
+          <button id="speaker-output-close" type="button">Done</button>
+        </header>
+        <p id="speaker-output-status" role="status"></p>
+        <div id="speaker-output-devices" role="group" aria-label="Output devices"></div>
+      </section>
+    </div>
+    <button id="dashboard-switch" class="dashboard-icon-button" type="button" aria-controls="deck dashboard-panel stats-panel"
+      data-next="dashboard" aria-label="Show Dashboard" title="Show Dashboard">
+      <svg class="dashboard-icon dashboard-switch-dashboard" viewBox="0 0 24 24" aria-hidden="true">
+        <rect x="3" y="3" width="7" height="10" rx="1"/>
+        <rect x="14" y="3" width="7" height="6" rx="1"/>
+        <rect x="14" y="13" width="7" height="8" rx="1"/>
+        <rect x="3" y="17" width="7" height="4" rx="1"/>
+      </svg>
+      <svg class="dashboard-icon dashboard-switch-keys" viewBox="0 0 24 24" aria-hidden="true">
+        <rect x="3" y="5" width="4" height="5" rx="1"/>
+        <rect x="10" y="5" width="4" height="5" rx="1"/>
+        <rect x="17" y="5" width="4" height="5" rx="1"/>
+        <rect x="3" y="14" width="4" height="5" rx="1"/>
+        <rect x="10" y="14" width="4" height="5" rx="1"/>
+        <rect x="17" y="14" width="4" height="5" rx="1"/>
+      </svg>
+      <svg class="dashboard-icon dashboard-switch-stats" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M3 3v18h18M6 14l4-4 4 3 6-7"/>
+      </svg>
+    </button>
+    <button id="home-page" class="dashboard-icon-button" type="button" aria-label="Home" title="Home" disabled>
+      <svg class="dashboard-icon" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1Z"/>
+      </svg>
+    </button>
+    <div id="deck">
+      <nav id="page-nav" aria-label="Pages">
+        <button id="previous" type="button" aria-label="Previous page">‹</button>
+        <button id="next" type="button" aria-label="Next page">›</button>
+        <div class="page-current">
+          <img id="page-app-icon" alt="" hidden>
+          <div class="page-label">
+            <span id="page-name"></span>
+            <span id="page-folder" hidden></span>
+          </div>
+          <button id="page-count" type="button" aria-label="Why this page?" aria-controls="page-match" aria-expanded="false" hidden></button>
+          <p id="page-match" hidden></p>
+        </div>
+        <div id="activity-profile" hidden>
+          <button id="activity-profile-toggle" type="button" aria-controls="activity-profile-options" aria-expanded="false"></button>
+          <div id="activity-profile-options" hidden>
+            <div id="activity-profile-choices" role="group" aria-label="Activity profiles"></div>
+            <p id="activity-profile-error" role="alert"></p>
+          </div>
+        </div>
+        <button id="quick-tools-open" type="button" aria-haspopup="dialog" aria-controls="quick-tools" aria-expanded="false" hidden>Tools</button>
+        <button id="obs-tab" type="button" aria-controls="obs-panel" aria-expanded="false" hidden>OBS</button>
+        <button id="emoji-tab" type="button" aria-controls="emoji-panel" aria-expanded="false">Emoji</button>
+        <button id="page-lock" type="button" aria-pressed="false" hidden>Follow apps</button>
+      </nav>
+      <section id="keys" aria-label="Deck keys"></section>
+      <section id="obs-panel" aria-label="OBS control" hidden>
+        <div id="obs-heading">
+          <h2>OBS control</h2>
+          <p id="obs-status" role="status"></p>
+          <button id="obs-timers-toggle" type="button" aria-controls="obs-production" aria-expanded="false">Timers</button>
+          <button id="obs-modes-toggle" type="button" aria-controls="obs-modes" aria-expanded="false" hidden>Modes</button>
+          <button id="obs-return" type="button">Deck keys</button>
+        </div>
+        <div id="obs-recovery" hidden>
+          <p id="obs-unavailable" role="status"></p>
+          <button id="obs-reconnect" type="button" hidden>Retry connection</button>
+        </div>
+        <section id="obs-production" aria-label="Production timers" hidden></section>
+        <section id="obs-modes" aria-label="Production modes" hidden></section>
+        <div id="obs-content" hidden>
+          <div id="obs-outputs">
+            <button id="obs-record" type="button"></button>
+            <button id="obs-pause" type="button" hidden></button>
+            <button id="obs-stream" type="button"></button>
+            <button id="obs-transition" type="button" hidden>Take to program</button>
+            <span id="obs-replay-state"></span>
+            <button id="obs-save-replay" type="button">Save replay</button>
+            <button id="obs-preview-toggle" type="button" aria-controls="obs-scene-preview" aria-pressed="false">Scene preview</button>
+          </div>
+          <div id="obs-scene-columns">
+            <section aria-label="Scenes">
+              <div class="obs-list-heading"><h3>Scenes</h3><div id="obs-scenes-nav" class="obs-paging"></div></div>
+              <p id="obs-current-scenes"></p>
+              <div id="obs-scenes" class="obs-list"></div>
+            </section>
+            <section aria-label="Sources">
+              <div class="obs-list-heading"><h3>Sources</h3><div id="obs-items-nav" class="obs-paging"></div></div>
+              <p id="obs-source-scene"></p>
+              <div id="obs-items" class="obs-list"></div>
+            </section>
+            <section id="obs-detail" aria-label="Source controls">
+              <div class="obs-list-heading"><h3 id="obs-source-name"></h3></div>
+              <p id="obs-select-item">Select a source.</p>
+              <div id="obs-source-actions" hidden>
+                <button id="obs-visibility" type="button"></button>
+                <button id="obs-mute" type="button"></button>
+                <label id="obs-volume-label"><span>Volume</span><input id="obs-volume" type="range" min="0" max="100" value="0"><output id="obs-volume-value"></output></label>
+              </div>
+              <div id="obs-filters-header" class="obs-list-heading" hidden><h3>Filters</h3><div id="obs-filters-nav" class="obs-paging"></div></div>
+              <div id="obs-filters" class="obs-list"></div>
+            </section>
+            <figure id="obs-scene-preview" aria-label="Current OBS scene preview" hidden>
+              <figcaption id="obs-preview-caption"></figcaption>
+              <div id="obs-preview-frame"><img id="obs-preview-image" alt="" hidden></div>
+              <p id="obs-preview-status" role="status"></p>
+            </figure>
+          </div>
+          <div id="obs-confirm" hidden>
+            <p id="obs-confirm-text"></p>
+            <button id="obs-confirm-cancel" type="button">Cancel</button>
+            <button id="obs-confirm-apply" type="button">Confirm</button>
+          </div>
+        </div>
+      </section>
+      <section id="app-views-panel" aria-labelledby="app-views-heading" hidden>
+        <header class="app-views-header">
+          <h2 id="app-views-heading">App views</h2>
+          <div class="app-views-toolbar">
+            <button id="app-views-catalog-button" type="button" hidden>Catalog</button>
+            <button id="app-views-return" type="button">Deck keys</button>
+          </div>
+        </header>
+        <div id="app-views-feedback">
+          <p id="app-views-custom-error" role="status" hidden></p>
+          <p id="app-views-status" role="status"></p>
+        </div>
+        <div id="app-view-catalog">
+          <div class="app-views-search-row">
+            <input id="app-views-search" type="search" inputmode="none" maxlength="80" placeholder="Search app views" aria-label="Search app views">
+            <button id="app-views-type" type="button" aria-controls="app-views-keyboard" aria-expanded="false">Touch keyboard</button>
+          </div>
+          <div id="app-views-keyboard" aria-label="Touch keyboard" hidden></div>
+          <div id="app-views-results"></div>
+          <p id="app-views-empty" hidden>No matching app views.</p>
+          <div id="app-views-pages" class="app-views-pages" hidden>
+            <button id="app-views-previous" type="button" aria-label="Previous catalog page">‹</button>
+            <span id="app-views-page-number"></span>
+            <button id="app-views-next" type="button" aria-label="Next catalog page">›</button>
+          </div>
+        </div>
+        <article id="app-view-detail" aria-labelledby="app-view-title" hidden>
+          <h3 id="app-view-title"></h3>
+          <p id="app-view-summary"></p>
+          <div id="app-view-commands" aria-label="App commands"></div>
+          <div id="app-view-capabilities" aria-label="Capabilities"></div>
+          <div id="app-view-live" aria-label="Live app data" hidden></div>
+          <div id="app-view-widgets" aria-label="App widgets" hidden></div>
+        </article>
+      </section>
+      <section id="emoji-panel" aria-labelledby="emoji-heading" hidden>
+        <header class="emoji-header">
+          <h2 id="emoji-heading">Emoji</h2>
+          <div class="emoji-search-row">
+            <input id="emoji-search" type="search" inputmode="none" maxlength="60" placeholder="Search all emoji" aria-label="Search all emoji">
+            <button id="emoji-type" type="button" aria-controls="emoji-keyboard" aria-expanded="false">Touch keyboard</button>
+          </div>
+          <button id="emoji-return" type="button">Deck keys</button>
+        </header>
+        <div id="emoji-keyboard" aria-label="Touch keyboard" hidden></div>
+        <div id="emoji-browser">
+          <nav id="emoji-categories" aria-label="Emoji categories" hidden></nav>
+          <div id="emoji-grid" role="group" aria-label="Emoji buttons" tabindex="0"></div>
+        </div>
+        <div id="emoji-tones" role="group" aria-labelledby="emoji-tone-label" hidden>
+          <p id="emoji-tone-label">Skin tone</p>
+          <div id="emoji-tone-options"></div>
+        </div>
+        <p id="emoji-status" role="status"></p>
+      </section>
+    </div>
+
+    <aside id="panel">
+      <div class="clock">
+        <time id="time">--:--</time>
+        <div class="when">
+          <span id="weekday"></span>
+          <span id="date"></span>
+        </div>
+      </div>
+      <p id="status" role="status"></p>
+      <section id="telemetry" aria-label="PC telemetry">
+        <dl id="telemetry-readings"></dl>
+      </section>
+      <section id="mixer" aria-label="Windows audio">
+        <div class="audio-channel" data-device="output">
+          <button id="app-mixer-toggle" class="dashboard-icon-button" type="button" aria-controls="app-mixer"
+            aria-expanded="false" aria-label="Open App mixer" title="Open App mixer">
+            <svg class="dashboard-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M11 4.7a.7.7 0 0 0-1.2-.5L6.4 7.6A1.4 1.4 0 0 1 5.4 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.4a1.4 1.4 0 0 1 1 .4l3.4 3.4a.7.7 0 0 0 1.2-.5zM16 9a5 5 0 0 1 0 6m3.4 3.4a9 9 0 0 0 0-12.8"/>
+            </svg>
+          </button>
+          <input type="range" min="0" max="100" value="0" aria-label="Speaker volume" disabled>
+          <output>N/A</output>
+          <div class="mixer-peak">
+            <div class="audio-peak" data-peak="output" role="meter" aria-label="Speaker output signal" aria-valuemin="-60" aria-valuemax="0"></div>
+            <span data-peak-value>Reading…</span>
+          </div>
+        </div>
+        <div class="audio-channel" data-device="microphone">
+          <button id="microphone-mixer-toggle" class="dashboard-icon-button" type="button" aria-controls="microphone-mixer"
+            aria-expanded="false" aria-label="Choose microphones" title="Choose microphones">
+            <svg class="dashboard-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M12 19v3m7-12v2a7 7 0 0 1-14 0v-2"/>
+              <rect x="9" y="2" width="6" height="13" rx="3"/>
+            </svg>
+          </button>
+          <input type="range" min="0" max="100" value="0" aria-label="Microphone level" disabled>
+          <output>N/A</output>
+          <div class="mixer-peak">
+            <div class="audio-peak" data-peak="microphone" role="meter" aria-label="Microphone input signal" aria-valuemin="-60" aria-valuemax="0"></div>
+            <span data-peak-value>Reading…</span>
+          </div>
+        </div>
+        <button id="push-to-talk" class="dashboard-icon-button" type="button" disabled>
+          <svg class="dashboard-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="m11 7.601-5.994 8.19a1 1 0 0 0 .1 1.298l.817.818a1 1 0 0 0 1.314.087L15.09 12"/>
+            <path d="M16.5 21.174C15.5 20.5 14.372 20 13 20c-2.058 0-3.928 2.356-6 2-2.072-.356-2.775-3.369-1.5-4.5"/>
+            <circle cx="16" cy="7" r="5"/>
+          </svg>
+          <span id="push-to-talk-label">Push to talk</span>
+        </button>
+      </section>
+      <section id="app-mixer" class="app-mixer" aria-labelledby="app-mixer-title" hidden>
+        <header class="app-mixer-header">
+          <h2 id="app-mixer-title">App mixer</h2>
+          <button id="app-mixer-close" type="button">Done</button>
+        </header>
+        <p id="app-mixer-status" role="status"></p>
+        <div id="app-mixer-channels"></div>
+        <nav id="app-mixer-pages" aria-label="Audio apps" hidden>
+          <button id="app-mixer-prev" type="button" aria-label="Previous audio apps">‹</button>
+          <span id="app-mixer-position"></span>
+          <button id="app-mixer-next" type="button" aria-label="Next audio apps">›</button>
+        </nav>
+      </section>
+      <section id="microphone-mixer" class="app-mixer" aria-labelledby="microphone-mixer-title" hidden>
+        <header class="app-mixer-header">
+          <h2 id="microphone-mixer-title">Microphone mixer</h2>
+          <button id="microphone-mixer-close" type="button">Done</button>
+        </header>
+        <p id="microphone-mixer-status" role="status"></p>
+        <div id="microphone-mixer-options" role="group" aria-label="Microphone selection"></div>
+      </section>
+    </aside>
+    <section id="dashboard-panel" aria-label="Dashboard" hidden>
+      <header class="dashboard-header">
+        <div class="dashboard-clock">
+          <time id="dashboard-time"></time>
+          <time id="dashboard-date"></time>
+        </div>
+        <section id="dashboard-pomodoro" aria-label="Pomodoro" hidden>
+          <div class="pomodoro-labels">
+            <p class="pomodoro-title">Pomodoro</p>
+            <p id="pomodoro-phase" role="status">Reading timer</p>
+          </div>
+          <output id="pomodoro-time" role="timer" aria-live="off" aria-label="Pomodoro time remaining">–:––</output>
+          <div class="pomodoro-controls" role="group" aria-label="Pomodoro controls">
+            <button id="pomodoro-primary" type="button" disabled>Start focus</button>
+            <button id="pomodoro-reset" type="button" hidden>Reset</button>
+          </div>
+          <p id="pomodoro-feedback" role="status" hidden></p>
+        </section>
+        <section id="dashboard-signal" aria-label="Windows audio signal" hidden>
+          <div class="audio-signal">
+            <span>Speaker signal</span>
+            <div class="audio-peak" data-peak="output" role="meter" aria-label="Speaker output signal" aria-valuemin="-60" aria-valuemax="0"></div>
+            <span data-peak-value>Reading…</span>
+          </div>
+          <div class="audio-signal">
+            <span>Microphone signal</span>
+            <div class="audio-peak" data-peak="microphone" role="meter" aria-label="Microphone input signal" aria-valuemin="-60" aria-valuemax="0"></div>
+            <span data-peak-value>Reading…</span>
+          </div>
+        </section>
+      </header>
+      <div class="dashboard-content">
+        <section id="dashboard-calendar-card" class="dashboard-card" aria-label="Calendar">
+          <div id="dashboard-calendar"></div>
+          <button id="dashboard-calendar-open" type="button" hidden><span aria-hidden="true">↗</span></button>
+          <p id="dashboard-calendar-feedback" role="status" hidden></p>
+          <section id="dashboard-agenda" aria-label="Upcoming calendar event" hidden>
+            <div class="agenda-details" role="group" aria-label="Event details">
+              <p id="agenda-title">Next event</p>
+              <p id="agenda-timing" hidden></p>
+            </div>
+            <div class="agenda-controls" role="group" aria-label="Calendar controls">
+              <button id="agenda-join" type="button" hidden>Join</button>
+            </div>
+            <p id="agenda-notice" role="status" hidden></p>
+          </section>
+        </section>
+        <section class="dashboard-card dashboard-media" aria-label="Now Playing">
+          <div class="dashboard-media-content">
+            <div class="dashboard-cover">
+              <div id="dashboard-cover-fallback" aria-hidden="true">
+                <svg class="dashboard-icon" viewBox="0 0 24 24">
+                  <path d="m19 6-5.2-3.9a.5.5 0 0 0-.8.4V18"/>
+                  <circle cx="9" cy="18" r="4"/>
+                </svg>
+              </div>
+              <img id="dashboard-cover" alt="" hidden>
+            </div>
+            <div class="dashboard-media-copy">
+              <div class="dashboard-media-meta">
+                <p id="dashboard-playback" hidden></p>
+                <p id="dashboard-source" hidden></p>
+              </div>
+              <h2 id="dashboard-track"></h2>
+              <p id="dashboard-artist" hidden></p>
+              <p id="dashboard-album" hidden></p>
+              <div id="dashboard-timeline" hidden>
+                <progress id="dashboard-progress" aria-label="Track position"></progress>
+                <input id="dashboard-seek" type="range" step="1000" aria-label="Seek in track" hidden>
+                <div class="dashboard-timeline-times"><span id="dashboard-elapsed"></span><span id="dashboard-duration"></span></div>
+              </div>
+              <div class="dashboard-transport" role="group" aria-label="Playback controls">
+                <button id="dashboard-previous" class="dashboard-icon-button" type="button" aria-label="Previous track" title="Previous track" disabled>
+                  <svg class="dashboard-icon" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M17.971 4.285A2 2 0 0 1 21 6v12a2 2 0 0 1-3.029 1.715l-9.997-5.998a2 2 0 0 1-.003-3.432zM3 20V4"/>
+                  </svg>
+                </button>
+                <button id="dashboard-play" class="dashboard-icon-button" type="button" aria-label="Play" title="Play" disabled>
+                  <svg class="dashboard-icon dashboard-icon-play" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M5 5a2 2 0 0 1 3.008-1.728l11.997 6.998a2 2 0 0 1 .003 3.458l-12 7A2 2 0 0 1 5 19z"/>
+                  </svg>
+                  <svg class="dashboard-icon dashboard-icon-pause" viewBox="0 0 24 24" aria-hidden="true" hidden>
+                    <rect x="5" y="3" width="5" height="18" rx="1"/><rect x="14" y="3" width="5" height="18" rx="1"/>
+                  </svg>
+                </button>
+                <button id="dashboard-next" class="dashboard-icon-button" type="button" aria-label="Next track" title="Next track" disabled>
+                  <svg class="dashboard-icon" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M21 4v16M6.029 4.285A2 2 0 0 0 3 6v12a2 2 0 0 0 3.029 1.715l9.997-5.998a2 2 0 0 0 .003-3.432z"/>
+                  </svg>
+                </button>
+              </div>
+              <p id="dashboard-media-feedback" role="status" hidden></p>
+            </div>
+          </div>
+        </section>
+      </div>
+    </section>
+    <section id="stats-panel" aria-label="Stats" hidden>
+      <header class="stats-header">
+        <div class="stats-clock">
+          <time id="stats-time"></time>
+          <time id="stats-date"></time>
+        </div>
+        <nav id="stats-groups" aria-label="Telemetry groups">
+          <button id="stats-timeline-open" type="button" class="stats-group" aria-haspopup="dialog" aria-controls="stats-timeline-dialog" hidden>Timeline</button>
+          <button id="stats-processes-open" type="button" class="stats-group" aria-haspopup="dialog" aria-controls="stats-processes-dialog">Processes</button>
+        </nav>
+      </header>
+      <div id="stats-view-options" hidden>
+        <label id="stats-layout-control">Layout<select id="stats-layout"></select></label>
+        <label id="stats-power-mode" hidden>Power view
+          <select id="stats-power-view">
+            <option value="combined">Load and watts</option>
+            <option value="separate">Separate readings</option>
+          </select>
+        </label>
+        <label class="stats-option"><input id="stats-show-unavailable" type="checkbox">Show unavailable</label>
+        <label id="stats-history-control" hidden>History
+          <select id="stats-history"><option value="60000">Last minute</option></select>
+        </label>
+      </div>
+      <div id="stats-detail-controls" hidden>
+        <label id="stats-device-choice">Device
+          <select id="stats-device"></select>
+        </label>
+        <div id="stats-pages" role="group" aria-label="Reading pages">
+          <button id="stats-prev" type="button" class="stats-group" aria-label="Previous readings">‹</button>
+          <span id="stats-page-count" aria-live="polite"></span>
+          <button id="stats-next" type="button" class="stats-group" aria-label="Next readings">›</button>
+        </div>
+      </div>
+      <p id="stats-message" role="status" hidden></p>
+      <p id="stats-timeline-status" role="status"></p>
+      <div id="stats-readings" aria-label="Telemetry readings"></div>
+    </section>
+    <section id="widget-bar" class="lastra-widget-grid" aria-label="Persistent bar" hidden></section>
+    <p id="bar-status" role="status"></p>
+  </main>
+  <dialog id="windows-session-cover" aria-labelledby="windows-session-message">
+    <p id="windows-session-message">Windows session locked or suspended</p>
+  </dialog>
+  <dialog id="macro-choice" aria-labelledby="macro-choice-title">
+    <h2 id="macro-choice-title"></h2>
+    <div id="macro-choice-options" role="group" aria-label="Available choices"></div>
+    <p id="macro-choice-status" role="status"></p>
+    <div class="key-confirmation-buttons"><button id="macro-choice-cancel" type="button">Cancel</button></div>
+  </dialog>
+  <dialog id="page-directory" aria-labelledby="page-directory-title">
+    <header>
+      <h2 id="page-directory-title" tabindex="-1">Pages</h2>
+      <button id="page-directory-home" type="button">Home</button>
+      <button id="page-directory-close" type="button" autofocus>Close</button>
+    </header>
+    <nav id="page-directory-path" aria-label="Folder path" hidden></nav>
+    <div id="page-directory-list"></div>
+    <p id="page-directory-error" role="status"></p>
+  </dialog>
+  <dialog id="quick-tools" aria-labelledby="quick-tools-title" closedby="any">
+    <header class="tools-heading">
+      <h2 id="quick-tools-title">Tools</h2>
+      <button id="quick-tools-close" type="button" autofocus>Deck keys</button>
+    </header>
+    <div id="tools-content">
+      <section class="tools-column" aria-label="Time tools">
+        <div id="tools-timers"></div>
+        <section id="tools-pomodoro" aria-label="Pomodoro" hidden></section>
+      </section>
+      <section class="tools-column" aria-label="Decision and sound tools">
+        <section id="tools-decisions" class="tools-card" aria-label="Quick decision">
+          <div id="tools-decision-card"></div>
+        </section>
+        <section id="tools-soundboard" class="tools-card" aria-labelledby="tools-soundboard-title">
+          <h3 id="tools-soundboard-title">Soundboard</h3>
+          <p id="tools-sound-state" role="status"></p>
+          <div id="tools-sound-clips"></div>
+          <button id="tools-sound-stop" type="button" disabled>Stop all sounds</button>
+        </section>
+      </section>
+      <section id="quick-tools-actions" class="tools-card" aria-labelledby="tools-controls-title">
+        <h3 id="tools-controls-title">Deck controls</h3>
+        <button id="page-directory-open" data-tool-dismiss type="button" aria-haspopup="dialog" aria-controls="page-directory" hidden>Pages</button>
+        <button id="app-views-tab" data-tool-dismiss type="button" aria-controls="app-views-panel" aria-expanded="false">Apps</button>
+        <button type="button" id="quick-tools-feedback" data-quick-tool="feedback">Last action<small hidden></small></button>
+        <button type="button" id="quick-tools-output" data-quick-tool="output">Audio output<small hidden></small></button>
+        <button type="button" id="quick-tools-backlight" data-quick-tool="backlight">Display backlight<small hidden></small></button>
+        <button type="button" id="quick-tools-desktop" data-quick-tool="desktop">Reveal desktop<small hidden></small></button>
+      </section>
+    </div>
+  </dialog>
+  <dialog id="deck-backlight" aria-labelledby="deck-backlight-title" closedby="any">
+    <header>
+      <h2 id="deck-backlight-title">Display backlight</h2>
+      <button id="deck-backlight-close" type="button" autofocus>Close</button>
+    </header>
+    <p id="deck-backlight-status" role="status"></p>
+    <div id="deck-backlight-controls" hidden>
+      <label for="deck-backlight-level">Brightness <output id="deck-backlight-percent" for="deck-backlight-level"></output></label>
+      <input id="deck-backlight-level" type="range" min="0" max="100" step="1">
+    </div>
+    <footer>
+      <button id="deck-backlight-refresh" type="button">Read brightness</button>
+      <button id="deck-backlight-apply" type="button" disabled>Apply</button>
+    </footer>
+  </dialog>
+  <dialog id="key-confirmation" aria-labelledby="key-confirmation-title" aria-describedby="key-confirmation-text">
+    <h2 id="key-confirmation-title">Confirm action</h2>
+    <p id="key-confirmation-text"></p>
+    <div class="key-confirmation-buttons">
+      <button id="key-confirmation-cancel" type="button">Cancel</button>
+      <button id="key-confirmation-run" type="button" disabled>Run action</button>
+    </div>
+  </dialog>
+  <dialog id="key-feedback-dialog" aria-labelledby="key-feedback-title">
+    <h2 id="key-feedback-title"></h2>
+    <p id="key-feedback-state" role="status"></p>
+    <p id="key-feedback-message"></p>
+    <div id="key-feedback-steps" aria-label="Step results"></div>
+    <div class="key-confirmation-buttons">
+      <button id="key-feedback-stop-flow" type="button" hidden>Stop macro</button>
+      <button id="key-feedback-close" type="button">Close</button>
+    </div>
+  </dialog>
+  <script src="../shared/i18n-it.js"></script>
+  <script src="../shared/i18n.js"></script>
+  <script src="../shared/dom.js"></script>
+  <script src="../shared/appearance.js"></script>
+  <script src="macro-choice.js"></script>
+  <script src="agent-panel-fixtures.js"></script>
+  <script src="editor-preview.js"></script>
+  <script src="telemetry-history.js"></script>
+  <script src="reading-time.js"></script>
+  <script src="../shared/decisions.js"></script>
+  <script src="../shared/widget-layout.js"></script>
+  <script src="../shared/timers.js"></script>
+  <script src="../shared/sounds.js"></script>
+  <script src="../shared/sensor-binding.js"></script>
+  <script src="../shared/widget-composition.js"></script>
+  <script src="display-backlight-widgets.js"></script>
+  <script src="widget-providers.js"></script>
+  <script src="../shared/stats-chart.js"></script>
+  <script src="widget-components.js"></script>
+  <script src="widget-composition.js"></script>
+  <script src="audio-fader.js"></script>
+  <script src="control-modes.js"></script>
+  <script src="virtual-dial.js"></script>
+  <script src="now-playing.js"></script>
+  <script src="widgets.js"></script>
+  <script src="telemetry.js"></script>
+  <script src="app-mixer.js"></script>
+  <script src="audio-peaks.js"></script>
+  <script src="app-view-action-history.js"></script>
+  <script src="activity-profile.js"></script>
+  <script src="panel-measurement.js"></script>
+  <script src="../shared/editing-keys.js"></script>
+  <script src="../shared/key-readouts.js"></script>
+  <script src="../shared/linked-controls.js"></script>
+  <script src="key-live-state.js"></script>
+  <script src="view-only.js"></script>
+  <script src="flow-feedback.js"></script>
+  <script src="quick-tools.js"></script>
+  <script src="display-backlight.js"></script>
+  <script src="app.js"></script>
+  <script src="push-to-talk.js"></script>
+  <script src="microphone-mixer.js"></script>
+  <script src="obs-production.js"></script>
+  <script src="obs-modes.js"></script>
+  <script src="idle-screen.js"></script>
+  <script src="navigation-badges.js"></script>
+  <script src="obs.js"></script>
+  <script src="app-view-wsl.js"></script>
+  <script src="app-view-docker.js"></script>
+  <script src="app-view-spotify.js"></script>
+  <script src="app-view-streaming.js"></script>
+  <script src="app-view-terminal.js"></script>
+  <script src="app-view-notes.js"></script>
+  <script src="app-view-clipboard-pins.js"></script>
+  <script src="app-view-workspaces.js"></script>
+  <script src="app-view-github.js"></script>
+  <script src="app-view-windows.js"></script>
+  <script src="visible-feed.js"></script>
+  <script src="app-view-service-health.js"></script>
+  <script src="app-view-syncthing.js"></script>
+  <script src="app-view-prometheus.js"></script>
+  <script src="app-view-kubernetes.js"></script>
+  <script src="app-view-alerts.js"></script>
+  <script src="app-view-audio-presets.js"></script>
+  <script src="app-view-agent-activity.js"></script>
+  <script src="app-view-hardware-thresholds.js"></script>
+  <script src="app-view-resources.js"></script>
+  <script src="app-view-power.js"></script>
+  <script src="app-view-watchlist.js"></script>
+  <script src="app-view-web-embeds.js"></script>
+  <script src="../shared/snippets.js"></script>
+  <script src="touch-keyboard.js"></script>
+  <script src="emoji-view.js"></script>
+  <script src="snippet-picker.js"></script>
+  <script src="app-view-snippets.js"></script>
+  <script src="app-view-claude.js"></script>
+  <script src="app-view-chatgpt.js"></script>
+  <script src="app-view-vscode.js"></script>
+  <script src="app-view-projects.js"></script>
+  <script src="app-views.js"></script>
+  <script src="dashboard-calendar.js"></script>
+  <script src="speaker-press.js"></script>
+  <script src="speaker-output-picker.js"></script>
+  <script src="dashboard-audio.js"></script>
+  <script src="dashboard-pomodoro.js"></script>
+  <script src="dashboard-agenda.js"></script>
+  <script src="dashboard.js"></script>
+  <script src="stats-layout.js"></script>
+  <script src="stats-timeline.js"></script>
+  <script src="stats-processes.js"></script>
+  <script src="stats.js"></script>
+</body>
+</html>

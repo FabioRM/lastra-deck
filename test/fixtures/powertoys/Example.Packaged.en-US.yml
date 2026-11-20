@@ -1,0 +1,14 @@
+PackageName: Example.Packaged
+Name: Packaged fixture
+WindowFilter: packaged.exe
+Shortcuts:
+  - SectionName: Tabs
+    Properties:
+      - Name: Last tab
+        Shortcut:
+          - Ctrl: true
+            Keys: ["<9>"]
+      - Name: Advance focus
+        Description: A decimal value is a virtual key code.
+        Shortcut:
+          - Keys: [9]

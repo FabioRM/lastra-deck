@@ -1,0 +1,174 @@
+{
+  "version": 2,
+  "locale": "en-GB",
+  "grid": {
+    "cols": 6,
+    "rows": 2
+  },
+  "name": "Work",
+  "pages": [
+    {
+      "id": "home",
+      "name": "Work keys",
+      "keys": [
+        {
+          "id": "terminal",
+          "label": "Terminal",
+          "icon": "square-terminal",
+          "category": "app",
+          "action": {
+            "type": "launch",
+            "target": "wt.exe"
+          }
+        },
+        {
+          "id": "code",
+          "label": "VS Code",
+          "icon": "code",
+          "category": "app",
+          "action": {
+            "type": "launch",
+            "target": "%LOCALAPPDATA%\\Programs\\Microsoft VS Code\\Code.exe",
+            "reuseWindow": true
+          }
+        },
+        {
+          "id": "explorer",
+          "label": "File Explorer",
+          "icon": "folder",
+          "category": "app",
+          "action": {
+            "type": "launch",
+            "target": "explorer.exe",
+            "reuseWindow": true
+          }
+        },
+        {
+          "id": "downloads",
+          "label": "Downloads",
+          "icon": "folder-down",
+          "category": "app",
+          "action": {
+            "type": "open",
+            "target": "%USERPROFILE%\\Downloads"
+          }
+        },
+        {
+          "id": "task-manager",
+          "label": "Task Manager",
+          "icon": "activity",
+          "category": "app",
+          "action": {
+            "type": "launch",
+            "target": "taskmgr.exe"
+          }
+        }
+      ]
+    },
+    {
+      "id": "development",
+      "name": "VS Code",
+      "apps": [
+        "code.exe",
+        "code - insiders.exe"
+      ],
+      "appIds": [
+        "microsoft.visualstudiocode"
+      ],
+      "keys": [
+        {
+          "id": "command-palette",
+          "label": "Command palette",
+          "icon": "command",
+          "category": "app",
+          "action": {
+            "type": "hotkey",
+            "keys": "Ctrl+Shift+P"
+          }
+        },
+        {
+          "id": "quick-open",
+          "label": "Quick open",
+          "icon": "file-search",
+          "category": "app",
+          "action": {
+            "type": "hotkey",
+            "keys": "Ctrl+P"
+          }
+        },
+        {
+          "id": "find-in-files",
+          "label": "Find in files",
+          "icon": "search",
+          "category": "app",
+          "action": {
+            "type": "hotkey",
+            "keys": "Ctrl+Shift+F"
+          }
+        },
+        {
+          "id": "source-control",
+          "label": "Source control",
+          "icon": "git-branch",
+          "category": "app",
+          "action": {
+            "type": "hotkey",
+            "keys": "Ctrl+Shift+G"
+          }
+        }
+      ]
+    },
+    {
+      "id": "browser",
+      "name": "Browser",
+      "apps": [
+        "chrome.exe",
+        "msedge.exe",
+        "firefox.exe",
+        "brave.exe"
+      ],
+      "keys": [
+        {
+          "id": "new-tab",
+          "label": "New tab",
+          "icon": "square-plus",
+          "category": "app",
+          "action": {
+            "type": "hotkey",
+            "keys": "Ctrl+T"
+          }
+        },
+        {
+          "id": "restore-tab",
+          "label": "Restore tab",
+          "icon": "rotate-ccw",
+          "category": "app",
+          "action": {
+            "type": "hotkey",
+            "keys": "Ctrl+Shift+T"
+          }
+        },
+        {
+          "id": "find",
+          "label": "Find",
+          "icon": "search",
+          "category": "app",
+          "action": {
+            "type": "hotkey",
+            "keys": "Ctrl+F"
+          }
+        },
+        {
+          "id": "address",
+          "label": "Address bar",
+          "icon": "link",
+          "category": "app",
+          "action": {
+            "type": "hotkey",
+            "keys": "Ctrl+L"
+          }
+        }
+      ]
+    }
+  ]
+}

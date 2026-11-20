@@ -1,0 +1,6780 @@
+{
+  "license": "Apache-2.0",
+  "notice": "licenses/IntelliJ-Platform-NOTICE.txt",
+  "changes": "Lastra converted the pinned IntelliJ Platform XML and English action labels to JSON, with coverage metadata and source references.",
+  "version": "intellij-idea-reference-2026.2.3",
+  "reviewedOn": "2026-11-19",
+  "sources": {
+    "windows": {
+      "url": "https://github.com/JetBrains/intellij-community/blob/8062c061ff33e22041d9f1844db5b8b8a6b5e4d7/platform/platform-resources/src/keymaps/%24default.xml",
+      "terms": "https://www.apache.org/licenses/LICENSE-2.0",
+      "revision": "sha256:b2a38677e7fedae28a422194685eedb182c6f7d4d7cb0381cae753cf431cc97a",
+      "gitBlob": "4c490aab2b649f985a8a69a2701df7511e6dc925",
+      "method": "vendor-source",
+      "appVersion": "2026.2.3",
+      "keymap": "$default"
+    },
+    "emacs": {
+      "url": "https://github.com/JetBrains/intellij-community/blob/8062c061ff33e22041d9f1844db5b8b8a6b5e4d7/platform/platform-resources/src/keymaps/Emacs.xml",
+      "terms": "https://www.apache.org/licenses/LICENSE-2.0",
+      "revision": "sha256:195f1dfbb4626b6d6398e5cc4ba9111d477d58c83b87c563f51d130a0ab490ad",
+      "gitBlob": "9c0c109414fa9720a22dd8a79fe7aa0d28c1b540",
+      "method": "vendor-source",
+      "appVersion": "2026.2.3",
+      "keymap": "Emacs"
+    },
+    "sublime": {
+      "url": "https://github.com/JetBrains/intellij-community/blob/8062c061ff33e22041d9f1844db5b8b8a6b5e4d7/platform/platform-resources/src/keymaps/Sublime%20Text.xml",
+      "terms": "https://www.apache.org/licenses/LICENSE-2.0",
+      "revision": "sha256:035efd484696be8ac0980e13fbcaed52fe0ef0ce645b974607085f1da404c529",
+      "gitBlob": "0611c682e747efeb9051b9c213669a16cfe5077d",
+      "method": "vendor-source",
+      "appVersion": "2026.2.3",
+      "keymap": "Sublime Text"
+    },
+    "help": {
+      "url": "https://www.jetbrains.com/help/idea/configuring-keyboard-and-mouse-shortcuts.html",
+      "terms": "https://www.jetbrains.com/legal/docs/company/useterms/",
+      "revision": "idea-2026.3-help-reviewed-2026-11-19",
+      "method": "vendor-documentation"
+    }
+  },
+  "coverage": {
+    "release": "idea/2026.2.3",
+    "commit": "8062c061ff33e22041d9f1844db5b8b8a6b5e4d7",
+    "installedVersion": null,
+    "selectedPreset": null,
+    "englishActionTitles": "sha256:6d09436057f21098ce96b42feaf438cd10418f9c95a0f091a61374035488b839",
+    "keymapImplementation": "sha256:d377da6b390682859b0d07ab958f9e843c9e41fddbf90904b5cdbe01c1b983d5",
+    "declarations": {
+      "windows": {
+        "actions": 426,
+        "empty": 15,
+        "bindings": {
+          "keyboard": 447,
+          "double-press": 2,
+          "mouse": 14
+        }
+      },
+      "emacs": {
+        "actions": 115,
+        "empty": 31,
+        "bindings": {
+          "keyboard": 138,
+          "mouse": 1
+        }
+      },
+      "sublime": {
+        "actions": 122,
+        "empty": 56,
+        "bindings": {
+          "keyboard": 81,
+          "mouse": 6
+        }
+      }
+    },
+    "unresolved": [
+      "Installed IDEA command registrations and plugin or edition-specific actions",
+      "The selected local keymap and remaps",
+      "Active component, Windows keyboard layout and physical delivery"
+    ]
+  },
+  "windows": [
+    [
+      "CodeFloatingToolbar.GotoNextMenu",
+      "Go to Next Toolbar Menu",
+      [
+        [
+          "keyboard",
+          "TAB"
+        ]
+      ]
+    ],
+    [
+      "CodeFloatingToolbar.GotoPrevMenu",
+      "Go to Previous Toolbar Menu",
+      [
+        [
+          "keyboard",
+          "shift TAB"
+        ]
+      ]
+    ],
+    [
+      "RunAnything",
+      "Run Anything",
+      [
+        [
+          "double-press",
+          "ctrl control"
+        ]
+      ]
+    ],
+    [
+      "SearchEverywhere",
+      "Search Everywhere",
+      [
+        [
+          "double-press",
+          "shift SHIFT"
+        ]
+      ]
+    ],
+    [
+      "ShowNavBar",
+      null,
+      [
+        [
+          "keyboard",
+          "alt HOME"
+        ]
+      ]
+    ],
+    [
+      "OpenInRightSplit",
+      "Open in Right Split",
+      [
+        [
+          "keyboard",
+          "shift ENTER"
+        ],
+        [
+          "mouse",
+          "alt button1 doubleClick"
+        ]
+      ]
+    ],
+    [
+      "SplitChooser",
+      "Open in Split with Chooser",
+      [
+        [
+          "keyboard",
+          "alt shift ENTER"
+        ]
+      ]
+    ],
+    [
+      "SplitChooser.NextWindow",
+      "Next Split",
+      [
+        [
+          "keyboard",
+          "TAB"
+        ]
+      ]
+    ],
+    [
+      "SplitChooser.PreviousWindow",
+      "Previous Split",
+      [
+        [
+          "keyboard",
+          "shift TAB"
+        ]
+      ]
+    ],
+    [
+      "SplitChooser.Split",
+      "Split",
+      [
+        [
+          "keyboard",
+          "ENTER"
+        ]
+      ]
+    ],
+    [
+      "SplitChooser.Duplicate",
+      "Duplicate",
+      [
+        [
+          "keyboard",
+          "ctrl ENTER"
+        ]
+      ]
+    ],
+    [
+      "SplitChooser.SplitCenter",
+      "Without Split",
+      [
+        [
+          "keyboard",
+          "SPACE"
+        ]
+      ]
+    ],
+    [
+      "ShowSettings",
+      null,
+      [
+        [
+          "keyboard",
+          "control alt S"
+        ]
+      ]
+    ],
+    [
+      "ShowProjectStructureSettings",
+      "Project Structure",
+      [
+        [
+          "keyboard",
+          "control alt shift S"
+        ]
+      ]
+    ],
+    [
+      "FullyExpandTreeNode",
+      "Fully Expand Tree Node",
+      [
+        [
+          "keyboard",
+          "MULTIPLY"
+        ]
+      ]
+    ],
+    [
+      "ExpandTreeNode",
+      "Expand Tree Node",
+      [
+        [
+          "keyboard",
+          "ADD"
+        ]
+      ]
+    ],
+    [
+      "CollapseTreeNode",
+      "Collapse Tree Node",
+      [
+        [
+          "keyboard",
+          "SUBTRACT"
+        ]
+      ]
+    ],
+    [
+      "SwitchCoverage",
+      "Show Code Co_verage Data",
+      [
+        [
+          "keyboard",
+          "control alt F6"
+        ]
+      ]
+    ],
+    [
+      "EditorPageUpWithSelection",
+      "Page Up with Selection",
+      [
+        [
+          "keyboard",
+          "shift PAGE_UP"
+        ]
+      ]
+    ],
+    [
+      "EvaluateExpression",
+      "Evaluate E_xpression",
+      [
+        [
+          "keyboard",
+          "alt F8"
+        ]
+      ]
+    ],
+    [
+      "QuickEvaluateExpression",
+      null,
+      [
+        [
+          "keyboard",
+          "control alt F8"
+        ],
+        [
+          "mouse",
+          "alt button1"
+        ]
+      ]
+    ],
+    [
+      "ShowExecutionPoint",
+      "Show E_xecution Point",
+      [
+        [
+          "keyboard",
+          "alt F10"
+        ]
+      ]
+    ],
+    [
+      "EditorEscape",
+      "Escape",
+      [
+        [
+          "keyboard",
+          "ESCAPE"
+        ]
+      ]
+    ],
+    [
+      "FocusEditor",
+      "Focus Editor",
+      [
+        [
+          "keyboard",
+          "ESCAPE"
+        ]
+      ]
+    ],
+    [
+      "StepInto",
+      "Step Into",
+      [
+        [
+          "keyboard",
+          "F7"
+        ]
+      ]
+    ],
+    [
+      "SmartStepInto",
+      "Smart Ste_p Into",
+      [
+        [
+          "keyboard",
+          "shift F7"
+        ]
+      ]
+    ],
+    [
+      "ForceStepInto",
+      "Force Step I_nto",
+      [
+        [
+          "keyboard",
+          "alt shift F7"
+        ]
+      ]
+    ],
+    [
+      "ForceStepOver",
+      "Force Step O_ver",
+      [
+        [
+          "keyboard",
+          "alt shift F8"
+        ]
+      ]
+    ],
+    [
+      "FindUsages",
+      "Find Usages",
+      [
+        [
+          "keyboard",
+          "alt F7"
+        ]
+      ]
+    ],
+    [
+      "ShowUsages",
+      "Show Usages",
+      [
+        [
+          "keyboard",
+          "control alt F7"
+        ]
+      ]
+    ],
+    [
+      "ShowSettingsAndFindUsages",
+      "Find Usages Settings",
+      [
+        [
+          "keyboard",
+          "control shift alt F7"
+        ]
+      ]
+    ],
+    [
+      "UsageView.Include",
+      "Include",
+      [
+        [
+          "keyboard",
+          "INSERT"
+        ]
+      ]
+    ],
+    [
+      "EditorJoinLines",
+      "Join Lines",
+      [
+        [
+          "keyboard",
+          "control shift J"
+        ]
+      ]
+    ],
+    [
+      "EditorChooseLookupItemDot",
+      "Choose Lookup Item and Insert Dot",
+      [
+        [
+          "keyboard",
+          "control PERIOD"
+        ]
+      ]
+    ],
+    [
+      "EditorCompleteStatement",
+      "Complete Current Statement",
+      [
+        [
+          "keyboard",
+          "control shift ENTER"
+        ]
+      ]
+    ],
+    [
+      "DumpLookupElementWeights",
+      "Dump Lookup Element Weights to Log",
+      [
+        [
+          "keyboard",
+          "control alt shift W"
+        ]
+      ]
+    ],
+    [
+      "EditorLookupUp",
+      "Lookup Up",
+      [
+        [
+          "keyboard",
+          "control UP"
+        ]
+      ]
+    ],
+    [
+      "EditorLookupDown",
+      "Lookup Down",
+      [
+        [
+          "keyboard",
+          "control DOWN"
+        ]
+      ]
+    ],
+    [
+      "MethodOverloadSwitchUp",
+      "Previous Method Overload",
+      [
+        [
+          "keyboard",
+          "control UP"
+        ]
+      ]
+    ],
+    [
+      "MethodOverloadSwitchDown",
+      "Next Method Overload",
+      [
+        [
+          "keyboard",
+          "control DOWN"
+        ]
+      ]
+    ],
+    [
+      "CloseGotItTooltip",
+      "Close Got It Tooltip",
+      [
+        [
+          "keyboard",
+          "ESCAPE"
+        ]
+      ]
+    ],
+    [
+      "ReformatCode",
+      "Reformat Code",
+      [
+        [
+          "keyboard",
+          "control alt L"
+        ]
+      ]
+    ],
+    [
+      "ShowReformatFileDialog",
+      "Reformat File",
+      [
+        [
+          "keyboard",
+          "control shift alt L"
+        ]
+      ]
+    ],
+    [
+      "Generate",
+      "Generate",
+      [
+        [
+          "keyboard",
+          "alt INSERT"
+        ]
+      ]
+    ],
+    [
+      "EditorChooseLookupItemReplace",
+      "Choose Lookup Item Replace",
+      [
+        [
+          "keyboard",
+          "TAB"
+        ]
+      ]
+    ],
+    [
+      "NextParameter",
+      "Next Parameter",
+      [
+        [
+          "keyboard",
+          "TAB"
+        ]
+      ]
+    ],
+    [
+      "PrevParameter",
+      "Prev Parameter",
+      [
+        [
+          "keyboard",
+          "shift TAB"
+        ]
+      ]
+    ],
+    [
+      "ViewSource",
+      "Sho_w Source",
+      [
+        [
+          "keyboard",
+          "control ENTER"
+        ]
+      ]
+    ],
+    [
+      "CommentByBlockComment",
+      "Comment with Block Comment",
+      [
+        [
+          "keyboard",
+          "control shift SLASH"
+        ],
+        [
+          "keyboard",
+          "control shift DIVIDE"
+        ]
+      ]
+    ],
+    [
+      "FindWordAtCaret",
+      "Next Occurrence of the Word at Caret",
+      [
+        [
+          "keyboard",
+          "control F3"
+        ]
+      ]
+    ],
+    [
+      "FindPrevWordAtCaret",
+      "Previous Occurrence of the Word at Caret",
+      [
+        [
+          "keyboard",
+          "control shift F3"
+        ]
+      ]
+    ],
+    [
+      "SelectNextOccurrence",
+      "Add Selection for Next Occurrence",
+      [
+        [
+          "keyboard",
+          "alt J"
+        ]
+      ]
+    ],
+    [
+      "UnselectPreviousOccurrence",
+      "Unselect Occurrence",
+      [
+        [
+          "keyboard",
+          "alt shift J"
+        ]
+      ]
+    ],
+    [
+      "SelectAllOccurrences",
+      "Select All Occurrences",
+      [
+        [
+          "keyboard",
+          "control alt shift J"
+        ]
+      ]
+    ],
+    [
+      "EditorAddOrRemoveCaret",
+      "Add or Remove Caret",
+      [
+        [
+          "mouse",
+          "alt shift button1"
+        ]
+      ]
+    ],
+    [
+      "EditorAddRectangularSelectionOnMouseDrag",
+      "Add Rectangular Selection on Mouse Drag",
+      [
+        [
+          "mouse",
+          "ctrl alt shift button1"
+        ]
+      ]
+    ],
+    [
+      "EditorCreateRectangularSelectionOnMouseDrag",
+      "Create Rectangular Selection on Mouse Drag",
+      [
+        [
+          "mouse",
+          "alt button1"
+        ],
+        [
+          "mouse",
+          "button2"
+        ]
+      ]
+    ],
+    [
+      "EditorCreateRectangularSelection",
+      "Create Rectangular Selection",
+      [
+        [
+          "mouse",
+          "alt shift button2"
+        ]
+      ]
+    ],
+    [
+      "EditorAddCaretPerSelectedLine",
+      "Add Carets to Ends of Selected Lines",
+      [
+        [
+          "keyboard",
+          "shift alt G"
+        ]
+      ]
+    ],
+    [
+      "GotoDeclaration",
+      "Go to Declaration or Usages",
+      [
+        [
+          "keyboard",
+          "control B"
+        ],
+        [
+          "mouse",
+          "ctrl button1"
+        ]
+      ]
+    ],
+    [
+      "QuickImplementations",
+      "Quic_k Definition",
+      [
+        [
+          "keyboard",
+          "control shift I"
+        ]
+      ]
+    ],
+    [
+      "GotoTypeDeclaration",
+      "Go to Type Declaration",
+      [
+        [
+          "keyboard",
+          "control shift B"
+        ],
+        [
+          "mouse",
+          "ctrl shift button1"
+        ]
+      ]
+    ],
+    [
+      "GotoBookmark0",
+      null,
+      [
+        [
+          "keyboard",
+          "control 0"
+        ]
+      ]
+    ],
+    [
+      "GotoBookmark1",
+      null,
+      [
+        [
+          "keyboard",
+          "control 1"
+        ]
+      ]
+    ],
+    [
+      "GotoBookmark2",
+      null,
+      [
+        [
+          "keyboard",
+          "control 2"
+        ]
+      ]
+    ],
+    [
+      "GotoBookmark3",
+      null,
+      [
+        [
+          "keyboard",
+          "control 3"
+        ]
+      ]
+    ],
+    [
+      "GotoBookmark4",
+      null,
+      [
+        [
+          "keyboard",
+          "control 4"
+        ]
+      ]
+    ],
+    [
+      "GotoBookmark5",
+      null,
+      [
+        [
+          "keyboard",
+          "control 5"
+        ]
+      ]
+    ],
+    [
+      "GotoBookmark6",
+      null,
+      [
+        [
+          "keyboard",
+          "control 6"
+        ]
+      ]
+    ],
+    [
+      "GotoBookmark7",
+      null,
+      [
+        [
+          "keyboard",
+          "control 7"
+        ]
+      ]
+    ],
+    [
+      "GotoBookmark8",
+      null,
+      [
+        [
+          "keyboard",
+          "control 8"
+        ]
+      ]
+    ],
+    [
+      "GotoBookmark9",
+      null,
+      [
+        [
+          "keyboard",
+          "control 9"
+        ]
+      ]
+    ],
+    [
+      "ToggleBookmark0",
+      null,
+      [
+        [
+          "keyboard",
+          "control shift 0"
+        ]
+      ]
+    ],
+    [
+      "ToggleBookmark1",
+      null,
+      [
+        [
+          "keyboard",
+          "control shift 1"
+        ]
+      ]
+    ],
+    [
+      "ToggleBookmark2",
+      null,
+      [
+        [
+          "keyboard",
+          "control shift 2"
+        ]
+      ]
+    ],
+    [
+      "ToggleBookmark3",
+      null,
+      [
+        [
+          "keyboard",
+          "control shift 3"
+        ]
+      ]
+    ],
+    [
+      "ToggleBookmark4",
+      null,
+      [
+        [
+          "keyboard",
+          "control shift 4"
+        ]
+      ]
+    ],
+    [
+      "ToggleBookmark5",
+      null,
+      [
+        [
+          "keyboard",
+          "control shift 5"
+        ]
+      ]
+    ],
+    [
+      "ToggleBookmark6",
+      null,
+      [
+        [
+          "keyboard",
+          "control shift 6"
+        ]
+      ]
+    ],
+    [
+      "ToggleBookmark7",
+      null,
+      [
+        [
+          "keyboard",
+          "control shift 7"
+        ]
+      ]
+    ],
+    [
+      "ToggleBookmark8",
+      null,
+      [
+        [
+          "keyboard",
+          "control shift 8"
+        ]
+      ]
+    ],
+    [
+      "ToggleBookmark9",
+      null,
+      [
+        [
+          "keyboard",
+          "control shift 9"
+        ]
+      ]
+    ],
+    [
+      "$Undo",
+      "Undo",
+      [
+        [
+          "keyboard",
+          "control Z"
+        ],
+        [
+          "keyboard",
+          "alt BACK_SPACE"
+        ]
+      ]
+    ],
+    [
+      "PreviousTemplateVariable",
+      "Previous Template Variable",
+      [
+        [
+          "keyboard",
+          "shift TAB"
+        ]
+      ]
+    ],
+    [
+      "EditorScrollUp",
+      "Scroll Up",
+      [
+        [
+          "keyboard",
+          "control UP"
+        ]
+      ]
+    ],
+    [
+      "ExpandAll",
+      "Expand All",
+      [
+        [
+          "keyboard",
+          "control ADD"
+        ],
+        [
+          "keyboard",
+          "control EQUALS"
+        ]
+      ]
+    ],
+    [
+      "ExpandExpandableComponent",
+      "Expand Component",
+      [
+        [
+          "keyboard",
+          "shift ENTER"
+        ],
+        [
+          "keyboard",
+          "control ADD"
+        ],
+        [
+          "keyboard",
+          "control EQUALS"
+        ]
+      ]
+    ],
+    [
+      "GotoSuperMethod",
+      "Go to Super Method",
+      [
+        [
+          "keyboard",
+          "control U"
+        ]
+      ]
+    ],
+    [
+      "GotoTest",
+      "Go to Test",
+      [
+        [
+          "keyboard",
+          "control shift T"
+        ]
+      ]
+    ],
+    [
+      "GotoRelated",
+      "Related Symbol",
+      [
+        [
+          "keyboard",
+          "control alt HOME"
+        ]
+      ]
+    ],
+    [
+      "CloseActiveTab",
+      "Cl_ose Active Tab",
+      [
+        [
+          "keyboard",
+          "control shift F4"
+        ]
+      ]
+    ],
+    [
+      "GotoClass",
+      "Go to Class",
+      [
+        [
+          "keyboard",
+          "control N"
+        ]
+      ]
+    ],
+    [
+      "GotoChangedFile",
+      "Go to Changed File",
+      []
+    ],
+    [
+      "GotoSymbol",
+      "Go to Symbol",
+      [
+        [
+          "keyboard",
+          "control shift alt N"
+        ]
+      ]
+    ],
+    [
+      "GotoAction",
+      "Find Action",
+      [
+        [
+          "keyboard",
+          "control shift A"
+        ]
+      ]
+    ],
+    [
+      "TextSearchAction",
+      "Text",
+      [
+        [
+          "keyboard",
+          "control shift alt E"
+        ]
+      ]
+    ],
+    [
+      "RunInspection",
+      null,
+      [
+        [
+          "keyboard",
+          "control shift alt I"
+        ]
+      ]
+    ],
+    [
+      "FileStructurePopup",
+      "F_ile Structure",
+      [
+        [
+          "keyboard",
+          "control F12"
+        ]
+      ]
+    ],
+    [
+      "ShowFilePath",
+      "File Path",
+      [
+        [
+          "keyboard",
+          "control alt F12"
+        ]
+      ]
+    ],
+    [
+      "EditorUnindentSelection",
+      "Unindent Line or Selection",
+      [
+        [
+          "keyboard",
+          "shift TAB"
+        ]
+      ]
+    ],
+    [
+      "PasteMultiple",
+      "Past_e from History",
+      [
+        [
+          "keyboard",
+          "control shift V"
+        ],
+        [
+          "keyboard",
+          "control shift INSERT"
+        ]
+      ]
+    ],
+    [
+      "EditorBackSpace",
+      "Backspace",
+      [
+        [
+          "keyboard",
+          "BACK_SPACE"
+        ],
+        [
+          "keyboard",
+          "shift BACK_SPACE"
+        ]
+      ]
+    ],
+    [
+      "Back",
+      "Back",
+      [
+        [
+          "keyboard",
+          "control alt LEFT"
+        ],
+        [
+          "mouse",
+          "button4"
+        ]
+      ]
+    ],
+    [
+      "EditorScrollDown",
+      "Scroll Down",
+      [
+        [
+          "keyboard",
+          "control DOWN"
+        ]
+      ]
+    ],
+    [
+      "CompileDirty",
+      "Build Project",
+      [
+        [
+          "keyboard",
+          "control F9"
+        ]
+      ]
+    ],
+    [
+      "MethodHierarchy",
+      "Method Hierarchy",
+      [
+        [
+          "keyboard",
+          "control shift H"
+        ]
+      ]
+    ],
+    [
+      "PreviousTab",
+      "Se_lect Previous Tab",
+      [
+        [
+          "keyboard",
+          "alt LEFT"
+        ]
+      ]
+    ],
+    [
+      "PreviousEditorTab",
+      "Select Previous Tab in Multi-Editor File",
+      [
+        [
+          "keyboard",
+          "alt shift LEFT"
+        ]
+      ]
+    ],
+    [
+      "EditorCodeBlockEnd",
+      "Move Caret to Code Block End",
+      [
+        [
+          "keyboard",
+          "control CLOSE_BRACKET"
+        ]
+      ]
+    ],
+    [
+      "EditorCodeBlockStartWithSelection",
+      "Move Caret to Code Block Start with Selection",
+      [
+        [
+          "keyboard",
+          "control shift OPEN_BRACKET"
+        ]
+      ]
+    ],
+    [
+      "IntroduceVariable",
+      "Introduce Variable",
+      [
+        [
+          "keyboard",
+          "control alt V"
+        ]
+      ]
+    ],
+    [
+      "RecentFiles",
+      "Rece_nt Files",
+      [
+        [
+          "keyboard",
+          "control E"
+        ]
+      ]
+    ],
+    [
+      "SwitcherRecentEditedChangedToggleCheckBox",
+      "Toggle Changed Only Files",
+      [
+        [
+          "keyboard",
+          "control E"
+        ]
+      ]
+    ],
+    [
+      "SwitcherIterateItems",
+      "Iterate Recent Files",
+      [
+        [
+          "keyboard",
+          "control E"
+        ]
+      ]
+    ],
+    [
+      "RecentChangedFiles",
+      "Recently Changed Files",
+      []
+    ],
+    [
+      "RecentLocations",
+      "Recent Locations",
+      [
+        [
+          "keyboard",
+          "control shift E"
+        ]
+      ]
+    ],
+    [
+      "QuickChangeScheme",
+      "Quick Switch Scheme",
+      [
+        [
+          "keyboard",
+          "control BACK_QUOTE"
+        ]
+      ]
+    ],
+    [
+      "OptimizeImports",
+      "Optimi_ze Imports",
+      [
+        [
+          "keyboard",
+          "control alt O"
+        ]
+      ]
+    ],
+    [
+      "EditorPreviousWord",
+      "Move Caret to Previous Word",
+      [
+        [
+          "keyboard",
+          "control LEFT"
+        ]
+      ]
+    ],
+    [
+      "EditorUpWithSelection",
+      "Up with Selection",
+      [
+        [
+          "keyboard",
+          "shift UP"
+        ]
+      ]
+    ],
+    [
+      "QuickJavaDoc",
+      "Quick Documentation",
+      [
+        [
+          "keyboard",
+          "control Q"
+        ],
+        [
+          "mouse",
+          "alt button2"
+        ]
+      ]
+    ],
+    [
+      "ToggleRenderedDocPresentation",
+      "Toggle Rendered View",
+      [
+        [
+          "keyboard",
+          "control alt Q"
+        ]
+      ]
+    ],
+    [
+      "ShowBookmarks",
+      "Show Bookmarks",
+      [
+        [
+          "keyboard",
+          "shift F11"
+        ]
+      ]
+    ],
+    [
+      "ShowTypeBookmarks",
+      "Go to Mnemonic",
+      [
+        [
+          "keyboard",
+          "control shift F11"
+        ]
+      ]
+    ],
+    [
+      "HighlightUsagesInFile",
+      "Highlight Usages in File",
+      [
+        [
+          "keyboard",
+          "control shift F7"
+        ]
+      ]
+    ],
+    [
+      "GotoFile",
+      "Go to File",
+      [
+        [
+          "keyboard",
+          "control shift N"
+        ]
+      ]
+    ],
+    [
+      "ActivateTerminalToolWindow",
+      null,
+      [
+        [
+          "keyboard",
+          "alt F12"
+        ]
+      ]
+    ],
+    [
+      "CloseContent",
+      "Close Tab",
+      [
+        [
+          "keyboard",
+          "control F4"
+        ]
+      ]
+    ],
+    [
+      "Replace",
+      "Replace",
+      [
+        [
+          "keyboard",
+          "control R"
+        ]
+      ]
+    ],
+    [
+      "ExpandRegion",
+      "E_xpand",
+      [
+        [
+          "keyboard",
+          "control ADD"
+        ],
+        [
+          "keyboard",
+          "control EQUALS"
+        ]
+      ]
+    ],
+    [
+      "ExpandRegionRecursively",
+      "Expand Recursively",
+      [
+        [
+          "keyboard",
+          "control alt ADD"
+        ],
+        [
+          "keyboard",
+          "control alt EQUALS"
+        ]
+      ]
+    ],
+    [
+      "ExpandToLevel1",
+      "1",
+      [
+        [
+          "keyboard",
+          "control MULTIPLY",
+          "1"
+        ],
+        [
+          "keyboard",
+          "control MULTIPLY",
+          "NUMPAD1"
+        ]
+      ]
+    ],
+    [
+      "ExpandToLevel2",
+      "2",
+      [
+        [
+          "keyboard",
+          "control MULTIPLY",
+          "2"
+        ],
+        [
+          "keyboard",
+          "control MULTIPLY",
+          "NUMPAD2"
+        ]
+      ]
+    ],
+    [
+      "ExpandToLevel3",
+      "3",
+      [
+        [
+          "keyboard",
+          "control MULTIPLY",
+          "3"
+        ],
+        [
+          "keyboard",
+          "control MULTIPLY",
+          "NUMPAD3"
+        ]
+      ]
+    ],
+    [
+      "ExpandToLevel4",
+      "4",
+      [
+        [
+          "keyboard",
+          "control MULTIPLY",
+          "4"
+        ],
+        [
+          "keyboard",
+          "control MULTIPLY",
+          "NUMPAD4"
+        ]
+      ]
+    ],
+    [
+      "ExpandToLevel5",
+      "5",
+      [
+        [
+          "keyboard",
+          "control MULTIPLY",
+          "5"
+        ],
+        [
+          "keyboard",
+          "control MULTIPLY",
+          "NUMPAD5"
+        ]
+      ]
+    ],
+    [
+      "ExpandAllToLevel1",
+      "1",
+      [
+        [
+          "keyboard",
+          "control shift MULTIPLY",
+          "1"
+        ],
+        [
+          "keyboard",
+          "control shift MULTIPLY",
+          "NUMPAD1"
+        ]
+      ]
+    ],
+    [
+      "ExpandAllToLevel2",
+      "2",
+      [
+        [
+          "keyboard",
+          "control shift MULTIPLY",
+          "2"
+        ],
+        [
+          "keyboard",
+          "control shift MULTIPLY",
+          "NUMPAD2"
+        ]
+      ]
+    ],
+    [
+      "ExpandAllToLevel3",
+      "3",
+      [
+        [
+          "keyboard",
+          "control shift MULTIPLY",
+          "3"
+        ],
+        [
+          "keyboard",
+          "control shift MULTIPLY",
+          "NUMPAD3"
+        ]
+      ]
+    ],
+    [
+      "ExpandAllToLevel4",
+      "4",
+      [
+        [
+          "keyboard",
+          "control shift MULTIPLY",
+          "4"
+        ],
+        [
+          "keyboard",
+          "control shift MULTIPLY",
+          "NUMPAD4"
+        ]
+      ]
+    ],
+    [
+      "ExpandAllToLevel5",
+      "5",
+      [
+        [
+          "keyboard",
+          "control shift MULTIPLY",
+          "5"
+        ],
+        [
+          "keyboard",
+          "control shift MULTIPLY",
+          "NUMPAD5"
+        ]
+      ]
+    ],
+    [
+      "EditorLeftWithSelection",
+      "Left with Selection",
+      [
+        [
+          "keyboard",
+          "shift LEFT"
+        ]
+      ]
+    ],
+    [
+      "Compile",
+      "R_ebuild",
+      [
+        [
+          "keyboard",
+          "control shift F9"
+        ]
+      ]
+    ],
+    [
+      "$Cut",
+      "Cu_t",
+      [
+        [
+          "keyboard",
+          "control X"
+        ],
+        [
+          "keyboard",
+          "shift DELETE"
+        ]
+      ]
+    ],
+    [
+      "ExtractMethod",
+      "Extract Method",
+      [
+        [
+          "keyboard",
+          "control alt M"
+        ]
+      ]
+    ],
+    [
+      "InsertLiveTemplate",
+      "Insert Live Template",
+      [
+        [
+          "keyboard",
+          "control J"
+        ]
+      ]
+    ],
+    [
+      "EditorDeleteToWordStart",
+      "Delete to Word Start",
+      [
+        [
+          "keyboard",
+          "control BACK_SPACE"
+        ]
+      ]
+    ],
+    [
+      "IntroduceConstant",
+      "Introduce Constant",
+      [
+        [
+          "keyboard",
+          "control alt C"
+        ]
+      ]
+    ],
+    [
+      "EditorPageUp",
+      "Page Up",
+      [
+        [
+          "keyboard",
+          "PAGE_UP"
+        ]
+      ]
+    ],
+    [
+      "$Copy",
+      "Copy",
+      [
+        [
+          "keyboard",
+          "control C"
+        ],
+        [
+          "keyboard",
+          "control INSERT"
+        ]
+      ]
+    ],
+    [
+      "CopyPaths",
+      "C_opy Paths",
+      [
+        [
+          "keyboard",
+          "control shift C"
+        ]
+      ]
+    ],
+    [
+      "EditorToggleInsertState",
+      "Toggle Insert/Overwrite",
+      [
+        [
+          "keyboard",
+          "INSERT"
+        ]
+      ]
+    ],
+    [
+      "EditorToggleColumnMode",
+      "Column Selection Mode",
+      [
+        [
+          "keyboard",
+          "alt shift INSERT"
+        ]
+      ]
+    ],
+    [
+      "ParameterInfo",
+      "Parameter Info",
+      [
+        [
+          "keyboard",
+          "control P"
+        ]
+      ]
+    ],
+    [
+      "ExpressionTypeInfo",
+      "Typ_e Info",
+      [
+        [
+          "keyboard",
+          "control shift P"
+        ]
+      ]
+    ],
+    [
+      "ChangeSignature",
+      "Change Si_gnature",
+      [
+        [
+          "keyboard",
+          "control F6"
+        ]
+      ]
+    ],
+    [
+      "ChangeTypeSignature",
+      "T_ype Migration",
+      [
+        [
+          "keyboard",
+          "control shift F6"
+        ]
+      ]
+    ],
+    [
+      "DebugClass",
+      null,
+      []
+    ],
+    [
+      "RunCoverage",
+      null,
+      []
+    ],
+    [
+      "IntroduceField",
+      "Introduce Field",
+      [
+        [
+          "keyboard",
+          "control alt F"
+        ]
+      ]
+    ],
+    [
+      "ShowIntentionActions",
+      "Show Context Actions",
+      [
+        [
+          "keyboard",
+          "alt ENTER"
+        ]
+      ]
+    ],
+    [
+      "ExpandAllRegions",
+      "Expand All",
+      [
+        [
+          "keyboard",
+          "control shift ADD"
+        ],
+        [
+          "keyboard",
+          "control shift EQUALS"
+        ]
+      ]
+    ],
+    [
+      "CollapseAll",
+      "Collapse All",
+      [
+        [
+          "keyboard",
+          "control SUBTRACT"
+        ],
+        [
+          "keyboard",
+          "control MINUS"
+        ]
+      ]
+    ],
+    [
+      "CollapseExpandableComponent",
+      "Collapse Component",
+      [
+        [
+          "keyboard",
+          "shift ENTER"
+        ],
+        [
+          "keyboard",
+          "control SUBTRACT"
+        ],
+        [
+          "keyboard",
+          "control MINUS"
+        ]
+      ]
+    ],
+    [
+      "CollapseRegion",
+      "Collapse",
+      [
+        [
+          "keyboard",
+          "control SUBTRACT"
+        ],
+        [
+          "keyboard",
+          "control MINUS"
+        ]
+      ]
+    ],
+    [
+      "CollapseRegionRecursively",
+      "Coll_apse Recursively",
+      [
+        [
+          "keyboard",
+          "control alt SUBTRACT"
+        ],
+        [
+          "keyboard",
+          "control alt MINUS"
+        ]
+      ]
+    ],
+    [
+      "PreviousOccurence",
+      "Previ_ous Occurrence",
+      [
+        [
+          "keyboard",
+          "control alt UP"
+        ]
+      ]
+    ],
+    [
+      "FindPrevious",
+      "Find Pre_vious / Move to Previous Occurrence",
+      [
+        [
+          "keyboard",
+          "shift F3"
+        ],
+        [
+          "keyboard",
+          "control shift L"
+        ]
+      ]
+    ],
+    [
+      "EditorDuplicate",
+      "Duplicate Line or Selection",
+      [
+        [
+          "keyboard",
+          "control D"
+        ]
+      ]
+    ],
+    [
+      "CompareTwoFiles",
+      "Compare Files",
+      [
+        [
+          "keyboard",
+          "control D"
+        ]
+      ]
+    ],
+    [
+      "Diff.ShowDiff",
+      "Show Diff",
+      [
+        [
+          "keyboard",
+          "control D"
+        ]
+      ]
+    ],
+    [
+      "Compare.SameVersion",
+      "Compare with Same Repositor_y Version",
+      [
+        [
+          "keyboard",
+          "control D"
+        ]
+      ]
+    ],
+    [
+      "Diff.ShowSettingsPopup",
+      "Show Diff Settings Popup",
+      [
+        [
+          "keyboard",
+          "control shift D"
+        ]
+      ]
+    ],
+    [
+      "SendEOF",
+      "Send EOF",
+      [
+        [
+          "keyboard",
+          "control D"
+        ]
+      ]
+    ],
+    [
+      "EditorToggleCase",
+      "Toggle Case",
+      [
+        [
+          "keyboard",
+          "control shift U"
+        ]
+      ]
+    ],
+    [
+      "GotoLine",
+      "Go to Line:Column",
+      [
+        [
+          "keyboard",
+          "control G"
+        ]
+      ]
+    ],
+    [
+      "GotoCustomRegion",
+      "Custom Folding",
+      [
+        [
+          "keyboard",
+          "control alt PERIOD"
+        ]
+      ]
+    ],
+    [
+      "FindInPath",
+      "Find in Files",
+      [
+        [
+          "keyboard",
+          "control shift F"
+        ]
+      ]
+    ],
+    [
+      "EditorTextEndWithSelection",
+      "Move Caret to Text End with Selection",
+      [
+        [
+          "keyboard",
+          "control shift END"
+        ]
+      ]
+    ],
+    [
+      "OverrideMethods",
+      "Override Methods",
+      [
+        [
+          "keyboard",
+          "control O"
+        ]
+      ]
+    ],
+    [
+      "EditorStartNewLine",
+      "Start New Line",
+      [
+        [
+          "keyboard",
+          "shift ENTER"
+        ]
+      ]
+    ],
+    [
+      "EditorStartNewLineBefore",
+      "Start New Line Before Current",
+      [
+        [
+          "keyboard",
+          "control alt ENTER"
+        ]
+      ]
+    ],
+    [
+      "EditorLeft",
+      "Left",
+      [
+        [
+          "keyboard",
+          "LEFT"
+        ]
+      ]
+    ],
+    [
+      "Stop",
+      "Stop",
+      [
+        [
+          "keyboard",
+          "control F2"
+        ]
+      ]
+    ],
+    [
+      "StopBackgroundProcesses",
+      "Stop Background Processes",
+      [
+        [
+          "keyboard",
+          "control shift F2"
+        ]
+      ]
+    ],
+    [
+      "EditorTextStartWithSelection",
+      "Move Caret to Text Start with Selection",
+      [
+        [
+          "keyboard",
+          "control shift HOME"
+        ]
+      ]
+    ],
+    [
+      "Find",
+      "Find",
+      [
+        [
+          "keyboard",
+          "control F"
+        ],
+        [
+          "keyboard",
+          "alt F3"
+        ]
+      ]
+    ],
+    [
+      "EditorCodeBlockStart",
+      "Move Caret to Code Block Start",
+      [
+        [
+          "keyboard",
+          "control OPEN_BRACKET"
+        ]
+      ]
+    ],
+    [
+      "Run",
+      null,
+      [
+        [
+          "keyboard",
+          "shift F10"
+        ]
+      ]
+    ],
+    [
+      "CallHierarchy",
+      "Call Hierarch_y",
+      [
+        [
+          "keyboard",
+          "control alt H"
+        ]
+      ]
+    ],
+    [
+      "EditorTextEnd",
+      "Move Caret to Text End",
+      [
+        [
+          "keyboard",
+          "control END"
+        ]
+      ]
+    ],
+    [
+      "GotoImplementation",
+      "Go to I_mplementation(s)",
+      [
+        [
+          "keyboard",
+          "control alt B"
+        ],
+        [
+          "mouse",
+          "ctrl alt button1"
+        ]
+      ]
+    ],
+    [
+      "EditorPageDown",
+      "Page Down",
+      [
+        [
+          "keyboard",
+          "PAGE_DOWN"
+        ]
+      ]
+    ],
+    [
+      "ExternalJavaDoc",
+      "E_xternal Documentation",
+      [
+        [
+          "keyboard",
+          "shift F1"
+        ]
+      ]
+    ],
+    [
+      "StepOut",
+      "Step Ou_t",
+      [
+        [
+          "keyboard",
+          "shift F8"
+        ]
+      ]
+    ],
+    [
+      "Resume",
+      "Resume Pro_gram",
+      [
+        [
+          "keyboard",
+          "F9"
+        ]
+      ]
+    ],
+    [
+      "EditorDeleteLine",
+      "Delete Line",
+      [
+        [
+          "keyboard",
+          "control Y"
+        ]
+      ]
+    ],
+    [
+      "ShowErrorDescription",
+      "E_rror Description",
+      [
+        [
+          "keyboard",
+          "control F1"
+        ]
+      ]
+    ],
+    [
+      "EditorContextInfo",
+      "Context Info",
+      [
+        [
+          "keyboard",
+          "alt Q"
+        ]
+      ]
+    ],
+    [
+      "NextDiff",
+      "Next Difference",
+      [
+        [
+          "keyboard",
+          "F7"
+        ]
+      ]
+    ],
+    [
+      "Diff.PrevChange",
+      "Compare Previous File",
+      [
+        [
+          "keyboard",
+          "alt shift LEFT"
+        ]
+      ]
+    ],
+    [
+      "Diff.NextChange",
+      "Compare Next File",
+      [
+        [
+          "keyboard",
+          "alt shift RIGHT"
+        ]
+      ]
+    ],
+    [
+      "Diff.FocusOppositePane",
+      "Select Opposite Diff Pane",
+      [
+        [
+          "keyboard",
+          "control shift TAB"
+        ]
+      ]
+    ],
+    [
+      "Diff.FocusOppositePaneAndScroll",
+      "Select Position in Opposite Diff Pane",
+      []
+    ],
+    [
+      "Diff.ApplyLeftSide",
+      "Accept Left Side",
+      [
+        [
+          "keyboard",
+          "control alt R"
+        ]
+      ]
+    ],
+    [
+      "Diff.ApplyRightSide",
+      "Accept Right Side",
+      [
+        [
+          "keyboard",
+          "control alt A"
+        ]
+      ]
+    ],
+    [
+      "Move",
+      "Move",
+      [
+        [
+          "keyboard",
+          "F6"
+        ]
+      ]
+    ],
+    [
+      "MethodDown",
+      "N_ext Method",
+      [
+        [
+          "keyboard",
+          "alt DOWN"
+        ]
+      ]
+    ],
+    [
+      "$Paste",
+      "Paste",
+      [
+        [
+          "keyboard",
+          "control V"
+        ],
+        [
+          "keyboard",
+          "shift INSERT"
+        ]
+      ]
+    ],
+    [
+      "EditorPasteSimple",
+      "Paste as P_lain Text",
+      [
+        [
+          "keyboard",
+          "control alt shift V"
+        ]
+      ]
+    ],
+    [
+      "CopyReference",
+      "Cop_y Reference",
+      [
+        [
+          "keyboard",
+          "control alt shift C"
+        ]
+      ]
+    ],
+    [
+      "EditorPasteFromX11",
+      "Paste from X Clipboard",
+      [
+        [
+          "mouse",
+          "button2"
+        ]
+      ]
+    ],
+    [
+      "Vcs.RollbackChangedLines",
+      "Rollback Lines",
+      [
+        [
+          "keyboard",
+          "control alt Z"
+        ]
+      ]
+    ],
+    [
+      "ChangesView.Revert",
+      "Rollback",
+      [
+        [
+          "keyboard",
+          "control alt Z"
+        ]
+      ]
+    ],
+    [
+      "Vcs.MoveChangedLinesToChangelist",
+      "Move Lines to Another Changelist",
+      [
+        [
+          "keyboard",
+          "alt shift M"
+        ]
+      ]
+    ],
+    [
+      "ChangesView.Move",
+      "Move to Another Changelist",
+      [
+        [
+          "keyboard",
+          "alt shift M"
+        ]
+      ]
+    ],
+    [
+      "GotoNextError",
+      "Next Highlighted Error",
+      [
+        [
+          "keyboard",
+          "F2"
+        ]
+      ]
+    ],
+    [
+      "EditorPageDownWithSelection",
+      "Page Down with Selection",
+      [
+        [
+          "keyboard",
+          "shift PAGE_DOWN"
+        ]
+      ]
+    ],
+    [
+      "SurroundWithLiveTemplate",
+      "Surround with Live Tem_plate",
+      [
+        [
+          "keyboard",
+          "control alt J"
+        ]
+      ]
+    ],
+    [
+      "EditorTextStart",
+      "Move Caret to Text Start",
+      [
+        [
+          "keyboard",
+          "control HOME"
+        ]
+      ]
+    ],
+    [
+      "Synchronize",
+      "Reload All from Disk",
+      [
+        [
+          "keyboard",
+          "control alt Y"
+        ]
+      ]
+    ],
+    [
+      "EditorPreviousWordWithSelection",
+      "Move Caret to Previous Word with Selection",
+      [
+        [
+          "keyboard",
+          "control shift LEFT"
+        ]
+      ]
+    ],
+    [
+      "EditorDownWithSelection",
+      "Down with Selection",
+      [
+        [
+          "keyboard",
+          "shift DOWN"
+        ]
+      ]
+    ],
+    [
+      "GotoPreviousError",
+      "Previous Highlighted Error",
+      [
+        [
+          "keyboard",
+          "shift F2"
+        ]
+      ]
+    ],
+    [
+      "EditorScrollToCenter",
+      "Scroll to Center",
+      [
+        [
+          "keyboard",
+          "control M"
+        ]
+      ]
+    ],
+    [
+      "$Redo",
+      "Redo",
+      [
+        [
+          "keyboard",
+          "control shift Z"
+        ],
+        [
+          "keyboard",
+          "alt shift BACK_SPACE"
+        ]
+      ]
+    ],
+    [
+      "EditorMoveToPageTop",
+      "Move Caret to Page Top",
+      [
+        [
+          "keyboard",
+          "control PAGE_UP"
+        ]
+      ]
+    ],
+    [
+      "EditorMoveToPageBottom",
+      "Move Caret to Page Bottom",
+      [
+        [
+          "keyboard",
+          "control PAGE_DOWN"
+        ]
+      ]
+    ],
+    [
+      "EditorMoveToPageTopWithSelection",
+      "Move Caret to Page Top with Selection",
+      [
+        [
+          "keyboard",
+          "control shift PAGE_UP"
+        ]
+      ]
+    ],
+    [
+      "EditorMoveToPageBottomWithSelection",
+      "Move Caret to Page Bottom with Selection",
+      [
+        [
+          "keyboard",
+          "control shift PAGE_DOWN"
+        ]
+      ]
+    ],
+    [
+      "EditorDown",
+      "Down",
+      [
+        [
+          "keyboard",
+          "DOWN"
+        ]
+      ]
+    ],
+    [
+      "RunClass",
+      null,
+      [
+        [
+          "keyboard",
+          "control shift F10"
+        ]
+      ]
+    ],
+    [
+      "FindNext",
+      "Find Next / Move to Next Occurrence",
+      [
+        [
+          "keyboard",
+          "F3"
+        ],
+        [
+          "keyboard",
+          "control L"
+        ]
+      ]
+    ],
+    [
+      "ImplementMethods",
+      "Implement Methods",
+      [
+        [
+          "keyboard",
+          "control I"
+        ]
+      ]
+    ],
+    [
+      "MethodUp",
+      "Prev_ious Method",
+      [
+        [
+          "keyboard",
+          "alt UP"
+        ]
+      ]
+    ],
+    [
+      "NextTab",
+      "Select Ne_xt Tab",
+      [
+        [
+          "keyboard",
+          "alt RIGHT"
+        ]
+      ]
+    ],
+    [
+      "ShowContent",
+      "Show List of Tabs",
+      [
+        [
+          "keyboard",
+          "alt DOWN"
+        ]
+      ]
+    ],
+    [
+      "NextEditorTab",
+      "Select Next Tab in Multi-Editor File",
+      [
+        [
+          "keyboard",
+          "alt shift RIGHT"
+        ]
+      ]
+    ],
+    [
+      "EditSource",
+      "Jump to Source",
+      [
+        [
+          "keyboard",
+          "F4"
+        ]
+      ]
+    ],
+    [
+      "EditSourceInNewWindow",
+      "Open Tab in New Window",
+      [
+        [
+          "keyboard",
+          "shift F4"
+        ]
+      ]
+    ],
+    [
+      "CodeCompletion",
+      "Basic",
+      [
+        [
+          "keyboard",
+          "control SPACE"
+        ]
+      ]
+    ],
+    [
+      "HippieCompletion",
+      "Cyclic Expand Word",
+      [
+        [
+          "keyboard",
+          "alt SLASH"
+        ]
+      ]
+    ],
+    [
+      "HippieBackwardCompletion",
+      "Cyclic Expand Word (Backward)",
+      [
+        [
+          "keyboard",
+          "alt shift SLASH"
+        ]
+      ]
+    ],
+    [
+      "TogglePopupHints",
+      "Toggle Popup Hints for Current File",
+      []
+    ],
+    [
+      "EditorNextWordWithSelection",
+      "Move Caret to Next Word with Selection",
+      [
+        [
+          "keyboard",
+          "control shift RIGHT"
+        ]
+      ]
+    ],
+    [
+      "JumpToLastChange",
+      "Last Edit L_ocation",
+      [
+        [
+          "keyboard",
+          "control shift BACK_SPACE"
+        ]
+      ]
+    ],
+    [
+      "EditorNextWord",
+      "Move Caret to Next Word",
+      [
+        [
+          "keyboard",
+          "control RIGHT"
+        ]
+      ]
+    ],
+    [
+      "EditorLineStart",
+      "Move Caret to Line Start",
+      [
+        [
+          "keyboard",
+          "HOME"
+        ]
+      ]
+    ],
+    [
+      "EditorUnSelectWord",
+      "Shrink Selection",
+      [
+        [
+          "keyboard",
+          "control shift W"
+        ]
+      ]
+    ],
+    [
+      "ValidateXml",
+      "Validate",
+      []
+    ],
+    [
+      "ToggleLineBreakpoint",
+      "Toggle Line Breakpoint",
+      [
+        [
+          "keyboard",
+          "control F8"
+        ]
+      ]
+    ],
+    [
+      "ToggleTemporaryLineBreakpoint",
+      "Toggle Temporary Line Breakpoint",
+      [
+        [
+          "keyboard",
+          "control shift alt F8"
+        ]
+      ]
+    ],
+    [
+      "XDebugger.SetValue",
+      null,
+      [
+        [
+          "keyboard",
+          "F2"
+        ]
+      ]
+    ],
+    [
+      "XDebugger.NewWatch",
+      null,
+      [
+        [
+          "keyboard",
+          "INSERT"
+        ]
+      ]
+    ],
+    [
+      "XDebugger.AttachToProcess",
+      null,
+      [
+        [
+          "keyboard",
+          "control alt F5"
+        ]
+      ]
+    ],
+    [
+      "XDebugger.JumpToTypeSource",
+      null,
+      [
+        [
+          "keyboard",
+          "shift F4"
+        ]
+      ]
+    ],
+    [
+      "ToggleBookmark",
+      "Toggle Bookmark",
+      [
+        [
+          "keyboard",
+          "F11"
+        ]
+      ]
+    ],
+    [
+      "ToggleBookmarkWithMnemonic",
+      "Toggle Bookmark Mnemonic",
+      [
+        [
+          "keyboard",
+          "control F11"
+        ]
+      ]
+    ],
+    [
+      "MoveStatementDown",
+      "Move Statement Do_wn",
+      [
+        [
+          "keyboard",
+          "control shift DOWN"
+        ]
+      ]
+    ],
+    [
+      "MoveStatementUp",
+      "Move Statement Up",
+      [
+        [
+          "keyboard",
+          "control shift UP"
+        ]
+      ]
+    ],
+    [
+      "MoveElementLeft",
+      "Move Element Left",
+      [
+        [
+          "keyboard",
+          "control alt shift LEFT"
+        ]
+      ]
+    ],
+    [
+      "MoveElementRight",
+      "Move Element Right",
+      [
+        [
+          "keyboard",
+          "control alt shift RIGHT"
+        ]
+      ]
+    ],
+    [
+      "MoveLineDown",
+      "Move Line Do_wn",
+      [
+        [
+          "keyboard",
+          "alt shift DOWN"
+        ]
+      ]
+    ],
+    [
+      "MoveLineUp",
+      "Move Line Up",
+      [
+        [
+          "keyboard",
+          "alt shift UP"
+        ]
+      ]
+    ],
+    [
+      "EditorEnter",
+      "Enter",
+      [
+        [
+          "keyboard",
+          "ENTER"
+        ]
+      ]
+    ],
+    [
+      "EditorRightWithSelection",
+      "Right with Selection",
+      [
+        [
+          "keyboard",
+          "shift RIGHT"
+        ]
+      ]
+    ],
+    [
+      "TypeHierarchy",
+      "Type Hierarchy",
+      [
+        [
+          "keyboard",
+          "control H"
+        ]
+      ]
+    ],
+    [
+      "EditorUp",
+      "Up",
+      [
+        [
+          "keyboard",
+          "UP"
+        ]
+      ]
+    ],
+    [
+      "EditorTab",
+      "Tab",
+      [
+        [
+          "keyboard",
+          "TAB"
+        ]
+      ]
+    ],
+    [
+      "ExpandLiveTemplateByTab",
+      "Expand Live Template by Tab",
+      [
+        [
+          "keyboard",
+          "TAB"
+        ]
+      ]
+    ],
+    [
+      "IntroduceParameter",
+      "Introduce Parameter",
+      [
+        [
+          "keyboard",
+          "control alt P"
+        ]
+      ]
+    ],
+    [
+      "NextOccurence",
+      "Ne_xt Occurrence",
+      [
+        [
+          "keyboard",
+          "control alt DOWN"
+        ]
+      ]
+    ],
+    [
+      "EditorCodeBlockEndWithSelection",
+      "Move Caret to Code Block End with Selection",
+      [
+        [
+          "keyboard",
+          "control shift CLOSE_BRACKET"
+        ]
+      ]
+    ],
+    [
+      "ToggleReadOnlyAttribute",
+      "Toggle Read-Only Attribute",
+      []
+    ],
+    [
+      "AutoIndentLines",
+      "Auto-Indent Lines",
+      [
+        [
+          "keyboard",
+          "control alt I"
+        ]
+      ]
+    ],
+    [
+      "EditorSelectWord",
+      "Extend Selection",
+      [
+        [
+          "keyboard",
+          "control W"
+        ]
+      ]
+    ],
+    [
+      "EditorChooseLookupItem",
+      "Choose Lookup Item",
+      [
+        [
+          "keyboard",
+          "ENTER"
+        ]
+      ]
+    ],
+    [
+      "Inline",
+      "I_nline",
+      [
+        [
+          "keyboard",
+          "control alt N"
+        ]
+      ]
+    ],
+    [
+      "CopyElement",
+      "C_opy",
+      [
+        [
+          "keyboard",
+          "F5"
+        ]
+      ]
+    ],
+    [
+      "ClassNameCompletion",
+      "Second Basic Completion",
+      [
+        [
+          "keyboard",
+          "control alt SPACE"
+        ]
+      ]
+    ],
+    [
+      "JumpToLastWindow",
+      "Jump to Last Tool Window",
+      [
+        [
+          "keyboard",
+          "F12"
+        ]
+      ]
+    ],
+    [
+      "StepOver",
+      "Step Over",
+      [
+        [
+          "keyboard",
+          "F8"
+        ]
+      ]
+    ],
+    [
+      "$SelectAll",
+      "Select All",
+      [
+        [
+          "keyboard",
+          "control A"
+        ]
+      ]
+    ],
+    [
+      "SaveAll",
+      "Save All",
+      [
+        [
+          "keyboard",
+          "control S"
+        ]
+      ]
+    ],
+    [
+      "$Delete",
+      "Delete",
+      [
+        [
+          "keyboard",
+          "DELETE"
+        ]
+      ]
+    ],
+    [
+      "RestoreDefaultLayout",
+      "Restore Current Layout",
+      [
+        [
+          "keyboard",
+          "shift F12"
+        ]
+      ]
+    ],
+    [
+      "HideActiveWindow",
+      "Hi_de Active Tool Window",
+      [
+        [
+          "keyboard",
+          "shift ESCAPE"
+        ]
+      ]
+    ],
+    [
+      "HideAllWindows",
+      "Hide All Tool Windows",
+      [
+        [
+          "keyboard",
+          "control shift F12"
+        ]
+      ]
+    ],
+    [
+      "ResizeToolWindowLeft",
+      "Stretch to Left",
+      [
+        [
+          "keyboard",
+          "control alt shift LEFT"
+        ]
+      ]
+    ],
+    [
+      "ResizeToolWindowRight",
+      "Stretch to Right",
+      [
+        [
+          "keyboard",
+          "control alt shift RIGHT"
+        ]
+      ]
+    ],
+    [
+      "ResizeToolWindowUp",
+      "Stretch to Top",
+      [
+        [
+          "keyboard",
+          "control alt shift UP"
+        ]
+      ]
+    ],
+    [
+      "ResizeToolWindowDown",
+      "Stretch to Bottom",
+      [
+        [
+          "keyboard",
+          "control alt shift DOWN"
+        ]
+      ]
+    ],
+    [
+      "MaximizeToolWindow",
+      null,
+      [
+        [
+          "keyboard",
+          "control shift QUOTE"
+        ]
+      ]
+    ],
+    [
+      "HideSideWindows",
+      "Hide Side Tool Windows",
+      []
+    ],
+    [
+      "ShowPopupMenu",
+      "Show Context Menu",
+      [
+        [
+          "keyboard",
+          "CONTEXT_MENU"
+        ]
+      ]
+    ],
+    [
+      "EditorLineStartWithSelection",
+      "Move Caret to Line Start with Selection",
+      [
+        [
+          "keyboard",
+          "shift HOME"
+        ]
+      ]
+    ],
+    [
+      "EditorRight",
+      "Right",
+      [
+        [
+          "keyboard",
+          "RIGHT"
+        ]
+      ]
+    ],
+    [
+      "ContextHelp",
+      "Conte_xt Help",
+      [
+        [
+          "keyboard",
+          "F1"
+        ]
+      ]
+    ],
+    [
+      "Forward",
+      "For_ward",
+      [
+        [
+          "keyboard",
+          "control alt RIGHT"
+        ],
+        [
+          "mouse",
+          "button5"
+        ]
+      ]
+    ],
+    [
+      "CollapseAllRegions",
+      "Collapse All",
+      [
+        [
+          "keyboard",
+          "control shift SUBTRACT"
+        ],
+        [
+          "keyboard",
+          "control shift MINUS"
+        ]
+      ]
+    ],
+    [
+      "SmartTypeCompletion",
+      "Type-Matching",
+      [
+        [
+          "keyboard",
+          "control shift SPACE"
+        ]
+      ]
+    ],
+    [
+      "ReplaceInPath",
+      "Repl_ace in Files",
+      [
+        [
+          "keyboard",
+          "control shift R"
+        ]
+      ]
+    ],
+    [
+      "SurroundWith",
+      "Surround With",
+      [
+        [
+          "keyboard",
+          "control alt T"
+        ]
+      ]
+    ],
+    [
+      "Unwrap",
+      "Un_wrap/Remove",
+      [
+        [
+          "keyboard",
+          "control shift DELETE"
+        ]
+      ]
+    ],
+    [
+      "ActivateProjectToolWindow",
+      null,
+      [
+        [
+          "keyboard",
+          "alt 1"
+        ]
+      ]
+    ],
+    [
+      "ActivateFavoritesToolWindow",
+      null,
+      []
+    ],
+    [
+      "ActivateBookmarksToolWindow",
+      null,
+      [
+        [
+          "keyboard",
+          "alt 2"
+        ]
+      ]
+    ],
+    [
+      "ActivateFindToolWindow",
+      "Find",
+      [
+        [
+          "keyboard",
+          "alt 3"
+        ]
+      ]
+    ],
+    [
+      "ActivateRunToolWindow",
+      "Run",
+      [
+        [
+          "keyboard",
+          "alt 4"
+        ]
+      ]
+    ],
+    [
+      "ActivateDebugToolWindow",
+      null,
+      [
+        [
+          "keyboard",
+          "alt 5"
+        ]
+      ]
+    ],
+    [
+      "ActivateProblemsViewToolWindow",
+      null,
+      [
+        [
+          "keyboard",
+          "alt 6"
+        ]
+      ]
+    ],
+    [
+      "ActivateStructureToolWindow",
+      null,
+      [
+        [
+          "keyboard",
+          "alt 7"
+        ]
+      ]
+    ],
+    [
+      "ActivateHierarchyToolWindow",
+      "Hierarchy",
+      []
+    ],
+    [
+      "ActivateServicesToolWindow",
+      null,
+      [
+        [
+          "keyboard",
+          "alt 8"
+        ]
+      ]
+    ],
+    [
+      "ActivateVersionControlToolWindow",
+      null,
+      [
+        [
+          "keyboard",
+          "alt 9"
+        ]
+      ]
+    ],
+    [
+      "ActivateCommitToolWindow",
+      null,
+      [
+        [
+          "keyboard",
+          "alt 0"
+        ]
+      ]
+    ],
+    [
+      "NewElement",
+      "New",
+      [
+        [
+          "keyboard",
+          "alt INSERT"
+        ]
+      ]
+    ],
+    [
+      "NewElementSamePlace",
+      "New in This Directory",
+      [
+        [
+          "keyboard",
+          "control alt INSERT"
+        ]
+      ]
+    ],
+    [
+      "EditorSplitLine",
+      "Split Line",
+      [
+        [
+          "keyboard",
+          "control ENTER"
+        ]
+      ]
+    ],
+    [
+      "FindUsagesInFile",
+      "F_ind Usages in File",
+      [
+        [
+          "keyboard",
+          "control F7"
+        ]
+      ]
+    ],
+    [
+      "EditorLineEndWithSelection",
+      "Move Caret to Line End with Selection",
+      [
+        [
+          "keyboard",
+          "shift END"
+        ]
+      ]
+    ],
+    [
+      "SelectIn",
+      "Se_lect In",
+      [
+        [
+          "keyboard",
+          "alt F1"
+        ]
+      ]
+    ],
+    [
+      "PreviousDiff",
+      "Previous Difference",
+      [
+        [
+          "keyboard",
+          "shift F7"
+        ]
+      ]
+    ],
+    [
+      "ExportToTextFile",
+      "Export to Text File",
+      [
+        [
+          "keyboard",
+          "alt O"
+        ]
+      ]
+    ],
+    [
+      "EditorLineEnd",
+      "Move Caret to Line End",
+      [
+        [
+          "keyboard",
+          "END"
+        ]
+      ]
+    ],
+    [
+      "Debug",
+      null,
+      [
+        [
+          "keyboard",
+          "shift F9"
+        ]
+      ]
+    ],
+    [
+      "EditorIndentSelection",
+      "Indent Selection",
+      [
+        [
+          "keyboard",
+          "TAB"
+        ]
+      ]
+    ],
+    [
+      "CommentByLineComment",
+      "Comment with Line Comment",
+      [
+        [
+          "keyboard",
+          "control SLASH"
+        ],
+        [
+          "keyboard",
+          "control DIVIDE"
+        ]
+      ]
+    ],
+    [
+      "RunToCursor",
+      "Run to Cursor",
+      [
+        [
+          "keyboard",
+          "alt F9"
+        ]
+      ]
+    ],
+    [
+      "ForceRunToCursor",
+      "Force Run to Cur_sor",
+      [
+        [
+          "keyboard",
+          "control alt F9"
+        ]
+      ]
+    ],
+    [
+      "RenameElement",
+      "Rename",
+      [
+        [
+          "keyboard",
+          "shift F6"
+        ]
+      ]
+    ],
+    [
+      "SafeDelete",
+      "Safe Delete",
+      [
+        [
+          "keyboard",
+          "alt DELETE"
+        ]
+      ]
+    ],
+    [
+      "SelectVirtualTemplateElement",
+      "Show Options Popup for In-place Refactoring",
+      [
+        [
+          "keyboard",
+          "Alt Shift O"
+        ]
+      ]
+    ],
+    [
+      "NextTemplateVariable",
+      "Next Template Variable or Finish In-Place Refactoring",
+      [
+        [
+          "keyboard",
+          "TAB"
+        ],
+        [
+          "keyboard",
+          "ENTER"
+        ]
+      ]
+    ],
+    [
+      "ViewBreakpoints",
+      "View Brea_kpoints",
+      [
+        [
+          "keyboard",
+          "control shift F8"
+        ]
+      ]
+    ],
+    [
+      "EditBreakpoint",
+      "Edit Breakpoint",
+      [
+        [
+          "keyboard",
+          "control shift F8"
+        ]
+      ]
+    ],
+    [
+      "EditorDeleteToWordEnd",
+      "Delete to Word End",
+      [
+        [
+          "keyboard",
+          "control DELETE"
+        ]
+      ]
+    ],
+    [
+      "ChooseRunConfiguration",
+      "Run",
+      [
+        [
+          "keyboard",
+          "alt shift F10"
+        ]
+      ]
+    ],
+    [
+      "ChooseDebugConfiguration",
+      "Debug",
+      [
+        [
+          "keyboard",
+          "alt shift F9"
+        ]
+      ]
+    ],
+    [
+      "Refresh",
+      "R_efresh",
+      [
+        [
+          "keyboard",
+          "control F5"
+        ]
+      ]
+    ],
+    [
+      "ForceRefresh",
+      "Force Refresh",
+      [
+        [
+          "keyboard",
+          "control shift F5"
+        ]
+      ]
+    ],
+    [
+      "Rerun",
+      "Rerun",
+      [
+        [
+          "keyboard",
+          "control F5"
+        ]
+      ]
+    ],
+    [
+      "RerunTests",
+      "Rerun Tests",
+      [
+        [
+          "keyboard",
+          "shift alt R"
+        ]
+      ]
+    ],
+    [
+      "CollapseSelection",
+      "Fold Selection / Remove Region",
+      [
+        [
+          "keyboard",
+          "control PERIOD"
+        ]
+      ]
+    ],
+    [
+      "CollapseBlock",
+      "Fold Code Block",
+      [
+        [
+          "keyboard",
+          "control shift PERIOD"
+        ]
+      ]
+    ],
+    [
+      "StructuralSearchPlugin.StructuralSearchAction",
+      "Search S_tructurally",
+      []
+    ],
+    [
+      "StructuralSearchPlugin.StructuralReplaceAction",
+      "Repla_ce Structurally",
+      []
+    ],
+    [
+      "DuplicatesForm.SendToLeft",
+      null,
+      [
+        [
+          "keyboard",
+          "control 1"
+        ]
+      ]
+    ],
+    [
+      "DuplicatesForm.SendToRight",
+      null,
+      [
+        [
+          "keyboard",
+          "control 2"
+        ]
+      ]
+    ],
+    [
+      "VcsShowNextChangeMarker",
+      "Next C_hange",
+      [
+        [
+          "keyboard",
+          "shift control alt DOWN"
+        ]
+      ]
+    ],
+    [
+      "VcsShowPrevChangeMarker",
+      "Previous Ch_ange",
+      [
+        [
+          "keyboard",
+          "shift control alt UP"
+        ]
+      ]
+    ],
+    [
+      "Vcs.ToggleAmendCommitMode",
+      "Amend Commit",
+      [
+        [
+          "keyboard",
+          "alt M"
+        ]
+      ]
+    ],
+    [
+      "Vcs.ShowMessageHistory",
+      "Commit Message History",
+      [
+        [
+          "keyboard",
+          "control M"
+        ]
+      ]
+    ],
+    [
+      "ChangesView.ShowCommitOptions",
+      "Show Commit Options",
+      [
+        [
+          "keyboard",
+          "control O"
+        ]
+      ]
+    ],
+    [
+      "CodeInspection.OnEditor",
+      "Inspect Code with Editor Settings",
+      [
+        [
+          "keyboard",
+          "alt shift I"
+        ]
+      ]
+    ],
+    [
+      "FileChooser.GoToParent",
+      "Parent Directory",
+      [
+        [
+          "keyboard",
+          "BACK_SPACE"
+        ]
+      ]
+    ],
+    [
+      "FileChooser.GoToRoot",
+      "Root Directory",
+      [
+        [
+          "keyboard",
+          "control BACK_SLASH"
+        ]
+      ]
+    ],
+    [
+      "FileChooser.GotoHome",
+      "Home Directory",
+      [
+        [
+          "keyboard",
+          "control 1"
+        ]
+      ]
+    ],
+    [
+      "FileChooser.GotoDesktop",
+      "Desktop Directory",
+      [
+        [
+          "keyboard",
+          "control D"
+        ]
+      ]
+    ],
+    [
+      "FileChooser.GotoProject",
+      "Project Directory",
+      [
+        [
+          "keyboard",
+          "control 2"
+        ]
+      ]
+    ],
+    [
+      "FileChooser.GotoModule",
+      "Module Directory",
+      [
+        [
+          "keyboard",
+          "control 3"
+        ]
+      ]
+    ],
+    [
+      "FileChooser.NewFolder",
+      "New Directory",
+      [
+        [
+          "keyboard",
+          "alt INSERT"
+        ],
+        [
+          "keyboard",
+          "control N"
+        ]
+      ]
+    ],
+    [
+      "FileChooser.TogglePathBar",
+      "Show/Hide Path Input Field",
+      [
+        [
+          "keyboard",
+          "control P"
+        ]
+      ]
+    ],
+    [
+      "PopupHector",
+      "Configure Current File Analysis",
+      [
+        [
+          "keyboard",
+          "ctrl alt shift H"
+        ]
+      ]
+    ],
+    [
+      "Switcher",
+      "Switcher",
+      [
+        [
+          "keyboard",
+          "ctrl TAB"
+        ],
+        [
+          "keyboard",
+          "ctrl shift TAB"
+        ]
+      ]
+    ],
+    [
+      "NextProjectWindow",
+      "Next Project Window",
+      [
+        [
+          "keyboard",
+          "control alt CLOSE_BRACKET"
+        ]
+      ]
+    ],
+    [
+      "PreviousProjectWindow",
+      "Previous Project Window",
+      [
+        [
+          "keyboard",
+          "control alt OPEN_BRACKET"
+        ]
+      ]
+    ],
+    [
+      "Vcs.QuickListPopupAction",
+      "VCS Operations Popup",
+      [
+        [
+          "keyboard",
+          "alt BACK_QUOTE"
+        ]
+      ]
+    ],
+    [
+      "VcsHistory.ShowAllAffected",
+      "Show All Affected Files",
+      [
+        [
+          "keyboard",
+          "alt shift A"
+        ]
+      ]
+    ],
+    [
+      "ChangesView.GroupBy.Directory",
+      "Directory",
+      [
+        [
+          "keyboard",
+          "control alt P"
+        ]
+      ]
+    ],
+    [
+      "ChangesView.GroupBy.Module",
+      "Module",
+      [
+        [
+          "keyboard",
+          "control alt M"
+        ]
+      ]
+    ],
+    [
+      "ShelveChanges.UnshelveWithDialog",
+      "Unshelve",
+      [
+        [
+          "keyboard",
+          "control shift U"
+        ]
+      ]
+    ],
+    [
+      "ShelvedChanges.Rename",
+      "Rename",
+      [
+        [
+          "keyboard",
+          "F2"
+        ],
+        [
+          "keyboard",
+          "Shift F6"
+        ]
+      ]
+    ],
+    [
+      "Console.Open",
+      "Open Console",
+      [
+        [
+          "keyboard",
+          "control shift F10"
+        ]
+      ]
+    ],
+    [
+      "Console.Execute",
+      "Execute Current Statement in Console",
+      [
+        [
+          "keyboard",
+          "ENTER"
+        ]
+      ]
+    ],
+    [
+      "Console.Execute.Multiline",
+      "Execute Current Statement in Multiline Console",
+      [
+        [
+          "keyboard",
+          "control ENTER"
+        ]
+      ]
+    ],
+    [
+      "Console.History.Next",
+      "Next Entry in Console History",
+      []
+    ],
+    [
+      "Console.History.Previous",
+      "Previous Entry in Console History",
+      []
+    ],
+    [
+      "Console.History.Browse",
+      "Browse Query History",
+      [
+        [
+          "keyboard",
+          "control alt E"
+        ]
+      ]
+    ],
+    [
+      "Refactorings.QuickListPopupAction",
+      "Refactor This",
+      [
+        [
+          "keyboard",
+          "control alt shift T"
+        ]
+      ]
+    ],
+    [
+      "NewScratchFile",
+      "Scratch File",
+      [
+        [
+          "keyboard",
+          "control alt shift INSERT"
+        ]
+      ]
+    ],
+    [
+      "EditorMatchBrace",
+      "Move Caret to Matching Brace",
+      [
+        [
+          "keyboard",
+          "control shift M"
+        ]
+      ]
+    ],
+    [
+      "QuickActionPopup",
+      "Show Quick Actions Popup",
+      [
+        [
+          "keyboard",
+          "control alt ENTER"
+        ]
+      ]
+    ],
+    [
+      "Git.Reword.Commit",
+      null,
+      [
+        [
+          "keyboard",
+          "F2"
+        ],
+        [
+          "keyboard",
+          "Shift F6"
+        ]
+      ]
+    ],
+    [
+      "Git.Rename.Local.Branch",
+      null,
+      [
+        [
+          "keyboard",
+          "F2"
+        ],
+        [
+          "keyboard",
+          "Shift F6"
+        ]
+      ]
+    ],
+    [
+      "Git.CreateNewBranch",
+      null,
+      [
+        [
+          "keyboard",
+          "control alt N"
+        ]
+      ]
+    ],
+    [
+      "Git.New.Branch.In.Log",
+      null,
+      [
+        [
+          "keyboard",
+          "control alt N"
+        ]
+      ]
+    ],
+    [
+      "ChangesView.SetDefault",
+      "Set Active Changelist",
+      [
+        [
+          "keyboard",
+          "control SPACE"
+        ]
+      ]
+    ],
+    [
+      "ChangesView.Rename",
+      "Edit Changelist",
+      [
+        [
+          "keyboard",
+          "F2"
+        ],
+        [
+          "keyboard",
+          "Shift F6"
+        ]
+      ]
+    ],
+    [
+      "DirDiffMenu.SynchronizeDiff",
+      "Synchronize Selected",
+      [
+        [
+          "keyboard",
+          "ENTER"
+        ]
+      ]
+    ],
+    [
+      "DirDiffMenu.SynchronizeDiff.All",
+      "Synchronize All",
+      [
+        [
+          "keyboard",
+          "control ENTER"
+        ]
+      ]
+    ],
+    [
+      "ServiceView.ShowServices",
+      "Show Services Tree",
+      [
+        [
+          "keyboard",
+          "control shift T"
+        ]
+      ]
+    ],
+    [
+      "BraceOrQuoteOut",
+      "Jump Outside Current Bracket/Quote",
+      [
+        [
+          "keyboard",
+          "TAB"
+        ]
+      ]
+    ],
+    [
+      "EditorFocusGutter",
+      "Focus Gutter (Accessibility)",
+      [
+        [
+          "keyboard",
+          "alt shift 6",
+          "F"
+        ]
+      ]
+    ],
+    [
+      "EditorShowGutterIconTooltip",
+      "Show Gutter Icon Tooltip (Accessibility)",
+      [
+        [
+          "keyboard",
+          "alt shift 6",
+          "T"
+        ]
+      ]
+    ],
+    [
+      "ShowFilterPopup",
+      null,
+      [
+        [
+          "keyboard",
+          "control alt F"
+        ]
+      ]
+    ],
+    [
+      "ShowSearchHistory",
+      "Show Search History",
+      [
+        [
+          "keyboard",
+          "alt down"
+        ]
+      ]
+    ],
+    [
+      "SearchEverywhere.NextTab",
+      "Next Tab",
+      [
+        [
+          "keyboard",
+          "TAB"
+        ]
+      ]
+    ],
+    [
+      "SearchEverywhere.PrevTab",
+      "Prev Tab",
+      [
+        [
+          "keyboard",
+          "shift TAB"
+        ]
+      ]
+    ],
+    [
+      "SearchEverywhere.CompleteCommand",
+      "Complete Command",
+      [
+        [
+          "keyboard",
+          "TAB"
+        ]
+      ]
+    ],
+    [
+      "SearchEverywhere.SelectItem",
+      "Select Item",
+      [
+        [
+          "keyboard",
+          "Enter"
+        ]
+      ]
+    ],
+    [
+      "SearchEverywhere.NavigateToNextGroup",
+      "Next Group Element",
+      [
+        [
+          "keyboard",
+          "PAGE_DOWN"
+        ],
+        [
+          "keyboard",
+          "control DOWN"
+        ]
+      ]
+    ],
+    [
+      "SearchEverywhere.NavigateToPrevGroup",
+      "Prev Group Element",
+      [
+        [
+          "keyboard",
+          "PAGE_UP"
+        ],
+        [
+          "keyboard",
+          "control UP"
+        ]
+      ]
+    ],
+    [
+      "TodoViewGroupByShowModules",
+      null,
+      [
+        [
+          "keyboard",
+          "control alt M"
+        ]
+      ]
+    ],
+    [
+      "TodoViewGroupByShowPackages",
+      null,
+      [
+        [
+          "keyboard",
+          "control alt P"
+        ]
+      ]
+    ],
+    [
+      "TodoViewGroupByFlattenPackage",
+      null,
+      [
+        [
+          "keyboard",
+          "control alt C"
+        ]
+      ]
+    ],
+    [
+      "ServiceView.GroupByContributor",
+      "Group Services by Type",
+      [
+        [
+          "keyboard",
+          "control alt T"
+        ]
+      ]
+    ],
+    [
+      "ToggleFindInSelection",
+      "Search in Selection Only",
+      [
+        [
+          "keyboard",
+          "control alt E"
+        ]
+      ]
+    ],
+    [
+      "UsageGrouping.Module",
+      null,
+      [
+        [
+          "keyboard",
+          "control alt M"
+        ]
+      ]
+    ],
+    [
+      "UsageGrouping.Directory",
+      null,
+      [
+        [
+          "keyboard",
+          "control alt P"
+        ]
+      ]
+    ],
+    [
+      "UsageGrouping.UsageType",
+      null,
+      [
+        [
+          "keyboard",
+          "control alt T"
+        ]
+      ]
+    ],
+    [
+      "UsageGrouping.FlattenModules",
+      null,
+      [
+        [
+          "keyboard",
+          "control alt O"
+        ]
+      ]
+    ],
+    [
+      "UsageGrouping.FileStructure",
+      null,
+      [
+        [
+          "keyboard",
+          "control alt F"
+        ]
+      ]
+    ],
+    [
+      "UsageGrouping.DirectoryStructure",
+      null,
+      [
+        [
+          "keyboard",
+          "control alt D"
+        ]
+      ]
+    ],
+    [
+      "UsageFiltering.ReadAccess",
+      null,
+      [
+        [
+          "keyboard",
+          "control R"
+        ]
+      ]
+    ],
+    [
+      "UsageFiltering.WriteAccess",
+      null,
+      [
+        [
+          "keyboard",
+          "control W"
+        ]
+      ]
+    ],
+    [
+      "UsageFiltering.Imports",
+      null,
+      [
+        [
+          "keyboard",
+          "control I"
+        ]
+      ]
+    ],
+    [
+      "SwitchHeaderSource",
+      null,
+      [
+        [
+          "keyboard",
+          "F10"
+        ]
+      ]
+    ],
+    [
+      "ActivateUnitTestsToolWindow",
+      null,
+      [
+        [
+          "keyboard",
+          "alt shift 8"
+        ]
+      ]
+    ],
+    [
+      "ActivateNuGetToolWindow",
+      null,
+      [
+        [
+          "keyboard",
+          "alt shift 7"
+        ]
+      ]
+    ],
+    [
+      "MainMenuButton.ShowMenu",
+      "Show Collapsed Main Menu",
+      [
+        [
+          "keyboard",
+          "alt BACK_SLASH"
+        ]
+      ]
+    ],
+    [
+      "EditorDecreaseFontSizeGlobal",
+      "Decrease Font Size in All Editors",
+      [
+        [
+          "keyboard",
+          "alt shift COMMA"
+        ]
+      ]
+    ],
+    [
+      "EditorIncreaseFontSizeGlobal",
+      "Increase Font Size in All Editors",
+      [
+        [
+          "keyboard",
+          "alt shift PERIOD"
+        ]
+      ]
+    ],
+    [
+      "ZoomInIdeAction",
+      "Zoom In IDE",
+      [
+        [
+          "keyboard",
+          "shift alt EQUALS"
+        ]
+      ]
+    ],
+    [
+      "ZoomOutIdeAction",
+      "Zoom Out IDE",
+      [
+        [
+          "keyboard",
+          "shift alt MINUS"
+        ]
+      ]
+    ],
+    [
+      "ResetIdeScaleAction",
+      "Reset IDE Scale",
+      [
+        [
+          "keyboard",
+          "shift alt 0"
+        ]
+      ]
+    ]
+  ],
+  "emacs": [
+    [
+      "EditorEscape",
+      "Escape",
+      [
+        [
+          "keyboard",
+          "ESCAPE",
+          "ESCAPE"
+        ],
+        [
+          "keyboard",
+          "control G"
+        ]
+      ]
+    ],
+    [
+      "EditorCutLineBackward",
+      "Cut Line Backward",
+      [
+        [
+          "keyboard",
+          "alt MINUS",
+          "control K"
+        ]
+      ]
+    ],
+    [
+      "EditorCutLineEnd",
+      "Cut up to Line End",
+      [
+        [
+          "keyboard",
+          "control K"
+        ]
+      ]
+    ],
+    [
+      "FindUsages",
+      "Find Usages",
+      [
+        [
+          "keyboard",
+          "alt F7"
+        ],
+        [
+          "keyboard",
+          "shift alt S"
+        ]
+      ]
+    ],
+    [
+      "$Cut",
+      "Cu_t",
+      [
+        [
+          "keyboard",
+          "shift DELETE"
+        ]
+      ]
+    ],
+    [
+      "EditorSplitLine",
+      "Split Line",
+      [
+        [
+          "keyboard",
+          "control O"
+        ]
+      ]
+    ],
+    [
+      "MethodDown",
+      "N_ext Method",
+      [
+        [
+          "keyboard",
+          "alt DOWN"
+        ],
+        [
+          "keyboard",
+          "control alt E"
+        ]
+      ]
+    ],
+    [
+      "$Paste",
+      "Paste",
+      [
+        [
+          "keyboard",
+          "shift INSERT"
+        ],
+        [
+          "keyboard",
+          "control Y"
+        ]
+      ]
+    ],
+    [
+      "PasteMultiple",
+      "Past_e from History",
+      [
+        [
+          "keyboard",
+          "alt Y"
+        ]
+      ]
+    ],
+    [
+      "EditorSelectWord",
+      "Extend Selection",
+      [
+        [
+          "keyboard",
+          "control alt W"
+        ]
+      ]
+    ],
+    [
+      "EditorToggleStickySelection",
+      "Toggle Sticky Selection",
+      [
+        [
+          "keyboard",
+          "control SPACE"
+        ],
+        [
+          "keyboard",
+          "control shift 2"
+        ]
+      ]
+    ],
+    [
+      "EditorSwapSelectionBoundaries",
+      "Swap Selection Boundaries",
+      [
+        [
+          "keyboard",
+          "control X",
+          "X"
+        ]
+      ]
+    ],
+    [
+      "$SelectAll",
+      "Select All",
+      [
+        [
+          "keyboard",
+          "control X",
+          "H"
+        ]
+      ]
+    ],
+    [
+      "AutoIndentLines",
+      "Auto-Indent Lines",
+      [
+        [
+          "keyboard",
+          "control alt I"
+        ],
+        [
+          "keyboard",
+          "control alt Q"
+        ]
+      ]
+    ],
+    [
+      "GotoNextError",
+      "Next Highlighted Error",
+      [
+        [
+          "keyboard",
+          "F2"
+        ],
+        [
+          "keyboard",
+          "control X",
+          "BACK_QUOTE"
+        ]
+      ]
+    ],
+    [
+      "EditorTextStart",
+      "Move Caret to Text Start",
+      [
+        [
+          "keyboard",
+          "control HOME"
+        ],
+        [
+          "keyboard",
+          "shift alt COMMA"
+        ],
+        [
+          "keyboard",
+          "ESCAPE",
+          "COMMA"
+        ]
+      ]
+    ],
+    [
+      "EditorDeleteToWordStart",
+      "Delete to Word Start",
+      [
+        [
+          "keyboard",
+          "control BACK_SPACE"
+        ],
+        [
+          "keyboard",
+          "alt BACK_SPACE"
+        ],
+        [
+          "keyboard",
+          "ESCAPE",
+          "BACK_SPACE"
+        ]
+      ]
+    ],
+    [
+      "SaveAll",
+      "Save All",
+      [
+        [
+          "keyboard",
+          "control X",
+          "control S"
+        ]
+      ]
+    ],
+    [
+      "$Delete",
+      "Delete",
+      [
+        [
+          "keyboard",
+          "DELETE"
+        ],
+        [
+          "keyboard",
+          "control D"
+        ]
+      ]
+    ],
+    [
+      "EditorKillToWordStart",
+      "Kill to Word Start",
+      [
+        [
+          "keyboard",
+          "alt DELETE"
+        ]
+      ]
+    ],
+    [
+      "EditorKillToWordEnd",
+      "Kill to Word End",
+      [
+        [
+          "keyboard",
+          "alt D"
+        ]
+      ]
+    ],
+    [
+      "EditorKillRegion",
+      "Kill Selected Region",
+      [
+        [
+          "keyboard",
+          "control W"
+        ]
+      ]
+    ],
+    [
+      "EditorKillRingSave",
+      "Save to Kill Ring",
+      [
+        [
+          "keyboard",
+          "alt W"
+        ]
+      ]
+    ],
+    [
+      "$Undo",
+      "Undo",
+      [
+        [
+          "keyboard",
+          "shift control MINUS"
+        ],
+        [
+          "keyboard",
+          "control SLASH"
+        ]
+      ]
+    ],
+    [
+      "EditorPageUp",
+      "Page Up",
+      [
+        [
+          "keyboard",
+          "PAGE_UP"
+        ],
+        [
+          "keyboard",
+          "control Z"
+        ],
+        [
+          "keyboard",
+          "alt V"
+        ]
+      ]
+    ],
+    [
+      "$Copy",
+      "Copy",
+      [
+        [
+          "keyboard",
+          "control INSERT"
+        ],
+        [
+          "keyboard",
+          "alt C"
+        ],
+        [
+          "keyboard",
+          "ESCAPE",
+          "W"
+        ]
+      ]
+    ],
+    [
+      "GotoPreviousError",
+      "Previous Highlighted Error",
+      [
+        [
+          "keyboard",
+          "shift F2"
+        ],
+        [
+          "keyboard",
+          "shift control X",
+          "BACK_QUOTE"
+        ]
+      ]
+    ],
+    [
+      "GotoClass",
+      "Go to Class",
+      [
+        [
+          "keyboard",
+          "shift alt G"
+        ]
+      ]
+    ],
+    [
+      "GotoChangedFile",
+      "Go to Changed File",
+      []
+    ],
+    [
+      "Switcher",
+      "Switcher",
+      [
+        [
+          "keyboard",
+          "control X",
+          "B"
+        ]
+      ]
+    ],
+    [
+      "GotoFile",
+      "Go to File",
+      [
+        [
+          "keyboard",
+          "control X",
+          "control F"
+        ]
+      ]
+    ],
+    [
+      "EditorRight",
+      "Right",
+      [
+        [
+          "keyboard",
+          "RIGHT"
+        ],
+        [
+          "keyboard",
+          "control F"
+        ]
+      ]
+    ],
+    [
+      "$Redo",
+      "Redo",
+      [
+        [
+          "keyboard",
+          "shift control Z"
+        ],
+        [
+          "keyboard",
+          "shift alt MINUS"
+        ]
+      ]
+    ],
+    [
+      "ParameterInfo",
+      "Parameter Info",
+      [
+        [
+          "keyboard",
+          "shift alt P"
+        ]
+      ]
+    ],
+    [
+      "EditorDown",
+      "Down",
+      [
+        [
+          "keyboard",
+          "DOWN"
+        ],
+        [
+          "keyboard",
+          "control N"
+        ]
+      ]
+    ],
+    [
+      "FindNext",
+      "Find Next / Move to Next Occurrence",
+      [
+        [
+          "keyboard",
+          "F3"
+        ],
+        [
+          "keyboard",
+          "alt S"
+        ]
+      ]
+    ],
+    [
+      "SmartTypeCompletion",
+      "Type-Matching",
+      [
+        [
+          "keyboard",
+          "shift control SPACE"
+        ],
+        [
+          "keyboard",
+          "control alt SLASH"
+        ]
+      ]
+    ],
+    [
+      "GotoDeclaration",
+      "Go to Declaration or Usages",
+      [
+        [
+          "keyboard",
+          "control alt G"
+        ],
+        [
+          "keyboard",
+          "ESCAPE",
+          "PERIOD"
+        ],
+        [
+          "keyboard",
+          "alt PERIOD"
+        ],
+        [
+          "mouse",
+          "ctrl button1"
+        ]
+      ]
+    ],
+    [
+      "MethodUp",
+      "Prev_ious Method",
+      [
+        [
+          "keyboard",
+          "alt UP"
+        ],
+        [
+          "keyboard",
+          "control alt A"
+        ]
+      ]
+    ],
+    [
+      "EditorDuplicate",
+      "Duplicate Line or Selection",
+      [
+        [
+          "keyboard",
+          "meta D"
+        ]
+      ]
+    ],
+    [
+      "FindPrevious",
+      "Find Pre_vious / Move to Previous Occurrence",
+      [
+        [
+          "keyboard",
+          "shift F3"
+        ],
+        [
+          "keyboard",
+          "alt R"
+        ],
+        [
+          "keyboard",
+          "control R"
+        ]
+      ]
+    ],
+    [
+      "NextTab",
+      "Select Ne_xt Tab",
+      [
+        [
+          "keyboard",
+          "alt RIGHT"
+        ],
+        [
+          "keyboard",
+          "control X",
+          "N"
+        ]
+      ]
+    ],
+    [
+      "NextEditorTab",
+      "Select Next Tab in Multi-Editor File",
+      [
+        [
+          "keyboard",
+          "alt shift RIGHT"
+        ]
+      ]
+    ],
+    [
+      "Diff.PrevChange",
+      "Compare Previous File",
+      [
+        [
+          "keyboard",
+          "alt shift LEFT"
+        ]
+      ]
+    ],
+    [
+      "Diff.NextChange",
+      "Compare Next File",
+      [
+        [
+          "keyboard",
+          "alt shift RIGHT"
+        ]
+      ]
+    ],
+    [
+      "GotoLine",
+      "Go to Line:Column",
+      [
+        [
+          "keyboard",
+          "alt G"
+        ]
+      ]
+    ],
+    [
+      "CodeCompletion",
+      "Basic",
+      [
+        [
+          "keyboard",
+          "alt SLASH"
+        ]
+      ]
+    ],
+    [
+      "SynchronizeCurrentFile",
+      "Reload from Disk",
+      [
+        [
+          "keyboard",
+          "alt U"
+        ],
+        [
+          "keyboard",
+          "ESCAPE",
+          "U"
+        ]
+      ]
+    ],
+    [
+      "PreviousTab",
+      "Se_lect Previous Tab",
+      [
+        [
+          "keyboard",
+          "alt LEFT"
+        ],
+        [
+          "keyboard",
+          "control X",
+          "P"
+        ]
+      ]
+    ],
+    [
+      "PreviousEditorTab",
+      "Select Previous Tab in Multi-Editor File",
+      [
+        [
+          "keyboard",
+          "alt shift LEFT"
+        ]
+      ]
+    ],
+    [
+      "EditorLineEnd",
+      "Move Caret to Line End",
+      [
+        [
+          "keyboard",
+          "END"
+        ],
+        [
+          "keyboard",
+          "control E"
+        ]
+      ]
+    ],
+    [
+      "EditorCodeBlockEnd",
+      "Move Caret to Code Block End",
+      [
+        [
+          "keyboard",
+          "control CLOSE_BRACKET"
+        ],
+        [
+          "keyboard",
+          "control alt CLOSE_BRACKET"
+        ]
+      ]
+    ],
+    [
+      "EditorNextWord",
+      "Move Caret to Next Word",
+      [
+        [
+          "keyboard",
+          "control RIGHT"
+        ],
+        [
+          "keyboard",
+          "alt F"
+        ],
+        [
+          "keyboard",
+          "ESCAPE",
+          "control F"
+        ]
+      ]
+    ],
+    [
+      "CompileProject",
+      "Rebuild Project",
+      [
+        [
+          "keyboard",
+          "shift alt M"
+        ]
+      ]
+    ],
+    [
+      "EditorLineStart",
+      "Move Caret to Line Start",
+      [
+        [
+          "keyboard",
+          "HOME"
+        ],
+        [
+          "keyboard",
+          "control A"
+        ],
+        [
+          "keyboard",
+          "alt M"
+        ]
+      ]
+    ],
+    [
+      "EditorLeft",
+      "Left",
+      [
+        [
+          "keyboard",
+          "LEFT"
+        ],
+        [
+          "keyboard",
+          "control B"
+        ]
+      ]
+    ],
+    [
+      "CloseAllEditors",
+      "Close All Tabs",
+      [
+        [
+          "keyboard",
+          "control X",
+          "control C"
+        ]
+      ]
+    ],
+    [
+      "Find",
+      "Find",
+      [
+        [
+          "keyboard",
+          "control alt S"
+        ],
+        [
+          "keyboard",
+          "alt F3"
+        ],
+        [
+          "keyboard",
+          "control S"
+        ]
+      ]
+    ],
+    [
+      "EditorPreviousWord",
+      "Move Caret to Previous Word",
+      [
+        [
+          "keyboard",
+          "control LEFT"
+        ],
+        [
+          "keyboard",
+          "alt B"
+        ],
+        [
+          "keyboard",
+          "ESCAPE",
+          "control B"
+        ]
+      ]
+    ],
+    [
+      "EditorCodeBlockStart",
+      "Move Caret to Code Block Start",
+      [
+        [
+          "keyboard",
+          "control OPEN_BRACKET"
+        ],
+        [
+          "keyboard",
+          "control alt OPEN_BRACKET"
+        ]
+      ]
+    ],
+    [
+      "EmacsStyleIndent",
+      "Emacs Tab",
+      [
+        [
+          "keyboard",
+          "TAB"
+        ]
+      ]
+    ],
+    [
+      "EditorUp",
+      "Up",
+      [
+        [
+          "keyboard",
+          "UP"
+        ],
+        [
+          "keyboard",
+          "control P"
+        ]
+      ]
+    ],
+    [
+      "CloseContent",
+      "Close Tab",
+      [
+        [
+          "keyboard",
+          "control F4"
+        ],
+        [
+          "keyboard",
+          "control X",
+          "K"
+        ],
+        [
+          "keyboard",
+          "control X",
+          "0"
+        ]
+      ]
+    ],
+    [
+      "SplitVertically",
+      "Split Right",
+      [
+        [
+          "keyboard",
+          "control X",
+          "3"
+        ]
+      ]
+    ],
+    [
+      "SplitHorizontally",
+      "Split Down",
+      [
+        [
+          "keyboard",
+          "control X",
+          "2"
+        ]
+      ]
+    ],
+    [
+      "UnsplitAll",
+      "U_nsplit All",
+      [
+        [
+          "keyboard",
+          "control X",
+          "1"
+        ]
+      ]
+    ],
+    [
+      "NextSplitter",
+      "Go to Next Splitter",
+      [
+        [
+          "keyboard",
+          "control X",
+          "O"
+        ]
+      ]
+    ],
+    [
+      "Replace",
+      "Replace",
+      [
+        [
+          "keyboard",
+          "shift alt 5"
+        ]
+      ]
+    ],
+    [
+      "EditorTextEnd",
+      "Move Caret to Text End",
+      [
+        [
+          "keyboard",
+          "control END"
+        ],
+        [
+          "keyboard",
+          "shift alt PERIOD"
+        ]
+      ]
+    ],
+    [
+      "EditorPageDown",
+      "Page Down",
+      [
+        [
+          "keyboard",
+          "PAGE_DOWN"
+        ],
+        [
+          "keyboard",
+          "control V"
+        ]
+      ]
+    ],
+    [
+      "VcsShowNextChangeMarker",
+      "Next C_hange",
+      [
+        [
+          "keyboard",
+          "shift control alt DOWN"
+        ]
+      ]
+    ],
+    [
+      "VcsShowPrevChangeMarker",
+      "Previous Ch_ange",
+      [
+        [
+          "keyboard",
+          "shift control alt UP"
+        ]
+      ]
+    ],
+    [
+      "NextProjectWindow",
+      "Next Project Window",
+      [
+        [
+          "keyboard",
+          "control X",
+          "control O"
+        ]
+      ]
+    ],
+    [
+      "CommentByLineComment",
+      "Comment with Line Comment",
+      [
+        [
+          "keyboard",
+          "alt SEMICOLON"
+        ]
+      ]
+    ],
+    [
+      "EditorForwardParagraph",
+      null,
+      [
+        [
+          "keyboard",
+          "control DOWN"
+        ]
+      ]
+    ],
+    [
+      "EditorBackwardParagraph",
+      null,
+      [
+        [
+          "keyboard",
+          "control UP"
+        ]
+      ]
+    ],
+    [
+      "EditorForwardParagraphWithSelection",
+      null,
+      [
+        [
+          "keyboard",
+          "control shift DOWN"
+        ]
+      ]
+    ],
+    [
+      "EditorBackwardParagraphWithSelection",
+      null,
+      [
+        [
+          "keyboard",
+          "control shift UP"
+        ]
+      ]
+    ],
+    [
+      "EditorScrollToCenter",
+      "Scroll to Center",
+      [
+        [
+          "keyboard",
+          "control L"
+        ]
+      ]
+    ],
+    [
+      "EditorEnter",
+      "Enter",
+      [
+        [
+          "keyboard",
+          "ENTER"
+        ],
+        [
+          "keyboard",
+          "control M"
+        ]
+      ]
+    ],
+    [
+      "EditorChooseLookupItem",
+      "Choose Lookup Item",
+      [
+        [
+          "keyboard",
+          "ENTER"
+        ],
+        [
+          "keyboard",
+          "control M"
+        ]
+      ]
+    ],
+    [
+      "SelectVirtualTemplateElement",
+      "Show Options Popup for In-place Refactoring",
+      [
+        [
+          "keyboard",
+          "Alt Shift O"
+        ]
+      ]
+    ],
+    [
+      "NextTemplateVariable",
+      "Next Template Variable or Finish In-Place Refactoring",
+      [
+        [
+          "keyboard",
+          "TAB"
+        ],
+        [
+          "keyboard",
+          "ENTER"
+        ],
+        [
+          "keyboard",
+          "control M"
+        ]
+      ]
+    ],
+    [
+      "Console.Execute",
+      "Execute Current Statement in Console",
+      [
+        [
+          "keyboard",
+          "ENTER"
+        ],
+        [
+          "keyboard",
+          "control M"
+        ]
+      ]
+    ],
+    [
+      "GotoAction",
+      "Find Action",
+      [
+        [
+          "keyboard",
+          "ESCAPE",
+          "X"
+        ],
+        [
+          "keyboard",
+          "alt X"
+        ]
+      ]
+    ],
+    [
+      "CollapseAllRegions",
+      "Collapse All",
+      []
+    ],
+    [
+      "ReformatCode",
+      "Reformat Code",
+      []
+    ],
+    [
+      "OverrideMethods",
+      "Override Methods",
+      []
+    ],
+    [
+      "ToggleBookmark2",
+      null,
+      []
+    ],
+    [
+      "SafeDelete",
+      "Safe Delete",
+      []
+    ],
+    [
+      "IntroduceField",
+      "Introduce Field",
+      []
+    ],
+    [
+      "RecentFiles",
+      "Rece_nt Files",
+      []
+    ],
+    [
+      "SwitcherRecentEditedChangedToggleCheckBox",
+      "Toggle Changed Only Files",
+      []
+    ],
+    [
+      "SwitcherIterateItems",
+      "Iterate Recent Files",
+      []
+    ],
+    [
+      "EditorTab",
+      "Tab",
+      []
+    ],
+    [
+      "EditorDeleteLine",
+      "Delete Line",
+      []
+    ],
+    [
+      "PreviousProjectWindow",
+      "Previous Project Window",
+      []
+    ],
+    [
+      "Vcs.ToggleAmendCommitMode",
+      "Amend Commit",
+      []
+    ],
+    [
+      "ChangesView.ShowCommitOptions",
+      "Show Commit Options",
+      []
+    ],
+    [
+      "Vcs.ShowMessageHistory",
+      "Commit Message History",
+      []
+    ],
+    [
+      "GotoImplementation",
+      "Go to I_mplementation(s)",
+      []
+    ],
+    [
+      "EditorScrollUp",
+      "Scroll Up",
+      []
+    ],
+    [
+      "EditorScrollDown",
+      "Scroll Down",
+      []
+    ],
+    [
+      "Vcs.MoveChangedLinesToChangelist",
+      "Move Lines to Another Changelist",
+      []
+    ],
+    [
+      "ChangesView.Move",
+      "Move to Another Changelist",
+      []
+    ],
+    [
+      "MoveStatementUp",
+      "Move Statement Up",
+      []
+    ],
+    [
+      "MoveStatementDown",
+      "Move Statement Do_wn",
+      []
+    ],
+    [
+      "ToggleRenderedDocPresentation",
+      "Toggle Rendered View",
+      []
+    ],
+    [
+      "EditorAddCaretPerSelectedLine",
+      "Add Carets to Ends of Selected Lines",
+      []
+    ],
+    [
+      "GoGenerateFileAction",
+      null,
+      []
+    ],
+    [
+      "Diff.ApplyLeftSide",
+      "Accept Left Side",
+      []
+    ],
+    [
+      "Diff.ApplyRightSide",
+      "Accept Right Side",
+      []
+    ],
+    [
+      "EditorDecreaseFontSizeGlobal",
+      "Decrease Font Size in All Editors",
+      []
+    ],
+    [
+      "EditorIncreaseFontSizeGlobal",
+      "Increase Font Size in All Editors",
+      []
+    ],
+    [
+      "ZoomOutIdeAction",
+      "Zoom Out IDE",
+      []
+    ]
+  ],
+  "sublime": [
+    [
+      "OpenFile",
+      "Open",
+      [
+        [
+          "keyboard",
+          "control o"
+        ]
+      ]
+    ],
+    [
+      "OverrideMethods",
+      "Override Methods",
+      []
+    ],
+    [
+      "NewElement",
+      "New",
+      [
+        [
+          "keyboard",
+          "control n"
+        ]
+      ]
+    ],
+    [
+      "GotoClass",
+      "Go to Class",
+      []
+    ],
+    [
+      "GotoChangedFile",
+      "Go to Changed File",
+      []
+    ],
+    [
+      "ReopenClosedTab",
+      "Reopen Closed Tab",
+      [
+        [
+          "keyboard",
+          "control shift t"
+        ]
+      ]
+    ],
+    [
+      "GotoTest",
+      "Go to Test",
+      []
+    ],
+    [
+      "CloseContent",
+      "Close Tab",
+      [
+        [
+          "keyboard",
+          "control F4"
+        ],
+        [
+          "keyboard",
+          "control w"
+        ]
+      ]
+    ],
+    [
+      "EditorUnSelectWord",
+      "Shrink Selection",
+      []
+    ],
+    [
+      "$Redo",
+      "Redo",
+      [
+        [
+          "keyboard",
+          "control shift z"
+        ],
+        [
+          "keyboard",
+          "control y"
+        ]
+      ]
+    ],
+    [
+      "MoveLineUp",
+      "Move Line Up",
+      [
+        [
+          "keyboard",
+          "control shift UP"
+        ]
+      ]
+    ],
+    [
+      "MoveStatementUp",
+      "Move Statement Up",
+      []
+    ],
+    [
+      "MoveLineDown",
+      "Move Line Do_wn",
+      [
+        [
+          "keyboard",
+          "control shift DOWN"
+        ]
+      ]
+    ],
+    [
+      "MoveStatementDown",
+      "Move Statement Do_wn",
+      []
+    ],
+    [
+      "EditorDeleteLine",
+      "Delete Line",
+      [
+        [
+          "keyboard",
+          "control shift k"
+        ]
+      ]
+    ],
+    [
+      "Vcs.Push",
+      "Push",
+      []
+    ],
+    [
+      "$Paste",
+      "Paste",
+      [
+        [
+          "keyboard",
+          "control shift V"
+        ]
+      ]
+    ],
+    [
+      "EditorPasteSimple",
+      "Paste as P_lain Text",
+      [
+        [
+          "keyboard",
+          "control V"
+        ],
+        [
+          "keyboard",
+          "shift INSERT"
+        ]
+      ]
+    ],
+    [
+      "PasteMultiple",
+      "Past_e from History",
+      [
+        [
+          "keyboard",
+          "control k",
+          "control v"
+        ],
+        [
+          "keyboard",
+          "control k",
+          "v"
+        ]
+      ]
+    ],
+    [
+      "EditorIndentLineOrSelection",
+      "Indent Line or Selection",
+      [
+        [
+          "keyboard",
+          "control CLOSE_BRACKET"
+        ]
+      ]
+    ],
+    [
+      "EditorCodeBlockEnd",
+      "Move Caret to Code Block End",
+      []
+    ],
+    [
+      "EditorCodeBlockEndWithSelection",
+      "Move Caret to Code Block End with Selection",
+      []
+    ],
+    [
+      "EditorUnindentSelection",
+      "Unindent Line or Selection",
+      [
+        [
+          "keyboard",
+          "control OPEN_BRACKET"
+        ]
+      ]
+    ],
+    [
+      "EditorCodeBlockStart",
+      "Move Caret to Code Block Start",
+      []
+    ],
+    [
+      "EditorCodeBlockStartWithSelection",
+      "Move Caret to Code Block Start with Selection",
+      []
+    ],
+    [
+      "EditorDuplicate",
+      "Duplicate Line or Selection",
+      [
+        [
+          "keyboard",
+          "control shift d"
+        ]
+      ]
+    ],
+    [
+      "Diff.ShowSettingsPopup",
+      "Show Diff Settings Popup",
+      []
+    ],
+    [
+      "CIDR.Lang.Cpp.GenerateDefinitions",
+      null,
+      []
+    ],
+    [
+      "EditorJoinLines",
+      "Join Lines",
+      [
+        [
+          "keyboard",
+          "control j"
+        ]
+      ]
+    ],
+    [
+      "InsertLiveTemplate",
+      "Insert Live Template",
+      []
+    ],
+    [
+      "EditorStartNewLine",
+      "Start New Line",
+      [
+        [
+          "keyboard",
+          "control ENTER"
+        ]
+      ]
+    ],
+    [
+      "EditorStartNewLineBefore",
+      "Start New Line Before Current",
+      [
+        [
+          "keyboard",
+          "control shift ENTER"
+        ]
+      ]
+    ],
+    [
+      "EditorCompleteStatement",
+      "Complete Current Statement",
+      []
+    ],
+    [
+      "EditorDeleteToLineEnd",
+      "Delete to Line End",
+      [
+        [
+          "keyboard",
+          "control k",
+          "control k"
+        ]
+      ]
+    ],
+    [
+      "EditorDeleteToLineStart",
+      "Delete to Line Start",
+      [
+        [
+          "keyboard",
+          "control shift BACK_SPACE"
+        ],
+        [
+          "keyboard",
+          "control k",
+          "control BACK_SPACE"
+        ]
+      ]
+    ],
+    [
+      "JumpToLastChange",
+      "Last Edit L_ocation",
+      []
+    ],
+    [
+      "Vcs.UpdateProject",
+      "Update Project",
+      []
+    ],
+    [
+      "ChangesView.ShowCommitOptions",
+      "Show Commit Options",
+      []
+    ],
+    [
+      "ExpandAllRegions",
+      "Expand All",
+      [
+        [
+          "keyboard",
+          "control k",
+          "control j"
+        ],
+        [
+          "keyboard",
+          "control k",
+          "control 0"
+        ]
+      ]
+    ],
+    [
+      "CollapseAllRegions",
+      "Collapse All",
+      [
+        [
+          "keyboard",
+          "control k",
+          "control 1"
+        ]
+      ]
+    ],
+    [
+      "CollapseRegion",
+      "Collapse",
+      [
+        [
+          "keyboard",
+          "control shift OPEN_BRACKET"
+        ]
+      ]
+    ],
+    [
+      "ExpandRegion",
+      "E_xpand",
+      [
+        [
+          "keyboard",
+          "control shift CLOSE_BRACKET"
+        ]
+      ]
+    ],
+    [
+      "EditorToggleCase",
+      "Toggle Case",
+      [
+        [
+          "keyboard",
+          "control k",
+          "control u"
+        ],
+        [
+          "keyboard",
+          "control k",
+          "control l"
+        ]
+      ]
+    ],
+    [
+      "EditorContextInfo",
+      "Context Info",
+      []
+    ],
+    [
+      "Resume",
+      "Resume Pro_gram",
+      []
+    ],
+    [
+      "EditorSortLines",
+      "Sort Lines",
+      [
+        [
+          "keyboard",
+          "control F9"
+        ]
+      ]
+    ],
+    [
+      "CompileDirty",
+      "Build Project",
+      []
+    ],
+    [
+      "EditorSplitLine",
+      "Split Line",
+      [
+        [
+          "keyboard",
+          "shift ENTER"
+        ]
+      ]
+    ],
+    [
+      "EditorNextWordInDifferentHumpsMode",
+      "Move Caret to Next Word in Different \"CamelHumps\" Mode",
+      [
+        [
+          "keyboard",
+          "alt RIGHT"
+        ]
+      ]
+    ],
+    [
+      "Diff.NextChange",
+      "Compare Next File",
+      []
+    ],
+    [
+      "EditorPreviousWordInDifferentHumpsMode",
+      "Move Caret to Previous Word in Different \"CamelHumps\" Mode",
+      [
+        [
+          "keyboard",
+          "alt LEFT"
+        ]
+      ]
+    ],
+    [
+      "Diff.PrevChange",
+      "Compare Previous File",
+      []
+    ],
+    [
+      "Diff.ApplyLeftSide",
+      "Accept Left Side",
+      []
+    ],
+    [
+      "Diff.ApplyRightSide",
+      "Accept Right Side",
+      []
+    ],
+    [
+      "EditorNextWordInDifferentHumpsModeWithSelection",
+      "Move Caret to Next Word with Selection in Different \"CamelHumps\" Mode",
+      [
+        [
+          "keyboard",
+          "alt shift RIGHT"
+        ]
+      ]
+    ],
+    [
+      "NextEditorTab",
+      "Select Next Tab in Multi-Editor File",
+      []
+    ],
+    [
+      "EditorPreviousWordInDifferentHumpsModeWithSelection",
+      "Move Caret to Previous Word with Selection in Different \"CamelHumps\" Mode",
+      [
+        [
+          "keyboard",
+          "alt shift LEFT"
+        ]
+      ]
+    ],
+    [
+      "PreviousEditorTab",
+      "Select Previous Tab in Multi-Editor File",
+      []
+    ],
+    [
+      "FillParagraph",
+      "Fill Paragraph",
+      [
+        [
+          "keyboard",
+          "alt q"
+        ]
+      ]
+    ],
+    [
+      "EditorSelectLine",
+      "Extend Line Selection",
+      [
+        [
+          "keyboard",
+          "control l"
+        ]
+      ]
+    ],
+    [
+      "EditorSelectWord",
+      "Extend Selection",
+      [
+        [
+          "keyboard",
+          "control shift SPACE"
+        ],
+        [
+          "keyboard",
+          "control shift a"
+        ],
+        [
+          "keyboard",
+          "control shift j"
+        ],
+        [
+          "keyboard",
+          "control shift m"
+        ]
+      ]
+    ],
+    [
+      "SmartTypeCompletion",
+      "Type-Matching",
+      []
+    ],
+    [
+      "SelectNextOccurrence",
+      "Add Selection for Next Occurrence",
+      [
+        [
+          "keyboard",
+          "control d"
+        ]
+      ]
+    ],
+    [
+      "Find",
+      "Find",
+      [
+        [
+          "keyboard",
+          "control f"
+        ]
+      ]
+    ],
+    [
+      "FindNext",
+      "Find Next / Move to Next Occurrence",
+      [
+        [
+          "keyboard",
+          "f3"
+        ],
+        [
+          "keyboard",
+          "control k",
+          "control d"
+        ]
+      ]
+    ],
+    [
+      "FindPrevious",
+      "Find Pre_vious / Move to Previous Occurrence",
+      [
+        [
+          "keyboard",
+          "shift f3"
+        ]
+      ]
+    ],
+    [
+      "IncrementalSearch",
+      "Incrementa_l Search",
+      [
+        [
+          "keyboard",
+          "control i"
+        ]
+      ]
+    ],
+    [
+      "ImplementMethods",
+      "Implement Methods",
+      []
+    ],
+    [
+      "Replace",
+      "Replace",
+      [
+        [
+          "keyboard",
+          "control h"
+        ]
+      ]
+    ],
+    [
+      "TypeHierarchy",
+      "Type Hierarchy",
+      []
+    ],
+    [
+      "MethodHierarchy",
+      "Method Hierarchy",
+      []
+    ],
+    [
+      "SelectAllOccurrences",
+      "Select All Occurrences",
+      [
+        [
+          "keyboard",
+          "alt f3"
+        ]
+      ]
+    ],
+    [
+      "ToggleFullScreen",
+      "Toggle Full Screen Mode",
+      [
+        [
+          "keyboard",
+          "f11"
+        ]
+      ]
+    ],
+    [
+      "ToggleDistractionFreeMode",
+      "Toggle Distraction Free Mode",
+      [
+        [
+          "keyboard",
+          "shift f11"
+        ]
+      ]
+    ],
+    [
+      "ShowBookmarks",
+      "Show Bookmarks",
+      []
+    ],
+    [
+      "ShowTypeBookmarks",
+      "Go to Mnemonic",
+      []
+    ],
+    [
+      "Move",
+      "Move",
+      []
+    ],
+    [
+      "ChangeSignature",
+      "Change Si_gnature",
+      []
+    ],
+    [
+      "ChangeTypeSignature",
+      "T_ype Migration",
+      []
+    ],
+    [
+      "EditorIncreaseFontSize",
+      "Increase Font Size",
+      [
+        [
+          "keyboard",
+          "control ADD"
+        ],
+        [
+          "keyboard",
+          "control EQUALS"
+        ]
+      ]
+    ],
+    [
+      "EditorDecreaseFontSize",
+      "Decrease Font Size",
+      [
+        [
+          "keyboard",
+          "control SUBTRACT"
+        ],
+        [
+          "keyboard",
+          "control MINUS"
+        ],
+        [
+          "keyboard",
+          "control shift ADD"
+        ],
+        [
+          "keyboard",
+          "control shift EQUALS"
+        ]
+      ]
+    ],
+    [
+      "GotoFile",
+      "Go to File",
+      [
+        [
+          "keyboard",
+          "control p"
+        ]
+      ]
+    ],
+    [
+      "ParameterInfo",
+      "Parameter Info",
+      []
+    ],
+    [
+      "TodoViewGroupByShowPackages",
+      null,
+      []
+    ],
+    [
+      "ServiceView.GroupByContributor",
+      "Group Services by Type",
+      []
+    ],
+    [
+      "FileStructurePopup",
+      "F_ile Structure",
+      [
+        [
+          "keyboard",
+          "control r"
+        ]
+      ]
+    ],
+    [
+      "GotoSymbol",
+      "Go to Symbol",
+      [
+        [
+          "keyboard",
+          "control shift r"
+        ]
+      ]
+    ],
+    [
+      "ReplaceInPath",
+      "Repl_ace in Files",
+      []
+    ],
+    [
+      "GotoDeclaration",
+      "Go to Declaration or Usages",
+      [
+        [
+          "keyboard",
+          "f12"
+        ],
+        [
+          "mouse",
+          "button2"
+        ],
+        [
+          "mouse",
+          "shift control button1"
+        ]
+      ]
+    ],
+    [
+      "JumpToLastWindow",
+      "Jump to Last Tool Window",
+      []
+    ],
+    [
+      "ShowUsages",
+      "Show Usages",
+      [
+        [
+          "keyboard",
+          "shift f12"
+        ]
+      ]
+    ],
+    [
+      "RestoreDefaultLayout",
+      "Restore Current Layout",
+      []
+    ],
+    [
+      "Back",
+      "Back",
+      [
+        [
+          "keyboard",
+          "alt SUBTRACT"
+        ],
+        [
+          "keyboard",
+          "alt MINUS"
+        ],
+        [
+          "mouse",
+          "button4"
+        ]
+      ]
+    ],
+    [
+      "Forward",
+      "For_ward",
+      [
+        [
+          "keyboard",
+          "alt shift SUBTRACT"
+        ],
+        [
+          "keyboard",
+          "alt shift MINUS"
+        ],
+        [
+          "mouse",
+          "button5"
+        ]
+      ]
+    ],
+    [
+      "EditorMatchBrace",
+      "Move Caret to Matching Brace",
+      [
+        [
+          "keyboard",
+          "control M"
+        ]
+      ]
+    ],
+    [
+      "EditorScrollToCenter",
+      "Scroll to Center",
+      [
+        [
+          "keyboard",
+          "control k",
+          "control c"
+        ]
+      ]
+    ],
+    [
+      "ToggleBookmark",
+      "Toggle Bookmark",
+      [
+        [
+          "keyboard",
+          "control f2"
+        ]
+      ]
+    ],
+    [
+      "Stop",
+      "Stop",
+      []
+    ],
+    [
+      "GotoNextBookmark",
+      "Next Line Bookmark",
+      [
+        [
+          "keyboard",
+          "f2"
+        ]
+      ]
+    ],
+    [
+      "GotoNextError",
+      "Next Highlighted Error",
+      []
+    ],
+    [
+      "GotoPreviousBookmark",
+      "Previous Line Bookmark",
+      [
+        [
+          "keyboard",
+          "shift f2"
+        ]
+      ]
+    ],
+    [
+      "GotoPreviousError",
+      "Previous Highlighted Error",
+      []
+    ],
+    [
+      "StopBackgroundProcesses",
+      "Stop Background Processes",
+      []
+    ],
+    [
+      "NextTab",
+      "Select Ne_xt Tab",
+      [
+        [
+          "keyboard",
+          "control PAGE_DOWN"
+        ]
+      ]
+    ],
+    [
+      "EditorMoveToPageBottom",
+      "Move Caret to Page Bottom",
+      []
+    ],
+    [
+      "PreviousTab",
+      "Se_lect Previous Tab",
+      [
+        [
+          "keyboard",
+          "control PAGE_UP"
+        ]
+      ]
+    ],
+    [
+      "EditorMoveToPageTop",
+      "Move Caret to Page Top",
+      []
+    ],
+    [
+      "GotoAction",
+      "Find Action",
+      [
+        [
+          "keyboard",
+          "shift control p"
+        ]
+      ]
+    ],
+    [
+      "ExpressionTypeInfo",
+      "Typ_e Info",
+      []
+    ],
+    [
+      "Compile",
+      "R_ebuild",
+      [
+        [
+          "keyboard",
+          "control b"
+        ]
+      ]
+    ],
+    [
+      "GotoTypeDeclaration",
+      "Go to Type Declaration",
+      []
+    ],
+    [
+      "StartStopMacroRecording",
+      "Start/Stop Macro Recording",
+      [
+        [
+          "keyboard",
+          "control q"
+        ]
+      ]
+    ],
+    [
+      "QuickJavaDoc",
+      "Quick Documentation",
+      []
+    ],
+    [
+      "PlaybackLastMacro",
+      "Pla_y Back Last Macro",
+      [
+        [
+          "keyboard",
+          "control shift q"
+        ]
+      ]
+    ],
+    [
+      "EditorAddOrRemoveCaret",
+      "Add or Remove Caret",
+      [
+        [
+          "mouse",
+          "control button1"
+        ]
+      ]
+    ],
+    [
+      "EditorCloneCaretAbove",
+      "Clone Caret Above",
+      [
+        [
+          "keyboard",
+          "control alt UP"
+        ]
+      ]
+    ],
+    [
+      "PreviousOccurence",
+      "Previ_ous Occurrence",
+      []
+    ],
+    [
+      "EditorCloneCaretBelow",
+      "Clone Caret Below",
+      [
+        [
+          "keyboard",
+          "control alt DOWN"
+        ]
+      ]
+    ],
+    [
+      "NextOccurence",
+      "Ne_xt Occurrence",
+      []
+    ],
+    [
+      "EditorAddRectangularSelectionOnMouseDrag",
+      "Add Rectangular Selection on Mouse Drag",
+      [
+        [
+          "mouse",
+          "ctrl button2"
+        ]
+      ]
+    ],
+    [
+      "CheckinProject",
+      "Comm_it",
+      []
+    ],
+    [
+      "ZoomOutIdeAction",
+      "Zoom Out IDE",
+      []
+    ]
+  ]
+}

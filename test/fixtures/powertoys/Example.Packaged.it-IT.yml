@@ -1,0 +1,10 @@
+PackageName: Example.Packaged
+Name: Esempio pacchetto
+WindowFilter: packaged.exe
+Shortcuts:
+  - SectionName: Schede
+    Properties:
+      - Name: Ultima scheda
+        Shortcut:
+          - Ctrl: true
+            Keys: ["<9>"]

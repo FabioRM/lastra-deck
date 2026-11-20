@@ -1,0 +1,223 @@
+[
+  {
+    "id": "vscode",
+    "name": "VS Code",
+    "apps": [
+      "code.exe",
+      "code - insiders.exe"
+    ],
+    "keys": [
+      {
+        "id": "palette",
+        "label": "Command Palette",
+        "icon": "command",
+        "category": "app",
+        "action": {
+          "type": "hotkey",
+          "keys": "ctrl+shift+p"
+        }
+      },
+      {
+        "id": "file",
+        "label": "Quick Open",
+        "icon": "file-search",
+        "category": "app",
+        "action": {
+          "type": "hotkey",
+          "keys": "ctrl+p"
+        },
+        "hold": {
+          "type": "hotkey",
+          "keys": "ctrl+shift+f"
+        }
+      },
+      {
+        "id": "explorer",
+        "label": "Project Explorer",
+        "icon": "files",
+        "category": "app",
+        "action": {
+          "type": "hotkey",
+          "keys": "ctrl+shift+e"
+        }
+      },
+      {
+        "id": "search",
+        "label": "Search project",
+        "icon": "search",
+        "category": "app",
+        "action": {
+          "type": "hotkey",
+          "keys": "ctrl+shift+f"
+        }
+      },
+      {
+        "id": "git",
+        "label": "Source Control",
+        "icon": "git-branch",
+        "category": "app",
+        "action": {
+          "type": "hotkey",
+          "keys": "ctrl+shift+g"
+        }
+      },
+      {
+        "id": "debug",
+        "label": "Run and Debug",
+        "icon": "bug",
+        "category": "app",
+        "action": {
+          "type": "hotkey",
+          "keys": "ctrl+shift+d"
+        }
+      },
+      {
+        "id": "sidebar",
+        "label": "Sidebar",
+        "icon": "panel-left",
+        "category": "app",
+        "action": {
+          "type": "hotkey",
+          "keys": "ctrl+b"
+        }
+      },
+      {
+        "id": "close",
+        "label": "Close editor",
+        "icon": "x",
+        "category": "app",
+        "action": {
+          "type": "hotkey",
+          "keys": "ctrl+w"
+        }
+      },
+      {
+        "id": "save",
+        "label": "Save",
+        "icon": "save",
+        "category": "app",
+        "action": {
+          "type": "hotkey",
+          "keys": "ctrl+s"
+        }
+      },
+      {
+        "id": "line",
+        "label": "Go to line",
+        "icon": "list-ordered",
+        "category": "app",
+        "action": {
+          "type": "hotkey",
+          "keys": "ctrl+g"
+        }
+      },
+      {
+        "id": "split",
+        "label": "Split editor",
+        "icon": "columns-2",
+        "category": "app",
+        "action": {
+          "type": "hotkey",
+          "keys": "ctrl+backslash"
+        }
+      }
+    ]
+  },
+  {
+    "id": "browser",
+    "name": "Browser",
+    "apps": [
+      "chrome.exe",
+      "msedge.exe",
+      "firefox.exe",
+      "brave.exe"
+    ],
+    "keys": [
+      {
+        "id": "tab",
+        "label": "New / reopen tab",
+        "icon": "square-plus",
+        "category": "app",
+        "action": {
+          "type": "hotkey",
+          "keys": "ctrl+t"
+        },
+        "double": {
+          "type": "hotkey",
+          "keys": "ctrl+shift+t"
+        }
+      },
+      {
+        "id": "prev",
+        "label": "Previous tab",
+        "icon": "chevron-left",
+        "category": "app",
+        "action": {
+          "type": "hotkey",
+          "keys": "ctrl+shift+tab"
+        }
+      },
+      {
+        "id": "next",
+        "label": "Next tab",
+        "icon": "chevron-right",
+        "category": "app",
+        "action": {
+          "type": "hotkey",
+          "keys": "ctrl+tab"
+        }
+      },
+      {
+        "id": "close",
+        "label": "Close tab",
+        "icon": "x",
+        "category": "app",
+        "action": {
+          "type": "hotkey",
+          "keys": "ctrl+w"
+        },
+        "confirm": true
+      },
+      {
+        "id": "address",
+        "label": "Address bar",
+        "icon": "link",
+        "category": "app",
+        "action": {
+          "type": "hotkey",
+          "keys": "ctrl+l"
+        }
+      },
+      {
+        "id": "find",
+        "label": "Find on page",
+        "icon": "search",
+        "category": "app",
+        "action": {
+          "type": "hotkey",
+          "keys": "ctrl+f"
+        }
+      },
+      {
+        "id": "reload",
+        "label": "Reload",
+        "icon": "refresh-cw",
+        "category": "app",
+        "action": {
+          "type": "hotkey",
+          "keys": "ctrl+r"
+        }
+      },
+      {
+        "id": "history",
+        "label": "History",
+        "icon": "history",
+        "category": "app",
+        "action": {
+          "type": "hotkey",
+          "keys": "ctrl+h"
+        }
+      }
+    ]
+  }
+]

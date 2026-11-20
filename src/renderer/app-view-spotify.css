@@ -1,0 +1,38 @@
+#app-view-detail:has(.spotify-playlists) {
+  overflow-y: auto;
+  touch-action: pan-y;
+}
+#app-view-detail:has(.spotify-playlists) #app-view-widgets { order: 1; }
+#app-view-detail:has(.spotify-playlists) #app-view-capabilities { order: 2; }
+#app-view-detail:has(.spotify-playlists) #app-view-live { order: 3; }
+
+.spotify-playlists, .spotify-account { display: grid; gap: 8px; }
+.spotify-account { margin-bottom: 14px; }
+.spotify-account-content, .spotify-account-devices { display: grid; gap: 7px; min-width: 0; }
+.spotify-account-content[hidden] { display: none; }
+.spotify-account-content h5, .spotify-account-track, .spotify-account-queue ol { margin: 0; }
+.spotify-account-content > button { justify-self: start; }
+.spotify-account-devices { grid-template-columns: repeat(auto-fit, minmax(min(100%, 170px), 1fr)); }
+.spotify-account-devices > *, .spotify-account-track, .spotify-account-queue { overflow-wrap: anywhere; }
+.spotify-account-queue ol { padding-inline-start: 1.5em; }
+.spotify-playlists-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+.spotify-playlists-toolbar h4 { margin-right: auto; }
+.spotify-playlists-error { color: var(--err); }
+.spotify-playlists-list {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+.spotify-playlist { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px; }
+#app-views-panel .spotify-playlists-list button {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: left;
+  white-space: nowrap;
+}
+.portrait .spotify-playlists-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }

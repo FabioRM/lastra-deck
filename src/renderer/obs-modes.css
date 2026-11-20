@@ -1,0 +1,60 @@
+#obs-modes {
+  min-height: 0;
+  display: grid;
+  align-content: start;
+  gap: 12px;
+  overflow: auto;
+  overscroll-behavior: contain;
+  touch-action: pan-y;
+  font-size: calc(22px * var(--text-scale));
+}
+
+#obs-modes-toggle { flex: none; }
+.portrait #obs-panel:has(#obs-modes-toggle:not([hidden])) { grid-template-rows: auto minmax(0, 1fr); }
+.portrait #obs-panel:has(#obs-modes-toggle:not([hidden])) #obs-heading { flex-wrap: wrap; }
+.obs-mode-controls { display: flex; flex-wrap: wrap; align-items: start; gap: 9px; }
+#obs-modes .obs-mode-controls button { min-height: 52px; }
+#obs-modes [data-obs-mode-preview] { text-align: start; flex: 1 1 150px; }
+#obs-modes [data-obs-mode-preview] small { display: block; color: var(--muted-text); overflow-wrap: anywhere; }
+#obs-modes > p:empty, #obs-mode-review p:empty { display: none; }
+.obs-mode-settings { display: grid; gap: 12px; }
+.obs-mode-fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(235px, 100%), 1fr)); gap: 12px; }
+.obs-mode-fields fieldset { min-width: 0; display: grid; gap: 7px; padding: 10px; border: 1px solid var(--control-border); border-radius: 9px; }
+.obs-mode-fields legend { padding-inline: 5px; font-weight: 600; }
+.obs-mode-fields label { display: grid; gap: 4px; }
+.obs-mode-fields select, #obs-mode-review button {
+  min-height: 48px;
+  min-width: 0;
+  padding: 4px 9px;
+  border: 1px solid var(--control-border);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+}
+
+.obs-mode-result { display: grid; gap: 8px; }
+.obs-mode-result ol, #obs-mode-review ol { display: grid; gap: 5px; padding-inline-start: 1.2em; }
+.obs-mode-result li span, #obs-mode-review li span { display: block; color: var(--muted-text); }
+.obs-mode-result li[data-status='confirmed'] span { color: var(--ok); }
+.obs-mode-result li[data-status='unverified'] span { color: var(--warn); }
+
+#obs-mode-review {
+  margin: auto;
+  width: min(560px, calc(100% - 32px));
+  max-height: calc(100% - 24px);
+  padding: 20px;
+  border: 1px solid var(--control-border);
+  border-radius: 16px;
+  background: var(--surface);
+  color: var(--text);
+  font-size: calc(22px * var(--text-scale));
+  overflow: auto;
+  overflow-wrap: anywhere;
+  touch-action: pan-y;
+}
+#obs-mode-review::backdrop { background: var(--overlay); }
+#obs-mode-review :is(ol, p, .obs-mode-controls) { margin-top: 12px; }
+#obs-mode-review .obs-mode-controls { justify-content: flex-end; }
+#obs-mode-review button:last-child { border-color: var(--warn); color: var(--warn); }
+#obs-mode-review button:disabled { opacity: .5; }

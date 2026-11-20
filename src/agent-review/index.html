@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'">
+  <title>Lastra profile approval</title>
+  <link rel="stylesheet" href="review.css">
+</head>
+<body>
+  <main>
+    <header>
+      <h1 id="operation">Profile approval</h1>
+      <p id="target" role="status">Reading the proposed changes…</p>
+    </header>
+    <section id="changes" aria-label="Proposed changes" tabindex="0"></section>
+    <footer>
+      <button id="cancel" type="button" autofocus>Cancel</button>
+      <button id="approve" type="button" disabled>Approve once</button>
+    </footer>
+  </main>
+  <script src="../shared/i18n-it.js"></script>
+  <script src="../shared/i18n.js"></script>
+  <script src="review.js"></script>
+</body>
+</html>

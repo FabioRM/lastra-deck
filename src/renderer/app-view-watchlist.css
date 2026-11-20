@@ -1,0 +1,14 @@
+.watchlist-cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+#app-views-panel .watchlist-card {
+  display: grid;
+  gap: 2px;
+  text-align: left;
+  overflow-wrap: anywhere;
+  background: var(--pressed-surface);
+}
+.watchlist-card .app-view-secondary { font-size: 20px; font-weight: 400; }
+.watchlist-card .widget-stat { font-size: 1.15em; }
+.watchlist-detail { display: grid; justify-items: start; gap: 10px; }
+.watchlist-chart { --widget-cols: 1; width: 100%; min-height: 200px; }
+.watchlist-chart .widget-graph { min-height: 95px; }
+.portrait .watchlist-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }

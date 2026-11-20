@@ -1,0 +1,27 @@
+#app-view-detail:has(.streaming-titles) {
+  overflow-y: auto;
+  touch-action: pan-y;
+}
+#app-view-detail:has(.streaming-titles) #app-view-widgets { order: 1; }
+#app-view-detail:has(.streaming-titles) #app-view-capabilities { order: 2; }
+#app-view-detail:has(.streaming-titles) #app-view-live { order: 3; }
+.streaming-titles { display: grid; gap: 8px; }
+.streaming-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.streaming-toolbar h4 { margin-right: auto; }
+.streaming-error { color: var(--err); }
+.streaming-list {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+#app-views-panel .streaming-list button {
+  display: grid;
+  gap: 3px;
+  text-align: left;
+}
+.streaming-list button > * {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.portrait .streaming-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }

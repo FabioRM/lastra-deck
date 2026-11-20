@@ -1,0 +1,28 @@
+#app-view-detail:has(.terminal-view) {
+  overflow-y: auto;
+  touch-action: pan-y;
+}
+.terminal-view { display: grid; gap: 10px; }
+.terminal-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.terminal-columns { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.terminal-list {
+  display: grid;
+  min-width: 0;
+  align-content: start;
+  gap: 8px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--recessed-surface);
+}
+#app-views-panel .terminal-list button {
+  display: grid;
+  padding-block: 8px;
+  text-align: left;
+}
+.terminal-list button > * { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.terminal-list button span { font-size: 20px; }
+.terminal-command { display: grid; min-inline-size: 0; gap: 4px; }
+.terminal-command-actions { display: flex; flex-wrap: wrap; gap: 4px; }
+.terminal-command button { min-block-size: 44px; min-inline-size: 44px; }
+.portrait .terminal-columns { grid-template-columns: minmax(0, 1fr); }

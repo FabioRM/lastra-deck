@@ -1,0 +1,73 @@
+:root {
+  color-scheme: dark;
+  --base: #151b20;
+  --surface: #1c252c;
+  --border: #37464f;
+  --text: #f0efe7;
+  --muted: #bdc9cb;
+  --accent: #a9dfce;
+  background: var(--base);
+  color: var(--text);
+  font-family: "Segoe UI", system-ui, sans-serif;
+  line-height: 1.6;
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; }
+a { color: var(--accent); text-underline-offset: .21em; }
+a:hover { color: var(--text); }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 5px; }
+img { max-width: 100%; height: auto; display: block; }
+h1, h2, h3, p, figure { margin: 0; }
+h1, h2, h3 { line-height: 1.06; }
+
+.shell { width: min(100% - 3rem, 72rem); margin-inline: auto; }
+.skip-link { position: fixed; top: .75rem; left: .75rem; padding: .5rem 1rem; background: var(--base); transform: translateY(-180%); z-index: 1; }
+.skip-link:focus { transform: none; }
+.site-header, .site-footer { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem 2rem; padding-block: 1.25rem; }
+.site-header { border-bottom: 1px solid var(--border); }
+.site-header nav, .site-footer nav { display: flex; flex-wrap: wrap; gap: .45rem 1.55rem; }
+.site-header nav a, .site-footer nav a { color: var(--muted); font-size: .94rem; }
+.site-header nav a:hover, .site-footer nav a:hover { color: var(--text); }
+.wordmark { color: var(--text); text-decoration: none; font-weight: 750; font-size: 1.65rem; letter-spacing: -.07em; }
+.wordmark span { color: var(--accent); }
+
+.hero { padding-block: clamp(3rem, 5vw, 4.5rem) 3rem; }
+.hero-copy { max-width: 52rem; }
+.platform { color: var(--accent); font-size: .875rem; font-weight: 660; letter-spacing: .095em; }
+.platform span { padding-inline: .45rem; color: var(--muted); }
+h1 { margin-block: .65rem 1.25rem; font-size: clamp(2.65rem, 7vw, 5.5rem); letter-spacing: -.058em; }
+.hero-copy > p:not(.platform, .requirements) { max-width: 38rem; color: var(--muted); font-size: clamp(1.0625rem, 1.7vw, 1.28rem); }
+.hero-links { display: flex; align-items: center; flex-wrap: wrap; gap: .85rem 1.4rem; margin-top: 1.75rem; }
+.button { display: inline-block; background: var(--accent); color: #12231f; padding: .75rem 1.15rem; border-radius: .45rem; font-weight: 700; text-decoration: none; }
+.button:hover { background: #d8f5e9; color: #12231f; }
+.text-link { font-weight: 620; }
+.requirements { margin-top: .9rem; font-size: .94rem; color: var(--muted); }
+.deck { margin-top: 2.6rem; }
+.deck img { width: 100%; border: 1px solid #53636d; border-radius: .7rem; box-shadow: 0 16px 40px #0004; }
+.deck figcaption { margin-top: .65rem; color: var(--muted); font-size: .875rem; }
+
+.features { background: var(--surface); border-block: 1px solid var(--border); padding-block: clamp(2.75rem, 5vw, 5rem); }
+h2 { font-size: clamp(1.85rem, 4.5vw, 3rem); letter-spacing: -.055em; }
+.feature-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2rem; margin-top: 2rem; }
+.feature-grid article { border-top: 1px solid #657a82; padding-top: 1.15rem; }
+h3 { font-size: 1.3rem; letter-spacing: -.025em; }
+.feature-grid p { margin-block: .7rem .9rem; color: var(--muted); }
+.demo { margin-top: 2.3rem; border-top: 1px solid var(--border); padding-top: 1rem; }
+.demo summary { width: fit-content; cursor: pointer; color: var(--accent); font-weight: 650; }
+.demo img { width: 100%; border: 1px solid var(--border); border-radius: .5rem; margin-top: 1rem; }
+.demo p { color: var(--muted); font-size: .875rem; margin-top: .5rem; }
+
+.setup { display: grid; grid-template-columns: .9fr 1.1fr; gap: 2rem 4rem; padding-block: clamp(2.75rem, 6vw, 5rem); }
+.setup p { margin-top: .85rem; color: var(--muted); }
+.setup ol { margin: 0; padding-left: 1.55rem; }
+.setup li { padding-left: .35rem; }
+.setup li + li { margin-top: .8rem; }
+.setup li::marker { color: var(--accent); font-weight: 650; }
+.site-footer { border-top: 1px solid var(--border); color: var(--muted); font-size: .94rem; }
+
+@media (max-width: 48rem) {
+  .shell { width: calc(100% - 2rem); }
+  .feature-grid, .setup { grid-template-columns: 1fr; }
+  .setup { gap: 1.2rem; }
+}

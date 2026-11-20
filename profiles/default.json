@@ -1,0 +1,219 @@
+{
+  "version": 2,
+  "name": "Main",
+  "locale": "en-GB",
+  "grid": {
+    "cols": 8,
+    "rows": 3
+  },
+  "pages": [
+    {
+      "id": "home",
+      "name": "Home",
+      "keys": [
+        {
+          "id": "terminal",
+          "label": "Terminal",
+          "icon": "square-terminal",
+          "category": "app",
+          "action": {
+            "type": "launch",
+            "target": "wt.exe"
+          }
+        },
+        {
+          "id": "file-explorer",
+          "label": "File Explorer",
+          "icon": "folder",
+          "category": "app",
+          "action": {
+            "type": "launch",
+            "target": "explorer.exe"
+          },
+          "hold": {
+            "type": "open",
+            "target": "%USERPROFILE%\\Downloads"
+          }
+        },
+        {
+          "id": "task-manager",
+          "label": "Task Manager",
+          "icon": "activity",
+          "category": "app",
+          "action": {
+            "type": "launch",
+            "target": "taskmgr.exe"
+          }
+        },
+        {
+          "id": "settings",
+          "label": "Settings",
+          "icon": "settings",
+          "category": "app",
+          "action": {
+            "type": "open",
+            "target": "ms-settings:"
+          }
+        },
+        {
+          "id": "sound-settings",
+          "label": "Sound settings",
+          "icon": "sliders-horizontal",
+          "category": "media",
+          "action": {
+            "type": "open",
+            "target": "ms-settings:sound"
+          }
+        },
+        {
+          "id": "previous-track",
+          "label": "Previous track",
+          "icon": "skip-back",
+          "category": "media",
+          "action": {
+            "type": "media",
+            "key": "prev"
+          }
+        },
+        {
+          "id": "play",
+          "label": "Play / pause",
+          "icon": "play",
+          "category": "media",
+          "action": {
+            "type": "media",
+            "key": "playpause"
+          },
+          "hold": {
+            "type": "media",
+            "key": "stop"
+          }
+        },
+        {
+          "id": "next-track",
+          "label": "Next track",
+          "icon": "skip-forward",
+          "category": "media",
+          "action": {
+            "type": "media",
+            "key": "next"
+          }
+        },
+        {
+          "id": "volume-down",
+          "label": "Volume down",
+          "icon": "volume-1",
+          "category": "media",
+          "action": {
+            "type": "media",
+            "key": "voldown"
+          }
+        },
+        {
+          "id": "volume-up",
+          "label": "Volume up",
+          "icon": "volume-2",
+          "category": "media",
+          "action": {
+            "type": "media",
+            "key": "volup"
+          }
+        },
+        null,
+        null,
+        {
+          "id": "desktop",
+          "label": "Show desktop",
+          "icon": "monitor",
+          "category": "system",
+          "action": {
+            "type": "hotkey",
+            "keys": "win+d"
+          }
+        },
+        {
+          "id": "task-view",
+          "label": "Task View",
+          "icon": "layout-grid",
+          "category": "system",
+          "action": {
+            "type": "hotkey",
+            "keys": "win+tab"
+          }
+        },
+        {
+          "id": "previous-desktop",
+          "label": "Previous desktop",
+          "icon": "chevron-left",
+          "category": "system",
+          "action": {
+            "type": "hotkey",
+            "keys": "ctrl+win+left"
+          }
+        },
+        {
+          "id": "next-desktop",
+          "label": "Next desktop",
+          "icon": "chevron-right",
+          "category": "system",
+          "action": {
+            "type": "hotkey",
+            "keys": "ctrl+win+right"
+          }
+        },
+        {
+          "id": "screenshot",
+          "label": "Screenshot",
+          "icon": "camera",
+          "category": "system",
+          "action": {
+            "type": "hotkey",
+            "keys": "win+shift+s"
+          }
+        },
+        {
+          "id": "lock-pc",
+          "label": "Lock PC",
+          "icon": "lock",
+          "category": "system",
+          "action": {
+            "type": "launch",
+            "target": "rundll32.exe",
+            "args": [
+              "user32.dll,LockWorkStation"
+            ]
+          },
+          "confirm": true
+        },
+        {
+          "id": "start-meeting",
+          "label": "Start meeting",
+          "icon": "video",
+          "category": "meeting",
+          "action": {
+            "type": "sequence",
+            "steps": [
+              {
+                "type": "media",
+                "key": "stop"
+              },
+              {
+                "type": "delay",
+                "ms": 150
+              },
+              {
+                "type": "open",
+                "target": "https://meet.google.com/new"
+              }
+            ]
+          }
+        },
+        null,
+        null,
+        null,
+        null,
+        null
+      ]
+    }
+  ]
+}

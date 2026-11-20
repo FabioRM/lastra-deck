@@ -1,0 +1,138 @@
+#app-views-panel {
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr);
+  gap: 16px;
+  min-width: 0;
+  padding: 24px;
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  background: var(--panel-surface);
+  font-size: 25px;
+}
+#app-views-panel button, #app-views-panel input {
+  min-width: 0;
+  min-height: 50px;
+  padding: 5px 14px;
+  border: 1px solid var(--border);
+  border-radius: 11px;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+}
+#app-views-panel button { font-weight: 600; }
+#app-views-panel button:active { background: var(--recessed-surface); }
+#app-views-panel button:disabled { opacity: .5; }
+#app-views-panel button[aria-pressed='true'] { border-color: var(--app); color: var(--app); }
+
+.app-views-header, .app-views-toolbar, .app-views-search-row, .app-views-pages, .app-views-keyboard-row {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+.app-views-header { justify-content: space-between; flex-wrap: wrap; }
+.app-views-header h2 { font-size: 38px; }
+.app-views-toolbar { flex-wrap: wrap; }
+#app-views-feedback { color: var(--err); }
+#app-views-status:empty { display: none; }
+#app-view-catalog, #app-view-detail { grid-row: 3; min-height: 0; min-width: 0; }
+#app-views-search { flex: 1; color: var(--text); }
+#app-views-results {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 10px;
+}
+#app-views-panel .app-view-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 84px;
+  text-align: left;
+}
+.app-view-icon {
+  display: grid;
+  place-items: center;
+  flex: none;
+  color: var(--app);
+}
+.app-view-icon svg { width: 34px; height: 34px; }
+.app-view-card-copy {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 5px 10px;
+  min-width: 0;
+}
+.app-view-card .app-view-card-copy { display: grid; }
+.app-view-card-copy strong {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.app-view-card-copy span, .app-view-secondary, #app-views-empty { color: var(--muted-text); }
+.app-view-badge { flex: none; color: var(--app); font-size: 20px; }
+.app-views-pages { justify-content: center; margin-top: 8px; }
+#app-views-keyboard {
+  display: grid;
+  gap: 4px;
+  margin-top: 6px;
+}
+.app-views-keyboard-row { justify-content: center; gap: 5px; }
+#app-views-panel .app-views-keyboard-row button {
+  min-width: 40px;
+  min-height: 42px;
+  padding: 4px 9px;
+}
+#app-view-detail {
+  display: grid;
+  align-content: start;
+  gap: 14px;
+}
+#app-view-catalog, #app-view-detail {
+  overflow-y: auto;
+  touch-action: pan-y;
+}
+#app-view-title { font-size: 42px; line-height: 1.07; }
+#app-view-summary { color: var(--muted-text); }
+#app-view-commands, #app-view-capabilities { display: flex; flex-wrap: wrap; gap: 10px; }
+.app-view-capability {
+  flex: 1 1 280px;
+  padding: 12px 15px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--pressed-surface);
+}
+.app-view-capability p { font-size: 22px; }
+#app-view-widgets {
+  display: grid;
+  grid-template-columns: repeat(var(--app-view-widget-cols), minmax(0, 1fr));
+  grid-auto-rows: minmax(80px, auto);
+  gap: 8px;
+}
+.app-view-windows-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 8px;
+}
+#app-views-panel .app-view-windows-list button {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+  text-align: left;
+}
+.app-view-window-icon { display: grid; place-items: center; width: 34px; height: 34px; }
+.app-view-window-icon img { width: 30px; height: 30px; object-fit: contain; }
+.app-view-window-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.portrait #page-nav { gap: 7px; }
+.portrait #page-nav button { min-width: 48px; padding-inline: 10px; }
+.portrait #app-views-results { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.portrait #app-views-panel .app-view-card { min-height: 105px; }
+.portrait #app-view-detail { gap: 18px; }

@@ -1,0 +1,10 @@
+#app-view-detail:has(.alerts-view) { overflow: auto; touch-action: pan-y; }
+.alerts-view, .alerts-list, .alerts-group, .alert-card { display: grid; gap: 10px; }
+.alerts-view > .app-view-secondary:empty { display: none; }
+.alert-card { padding: 12px 15px; background: var(--pressed-surface); border: 1px solid var(--border); border-radius: 12px; }
+.alert-card header { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 4px 12px; }
+.alert-card h4 { overflow-wrap: anywhere; }
+.alert-status { color: var(--muted-text); font-size: 21px; }
+.alert-status[data-status="active"] { color: var(--err); }
+.alert-status[data-status="recovered"] { color: var(--app); }
+.alert-actions { display: flex; flex-wrap: wrap; gap: 8px; }

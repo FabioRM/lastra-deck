@@ -1,0 +1,77 @@
+#stats-timeline-open { border-color: var(--app); color: var(--app); }
+#stats-timeline-status { color: var(--warn); font-size: calc(21px * var(--text-scale)); }
+#stats-timeline-status:empty { display: none; }
+
+.stats-chart-footer { display: flex; align-items: end; gap: 6px; min-width: 0; }
+.stats-chart-footer .stats-scale { margin-inline-start: auto; }
+.stats-grafana, #stats-timeline-dialog button {
+  border: 1px solid var(--control-border);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--app);
+  font: inherit;
+}
+.stats-grafana { min-height: 34px; padding-inline: 7px; font-size: calc(17px * var(--text-scale)); }
+
+.stats-event-markers { pointer-events: none; }
+.stats-event-markers line { stroke: var(--event-color); stroke-width: 2; }
+:root[data-high-contrast='true'] .stats-event-markers line { stroke-width: 3; }
+:is(.stats-event-markers line, .stats-timeline-events li)[data-kind='service-down'] { --event-color: var(--err); }
+:is(.stats-event-markers line, .stats-timeline-events li)[data-kind='service-recovered'] { --event-color: var(--ok); }
+:is(.stats-event-markers line, .stats-timeline-events li)[data-kind='deployment'] { --event-color: var(--system); }
+:is(.stats-event-markers line, .stats-timeline-events li)[data-kind='launch'] { --event-color: var(--media); }
+.stats-event-markers line[data-kind='service-recovered'] { stroke-dasharray: 7 3; }
+.stats-event-markers line[data-kind='deployment'] { stroke-dasharray: 3 3; }
+.stats-event-markers line[data-kind='launch'] { stroke-dasharray: 8 3 2 3; }
+@media (forced-colors: active) {
+  .stats-event-markers line { stroke: CanvasText; }
+}
+
+#stats-timeline-dialog {
+  position: fixed;
+  inset: 0;
+  width: min(840px, calc(100vw - 28px));
+  max-height: calc(100dvh - 28px);
+  margin: auto;
+  padding: clamp(14px, 3vw, 24px);
+  border: 1px solid var(--control-border);
+  border-radius: 18px;
+  background: var(--panel-surface);
+  color: var(--text);
+  font-size: calc(20px * var(--text-scale));
+  overflow: auto;
+}
+#stats-timeline-dialog[open] { display: grid; gap: 14px; }
+#stats-timeline-dialog::backdrop { background: var(--overlay); }
+#stats-timeline-dialog header { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+#stats-timeline-dialog h2 { font-size: calc(28px * var(--text-scale)); }
+#stats-timeline-dialog :is(button, input, select, summary) { min-height: 48px; padding: 6px 10px; }
+#stats-timeline-dialog :is(input, select) {
+  width: 100%;
+  border: 1px solid var(--control-border);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+}
+#stats-timeline-dialog button:disabled { opacity: .65; }
+#stats-timeline-dialog :is(button, input, select, summary):focus-visible { outline: 2px solid var(--app); outline-offset: 2px; }
+.stats-timeline-window, .stats-timeline-summary { color: var(--muted-text); }
+.stats-timeline-events { list-style: none; }
+.stats-timeline-events li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 12px;
+  padding: 7px 10px;
+  border-block-end: 1px solid var(--border);
+  border-inline-start: 4px solid var(--event-color);
+  overflow-wrap: anywhere;
+}
+.stats-timeline-events time { color: var(--muted-text); font-variant-numeric: tabular-nums; }
+.stats-event-kind { color: var(--event-color); }
+.stats-timeline-form { display: flex; flex-wrap: wrap; align-items: end; gap: 10px; }
+.stats-timeline-form label { display: grid; flex: 1 1 190px; min-width: 0; gap: 5px; }
+.stats-timeline-message { color: var(--warn); overflow-wrap: anywhere; }
+.stats-timeline-summary:empty, .stats-timeline-events:empty, .stats-timeline-message:empty,
+.stats-timeline-actions:not(:has(button:not([hidden]))) { display: none; }

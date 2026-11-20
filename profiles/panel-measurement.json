@@ -1,0 +1,23 @@
+{
+  "version": 2,
+  "name": "Panel measurement",
+  "locale": "en-GB",
+  "grid": { "cols": 2, "rows": 1 },
+  "pages": [
+    { "id": "home", "name": "Bring Notepad to the foreground", "keys": [] },
+    {
+      "id": "receiver",
+      "name": "Notepad measurement",
+      "apps": ["notepad.exe"],
+      "keys": [
+        {
+          "id": "panel-measurement-marker",
+          "label": "Send x to Notepad",
+          "icon": "keyboard",
+          "category": "app",
+          "action": { "type": "text", "text": "x", "targetApps": ["notepad.exe"] }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,29 @@
+#microphone-mixer-status { color: var(--muted-text); font-size: 21px; }
+#microphone-mixer-status:empty { display: none; }
+
+#microphone-mixer-options {
+  display: grid;
+  flex: 1 1 0;
+  grid-template-columns: minmax(0, 1fr);
+  grid-auto-rows: minmax(52px, auto);
+  align-content: start;
+  gap: 8px;
+  min-height: 0;
+  overflow-y: auto;
+  touch-action: pan-y;
+}
+
+#microphone-mixer-options button {
+  min-width: 0;
+  padding: 6px 14px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--panel-surface);
+  color: var(--text);
+  font: 600 23px 'Barlow Semi Condensed', 'Segoe UI', sans-serif;
+  text-align: left;
+  overflow-wrap: anywhere;
+}
+
+#microphone-mixer-options button[aria-pressed='true'] { border-color: var(--app); color: var(--app); }
+#microphone-mixer-options button:active { background: var(--recessed-surface); }

@@ -1,0 +1,28 @@
+.chatgpt-view, .snippet-picker, .snippet-edit, .snippet-keyboard { display: grid; gap: 8px; }
+.snippet-picker { margin-block-start: 10px; }
+:is(.chatgpt-toolbar, .snippet-toolbar) { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+:is(.chatgpt-toolbar, .snippet-toolbar) :is(h4, input) { flex: 1; }
+:is(.chatgpt-items, .snippet-results) { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+#app-views-panel :is(.chatgpt-items, .snippet-results) button {
+  display: grid;
+  align-content: center;
+  overflow-wrap: anywhere;
+  text-align: left;
+}
+.chatgpt-items .app-view-secondary { font-size: 20px; }
+.snippet-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px 10px; }
+.snippet-fields label { display: grid; gap: 4px; }
+.snippet-fields:empty, .chatgpt-items:empty, .snippet-results:empty { display: none; }
+.snippet-draft {
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--recessed-surface);
+  color: var(--text);
+  font: inherit;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.snippet-edit > button { justify-self: start; }
+.snippet-keyboard .app-views-keyboard-row { flex-wrap: wrap; }
+.portrait :is(.chatgpt-items, .snippet-results) { grid-template-columns: repeat(2, minmax(0, 1fr)); }

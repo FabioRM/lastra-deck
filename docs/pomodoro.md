@@ -1,0 +1,5 @@
+# Dashboard Pomodoro
+
+Tap **Start focus** on the Dashboard for 25 minutes of focus. Use **Pause** and **Resume** to keep the remaining time, or **Reset** to return the current round to its full length. When focus ends, tap **Start break** for a five-minute break. The next round starts only when you tap its button.
+
+Lastra saves the round and restores it after a restart. A running round counts down while the Dashboard is closed or Windows is asleep. A paused round keeps its remaining time. View-only mode can display the timer. The normal deck controls can change it while the Dashboard is open.

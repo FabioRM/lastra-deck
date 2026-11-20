@@ -1,0 +1,17 @@
+#app-view-detail:has(.service-health) { overflow: auto; touch-action: pan-y; }
+
+.service-health { display: grid; gap: 12px; }
+.service-health-notice { color: var(--muted-text); }
+.service-health-notice:empty { display: none; }
+.service-health-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(330px, 100%), 1fr)); gap: 10px; }
+.service-check { display: grid; gap: 6px; padding: 12px 15px; background: var(--pressed-surface); border: 1px solid var(--border); border-radius: 12px; }
+.service-check header { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+.service-check h4 { overflow-wrap: anywhere; }
+.service-check-state { flex-shrink: 0; font-size: 21px; color: var(--muted-text); }
+.service-check-state[data-state="up"] { color: var(--app); }
+.service-check-state[data-state="retrying"] { color: var(--warn); }
+.service-check-state[data-state="down"] { color: var(--err); }
+.service-check .app-view-secondary { font-size: 20px; }
+.service-check-history { display: flex; gap: 3px; margin-top: 4px; }
+.service-check-history span { height: 13px; flex: 1; max-width: 16px; border-radius: 3px; background: var(--app); }
+.service-check-history span[data-result="down"] { background: var(--err); }

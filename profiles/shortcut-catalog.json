@@ -1,0 +1,2229 @@
+{
+  "schemaVersion": 2,
+  "version": "lastra-public-2026-11-19",
+  "attribution": "https://github.com/FabioRM/lastra-deck",
+  "reviewedOn": "2026-11-19",
+  "coverage": {
+    "apps": 6,
+    "appsWithBindings": 6,
+    "actions": 49,
+    "bindingVariants": 62,
+    "byPlatform": {
+      "windows": 51,
+      "web": 11,
+      "macos": 0,
+      "linux": 0,
+      "chromeos": 0,
+      "ipados": 0,
+      "unknown": 0
+    },
+    "byStatus": {
+      "documented": 56,
+      "ambiguous": 5,
+      "unknown": 1
+    }
+  },
+  "apps": [
+    {
+      "id": "chrome",
+      "name": "Google Chrome",
+      "slug": "chrome",
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "bindings": [
+        {
+          "id": "new-tab",
+          "actionId": "chrome:new-tab",
+          "bindingId": "cd204ea8a6a4c261a94d",
+          "label": "New tab",
+          "category": "tabs",
+          "context": "chrome:tabs",
+          "platform": "windows",
+          "hostPlatform": "windows",
+          "platforms": [
+            "windows"
+          ],
+          "edition": "desktop",
+          "appVersion": null,
+          "windowsBuild": null,
+          "language": null,
+          "layout": null,
+          "mode": null,
+          "source": "https://support.google.com/chrome/answer/157179?hl=en",
+          "sourceRevision": null,
+          "provenance": {
+            "sourceId": "chrome",
+            "terms": "https://policies.google.com/terms",
+            "reuse": "facts-only",
+            "label": "lastra-authored"
+          },
+          "verification": {
+            "status": "documented",
+            "date": "2026-11-19",
+            "method": "vendor-documentation"
+          },
+          "chord": "Ctrl+T",
+          "notation": "Ctrl+T"
+        },
+        {
+          "id": "close-tab",
+          "actionId": "chrome:close-tab",
+          "bindingId": "3b208e778fe9f42acec9",
+          "label": "Close tab",
+          "category": "tabs",
+          "context": "chrome:tabs",
+          "platform": "windows",
+          "hostPlatform": "windows",
+          "platforms": [
+            "windows"
+          ],
+          "edition": "desktop",
+          "appVersion": null,
+          "windowsBuild": null,
+          "language": null,
+          "layout": null,
+          "mode": null,
+          "source": "https://support.google.com/chrome/answer/157179?hl=en",
+          "sourceRevision": null,
+          "provenance": {
+            "sourceId": "chrome",
+            "terms": "https://policies.google.com/terms",
+            "reuse": "facts-only",
+            "label": "lastra-authored"
+          },
+          "verification": {
+            "status": "documented",
+            "date": "2026-11-19",
+            "method": "vendor-documentation"
+          },
+          "chord": "Ctrl+W",
+          "notation": "Ctrl+W"
+        },
+        {
+          "id": "reopen-closed-tab",
+          "actionId": "chrome:reopen-closed-tab",
+          "bindingId": "6a7094204bb47df370fe",
+          "label": "Restore closed tab",
+          "category": "tabs",
+          "context": "chrome:tabs",
+          "platform": "windows",
+          "hostPlatform": "windows",
+          "platforms": [
+            "windows"
+          ],
+          "edition": "desktop",
+          "appVersion": null,
+          "windowsBuild": null,
+          "language": null,
+          "layout": null,
+          "mode": null,
+          "source": "https://support.google.com/chrome/answer/157179?hl=en",
+          "sourceRevision": null,
+          "provenance": {
+            "sourceId": "chrome",
+            "terms": "https://policies.google.com/terms",
+            "reuse": "facts-only",
+            "label": "lastra-authored"
+          },
+          "verification": {
+            "status": "documented",
+            "date": "2026-11-19",
+            "method": "vendor-documentation"
+          },
+          "chord": "Ctrl+Shift+T",
+          "notation": "Ctrl+Shift+T"
+        },
+        {
+          "id": "next-tab",
+          "actionId": "chrome:next-tab",
+          "bindingId": "af2c4af5270f44ad53ce",
+          "label": "Next tab",
+          "category": "tabs",
+          "context": "chrome:tabs",
+          "platform": "windows",
+          "hostPlatform": "windows",
+          "platforms": [
+            "windows"
+          ],
+          "edition": "desktop",
+          "appVersion": null,
+          "windowsBuild": null,
+          "language": null,
+          "layout": null,
+          "mode": null,
+          "source": "https://support.google.com/chrome/answer/157179?hl=en",
+          "sourceRevision": null,
+          "provenance": {
+            "sourceId": "chrome",
+            "terms": "https://policies.google.com/terms",
+            "reuse": "facts-only",
+            "label": "lastra-authored"
+          },
+          "verification": {
+            "status": "documented",
+            "date": "2026-11-19",
+            "method": "vendor-documentation"
+          },
+          "chord": "Ctrl+Tab",
+          "notation": "Ctrl+Tab"
+        },
+        {
+          "id": "previous-tab",
+          "actionId": "chrome:previous-tab",
+          "bindingId": "45314d10e3f66e9052b1",
+          "label": "Previous tab",
+          "category": "tabs",
+          "context": "chrome:tabs",
+          "platform": "windows",
+          "hostPlatform": "windows",
+          "platforms": [
+            "windows"
+          ],
+          "edition": "desktop",
+          "appVersion": null,
+          "windowsBuild": null,
+          "language": null,
+          "layout": null,
+          "mode": null,
+          "source": "https://support.google.com/chrome/answer/157179?hl=en",
+          "sourceRevision": null,
+          "provenance": {
+            "sourceId": "chrome",
+            "terms": "https://policies.google.com/terms",
+            "reuse": "facts-only",
+            "label": "lastra-authored"
+          },
+          "verification": {
+            "status": "documented",
+            "date": "2026-11-19",
+            "method": "vendor-documentation"
+          },
+          "chord": "Ctrl+Shift+Tab",
+          "notation": "Ctrl+Shift+Tab"
+        },
+        {
+          "id": "switch-to-last-tab",
+          "actionId": "chrome:switch-to-last-tab",
+          "bindingId": "3cabd35b843983395572",
+          "label": "Last tab",
+          "category": "tabs",
+          "context": "chrome:tabs",
+          "platform": "windows",
+          "hostPlatform": "windows",
+          "platforms": [
+            "windows"
+          ],
+          "edition": "desktop",
+          "appVersion": null,
+          "windowsBuild": null,
+          "language": null,
+          "layout": null,
+          "mode": null,
+          "source": "https://support.google.com/chrome/answer/157179?hl=en",
+          "sourceRevision": null,
+          "provenance": {
+            "sourceId": "chrome",
+            "terms": "https://policies.google.com/terms",
+            "reuse": "facts-only",
+            "label": "lastra-authored"
+          },
+          "verification": {
+            "status": "documented",
+            "date": "2026-11-19",
+            "method": "vendor-documentation"
+          },
+          "chord": "Ctrl+9",
+          "notation": "Ctrl+9"
+        },
+        {
+          "id": "new-window",
+          "actionId": "chrome:new-window",
+          "bindingId": "a1df679d93c52cd20526",
+          "label": "New window",
+          "category": "tabs",
+          "context": "chrome:tabs",
+          "platform": "windows",
+          "hostPlatform": "windows",
+          "platforms": [
+            "windows"
+          ],
+          "edition": "desktop",
+          "appVersion": null,
+          "windowsBuild": null,
+          "language": null,
+          "layout": null,
+          "mode": null,
+          "source": "https://support.google.com/chrome/answer/157179?hl=en",
+          "sourceRevision": null,
+          "provenance": {
+            "sourceId": "chrome",
+            "terms": "https://policies.google.com/terms",
+            "reuse": "facts-only",
+            "label": "lastra-authored"
+          },
+          "verification": {
+            "status": "documented",
+            "date": "2026-11-19",
+            "method": "vendor-documentation"
+          },
+          "chord": "Ctrl+N",
+          "notation": "Ctrl+N"
+        },
+        {
+          "id": "new-incognito-window",
+          "actionId": "chrome:new-incognito-window",
+          "bindingId": "a2d1389d0a8d2d33d40f",
+          "label": "Incognito window",
+          "category": "tabs",
+          "context": "chrome:tabs",
+          "platform": "windows",
+          "hostPlatform": "windows",
+          "platforms": [
+            "windows"
+          ],
+          "edition": "desktop",
+          "appVersion": null,
+          "windowsBuild": null,
+          "language": null,
+          "layout": null,
+          "mode": null,
+          "source": "https://support.google.com/chrome/answer/157179?hl=en",
+          "sourceRevision": null,
+          "provenance": {
+            "sourceId": "chrome",
+            "terms": "https://policies.google.com/terms",
+            "reuse": "facts-only",
+            "label": "lastra-authored"
+          },
+          "verification": {
+            "status": "documented",
+            "date": "2026-11-19",
+            "method": "vendor-documentation"
+          },
+          "chord": "Ctrl+Shift+N",
+          "notation": "Ctrl+Shift+N"
+        },
+        {
+          "id": "close-window",
+          "actionId": "chrome:close-window",
+          "bindingId": "b61887380783b3c90d3b",
+          "label": "Close window",
+          "category": "tabs",
+          "context": "chrome:tabs",
+          "platform": "windows",
+          "hostPlatform": "windows",
+          "platforms": [
+            "windows"
+          ],
+          "edition": "desktop",
+          "appVersion": null,
+          "windowsBuild": null,
+          "language": null,
+          "layout": null,
+          "mode": null,
+          "source": "https://support.google.com/chrome/answer/157179?hl=en",
+          "sourceRevision": null,
+          "provenance": {
+            "sourceId": "chrome",
+            "terms": "https://policies.google.com/terms",
+            "reuse": "facts-only",
+            "label": "lastra-authored"
+          },
+          "verification": {
+            "status": "documented",
+            "date": "2026-11-19",
+            "method": "vendor-documentation"
+          },
+          "chord": "Ctrl+Shift+W",
+          "notation": "Ctrl+Shift+W"
+        },
+        {
+          "id": "go-back",
+          "actionId": "chrome:go-back",
+          "bindingId": "fb09673be1aa51ea284b",
+          "label": "Back",
+          "category": "navigation",
+          "context": "chrome:navigation",
+          "platform": "windows",
+          "hostPlatform": "windows",
+          "platforms": [
+            "windows"
+          ],
+          "edition": "desktop",
+          "appVersion": null,
+          "windowsBuild": null,
+          "language": null,
+          "layout": null,
+          "mode": null,
+          "source": "https://support.google.com/chrome/answer/157179?hl=en",
+          "sourceRevision": null,
+          "provenance": {
+            "sourceId": "chrome",
+            "terms": "https://policies.google.com/terms",
+            "reuse": "facts-only",
+            "label": "lastra-authored"
+          },
+          "verification": {
+            "status": "documented",
+            "date": "2026-11-19",
+            "method": "vendor-documentation"
+          },
+          "chord": "Alt+Left",
+          "notation": "Alt+Left"
+        },
+        {
+          "id": "go-forward",
+          "actionId": "chrome:go-forward",
+          "bindingId": "d54f806878908d626a9c",
+          "label": "Forward",
+          "category": "navigation",
+          "context": "chrome:navigation",
+          "platform": "windows",
+          "hostPlatform": "windows",
+          "platforms": [
+            "windows"
+          ],
+          "edition": "desktop",
+          "appVersion": null,
+          "windowsBuild": null,
+          "language": null,
+          "layout": null,
+          "mode": null,
+          "source": "https://support.google.com/chrome/answer/157179?hl=en",
+          "sourceRevision": null,
+          "provenance": {
+            "sourceId": "chrome",
+            "terms": "https://policies.google.com/terms",
+            "reuse": "facts-only",
+            "label": "lastra-authored"
+          },
+          "verification": {
+            "status": "documented",
+            "date": "2026-11-19",
+            "method": "vendor-documentation"
+          },
+          "chord": "Alt+Right",
+          "notation": "Alt+Right"
+        },
+        {
+          "id": "reload-page",
+          "actionId": "chrome:reload-page",
+          "bindingId": "90a84f3b7328a4b5ef38",
+          "label": "Reload",
+          "category": "navigation",
+          "context": "chrome:navigation",
+          "platform": "windows",
+          "hostPlatform": "windows",
+          "platforms": [
+            "windows"
+          ],
+          "edition": "desktop",
+          "appVersion": null,
+          "windowsBuild": null,
+          "language": null,
+          "layout": null,
+          "mode": null,
+          "source": "https://support.google.com/chrome/answer/157179?hl=en",
+          "sourceRevision": null,
+          "provenance": {
+            "sourceId": "chrome",
+            "terms": "https://policies.google.com/terms",
+            "reuse": "facts-only",
+            "label": "lastra-authored"
+          },
+          "verification": {
+            "status": "documented",
+            "date": "2026-11-19",
+            "method": "vendor-documentation"
+          },
+          "chord": "Ctrl+R",
+          "notation": "Ctrl+R"
+        },
+        {
+          "id": "focus-address-bar",
+          "actionId": "chrome:focus-address-bar",
+          "bindingId": "3996247bf83165033c1c",
+          "label": "Address bar",
+          "category": "address-bar",
+          "context": "chrome:address-bar",
+          "platform": "windows",
+          "hostPlatform": "windows",
+          "platforms": [
+            "windows"
+          ],
+          "edition": "desktop",
+          "appVersion": null,
+          "windowsBuild": null,
+          "language": null,
+          "layout": null,
+          "mode": null,
+          "source": "https://support.google.com/chrome/answer/157179?hl=en",
+          "sourceRevision": null,
+          "provenance": {
+            "sourceId": "chrome",
+            "terms": "https://policies.google.com/terms",
+            "reuse": "facts-only",
+            "label": "lastra-authored"
+          },
+          "verification": {
+            "status": "documented",
+            "date": "2026-11-19",
+            "method": "vendor-documentation"
+          },
+          "chord": "Ctrl+L",
+          "notation": "Ctrl+L"
+        },
+        {
+          "id": "new-tab",
+          "actionId": "chrome:new-tab",
+          "bindingId": "76ef7e05337b4ec2ba94",
+          "label": "New tab",
+          "category": "browser-controls",
+          "context": "chrome:browser-controls",
+          "platform": "windows",
+          "hostPlatform": "windows",
+          "platforms": [
+            "windows"
+          ],
+          "edition": "desktop",
+          "appVersion": null,
+          "windowsBuild": null,
+          "language": null,
+          "layout": null,
+          "mode": null,
+          "source": "https://support.google.com/chrome/answer/157179?hl=en",
+          "sourceRevision": null,
+          "provenance": {
+            "sourceId": "chrome",
+            "terms": "https://policies.google.com/terms",
+            "reuse": "facts-only",
+            "label": "lastra-authored"
+          },
+          "verification": {
+            "status": "documented",
+            "date": "2026-11-19",
+            "method": "vendor-documentation"
+          },
+          "chord": "Ctrl+T",
+          "notation": "Ctrl+T"
+        },
+        {
+          "id": "close-tab",
+          "actionId": "chrome:close-tab",
+          "bindingId": "6921f2ff2618829717ed",
+          "label": "Close tab",
+          "category": "browser-controls",
+          "context": "chrome:browser-controls",
+          "platform": "windows",
+          "hostPlatform": "windows",
+          "platforms": [
+            "windows"
+          ],
+          "edition": "desktop",
+          "appVersion": null,
+          "windowsBuild": null,
+          "language": null,
+          "layout": null,
+          "mode": null,
+          "source": "https://support.google.com/chrome/answer/157179?hl=en",
+          "sourceRevision": null,
+          "provenance": {
+            "sourceId": "chrome",
+            "terms": "https://policies.google.com/terms",
+            "reuse": "facts-only",
+            "label": "lastra-authored"
+          },
+          "verification": {
+            "status": "documented",
+            "date": "2026-11-19",
+            "method": "vendor-documentation"
+          },
+          "chord": "Ctrl+W",
+          "notation": "Ctrl+W"
+        },
+        {
+          "id": "reopen-closed-tab",
+          "actionId": "chrome:reopen-closed-tab",
+          "bindingId": "5d8ca908b363621f99f4",
+          "label": "Restore closed tab",
+          "category": "browser-controls",
+          "context": "chrome:browser-controls",
+          "platform": "windows",
+          "hostPlatform": "windows",
+          "platforms": [
+            "windows"
+          ],
+          "edition": "desktop",
+          "appVersion": null,
+          "windowsBuild": null,
+          "language": null,
+          "layout": null,
+          "mode": null,
+          "source": "https://support.google.com/chrome/answer/157179?hl=en",
+          "sourceRevision": null,
+          "provenance": {
+            "sourceId": "chrome",
+            "terms": "https://policies.google.com/terms",
+            "reuse": "facts-only",
+            "label": "lastra-authored"
+          },
+          "verification": {
+            "status": "documented",
+            "date": "2026-11-19",
+            "method": "vendor-documentation"
+          },
+          "chord": "Ctrl+Shift+T",
+          "notation": "Ctrl+Shift+T"
+        },
+        {
+          "id": "new-window",
+          "actionId": "chrome:new-window",
+          "bindingId": "6881e875306fa8c8643a",
+          "label": "New window",
+          "category": "browser-controls",
+          "context": "chrome:browser-controls",
+          "platform": "windows",
+          "hostPlatform": "windows",
+          "platforms": [
+            "windows"
+          ],
+          "edition": "desktop",
+          "appVersion": null,
+          "windowsBuild": null,
+          "language": null,
+          "layout": null,
+          "mode": null,
+          "source": "https://support.google.com/chrome/answer/157179?hl=en",
+          "sourceRevision": null,
+          "provenance": {
+            "sourceId": "chrome",
+            "terms": "https://policies.google.com/terms",
+            "reuse": "facts-only",
+            "label": "lastra-authored"
+          },
+          "verification": {
+            "status": "documented",
+            "date": "2026-11-19",
+            "method": "vendor-documentation"
+          },
+          "chord": "Ctrl+N",
+          "notation": "Ctrl+N"
+        },
+        {
+          "id": "new-incognito-window",
+          "actionId": "chrome:new-incognito-window",
+          "bindingId": "060861d491fe640bc9f6",
+          "label": "Incognito window",
+          "category": "browser-controls",
+          "context": "chrome:browser-controls",
+          "platform": "windows",
+          "hostPlatform": "windows",
+          "platforms": [
+            "windows"
+          ],
+          "edition": "desktop",
+          "appVersion": null,
+          "windowsBuild": null,
+          "language": null,
+          "layout": null,
+          "mode": null,
+          "source": "https://support.google.com/chrome/answer/157179?hl=en",
+          "sourceRevision": null,
+          "provenance": {
+            "sourceId": "chrome",
+            "terms": "https://policies.google.com/terms",
+            "reuse": "facts-only",
+            "label": "lastra-authored"
+          },
+          "verification": {
+            "status": "documented",
+            "date": "2026-11-19",
+            "method": "vendor-documentation"
+          },
+          "chord": "Ctrl+Shift+N",
+          "notation": "Ctrl+Shift+N"
+        },
+        {
+          "id": "focus-address-bar",
+          "actionId": "chrome:focus-address-bar",
+          "bindingId": "ea963a9122476c632d3a",
+          "label": "Address bar",
+          "category": "browser-controls",
+          "context": "chrome:browser-controls",
+          "platform": "windows",
+          "hostPlatform": "windows",
+          "platforms": [
+            "windows"
+          ],
+          "edition": "desktop",
+          "appVersion": null,
+          "windowsBuild": null,
+          "language": null,
+          "layout": null,
+          "mode": null,
+          "source": "https://support.google.com/chrome/answer/157179?hl=en",
+          "sourceRevision": null,
+          "provenance": {
+            "sourceId": "chrome",
+            "terms": "https://policies.google.com/terms",
+            "reuse": "facts-only",
+            "label": "lastra-authored"
+          },
+          "verification": {
+            "status": "documented",
+            "date": "2026-11-19",
+            "method": "vendor-documentation"
+          },
+          "chord": "Ctrl+L",
+          "notation": "Ctrl+L"
+        },
+        {
+          "id": "go-back",
+          "actionId": "chrome:go-back",
+          "bindingId": "155c7553c1ba8cde9037",
+          "label": "Back",
+          "category": "browser-controls",
+          "context": "chrome:browser-controls",
+          "platform": "windows",
+          "hostPlatform": "windows",
+          "platforms": [
+            "windows"
+          ],
+          "edition": "desktop",
+          "appVersion": null,
+          "windowsBuild": null,
+          "language": null,
+          "layout": null,
+          "mode": null,
+          "source": "https://support.google.com/chrome/answer/157179?hl=en",
+          "sourceRevision": null,
+          "provenance": {
+            "sourceId": "chrome",
+            "terms": "https://policies.google.com/terms",
+            "reuse": "facts-only",
+            "label": "lastra-authored"
+          },
+          "verification": {
+            "status": "documented",
+            "date": "2026-11-19",
+            "method": "vendor-documentation"
+          },
+          "chord": "Alt+Left",
+          "notation": "Alt+Left"
+        },
+        {
+          "id": "go-forward",
+          "actionId": "chrome:go-forward",
+          "bindingId": "a87aec9a20ac0c38ab33",
+          "label": "Forward",
+          "category": "browser-controls",
+          "context": "chrome:browser-controls",
+          "platform": "windows",
+          "hostPlatform": "windows",
+          "platforms": [
+            "windows"
+          ],
+          "edition": "desktop",
+          "appVersion": null,
+          "windowsBuild": null,
+          "language": null,
+          "layout": null,
+          "mode": null,
+          "source": "https://support.google.com/chrome/answer/157179?hl=en",
+          "sourceRevision": null,
+          "provenance": {
+            "sourceId": "chrome",
+            "terms": "https://policies.google.com/terms",
+            "reuse": "facts-only",
+            "label": "lastra-authored"
+          },
+          "verification": {
+            "status": "documented",
+            "date": "2026-11-19",
+            "method": "vendor-documentation"
+          },
+          "chord": "Alt+Right",
+          "notation": "Alt+Right"
+        }
+      ]
+    },
+    {
+      "id": "excel",
+      "name": "Microsoft Excel",
+      "slug": "excel",
+      "platforms": [
+        "macos",
+        "windows"
+      ],
+      "bindings": [
+        {
+          "id": "go-to-beginning",
+          "actionId": "excel:go-to-beginning",
+          "bindingId": "135f9904fb35e5d48df2",
+          "label": "First cell",
+          "category": "navigation",
+          "context": "excel:navigation",
+          "platform": "windows",
+          "hostPlatform": "windows",
+          "platforms": [
+            "windows"
+          ],
+          "edition": "Microsoft 365 desktop",
+          "appVersion": null,
+          "windowsBuild": null,
+          "language": "en-US",
+          "layout": "US",
+          "mode": "worksheet",
+          "source": "https://support.microsoft.com/en-us/accessibility/excel/keyboard-shortcuts-in-excel",
+          "sourceRevision": null,
+          "provenance": {
+            "sourceId": "excel-en",
+            "terms": "https://www.microsoft.com/en-us/legal/terms-of-use",
+            "reuse": "facts-only",
+            "label": "lastra-authored"
+          },
+          "verification": {
+            "status": "documented",
+            "date": "2026-11-19",
+            "method": "vendor-documentation"
+          },
+          "chord": "Ctrl+Home",
+          "notation": "Ctrl+Home"
+        },
+        {
+          "id": "go-to-last-used-cell",
+          "actionId": "excel:go-to-last-used-cell",
+          "bindingId": "90ed567fc05902bc1106",
+          "label": "Last used cell",
+          "category": "navigation",
+          "context": "excel:navigation",
+          "platform": "windows",
+          "hostPlatform": "windows",
+          "platforms": [
+            "windows"
+          ],
+          "edition": "Microsoft 365 desktop",
+          "appVersion": null,
+          "windowsBuild": null,
+          "language": "en-US",
+          "layout": "US",
+          "mode": "worksheet",
+          "source": "https://support.microsoft.com/en-us/accessibility/excel/keyboard-shortcuts-in-excel",
+          "sourceRevision": null,
+          "provenance": {
+            "sourceId": "excel-en",
+            "terms": "https://www.microsoft.com/en-us/legal/terms-of-use",
+            "reuse": "facts-only",
+            "label": "lastra-authored"
+          },
+          "verification": {
+            "status": "documented",
+            "date": "2026-11-19",
+            "method": "vendor-documentation"
+          },
+          "chord": "Ctrl+End",
+          "notation": "Ctrl+End"
+        },
+        {
+          "id": "next-sheet",
+          "actionId": "excel:next-sheet",
+          "bindingId": "4fc7604290e929bc10a9",
+          "label": "Next sheet",
+          "category": "navigation",
+          "context": "excel:navigation",
+          "platform": "windows",
+          "hostPlatform": "windows",
+          "platforms": [
+            "windows"
+          ],
+          "edition": "Microsoft 365 desktop",
+          "appVersion": null,
+          "windowsBuild": null,
+          "language": "en-US",
+          "layout": "US",
+          "mode": "worksheet",
+          "source": "https://support.microsoft.com/en-us/accessibility/excel/keyboard-shortcuts-in-excel",
+          "sourceRevision": null,
+          "provenance": {
+            "sourceId": "excel-en",
+            "terms": "https://www.microsoft.com/en-us/legal/terms-of-use",
+            "reuse": "facts-only",
+            "label": "lastra-authored"
+          },
+          "verification": {
+            "status": "documented",
+            "date": "2026-11-19",
+            "method": "vendor-documentation"
+          },
+          "chord": "Ctrl+PageDown",
+          "notation": "Ctrl+PageDown"
+        },
+        {
+          "id": "previous-sheet",
+          "actionId": "excel:previous-sheet",
+          "bindingId": "a6dd51574340ff4399e6",
+          "label": "Previous sheet",
+          "category": "navigation",
+          "context": "excel:navigation",
+          "platform": "windows",
+          "hostPlatform": "windows",
+          "platforms": [
+            "windows"
+          ],
+          "edition": "Microsoft 365 desktop",
+          "appVersion": null,
+          "windowsBuild": null,
+          "language": "en-US",
+          "layout": "US",
+          "mode": "worksheet",
+          "source": "https://support.microsoft.com/en-us/accessibility/excel/keyboard-shortcuts-in-excel",
+          "sourceRevision": null,
+          "provenance": {
+            "sourceId": "excel-en",
+            "terms": "https://www.microsoft.com/en-us/legal/terms-of-use",
+            "reuse": "facts-only",
+            "label": "lastra-authored"
+          },
+          "verification": {
+            "status": "documented",
+            "date": "2026-11-19",
+            "method": "vendor-documentation"
+          },
+          "chord": "Ctrl+PageUp",
+          "notation": "Ctrl+PageUp"
+        },
+        {
+          "id": "select-entire-row",
+          "actionId": "excel:select-entire-row",
+          "bindingId": "b2947c6c15682f719b35",
+          "label": "Select row",
+          "category": "navigation",
+          "context": "excel:navigation",
+          "platform": "windows",
+          "hostPlatform": "windows",
+          "platforms": [
+            "windows"
+          ],
+          "edition": "Microsoft 365 desktop",
+          "appVersion": null,
+          "windowsBuild": null,
+          "language": "en-US",
+          "layout": "US",
+          "mode": "worksheet",
+          "source": "https://support.microsoft.com/en-us/accessibility/excel/keyboard-shortcuts-in-excel",
+          "sourceRevision": null,
+          "provenance": {
+            "sourceId": "excel-en",
+            "terms": "https://www.microsoft.com/en-us/legal/terms-of-use",
+            "reuse": "facts-only",
+            "label": "lastra-authored"
+          },
+          "verification": {
+            "status": "documented",
+            "date": "2026-11-19",
+            "method": "vendor-documentation"
+          },
+          "chord": "Shift+Space",
+          "notation": "Shift+Space"
+        },
+        {
+          "id": "select-entire-column",
+          "actionId": "excel:select-entire-column",
+          "bindingId": "42d3ac9da3479f0257f5",
+          "label": "Select column",
+          "category": "navigation",
+          "context": "excel:navigation",
+          "platform": "windows",
+          "hostPlatform": "windows",
+          "platforms": [
+            "windows"
+          ],
+          "edition": "Microsoft 365 desktop",
+          "appVersion": null,
+          "windowsBuild": null,
+          "language": "en-US",
+          "layout": "US",
+          "mode": "worksheet",
+          "source": "https://support.microsoft.com/en-us/accessibility/excel/keyboard-shortcuts-in-excel",
+          "sourceRevision": null,
+          "provenance": {
+            "sourceId": "excel-en",
+            "terms": "https://www.microsoft.com/en-us/legal/terms-of-use",
+            "reuse": "facts-only",
+            "label": "lastra-authored"
+          },
+          "verification": {
+            "status": "documented",
+            "date": "2026-11-19",
+            "method": "vendor-documentation"
+          },
+          "chord": "Ctrl+Space",
+          "notation": "Ctrl+Space"
+        },
+        {
+          "id": "select-all",
+          "actionId": "excel:select-all",
+          "bindingId": "94b11da82cb89b6c86fd",
+          "label": "Select all",
+          "category": "navigation",
+          "context": "excel:navigation",
+          "platform": "windows",
+          "hostPlatform": "windows",
+          "platforms": [
+            "windows"
+          ],
+          "edition": "Microsoft 365 desktop",
+          "appVersion": null,
+          "windowsBuild": null,
+          "language": "en-US",
+          "layout": "US",
+          "mode": "worksheet",
+          "source": "https://support.microsoft.com/en-us/accessibility/excel/keyboard-shortcuts-in-excel",
+          "sourceRevision": null,
+          "provenance": {
+            "sourceId": "excel-en",
+            "terms": "https://www.microsoft.com/en-us/legal/terms-of-use",
+            "reuse": "facts-only",
+            "label": "lastra-authored"
+          },
+          "verification": {
+            "status": "ambiguous",
+            "date": "2026-11-19",
+            "method": "vendor-documentation"
+          },
+          "chord": "Ctrl+A",
+          "notation": "Ctrl+A",
+          "unavailable": "The first Ctrl+A can select the current data region. Review the worksheet selection before assigning."
+        },
+        {
+          "id": "format-cells-dialog",
+          "actionId": "excel:format-cells-dialog",
+          "bindingId": "36cd32bdaef06bb120de",
+          "label": "Format cells",
+          "category": "formatting",
+          "context": "excel:formatting",
+          "platform": "windows",
+          "hostPlatform": "windows",
+          "platforms": [
+            "windows"
+          ],
+          "edition": "Microsoft 365 desktop",
+          "appVersion": null,
+          "windowsBuild": null,
+          "language": "en-US",
+          "layout": "US",
+          "mode": "worksheet",
+          "source": "https://support.microsoft.com/en-us/accessibility/excel/keyboard-shortcuts-in-excel",
+          "sourceRevision": null,
+          "provenance": {
+            "sourceId": "excel-en",
+            "terms": "https://www.microsoft.com/en-us/legal/terms-of-use",
+            "reuse": "facts-only",
+            "label": "lastra-authored"
+          },
+          "verification": {
+            "status": "documented",
+            "date": "2026-11-19",
+            "method": "vendor-documentation"
+          },
+          "chord": "Ctrl+1",
+          "notation": "Ctrl+1"
+        },
+        {
+          "id": "bold",
+          "actionId": "excel:bold",
+          "bindingId": "32c250c82bfd0465fc28",
+          "label": "Bold",
+          "category": "formatting",
+          "context": "excel:formatting",
+          "platform": "windows",
+          "hostPlatform": "windows",
+          "platforms": [
+            "windows"
+          ],
+          "edition": "Microsoft 365 desktop",
+          "appVersion": null,
+          "windowsBuild": null,
+          "language": "en-US",
+          "layout": "US",
+          "mode": "worksheet",
+          "source": "https://support.microsoft.com/en-us/accessibility/excel/keyboard-shortcuts-in-excel",
+          "sourceRevision": null,
+          "provenance": {
+            "sourceId": "excel-en",
+            "terms": "https://www.microsoft.com/en-us/legal/terms-of-use",
+            "reuse": "facts-only",
+            "label": "lastra-authored"
+          },
+          "verification": {
+            "status": "documented",
+            "date": "2026-11-19",
+            "method": "vendor-documentation"
+          },
+          "chord": "Ctrl+B",
+          "notation": "Ctrl+B"
+        },
+        {
+          "id": "italic",
+          "actionId": "excel:italic",
+          "bindingId": "42a8e0f7b0359ed9cff8",
+          "label": "Italic",
+          "category": "formatting",
+          "context": "excel:formatting",
+          "platform": "windows",
+          "hostPlatform": "windows",
+          "platforms": [
+            "windows"
+          ],
+          "edition": "Microsoft 365 desktop",
+          "appVersion": null,
+          "windowsBuild": null,
+          "language": "en-US",
+          "layout": "US",
+          "mode": "worksheet",
+          "source": "https://support.microsoft.com/en-us/accessibility/excel/keyboard-shortcuts-in-excel",
+          "sourceRevision": null,
+          "provenance": {
+            "sourceId": "excel-en",
+            "terms": "https://www.microsoft.com/en-us/legal/terms-of-use",
+            "reuse": "facts-only",
+            "label": "lastra-authored"
+          },
+          "verification": {
+            "status": "documented",
+            "date": "2026-11-19",
+            "method": "vendor-documentation"
+          },
+          "chord": "Ctrl+I",
+          "notation": "Ctrl+I"
+        },
+        {
+          "id": "underline",
+          "actionId": "excel:underline",
+          "bindingId": "4060a260d8ae248a83b2",
+          "label": "Underline",
+          "category": "formatting",
+          "context": "excel:formatting",
+          "platform": "windows",
+          "hostPlatform": "windows",
+          "platforms": [
+            "windows"
+          ],
+          "edition": "Microsoft 365 desktop",
+          "appVersion": null,
+          "windowsBuild": null,
+          "language": "en-US",
+          "layout": "US",
+          "mode": "worksheet",
+          "source": "https://support.microsoft.com/en-us/accessibility/excel/keyboard-shortcuts-in-excel",
+          "sourceRevision": null,
+          "provenance": {
+            "sourceId": "excel-en",
+            "terms": "https://www.microsoft.com/en-us/legal/terms-of-use",
+            "reuse": "facts-only",
+            "label": "lastra-authored"
+          },
+          "verification": {
+            "status": "documented",
+            "date": "2026-11-19",
+            "method": "vendor-documentation"
+          },
+          "chord": "Ctrl+U",
+          "notation": "Ctrl+U"
+        },
+        {
+          "id": "save",
+          "actionId": "excel:save",
+          "bindingId": "d6049de81ffc667ab214",
+          "label": "Save workbook",
+          "category": "file",
+          "context": "excel:file",
+          "platform": "windows",
+          "hostPlatform": "windows",
+          "platforms": [
+            "windows"
+          ],
+          "edition": "Microsoft 365 desktop",
+          "appVersion": null,
+          "windowsBuild": null,
+          "language": "it-IT",
+          "layout": null,
+          "mode": "worksheet",
+          "source": "https://support.microsoft.com/it-it/accessibility/excel/keyboard-shortcuts-in-excel",
+          "sourceRevision": null,
+          "provenance": {
+            "sourceId": "excel-it",
+            "terms": "https://www.microsoft.com/en-us/legal/terms-of-use",
+            "reuse": "facts-only",
+            "label": "lastra-authored"
+          },
+          "verification": {
+            "status": "ambiguous",
+            "date": "2026-11-19",
+            "method": "vendor-documentation"
+          },
+          "chord": "Ctrl+S",
+          "notation": "Ctrl+S",
+          "unavailable": "Microsoft’s Italian Windows guide assigns Ctrl+S to Save and Underline. Confirm the installed keymap first."
+        },
+        {
+          "id": "underline",
+          "actionId": "excel:underline",
+          "bindingId": "1c2b459eef6eda4e3eed",
+          "label": "Underline",
+          "category": "formatting",
+          "context": "excel:formatting",
+          "platform": "windows",
+          "hostPlatform": "windows",
+          "platforms": [
+            "windows"
+          ],
+          "edition": "Microsoft 365 desktop",
+          "appVersion": null,
+          "windowsBuild": null,
+          "language": "it-IT",
+          "layout": null,
+          "mode": "worksheet",
+          "source": "https://support.microsoft.com/it-it/accessibility/excel/keyboard-shortcuts-in-excel",
+          "sourceRevision": null,
+          "provenance": {
+            "sourceId": "excel-it",
+            "terms": "https://www.microsoft.com/en-us/legal/terms-of-use",
+            "reuse": "facts-only",
+            "label": "lastra-authored"
+          },
+          "verification": {
+            "status": "ambiguous",
+            "date": "2026-11-19",
+            "method": "vendor-documentation"
+          },
+          "chord": "Ctrl+S",
+          "notation": "Ctrl+S",
+          "unavailable": "Microsoft’s Italian Windows guide assigns Ctrl+S to Save and Underline. Confirm the installed keymap first."
+        },
+        {
+          "id": "copy",
+          "actionId": "excel:copy",
+          "bindingId": "a454b0addcee4ff5aa09",
+          "label": "Copy selection",
+          "category": "navigation",
+          "context": "excel:navigation",
+          "platform": "windows",
+          "hostPlatform": "windows",
+          "platforms": [
+            "windows"
+          ],
+          "edition": "Microsoft 365 desktop",
+          "appVersion": null,
+          "windowsBuild": null,
+          "language": "it-IT",
+          "layout": null,
+          "mode": "worksheet",
+          "source": "https://support.microsoft.com/it-it/accessibility/excel/keyboard-shortcuts-in-excel",
+          "sourceRevision": null,
+          "provenance": {
+            "sourceId": "excel-it",
+            "terms": "https://www.microsoft.com/en-us/legal/terms-of-use",
+            "reuse": "facts-only",
+            "label": "lastra-authored"
+          },
+          "verification": {
+            "status": "ambiguous",
+            "date": "2026-11-19",
+            "method": "vendor-documentation"
+          },
+          "chord": "Ctrl+C",
+          "notation": "Ctrl+C",
+          "unavailable": "Microsoft’s Italian Windows guide assigns Ctrl+C to Copy and Italic. Confirm the installed keymap first."
+        },
+        {
+          "id": "italic",
+          "actionId": "excel:italic",
+          "bindingId": "015bfe699953fbff1455",
+          "label": "Italic",
+          "category": "formatting",
+          "context": "excel:formatting",
+          "platform": "windows",
+          "hostPlatform": "windows",
+          "platforms": [
+            "windows"
+          ],
+          "edition": "Microsoft 365 desktop",
+          "appVersion": null,
+          "windowsBuild": null,
+          "language": "it-IT",
+          "layout": null,
+          "mode": "worksheet",
+          "source": "https://support.microsoft.com/it-it/accessibility/excel/keyboard-shortcuts-in-excel",
+          "sourceRevision": null,
+          "provenance": {
+            "sourceId": "excel-it",
+            "terms": "https://www.microsoft.com/en-us/legal/terms-of-use",
+            "reuse": "facts-only",
+            "label": "lastra-authored"
+          },
+          "verification": {
+            "status": "ambiguous",
+            "date": "2026-11-19",
+            "method": "vendor-documentation"
+          },
+          "chord": "Ctrl+C",
+          "notation": "Ctrl+C",
+          "unavailable": "Microsoft’s Italian Windows guide assigns Ctrl+C to Copy and Italic. Confirm the installed keymap first."
+        }
+      ]
+    },
+    {
+      "id": "gdocs",
+      "name": "Google Docs",
+      "slug": "gdocs",
+      "platforms": [
+        "web"
+      ],
+      "bindings": [
+        {
+          "id": "undo",
+          "actionId": "gdocs:undo",
+          "bindingId": "a27335aca903fb61cabf",
+          "label": "Undo",
+          "category": "editing",
+          "context": "gdocs:editing",
+          "platform": "web",
+          "hostPlatform": "windows",
+          "platforms": [
+            "web"
+          ],
+          "edition": "browser",
+          "appVersion": null,
+          "windowsBuild": null,
+          "language": null,
+          "layout": null,
+          "mode": "document-editor",
+          "source": "https://support.google.com/docs/answer/179738?hl=en&co=GENIE.Platform%3DDesktop",
+          "sourceRevision": null,
+          "provenance": {
+            "sourceId": "docs",
+            "terms": "https://policies.google.com/terms",
+            "reuse": "facts-only",
+            "label": "lastra-authored"
+          },
+          "verification": {
+            "status": "documented",
+            "date": "2026-11-19",
+            "method": "vendor-documentation"
+          },
+          "chord": "Ctrl+Z",
+          "notation": "Ctrl+Z"
+        },
+        {
+          "id": "redo",
+          "actionId": "gdocs:redo",
+          "bindingId": "6145bc65041e8b37ea0c",
+          "label": "Redo",
+          "category": "editing",
+          "context": "gdocs:editing",
+          "platform": "web",
+          "hostPlatform": "windows",
+          "platforms": [
+            "web"
+          ],
+          "edition": "browser",
+          "appVersion": null,
+          "windowsBuild": null,
+          "language": null,
+          "layout": null,
+          "mode": "document-editor",
+          "source": "https://support.google.com/docs/answer/179738?hl=en&co=GENIE.Platform%3DDesktop",
+          "sourceRevision": null,
+          "provenance": {
+            "sourceId": "docs",
+            "terms": "https://policies.google.com/terms",
+            "reuse": "facts-only",
+            "label": "lastra-authored"
+          },
+          "verification": {
+            "status": "documented",
+            "date": "2026-11-19",
+            "method": "vendor-documentation"
+          },
+          "chord": "Ctrl+Shift+Z",
+          "notation": "Ctrl+Shift+Z"
+        },
+        {
+          "id": "find",
+          "actionId": "gdocs:find",
+          "bindingId": "c2ff85bb6b3cf23d2738",
+          "label": "Find in document",
+          "category": "editing",
+          "context": "gdocs:editing",
+          "platform": "web",
+          "hostPlatform": "windows",
+          "platforms": [
+            "web"
+          ],
+          "edition": "browser",
+          "appVersion": null,
+          "windowsBuild": null,
+          "language": null,
+          "layout": null,
+          "mode": "document-editor",
+          "source": "https://support.google.com/docs/answer/179738?hl=en&co=GENIE.Platform%3DDesktop",
+          "sourceRevision": null,
+          "provenance": {
+            "sourceId": "docs",
+            "terms": "https://policies.google.com/terms",
+            "reuse": "facts-only",
+            "label": "lastra-authored"
+          },
+          "verification": {
+            "status": "documented",
+            "date": "2026-11-19",
+            "method": "vendor-documentation"
+          },
+          "chord": "Ctrl+F",
+          "notation": "Ctrl+F"
+        },
+        {
+          "id": "select-all",
+          "actionId": "gdocs:select-all",
+          "bindingId": "88b87137983853f89d4f",
+          "label": "Select all",
+          "category": "editing",
+          "context": "gdocs:editing",
+          "platform": "web",
+          "hostPlatform": "windows",
+          "platforms": [
+            "web"
+          ],
+          "edition": "browser",
+          "appVersion": null,
+          "windowsBuild": null,
+          "language": null,
+          "layout": null,
+          "mode": "document-editor",
+          "source": "https://support.google.com/docs/answer/179738?hl=en&co=GENIE.Platform%3DDesktop",
+          "sourceRevision": null,
+          "provenance": {
+            "sourceId": "docs",
+            "terms": "https://policies.google.com/terms",
+            "reuse": "facts-only",
+            "label": "lastra-authored"
+          },
+          "verification": {
+            "status": "documented",
+            "date": "2026-11-19",
+            "method": "vendor-documentation"
+          },
+          "chord": "Ctrl+A",
+          "notation": "Ctrl+A"
+        },
+        {
+          "id": "copy",
+          "actionId": "gdocs:copy",
+          "bindingId": "29eb50252ac2ae2e95c4",
+          "label": "Copy",
+          "category": "editing",
+          "context": "gdocs:editing",
+          "platform": "web",
+          "hostPlatform": "windows",
+          "platforms": [
+            "web"
+          ],
+          "edition": "browser",
+          "appVersion": null,
+          "windowsBuild": null,
+          "language": null,
+          "layout": null,
+          "mode": "document-editor",
+          "source": "https://support.google.com/docs/answer/179738?hl=en&co=GENIE.Platform%3DDesktop",
+          "sourceRevision": null,
+          "provenance": {
+            "sourceId": "docs",
+            "terms": "https://policies.google.com/terms",
+            "reuse": "facts-only",
+            "label": "lastra-authored"
+          },
+          "verification": {
+            "status": "documented",
+            "date": "2026-11-19",
+            "method": "vendor-documentation"
+          },
+          "chord": "Ctrl+C",
+          "notation": "Ctrl+C"
+        },
+        {
+          "id": "cut",
+          "actionId": "gdocs:cut",
+          "bindingId": "5bbe0ab4b60f4238dd18",
+          "label": "Cut",
+          "category": "editing",
+          "context": "gdocs:editing",
+          "platform": "web",
+          "hostPlatform": "windows",
+          "platforms": [
+            "web"
+          ],
+          "edition": "browser",
+          "appVersion": null,
+          "windowsBuild": null,
+          "language": null,
+          "layout": null,
+          "mode": "document-editor",
+          "source": "https://support.google.com/docs/answer/179738?hl=en&co=GENIE.Platform%3DDesktop",
+          "sourceRevision": null,
+          "provenance": {
+            "sourceId": "docs",
+            "terms": "https://policies.google.com/terms",
+            "reuse": "facts-only",
+            "label": "lastra-authored"
+          },
+          "verification": {
+            "status": "documented",
+            "date": "2026-11-19",
+            "method": "vendor-documentation"
+          },
+          "chord": "Ctrl+X",
+          "notation": "Ctrl+X"
+        },
+        {
+          "id": "paste",
+          "actionId": "gdocs:paste",
+          "bindingId": "04ecc4502e232c821ee2",
+          "label": "Paste",
+          "category": "editing",
+          "context": "gdocs:editing",
+          "platform": "web",
+          "hostPlatform": "windows",
+          "platforms": [
+            "web"
+          ],
+          "edition": "browser",
+          "appVersion": null,
+          "windowsBuild": null,
+          "language": null,
+          "layout": null,
+          "mode": "document-editor",
+          "source": "https://support.google.com/docs/answer/179738?hl=en&co=GENIE.Platform%3DDesktop",
+          "sourceRevision": null,
+          "provenance": {
+            "sourceId": "docs",
+            "terms": "https://policies.google.com/terms",
+            "reuse": "facts-only",
+            "label": "lastra-authored"
+          },
+          "verification": {
+            "status": "documented",
+            "date": "2026-11-19",
+            "method": "vendor-documentation"
+          },
+          "chord": "Ctrl+V",
+          "notation": "Ctrl+V"
+        },
+        {
+          "id": "paste-without-formatting",
+          "actionId": "gdocs:paste-without-formatting",
+          "bindingId": "931f152a2adcc954ece9",
+          "label": "Paste without formatting",
+          "category": "editing",
+          "context": "gdocs:editing",
+          "platform": "web",
+          "hostPlatform": "windows",
+          "platforms": [
+            "web"
+          ],
+          "edition": "browser",
+          "appVersion": null,
+          "windowsBuild": null,
+          "language": null,
+          "layout": null,
+          "mode": "document-editor",
+          "source": "https://support.google.com/docs/answer/179738?hl=en&co=GENIE.Platform%3DDesktop",
+          "sourceRevision": null,
+          "provenance": {
+            "sourceId": "docs",
+            "terms": "https://policies.google.com/terms",
+            "reuse": "facts-only",
+            "label": "lastra-authored"
+          },
+          "verification": {
+            "status": "documented",
+            "date": "2026-11-19",
+            "method": "vendor-documentation"
+          },
+          "chord": "Ctrl+Shift+V",
+          "notation": "Ctrl+Shift+V"
+        },
+        {
+          "id": "print",
+          "actionId": "gdocs:print",
+          "bindingId": "8be73ea63d946b0b5be2",
+          "label": "Print",
+          "category": "document",
+          "context": "gdocs:document",
+          "platform": "web",
+          "hostPlatform": "windows",
+          "platforms": [
+            "web"
+          ],
+          "edition": "browser",
+          "appVersion": null,
+          "windowsBuild": null,
+          "language": null,
+          "layout": null,
+          "mode": "document-editor",
+          "source": "https://support.google.com/docs/answer/179738?hl=en&co=GENIE.Platform%3DDesktop",
+          "sourceRevision": null,
+          "provenance": {
+            "sourceId": "docs",
+            "terms": "https://policies.google.com/terms",
+            "reuse": "facts-only",
+            "label": "lastra-authored"
+          },
+          "verification": {
+            "status": "documented",
+            "date": "2026-11-19",
+            "method": "vendor-documentation"
+          },
+          "chord": "Ctrl+P",
+          "notation": "Ctrl+P"
+        }
+      ]
+    },
+    {
+      "id": "teams",
+      "name": "Microsoft Teams",
+      "slug": "teams",
+      "platforms": [
+        "macos",
+        "web",
+        "windows"
+      ],
+      "bindings": [
+        {
+          "id": "mic",
+          "actionId": "teams:mic",
+          "bindingId": "bc77a8e6da4236021030",
+          "label": "Toggle mic",
+          "category": "calls",
+          "context": "teams:calls",
+          "platform": "windows",
+          "hostPlatform": "windows",
+          "platforms": [
+            "windows"
+          ],
+          "edition": "work-or-school desktop",
+          "appVersion": null,
+          "windowsBuild": null,
+          "language": null,
+          "layout": "US",
+          "mode": "call",
+          "source": "https://support.microsoft.com/en-us/accessibility/teams/keyboard-shortcuts-for-microsoft-teams",
+          "sourceRevision": null,
+          "provenance": {
+            "sourceId": "teams",
+            "terms": "https://www.microsoft.com/en-us/legal/terms-of-use",
+            "reuse": "facts-only",
+            "label": "lastra-authored"
+          },
+          "verification": {
+            "status": "documented",
+            "date": "2026-11-19",
+            "method": "vendor-documentation"
+          },
+          "chord": "Ctrl+Shift+M",
+          "notation": "Ctrl+Shift+M",
+          "unavailable": "Requires confirmation of a work or school Teams call in the Windows app."
+        },
+        {
+          "id": "end-call",
+          "actionId": "teams:end-call",
+          "bindingId": "516d8d89ec5d5fe2362e",
+          "label": "End call",
+          "category": "calls",
+          "context": "teams:calls",
+          "platform": "windows",
+          "hostPlatform": "windows",
+          "platforms": [
+            "windows"
+          ],
+          "edition": "work-or-school desktop",
+          "appVersion": null,
+          "windowsBuild": null,
+          "language": null,
+          "layout": "US",
+          "mode": "call",
+          "source": "https://support.microsoft.com/en-us/accessibility/teams/keyboard-shortcuts-for-microsoft-teams",
+          "sourceRevision": null,
+          "provenance": {
+            "sourceId": "teams",
+            "terms": "https://www.microsoft.com/en-us/legal/terms-of-use",
+            "reuse": "facts-only",
+            "label": "lastra-authored"
+          },
+          "verification": {
+            "status": "documented",
+            "date": "2026-11-19",
+            "method": "vendor-documentation"
+          },
+          "chord": "Ctrl+Shift+H",
+          "notation": "Ctrl+Shift+H",
+          "unavailable": "Requires confirmation of a work or school Teams call in the Windows app."
+        },
+        {
+          "id": "mic",
+          "actionId": "teams:mic",
+          "bindingId": "9bd4377a2d83f8ca28c0",
+          "label": "Toggle mic",
+          "category": "calls",
+          "context": "teams:calls",
+          "platform": "web",
+          "hostPlatform": "windows",
+          "platforms": [
+            "web"
+          ],
+          "edition": "web",
+          "appVersion": null,
+          "windowsBuild": null,
+          "language": null,
+          "layout": "US",
+          "mode": "call",
+          "source": "https://support.microsoft.com/en-us/accessibility/teams/keyboard-shortcuts-for-microsoft-teams",
+          "sourceRevision": null,
+          "provenance": {
+            "sourceId": "teams",
+            "terms": "https://www.microsoft.com/en-us/legal/terms-of-use",
+            "reuse": "facts-only",
+            "label": "lastra-authored"
+          },
+          "verification": {
+            "status": "documented",
+            "date": "2026-11-19",
+            "method": "vendor-documentation"
+          },
+          "chord": "Ctrl+Shift+M",
+          "notation": "Ctrl+Shift+M",
+          "unavailable": "Requires a verified Teams web window and an active call."
+        },
+        {
+          "id": "end-call",
+          "actionId": "teams:end-call",
+          "bindingId": "098a2405966e322e18ee",
+          "label": "End call",
+          "category": "calls",
+          "context": "teams:calls",
+          "platform": "web",
+          "hostPlatform": "windows",
+          "platforms": [
+            "web"
+          ],
+          "edition": "web",
+          "appVersion": null,
+          "windowsBuild": null,
+          "language": null,
+          "layout": "US",
+          "mode": "call",
+          "source": "https://support.microsoft.com/en-us/accessibility/teams/keyboard-shortcuts-for-microsoft-teams",
+          "sourceRevision": null,
+          "provenance": {
+            "sourceId": "teams",
+            "terms": "https://www.microsoft.com/en-us/legal/terms-of-use",
+            "reuse": "facts-only",
+            "label": "lastra-authored"
+          },
+          "verification": {
+            "status": "documented",
+            "date": "2026-11-19",
+            "method": "vendor-documentation"
+          },
+          "chord": "Ctrl+Shift+H",
+          "notation": "Ctrl+Shift+H",
+          "unavailable": "Requires a verified Teams web window and an active call."
+        },
+        {
+          "id": "mic",
+          "actionId": "teams:mic",
+          "bindingId": "106f1df6fa04ea155ef9",
+          "label": "Toggle mic",
+          "category": "calls",
+          "context": "teams:calls",
+          "platform": "windows",
+          "hostPlatform": "windows",
+          "platforms": [
+            "windows"
+          ],
+          "edition": "personal desktop",
+          "appVersion": null,
+          "windowsBuild": null,
+          "language": null,
+          "layout": null,
+          "mode": "call",
+          "source": "https://support.microsoft.com/en-us/accessibility/teams/keyboard-shortcuts-for-microsoft-teams",
+          "sourceRevision": null,
+          "provenance": {
+            "sourceId": "teams",
+            "terms": "https://www.microsoft.com/en-us/legal/terms-of-use",
+            "reuse": "facts-only",
+            "label": "lastra-authored"
+          },
+          "verification": {
+            "status": "unknown",
+            "date": "2026-11-19",
+            "method": "vendor-documentation"
+          },
+          "chord": null,
+          "notation": "Unknown binding",
+          "strokes": null,
+          "unavailable": "The Personal edition keymap still needs verification."
+        }
+      ]
+    },
+    {
+      "id": "vscode",
+      "name": "Visual Studio Code",
+      "slug": "vscode",
+      "platforms": [
+        "linux",
+        "macos",
+        "windows"
+      ],
+      "bindings": [
+        {
+          "id": "quick-open-file",
+          "actionId": "vscode:quick-open-file",
+          "bindingId": "68a2f5fd45e83eabf4a8",
+          "label": "Quick open file",
+          "category": "editing",
+          "context": "vscode:editing",
+          "platform": "windows",
+          "hostPlatform": "windows",
+          "platforms": [
+            "windows"
+          ],
+          "edition": "desktop",
+          "appVersion": null,
+          "windowsBuild": null,
+          "language": null,
+          "layout": null,
+          "mode": null,
+          "source": "https://code.visualstudio.com/docs/reference/default-keybindings",
+          "sourceRevision": null,
+          "provenance": {
+            "sourceId": "vscode-defaults",
+            "terms": "https://www.microsoft.com/en-us/legal/terms-of-use",
+            "reuse": "facts-only",
+            "label": "lastra-authored"
+          },
+          "verification": {
+            "status": "documented",
+            "date": "2026-11-19",
+            "method": "vendor-documentation"
+          },
+          "chord": "Ctrl+P",
+          "notation": "Ctrl+P"
+        },
+        {
+          "id": "find",
+          "actionId": "vscode:find",
+          "bindingId": "2439b4e40a9b7165e23b",
+          "label": "Find in editor",
+          "category": "search",
+          "context": "vscode:search",
+          "platform": "windows",
+          "hostPlatform": "windows",
+          "platforms": [
+            "windows"
+          ],
+          "edition": "desktop",
+          "appVersion": null,
+          "windowsBuild": null,
+          "language": null,
+          "layout": null,
+          "mode": "editor",
+          "source": "https://code.visualstudio.com/docs/reference/default-keybindings",
+          "sourceRevision": null,
+          "provenance": {
+            "sourceId": "vscode-defaults",
+            "terms": "https://www.microsoft.com/en-us/legal/terms-of-use",
+            "reuse": "facts-only",
+            "label": "lastra-authored"
+          },
+          "verification": {
+            "status": "documented",
+            "date": "2026-11-19",
+            "method": "vendor-documentation"
+          },
+          "chord": "Ctrl+F",
+          "notation": "Ctrl+F"
+        },
+        {
+          "id": "keyboard-shortcuts",
+          "actionId": "vscode:keyboard-shortcuts",
+          "bindingId": "4c7fbcb8cbec2424a0ed",
+          "label": "Keyboard shortcuts",
+          "category": "settings",
+          "context": "vscode:settings",
+          "platform": "windows",
+          "hostPlatform": "windows",
+          "platforms": [
+            "windows"
+          ],
+          "edition": "desktop",
+          "appVersion": null,
+          "windowsBuild": null,
+          "language": null,
+          "layout": "US",
+          "mode": null,
+          "source": "https://code.visualstudio.com/shortcuts/keyboard-shortcuts-windows.pdf",
+          "sourceRevision": null,
+          "provenance": {
+            "sourceId": "vscode-pdf",
+            "terms": "https://www.microsoft.com/en-us/legal/terms-of-use",
+            "reuse": "facts-only",
+            "label": "lastra-authored"
+          },
+          "verification": {
+            "status": "documented",
+            "date": "2026-11-19",
+            "method": "vendor-documentation"
+          },
+          "chord": null,
+          "notation": "Ctrl+K then Ctrl+S",
+          "orderedChords": [
+            "Ctrl+K",
+            "Ctrl+S"
+          ],
+          "strokes": [
+            [
+              "Ctrl",
+              "K"
+            ],
+            [
+              "Ctrl",
+              "S"
+            ]
+          ]
+        }
+      ]
+    },
+    {
+      "id": "word",
+      "name": "Microsoft Word",
+      "slug": "word",
+      "platforms": [
+        "macos",
+        "windows"
+      ],
+      "bindings": [
+        {
+          "id": "bold",
+          "actionId": "word:bold",
+          "bindingId": "3b6c0f31cff23aca9654",
+          "label": "Bold",
+          "category": "formatting",
+          "context": "word:formatting",
+          "platform": "windows",
+          "hostPlatform": "windows",
+          "platforms": [
+            "windows"
+          ],
+          "edition": "Microsoft 365 desktop",
+          "appVersion": null,
+          "windowsBuild": null,
+          "language": "en-US",
+          "layout": "US",
+          "mode": "document-editor",
+          "source": "https://support.microsoft.com/en-us/accessibility/word/keyboard-shortcuts-in-word",
+          "sourceRevision": null,
+          "provenance": {
+            "sourceId": "word",
+            "terms": "https://www.microsoft.com/en-us/legal/terms-of-use",
+            "reuse": "facts-only",
+            "label": "lastra-authored"
+          },
+          "verification": {
+            "status": "documented",
+            "date": "2026-11-19",
+            "method": "vendor-documentation"
+          },
+          "chord": "Ctrl+B",
+          "notation": "Ctrl+B"
+        },
+        {
+          "id": "italic",
+          "actionId": "word:italic",
+          "bindingId": "06ea3039f20d583a8800",
+          "label": "Italic",
+          "category": "formatting",
+          "context": "word:formatting",
+          "platform": "windows",
+          "hostPlatform": "windows",
+          "platforms": [
+            "windows"
+          ],
+          "edition": "Microsoft 365 desktop",
+          "appVersion": null,
+          "windowsBuild": null,
+          "language": "en-US",
+          "layout": "US",
+          "mode": "document-editor",
+          "source": "https://support.microsoft.com/en-us/accessibility/word/keyboard-shortcuts-in-word",
+          "sourceRevision": null,
+          "provenance": {
+            "sourceId": "word",
+            "terms": "https://www.microsoft.com/en-us/legal/terms-of-use",
+            "reuse": "facts-only",
+            "label": "lastra-authored"
+          },
+          "verification": {
+            "status": "documented",
+            "date": "2026-11-19",
+            "method": "vendor-documentation"
+          },
+          "chord": "Ctrl+I",
+          "notation": "Ctrl+I"
+        },
+        {
+          "id": "underline",
+          "actionId": "word:underline",
+          "bindingId": "01a61a6ad38d0733c4bf",
+          "label": "Underline",
+          "category": "formatting",
+          "context": "word:formatting",
+          "platform": "windows",
+          "hostPlatform": "windows",
+          "platforms": [
+            "windows"
+          ],
+          "edition": "Microsoft 365 desktop",
+          "appVersion": null,
+          "windowsBuild": null,
+          "language": "en-US",
+          "layout": "US",
+          "mode": "document-editor",
+          "source": "https://support.microsoft.com/en-us/accessibility/word/keyboard-shortcuts-in-word",
+          "sourceRevision": null,
+          "provenance": {
+            "sourceId": "word",
+            "terms": "https://www.microsoft.com/en-us/legal/terms-of-use",
+            "reuse": "facts-only",
+            "label": "lastra-authored"
+          },
+          "verification": {
+            "status": "documented",
+            "date": "2026-11-19",
+            "method": "vendor-documentation"
+          },
+          "chord": "Ctrl+U",
+          "notation": "Ctrl+U"
+        },
+        {
+          "id": "find",
+          "actionId": "word:find",
+          "bindingId": "f2179b78f728a49923b2",
+          "label": "Find in document",
+          "category": "navigation",
+          "context": "word:navigation",
+          "platform": "windows",
+          "hostPlatform": "windows",
+          "platforms": [
+            "windows"
+          ],
+          "edition": "Microsoft 365 desktop",
+          "appVersion": null,
+          "windowsBuild": null,
+          "language": "en-US",
+          "layout": "US",
+          "mode": "document-editor",
+          "source": "https://support.microsoft.com/en-us/accessibility/word/keyboard-shortcuts-in-word",
+          "sourceRevision": null,
+          "provenance": {
+            "sourceId": "word",
+            "terms": "https://www.microsoft.com/en-us/legal/terms-of-use",
+            "reuse": "facts-only",
+            "label": "lastra-authored"
+          },
+          "verification": {
+            "status": "documented",
+            "date": "2026-11-19",
+            "method": "vendor-documentation"
+          },
+          "chord": "Ctrl+F",
+          "notation": "Ctrl+F"
+        },
+        {
+          "id": "open-document",
+          "actionId": "word:open-document",
+          "bindingId": "a3cbd7020ae784fa2855",
+          "label": "Open document",
+          "category": "file",
+          "context": "word:file",
+          "platform": "windows",
+          "hostPlatform": "windows",
+          "platforms": [
+            "windows"
+          ],
+          "edition": "Microsoft 365 desktop",
+          "appVersion": null,
+          "windowsBuild": null,
+          "language": "en-US",
+          "layout": "US",
+          "mode": null,
+          "source": "https://support.microsoft.com/en-us/accessibility/word/keyboard-shortcuts-in-word",
+          "sourceRevision": null,
+          "provenance": {
+            "sourceId": "word",
+            "terms": "https://www.microsoft.com/en-us/legal/terms-of-use",
+            "reuse": "facts-only",
+            "label": "lastra-authored"
+          },
+          "verification": {
+            "status": "documented",
+            "date": "2026-11-19",
+            "method": "vendor-documentation"
+          },
+          "chord": "Ctrl+O",
+          "notation": "Ctrl+O"
+        },
+        {
+          "id": "save",
+          "actionId": "word:save",
+          "bindingId": "90acae96690170df13ea",
+          "label": "Save",
+          "category": "file",
+          "context": "word:file",
+          "platform": "windows",
+          "hostPlatform": "windows",
+          "platforms": [
+            "windows"
+          ],
+          "edition": "Microsoft 365 desktop",
+          "appVersion": null,
+          "windowsBuild": null,
+          "language": "en-US",
+          "layout": "US",
+          "mode": null,
+          "source": "https://support.microsoft.com/en-us/accessibility/word/keyboard-shortcuts-in-word",
+          "sourceRevision": null,
+          "provenance": {
+            "sourceId": "word",
+            "terms": "https://www.microsoft.com/en-us/legal/terms-of-use",
+            "reuse": "facts-only",
+            "label": "lastra-authored"
+          },
+          "verification": {
+            "status": "documented",
+            "date": "2026-11-19",
+            "method": "vendor-documentation"
+          },
+          "chord": "Ctrl+S",
+          "notation": "Ctrl+S"
+        },
+        {
+          "id": "print",
+          "actionId": "word:print",
+          "bindingId": "f9e50d50351aa38aa2d4",
+          "label": "Print",
+          "category": "file",
+          "context": "word:file",
+          "platform": "windows",
+          "hostPlatform": "windows",
+          "platforms": [
+            "windows"
+          ],
+          "edition": "Microsoft 365 desktop",
+          "appVersion": null,
+          "windowsBuild": null,
+          "language": "en-US",
+          "layout": "US",
+          "mode": null,
+          "source": "https://support.microsoft.com/en-us/accessibility/word/keyboard-shortcuts-in-word",
+          "sourceRevision": null,
+          "provenance": {
+            "sourceId": "word",
+            "terms": "https://www.microsoft.com/en-us/legal/terms-of-use",
+            "reuse": "facts-only",
+            "label": "lastra-authored"
+          },
+          "verification": {
+            "status": "documented",
+            "date": "2026-11-19",
+            "method": "vendor-documentation"
+          },
+          "chord": "Ctrl+P",
+          "notation": "Ctrl+P"
+        },
+        {
+          "id": "undo",
+          "actionId": "word:undo",
+          "bindingId": "08e36d81f84026525250",
+          "label": "Undo",
+          "category": "file",
+          "context": "word:file",
+          "platform": "windows",
+          "hostPlatform": "windows",
+          "platforms": [
+            "windows"
+          ],
+          "edition": "Microsoft 365 desktop",
+          "appVersion": null,
+          "windowsBuild": null,
+          "language": "en-US",
+          "layout": "US",
+          "mode": "document-editor",
+          "source": "https://support.microsoft.com/en-us/accessibility/word/keyboard-shortcuts-in-word",
+          "sourceRevision": null,
+          "provenance": {
+            "sourceId": "word",
+            "terms": "https://www.microsoft.com/en-us/legal/terms-of-use",
+            "reuse": "facts-only",
+            "label": "lastra-authored"
+          },
+          "verification": {
+            "status": "documented",
+            "date": "2026-11-19",
+            "method": "vendor-documentation"
+          },
+          "chord": "Ctrl+Z",
+          "notation": "Ctrl+Z"
+        },
+        {
+          "id": "redo",
+          "actionId": "word:redo",
+          "bindingId": "25c6a8ad11d4eb2c0cbd",
+          "label": "Redo",
+          "category": "file",
+          "context": "word:file",
+          "platform": "windows",
+          "hostPlatform": "windows",
+          "platforms": [
+            "windows"
+          ],
+          "edition": "Microsoft 365 desktop",
+          "appVersion": null,
+          "windowsBuild": null,
+          "language": "en-US",
+          "layout": "US",
+          "mode": "document-editor",
+          "source": "https://support.microsoft.com/en-us/accessibility/word/keyboard-shortcuts-in-word",
+          "sourceRevision": null,
+          "provenance": {
+            "sourceId": "word",
+            "terms": "https://www.microsoft.com/en-us/legal/terms-of-use",
+            "reuse": "facts-only",
+            "label": "lastra-authored"
+          },
+          "verification": {
+            "status": "documented",
+            "date": "2026-11-19",
+            "method": "vendor-documentation"
+          },
+          "chord": "Ctrl+Y",
+          "notation": "Ctrl+Y"
+        }
+      ]
+    }
+  ]
+}

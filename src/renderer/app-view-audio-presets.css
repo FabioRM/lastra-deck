@@ -1,0 +1,17 @@
+#app-view-detail:has(.audio-presets-view) { overflow: auto; touch-action: pan-y; }
+.audio-presets-view, .audio-presets-review, .audio-preset-levels { display: grid; gap: 10px; }
+.audio-presets-buttons { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.audio-preset-levels > div {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 6px 16px;
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--pressed-surface);
+}
+.audio-preset-levels dt { overflow-wrap: anywhere; }
+.audio-preset-levels dd { color: var(--muted-text); font-variant-numeric: tabular-nums; }
+.audio-presets-view > [role='status']:empty { display: none; }

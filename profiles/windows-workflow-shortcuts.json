@@ -1,0 +1,250 @@
+{
+  "version": "windows-workflow-reference-2026-11-19",
+  "reviewedOn": "2026-11-19",
+  "zoom": [
+    [
+      "Meeting navigation",
+      "meeting-chat-panel",
+      "Toggle Meeting Chat Panel",
+      [
+        "Alt+H"
+      ],
+      {
+        "mode": "Zoom meeting",
+        "when": "A Zoom Workplace desktop meeting window is active."
+      }
+    ],
+    [
+      "Meeting navigation",
+      "meeting-participants-panel",
+      "Toggle Participants Panel",
+      [
+        "Alt+U"
+      ],
+      {
+        "mode": "Zoom meeting",
+        "when": "A Zoom Workplace desktop meeting window is active."
+      }
+    ],
+    [
+      "Meeting navigation",
+      "meeting-speaker-view",
+      "Switch to Speaker View",
+      [
+        "Alt+F1"
+      ],
+      {
+        "mode": "Zoom meeting",
+        "when": "The desktop meeting has video views available."
+      }
+    ],
+    [
+      "Meeting navigation",
+      "meeting-gallery-view",
+      "Switch to Gallery View",
+      [
+        "Alt+F2"
+      ],
+      {
+        "mode": "Zoom meeting",
+        "when": "The desktop meeting has video views available."
+      }
+    ]
+  ],
+  "slack": [
+    [
+      "Conversation navigation",
+      "jump-to-conversation-desktop",
+      "Jump to a Conversation",
+      [
+        "Ctrl+T"
+      ],
+      {
+        "mode": "Slack desktop",
+        "when": "The Slack desktop app is active.",
+        "requirement": "Ctrl+T is desktop-only. Ctrl+K is the general Slack alternative."
+      }
+    ],
+    [
+      "Conversation navigation",
+      "next-unread-conversation",
+      "Next Unread Channel or DM",
+      [
+        "Alt+Shift+Down"
+      ],
+      {
+        "mode": "Slack desktop",
+        "when": "Slack's conversation navigation is active and there is a next unread channel or direct message."
+      }
+    ],
+    [
+      "Search",
+      "search-current-conversation",
+      "Search in the Current Conversation",
+      [
+        "Ctrl+F"
+      ],
+      {
+        "mode": "Slack desktop",
+        "when": "A Slack channel or direct message is active.",
+        "requirement": "Slack's search preference determines whether Ctrl+F starts a Slack search in the browser."
+      }
+    ]
+  ],
+  "visualStudio2022": [
+    [
+      "IDE search",
+      "Window.QuickLaunch",
+      "Search Visual Studio Features",
+      [
+        "Ctrl+Q"
+      ],
+      {
+        "source": "visualStudioSearch",
+        "when": "A Visual Studio IDE window is active.",
+        "requirement": "All-In-One Search applies to 17.6 and later. Earlier 17.x builds use the search box."
+      }
+    ],
+    [
+      "IDE search",
+      "open-code-search",
+      "Search Code Symbols and Files",
+      [
+        "Ctrl+T"
+      ],
+      {
+        "source": "visualStudioSearch",
+        "when": "All-In-One Search is available in an active Visual Studio 2022 window.",
+        "requirement": "All-In-One Search applies to 17.6 and later."
+      }
+    ],
+    [
+      "Find and replace",
+      "Edit.FindinFiles",
+      "Find Text in Files",
+      [
+        "Ctrl+Shift+F"
+      ],
+      {
+        "when": "Visual Studio uses General development settings and the active editor or panel permits the command."
+      }
+    ],
+    [
+      "Find and replace",
+      "Edit.ReplaceinFiles",
+      "Open Replace in Files",
+      [
+        "Ctrl+Shift+H"
+      ],
+      {
+        "when": "Visual Studio uses General development settings.",
+        "requirement": "Opens a dialog. Text replacement requires a separate action there."
+      }
+    ]
+  ],
+  "visualStudio2026": [
+    [
+      "IDE search",
+      "Window.QuickLaunch",
+      "Search Visual Studio Features",
+      [
+        "Ctrl+Q"
+      ],
+      {
+        "source": "visualStudioModernSearch",
+        "when": "A Visual Studio IDE window is active."
+      }
+    ],
+    [
+      "IDE search",
+      "open-feature-search",
+      "Open Feature Search",
+      [
+        "Ctrl+Shift+P"
+      ],
+      {
+        "source": "visualStudioModernSearch",
+        "when": "All-In-One Search is available in an active Visual Studio 2026 window."
+      }
+    ],
+    [
+      "IDE search",
+      "open-code-search",
+      "Search Code Symbols and Files",
+      [
+        "Ctrl+T",
+        "Ctrl+P",
+        "Ctrl+,"
+      ],
+      {
+        "source": "visualStudioModernSearch",
+        "when": "All-In-One Search is available in an active Visual Studio 2026 window."
+      }
+    ],
+    [
+      "Find and replace",
+      "Edit.FindinFiles",
+      "Find Text in Files",
+      [
+        "Ctrl+Shift+F"
+      ],
+      {
+        "when": "Visual Studio uses General development settings and the active editor or panel permits the command."
+      }
+    ],
+    [
+      "Find and replace",
+      "Edit.ReplaceinFiles",
+      "Open Replace in Files",
+      [
+        "Ctrl+Shift+H"
+      ],
+      {
+        "when": "Visual Studio uses General development settings.",
+        "requirement": "Opens a dialog. Text replacement requires a separate action there."
+      }
+    ]
+  ],
+  "sources": {
+    "zoom": {
+      "url": "https://support.zoom.com/hc/en/article?id=zm_kb&sysparm_article=KB0067050",
+      "terms": "https://www.zoom.com/en/trust/terms/",
+      "revision": "Zoom Workplace Windows desktop, reviewed November 19, 2026",
+      "method": "vendor-documentation"
+    },
+    "slack": {
+      "url": "https://slack.com/help/articles/201374536-Slack-keyboard-shortcuts",
+      "terms": "https://slack.com/terms-of-service",
+      "revision": "Slack Windows desktop, reviewed November 19, 2026",
+      "method": "vendor-documentation"
+    },
+    "visualStudioSearch": {
+      "url": "https://learn.microsoft.com/en-us/visualstudio/ide/visual-studio-search?view=vs-2022",
+      "terms": "https://learn.microsoft.com/en-us/legal/termsofuse",
+      "revision": "Microsoft Visual Studio 2022 search",
+      "method": "vendor-documentation",
+      "appVersion": "2022 (17.x)"
+    },
+    "visualStudio2022": {
+      "url": "https://learn.microsoft.com/en-us/visualstudio/ide/default-keyboard-shortcuts-in-visual-studio?view=vs-2022",
+      "terms": "https://learn.microsoft.com/en-us/legal/termsofuse",
+      "revision": "Visual Studio 2022 General development settings",
+      "method": "vendor-documentation",
+      "appVersion": "2022 (17.x)"
+    },
+    "visualStudioModernSearch": {
+      "url": "https://learn.microsoft.com/en-us/visualstudio/ide/visual-studio-search?view=visualstudio",
+      "terms": "https://learn.microsoft.com/en-us/legal/termsofuse",
+      "revision": "Microsoft Visual Studio 2026 search",
+      "method": "vendor-documentation",
+      "appVersion": "2026 (18.x)"
+    },
+    "visualStudio2026": {
+      "url": "https://learn.microsoft.com/en-us/visualstudio/ide/default-keyboard-shortcuts-in-visual-studio?view=visualstudio",
+      "terms": "https://learn.microsoft.com/en-us/legal/termsofuse",
+      "revision": "Visual Studio 2026 General development settings",
+      "method": "vendor-documentation",
+      "appVersion": "2026 (18.x)"
+    }
+  }
+}

@@ -1,0 +1,6 @@
+node_modules/
+/rsc/
+preview*.png
+!docs/*.png
+out/
+/dist/*

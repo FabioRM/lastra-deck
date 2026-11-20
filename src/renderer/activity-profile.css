@@ -1,0 +1,25 @@
+#activity-profile { position: relative; }
+#page-nav #activity-profile-toggle { padding-inline: 10px; font-size: calc(21px * var(--text-scale)); }
+
+#activity-profile-options {
+  position: absolute;
+  z-index: 5;
+  inset: calc(100% + 8px) auto auto 0;
+  min-inline-size: 200px;
+  max-inline-size: 320px;
+  display: grid;
+  gap: 8px;
+  padding: 10px;
+  border: 1px solid var(--control-border);
+  border-radius: 12px;
+  background: var(--panel-surface);
+}
+
+#activity-profile-choices { display: grid; gap: 6px; }
+#activity-profile-choices button { text-align: start; }
+#page-nav #activity-profile-choices button[aria-pressed='true'] {
+  outline: 2px solid var(--app);
+  outline-offset: -4px;
+}
+#activity-profile-error { color: var(--err); overflow-wrap: anywhere; font-size: calc(20px * var(--text-scale)); }
+#activity-profile-error:empty { display: none; }

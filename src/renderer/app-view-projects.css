@@ -1,0 +1,37 @@
+.project-palette {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.project-toolbar,
+.project-choices,
+.project-destinations {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  min-inline-size: 0;
+}
+
+.project-palette [hidden] {
+  display: none;
+}
+
+.project-palette button {
+  min-block-size: 44px;
+  min-inline-size: 44px;
+  max-inline-size: 100%;
+  overflow-wrap: anywhere;
+  text-align: start;
+  white-space: normal;
+}
+
+.project-palette button[aria-pressed='true'] {
+  border-color: currentColor;
+  text-decoration: underline;
+  text-underline-offset: 0.16em;
+}
+
+.project-palette button:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}

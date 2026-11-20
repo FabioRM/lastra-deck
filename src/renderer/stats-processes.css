@@ -1,0 +1,40 @@
+#stats-processes-open { border-color: var(--app); color: var(--app); }
+
+#stats-processes-dialog {
+  position: fixed;
+  inset: 0;
+  width: min(850px, calc(100vw - 28px));
+  max-height: calc(100dvh - 28px);
+  margin: auto;
+  padding: clamp(14px, 3vw, 24px);
+  border: 1px solid var(--control-border);
+  border-radius: 18px;
+  background: var(--panel-surface);
+  color: var(--text);
+  font-size: calc(20px * var(--text-scale));
+  overflow: auto;
+}
+#stats-processes-dialog[open] { display: grid; gap: 12px; }
+#stats-processes-dialog::backdrop { background: var(--overlay); }
+#stats-processes-dialog header { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+#stats-processes-dialog h2 { font-size: calc(28px * var(--text-scale)); }
+#stats-processes-dialog :is(button, select) {
+  min-height: 48px;
+  padding: 6px 10px;
+  border: 1px solid var(--control-border);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+}
+.stats-processes-controls, .stats-processes-controls label { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; }
+.stats-processes-source, .stats-processes-status { color: var(--muted-text); }
+.stats-processes-status:empty { display: none; }
+.stats-processes-results { max-height: min(54dvh, 690px); overflow: auto; touch-action: pan-y; }
+.stats-processes-results:focus-visible { outline: 2px solid var(--app); outline-offset: -2px; }
+#stats-processes-dialog table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+#stats-processes-dialog thead { position: sticky; top: 0; background: var(--panel-surface); }
+#stats-processes-dialog :is(th, td) { padding: 7px 10px; border-block-end: 1px solid var(--border); text-align: end; }
+#stats-processes-dialog :is(th, td):first-child { text-align: start; }
+#stats-processes-dialog tbody :is(th, td) { font-weight: 400; }
+#stats-processes-dialog tbody th { overflow-wrap: anywhere; }

@@ -1,0 +1,12 @@
+# Windows shortcut workflow references
+
+The editor and MCP catalog include workflow references for Zoom Workplace meetings, Slack Desktop navigation, and the Visual Studio 2022 and 2026 IDEs. IntelliJ IDEA's Go to File and Rename are covered by the versioned IntelliJ IDEA catalog. [IntelliJ IDEA keymaps](intellij-idea-keymaps.md)
+
+| App | Reviewed workflow | Active preset evidence |
+| --- | --- | --- |
+| Zoom Workplace | `Alt+A`, `Alt+V` and `Alt+Y` apply to desktop meetings. The reference covers chat, participants and speaker or gallery view. | No local Zoom desktop build or selected shortcut configuration was observed. Zoom lets users change shortcuts and mark supported ones global. |
+| Slack | `Ctrl+K` jumps to a conversation and `Ctrl+G` starts search. `Ctrl+T` is a desktop alternative. `Ctrl+F` searches an open conversation and browser application behavior depends on Slack's search preference. | No local Slack desktop build or active workspace was observed. |
+| Visual Studio | `Ctrl+Q` opens IDE features and `Ctrl+Shift+F` opens Find in Files under General development settings. All-In-One Search is documented for Visual Studio 2022 17.6 onward and Visual Studio 2026. | Only Visual Studio Build Tools 2022 was detected. Windows reports release 17.14.44 and `vswhere` reports installation version 17.14.37827.9. A Visual Studio IDE executable and selected keyboard profile were unavailable. |
+| IntelliJ IDEA | Windows Default `Ctrl+Shift+N` opens Go to File and `Shift+F6` renames a symbol in the appropriate context. | The pinned 2026.2.3 factory keymaps and the public Windows guide cover these actions. Active preset and remaps remain open. |
+
+New workflow entries are references, including Visual Studio commands whose execution depends on the selected edition and keyboard profile. Live delivery to active meetings, workspaces and editor dialogs remains to be verified. [Zoom shortcuts](https://support.zoom.com/hc/en/article?id=zm_kb&sysparm_article=KB0067050) · [Slack shortcuts](https://slack.com/help/articles/201374536-Slack-keyboard-shortcuts) · [Slack search preferences](https://slack.com/help/articles/4402305240723-Set-your-search-preferences) · [Visual Studio 2022 defaults](https://learn.microsoft.com/en-us/visualstudio/ide/default-keyboard-shortcuts-in-visual-studio?view=vs-2022) · [Visual Studio search](https://learn.microsoft.com/en-us/visualstudio/ide/visual-studio-search?view=visualstudio)

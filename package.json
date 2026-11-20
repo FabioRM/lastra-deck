@@ -1,0 +1,51 @@
+{
+  "name": "lastra",
+  "productName": "Lastra",
+  "version": "0.2.2",
+  "description": "Touch macro deck for CORSAIR XENEON EDGE (2560x720), built on Electron",
+  "license": "MIT",
+  "author": "Fabio Angeletti",
+  "homepage": "https://fabiorm.github.io/lastra-deck/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/FabioRM/lastra-deck.git"
+  },
+  "private": true,
+  "main": "src/main/main.js",
+  "scripts": {
+    "start": "electron .",
+    "edit": "electron . --editor",
+    "dev": "electron . --windowed",
+    "preview": "electron . --preview=preview.png",
+    "preview:states": "electron . --preview=preview-states.png --preview-states",
+    "test": "node --test test/*.test.js",
+    "lint": "eslint .",
+    "typecheck": "tsc -p jsconfig.json",
+    "check": "npm run lint && npm run typecheck && npm test",
+    "dist": "electron-builder --win nsis --x64 --publish never",
+    "dist:dir": "electron-builder --win dir --x64 --publish never"
+  },
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "dependencies": {
+    "electron-updater": "6.8.12",
+    "ical.js": "2.2.1",
+    "koffi": "3.3.8",
+    "lucide-static": "^1.74.0",
+    "yauzl": "3.4.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "9.39.1",
+    "@types/node": "22.19.1",
+    "electron": "^45.3.3",
+    "electron-builder": "26.18.1",
+    "eslint": "9.39.1",
+    "globals": "16.5.0",
+    "typescript": "5.9.3",
+    "yaml": "2.9.1"
+  },
+  "bugs": {
+    "url": "https://github.com/FabioRM/lastra-deck/issues"
+  }
+}

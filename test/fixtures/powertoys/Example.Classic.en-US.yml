@@ -1,0 +1,19 @@
+PackageName: Example.Classic
+Name: Classic fixture
+WindowFilter: classic.exe
+Shortcuts:
+  - SectionName: Navigation
+    Properties:
+      - Name: Go back
+        Recommended: true
+        Shortcut:
+          - Alt: true
+            Keys: ["<Left>"]
+          - Ctrl: true
+            Keys: [LeftBracket]
+      - Name: Open keyboard shortcuts
+        Shortcut:
+          - Ctrl: true
+            Keys: [K]
+          - Ctrl: true
+            Keys: [S]

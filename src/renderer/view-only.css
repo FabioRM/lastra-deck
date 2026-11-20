@@ -1,0 +1,22 @@
+#view-only-status {
+  position: absolute;
+  inset-block-start: var(--pad);
+  inset-inline: var(--pad);
+  margin: 0;
+  font-size: calc(22px * var(--text-scale));
+  color: var(--text);
+  line-height: 1.2;
+}
+
+#view-only-status strong { color: var(--warn); }
+
+#stage[data-view-only] {
+  --view-only-space: calc(42px * var(--text-scale));
+  padding-block-start: calc(var(--pad) + var(--view-only-space));
+}
+
+#stage[data-view-only] > :is(#dashboard-switch, #home-page, #deck-audio-controls) {
+  inset-block-start: calc(var(--pad) + var(--view-only-space));
+}
+
+#stage[data-view-only] .key[data-view-only-key] { opacity: 1; }

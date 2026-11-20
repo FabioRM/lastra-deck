@@ -1,0 +1,16 @@
+.syncthing-view { display: grid; gap: 14px; min-width: 0; }
+.syncthing-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.syncthing-actions button { min-height: 48px; padding: 8px 14px; }
+.syncthing-feedback:empty { display: none; }
+.syncthing-feedback, .syncthing-state, .syncthing-remaining { color: var(--muted-text); }
+.syncthing-lists { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
+.syncthing-lists h3 { font-size: 1.15em; margin-block-end: 8px; }
+.syncthing-lists ul { display: grid; gap: 8px; list-style: none; }
+.syncthing-folder, .syncthing-device { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px 12px;
+  padding: 9px 12px; border: 1px solid var(--control-border); border-radius: 9px; background: var(--card-surface); }
+.syncthing-name { overflow-wrap: anywhere; }
+.syncthing-state { text-transform: capitalize; }
+.syncthing-percent { font-variant-numeric: tabular-nums; }
+.syncthing-progress { grid-column: 1 / -1; width: 100%; accent-color: var(--app); }
+.syncthing-device[data-connected='true'] .syncthing-state { color: var(--app); }
+.portrait .syncthing-lists { grid-template-columns: minmax(0, 1fr); }

@@ -1,0 +1,43 @@
+#deck-idle-screen {
+  position: fixed;
+  z-index: 30;
+  inset: 0;
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  gap: clamp(6px, 2vh, 26px);
+  padding: clamp(12px, 4vmin, 42px);
+  background: var(--background);
+  color: var(--text);
+  font-size: calc(clamp(18px, 4vmin, 36px) * var(--text-scale));
+  text-align: center;
+  touch-action: none;
+  user-select: none;
+}
+
+#deck-idle-screen time {
+  font-family: 'Barlow Condensed', 'Segoe UI', sans-serif;
+  font-size: min(calc(27vmin * var(--text-scale)), 18vw, 29vh);
+  font-variant-numeric: tabular-nums;
+  font-weight: 300;
+  line-height: .9;
+  white-space: nowrap;
+}
+
+#deck-idle-screen p, #deck-idle-screen ul { margin: 0; }
+#deck-idle-screen ul { padding: 0; list-style: none; }
+#deck-idle-screen p:first-of-type { color: var(--muted-text); }
+.deck-idle-statuses { color: var(--app); }
+#deck-idle-screen button {
+  min-width: 120px;
+  min-height: 52px;
+  padding: 8px 20px;
+  border: 1px solid var(--control-border);
+  border-radius: 14px;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  cursor: pointer;
+}
+
+#deck-idle-screen button:focus-visible { outline: 3px solid var(--app); outline-offset: 4px; }

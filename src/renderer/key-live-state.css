@@ -1,0 +1,17 @@
+.key:is([data-live-source], [data-readout]) { padding-block-end: clamp(22px, calc(var(--key) * 0.2), 36px); }
+.key[data-readout] { padding-block-end: clamp(31px, calc(var(--key) * 0.23), 40px); }
+.key-live-state {
+  position: absolute;
+  inset: auto 3px 6px;
+  color: var(--muted-text);
+  font-size: clamp(13px, calc(var(--key) * 0.1), 19px);
+  font-weight: 600;
+  line-height: 1.05;
+  text-align: center;
+  pointer-events: none;
+}
+.key:is([data-live-source], [data-readout]) .hold-bar { bottom: 2px; }
+.key[data-audio][aria-pressed='mixed'] { box-shadow: inset 0 0 0 2px var(--warn); }
+.key:is([data-live-source='spotify'], [data-live-source='obs-scene'])[aria-pressed='true'] { --cat: var(--ok); box-shadow: inset 0 0 0 2px var(--ok); }
+.key[data-live-tone='muted'] :is(.key-live-state, .glyph) { color: var(--warn); }
+.key[data-live-tone='playing'] .key-live-state { color: var(--ok); }

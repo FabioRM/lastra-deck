@@ -1,0 +1,168 @@
+{
+  "version": 2,
+  "locale": "en-GB",
+  "grid": {
+    "cols": 6,
+    "rows": 2
+  },
+  "name": "Streaming",
+  "pages": [
+    {
+      "id": "home",
+      "name": "Streaming keys",
+      "keys": [
+        {
+          "id": "obs",
+          "label": "OBS Studio",
+          "icon": "video",
+          "category": "app",
+          "action": {
+            "type": "launch",
+            "target": "%ProgramFiles%\\obs-studio\\bin\\64bit\\obs64.exe",
+            "cwd": "%ProgramFiles%\\obs-studio\\bin\\64bit",
+            "reuseWindow": true
+          }
+        },
+        {
+          "id": "windows-mic",
+          "label": "Windows mic",
+          "icon": "mic",
+          "category": "meeting",
+          "action": {
+            "type": "audio",
+            "device": "microphone"
+          }
+        },
+        {
+          "id": "speakers",
+          "label": "Speakers",
+          "icon": "volume-2",
+          "category": "media",
+          "action": {
+            "type": "audio",
+            "device": "output"
+          }
+        },
+        {
+          "id": "sound-settings",
+          "label": "Sound settings",
+          "icon": "sliders-horizontal",
+          "category": "system",
+          "action": {
+            "type": "open",
+            "target": "ms-settings:sound"
+          }
+        },
+        {
+          "id": "videos",
+          "label": "Videos",
+          "icon": "folder-open",
+          "category": "app",
+          "action": {
+            "type": "open",
+            "target": "%USERPROFILE%\\Videos"
+          }
+        }
+      ]
+    },
+    {
+      "id": "obs",
+      "name": "OBS Studio",
+      "apps": [
+        "obs64.exe",
+        "obs32.exe"
+      ],
+      "keys": [
+        {
+          "id": "windows-mic",
+          "label": "Windows mic",
+          "icon": "mic",
+          "category": "meeting",
+          "action": {
+            "type": "audio",
+            "device": "microphone"
+          }
+        },
+        {
+          "id": "speakers",
+          "label": "Speakers",
+          "icon": "volume-2",
+          "category": "media",
+          "action": {
+            "type": "audio",
+            "device": "output"
+          }
+        },
+        {
+          "id": "volume-down",
+          "label": "Volume down",
+          "icon": "volume-1",
+          "category": "media",
+          "action": {
+            "type": "media",
+            "key": "voldown"
+          }
+        },
+        {
+          "id": "volume-up",
+          "label": "Volume up",
+          "icon": "volume-2",
+          "category": "media",
+          "action": {
+            "type": "media",
+            "key": "volup"
+          }
+        }
+      ]
+    },
+    {
+      "id": "discord",
+      "name": "Discord",
+      "apps": [
+        "discord.exe"
+      ],
+      "keys": [
+        {
+          "id": "switcher",
+          "label": "Quick switcher",
+          "icon": "search",
+          "category": "app",
+          "action": {
+            "type": "hotkey",
+            "keys": "Ctrl+K"
+          }
+        },
+        {
+          "id": "search-channel",
+          "label": "Search channel",
+          "icon": "message-square",
+          "category": "app",
+          "action": {
+            "type": "hotkey",
+            "keys": "Ctrl+F"
+          }
+        },
+        {
+          "id": "windows-mic",
+          "label": "Windows mic",
+          "icon": "mic",
+          "category": "meeting",
+          "action": {
+            "type": "audio",
+            "device": "microphone"
+          }
+        },
+        {
+          "id": "speakers",
+          "label": "Speakers",
+          "icon": "volume-2",
+          "category": "media",
+          "action": {
+            "type": "audio",
+            "device": "output"
+          }
+        }
+      ]
+    }
+  ]
+}

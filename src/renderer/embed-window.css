@@ -1,0 +1,7 @@
+html { background: #171c21; color: #ebeee9; font: 18px system-ui, sans-serif; }
+body { margin: 0; }
+header { display: flex; align-items: center; gap: 10px; box-sizing: border-box; height: 64px; padding: 8px 12px; background: #232a31; border-bottom: 1px solid #48555f; }
+h1 { min-width: 0; flex: 1; margin: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 20px; }
+button { min-height: 43px; padding: 5px 12px; border: 1px solid #606d75; border-radius: 8px; background: #33434b; color: inherit; font: inherit; }
+button:focus-visible { outline: 2px solid #7db9b6; }
+#embed-status { padding: 0 18px; color: #bcc7c9; }

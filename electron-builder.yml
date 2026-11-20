@@ -1,0 +1,63 @@
+# Windows packaging for Lastra. See docs/releasing.md.
+appId: lastra.deck # Matches APP_ID in src/main/main.js (AppUserModelID, Start menu shortcut, uninstall key).
+productName: Lastra
+copyright: Copyright (c) Fabio Angeletti
+
+directories:
+  output: out
+
+# asar is off on purpose. Several files are read by processes other than Electron, using paths
+# computed from __dirname or the app root, and those paths would point inside app.asar:
+#   - csc.exe compiles src/main/hardware-monitor.cs and src/main/windows-media.cs at runtime;
+#   - MCP clients run extensions/lastra-mcp/stdio.js with plain Node (main.js copies that path),
+#     and stdio.js requires ../../src/main/* and ../../package.json;
+#   - Claude Code runs extensions/lastra-claude-code/hook.js with plain Node;
+#   - the tray opens docs/*.md and extensions/lastra-vscode/README.md in the default editor.
+# asarUnpack would put copies under app.asar.unpacked, but the code would still pass the
+# app.asar path. With asar off, resources/app mirrors the source tree and every path just works,
+# including koffi's native module (node_modules/@koromix/koffi-win32-x64/win32_x64/koffi.node).
+asar: false
+
+# koffi ships a prebuilt Node-API binary; there is nothing to rebuild for Electron.
+npmRebuild: false
+
+files:
+  - package.json
+  - LICENSE
+  - THIRD_PARTY_NOTICES.md
+  - licenses/**
+  - assets/**
+  - profiles/**
+  - src/**
+  - extensions/**
+  - docs/*.md
+  # lucide-static: only icons/*.svg are read (src/main/icons.js). Skip the 60 MB of fonts and bundles.
+  - "!**/node_modules/lucide-static/{dist,font}/**"
+  - "!**/node_modules/lucide-static/{icon-nodes.json,sprite.svg,tags.json,rollup.config.mjs,tsconfig.json}"
+  - "!**/node_modules/koffi/{doc,vendor}/**"
+  - "!**/*.{map,md.orig}"
+
+win:
+  target:
+    - target: nsis
+      arch: [x64]
+  icon: assets/icon.png
+  # Signing is automatic: with CSC_LINK + CSC_KEY_PASSWORD (or WIN_CSC_LINK + WIN_CSC_KEY_PASSWORD)
+  # electron-builder signs the app and installer; without them it logs that signing is skipped.
+  # Do not set signtoolOptions.publisherName by hand: electron-builder records it from the certificate,
+  # and electron-updater would then reject unsigned updates.
+
+nsis:
+  oneClick: true
+  perMachine: false # Per-user install in %LOCALAPPDATA%\Programs\Lastra: no UAC prompt, silent updates.
+  runAfterFinish: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  shortcutName: Lastra
+  deleteAppDataOnUninstall: false
+  artifactName: Lastra-Setup-${version}.${ext}
+
+publish:
+  provider: github
+  owner: FabioRM
+  repo: lastra-deck

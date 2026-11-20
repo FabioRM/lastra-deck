@@ -1,0 +1,14 @@
+.claude-view, .claude-session { display: grid; gap: 9px; min-width: 0; }
+.claude-view { padding-bottom: 10px; }
+.claude-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; min-width: 0; }
+.claude-toolbar h4, .claude-toolbar h5 { margin-right: auto; }
+.claude-toolbar > * { min-width: 0; overflow-wrap: anywhere; }
+.claude-sessions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 440px), 1fr));
+  gap: 10px;
+}
+.claude-session { align-content: start; border: 1px solid var(--border); border-radius: 11px; padding: 12px; }
+.claude-approval { border-color: var(--app); }
+.claude-session h5 { font-size: inherit; }
+.claude-session p { margin: 0; }

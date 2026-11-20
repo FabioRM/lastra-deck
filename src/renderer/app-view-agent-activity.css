@@ -1,0 +1,30 @@
+.agent-activity-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+  gap: 10px;
+  list-style: none;
+}
+
+.portrait .agent-activity-list { grid-template-columns: minmax(0, 1fr); }
+.agent-activity > p:empty { display: none; }
+
+.agent-activity-card {
+  display: grid;
+  gap: 8px;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface);
+  overflow-wrap: anywhere;
+}
+
+.agent-activity-card header { display: flex; align-items: start; justify-content: space-between; gap: 8px; }
+.agent-activity-card h3 { font-size: calc(24px * var(--text-scale)); }
+.agent-activity-card [data-state='completed'] { color: var(--ok); }
+.agent-activity-card [data-state='waiting'] { color: var(--warn); }
+.agent-activity-card [data-state='failed'] { color: var(--err); }
+.agent-wait-reason { color: var(--warn); }
+.agent-activity-progress { display: flex; align-items: center; gap: 8px; }
+.agent-activity-progress progress { width: 100%; height: 12px; accent-color: var(--media); }
+.agent-activity-pin { justify-self: start; }

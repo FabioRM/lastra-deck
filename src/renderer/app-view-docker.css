@@ -1,0 +1,78 @@
+#app-view-detail:has(.docker-view) {
+  overflow-y: auto;
+  touch-action: pan-y;
+}
+
+.docker-view { display: grid; gap: 10px; }
+.docker-context { overflow-wrap: anywhere; }
+.docker-columns {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
+  gap: 14px;
+}
+.docker-browser,
+.docker-inspector {
+  display: grid;
+  align-content: start;
+  min-width: 0;
+  padding: 12px 14px;
+  gap: 8px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--recessed-surface);
+}
+.docker-inspector h4 { overflow-wrap: anywhere; }
+.docker-controls {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.docker-filter { justify-content: space-between; }
+.docker-projects {
+  display: grid;
+  gap: 6px;
+  max-height: 280px;
+  overflow-y: auto;
+  touch-action: pan-y;
+}
+#app-views-panel .docker-container {
+  display: grid;
+  width: 100%;
+  padding-block: 7px;
+  text-align: left;
+}
+.docker-container > * {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.docker-container > span { font-size: 20px; }
+.docker-pager { justify-content: center; }
+.docker-metrics {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 7px 14px;
+}
+.docker-metrics div { min-width: 0; }
+.docker-metrics dt { font-size: 20px; }
+.docker-metrics dd { margin: 0; overflow-wrap: anywhere; }
+.docker-lifecycle { padding-top: 7px; border-top: 1px solid var(--border); }
+.docker-warning { color: var(--err); font-size: 22px; }
+.docker-log-panel { display: grid; min-width: 0; gap: 6px; }
+.docker-log-body {
+  max-height: 210px;
+  min-height: 55px;
+  padding: 9px;
+  overflow: auto;
+  touch-action: pan-y;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  font-family: Consolas, monospace;
+  font-size: 19px;
+  line-height: 1.4;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.portrait .docker-columns { grid-template-columns: minmax(0, 1fr); }

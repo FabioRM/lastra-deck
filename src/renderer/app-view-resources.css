@@ -1,0 +1,26 @@
+.resource-cards {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+.resource-card {
+  display: grid;
+  align-content: start;
+  gap: 8px;
+  min-width: 0;
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--pressed-surface);
+}
+.resource-values {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, auto);
+  gap: 4px 10px;
+  margin: 0;
+  font-size: 22px;
+}
+.resource-values dt { color: var(--muted-text); }
+.resource-values dd { margin: 0; text-align: right; font-variant-numeric: tabular-nums; }
+.resource-card .app-view-secondary { font-size: 20px; }
+.portrait .resource-cards { grid-template-columns: minmax(0, 1fr); }

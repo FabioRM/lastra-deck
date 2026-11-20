@@ -1,0 +1,12 @@
+.power-content { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.power-card { display: grid; align-content: start; gap: 10px; min-width: 0; padding: 16px; border: 1px solid var(--border); border-radius: 16px; background: var(--card-surface); }
+.power-heading { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; justify-content: space-between; }
+.power-card .widget-stat { font-size: 1.2em; }
+.power-measurements { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 16px; }
+.power-card .power-charge { font-size: 2.1em; font-variant-numeric: tabular-nums; }
+.power-watts { display: grid; gap: 2px; padding: 5px 10px; border-radius: 10px; background: var(--media-surface); color: var(--media); }
+.power-watts small { font-size: .76em; }
+.power-card .widget-gauge { width: 100%; }
+.power-card[data-state='stale'] .power-charge { color: var(--warn); }
+.power-card .widget-list { margin: 0; padding: 0; }
+.portrait .power-content { grid-template-columns: minmax(0, 1fr); }

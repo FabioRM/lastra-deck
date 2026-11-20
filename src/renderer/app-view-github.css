@@ -1,0 +1,27 @@
+#app-view-detail:has(.github-checks) { overflow-y: auto; touch-action: pan-y; }
+
+.github-checks { display: grid; min-width: 0; gap: 12px; }
+.github-toolbar, .github-repositories { display: flex; min-width: 0; flex-wrap: wrap; gap: 8px; }
+.github-toolbar button, .github-result { min-block-size: 44px; min-inline-size: 44px; max-inline-size: 100%; }
+.github-repository { white-space: normal; overflow-wrap: anywhere; }
+.github-repository[aria-pressed='true'] { border-color: currentColor; text-decoration: underline; text-underline-offset: 0.16em; }
+
+.github-columns { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.github-results {
+  display: grid;
+  min-width: 0;
+  align-content: start;
+  gap: 7px;
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--recessed-surface);
+}
+.github-results h4 { overflow-wrap: anywhere; }
+#app-views-panel .github-result { display: grid; gap: 3px; text-align: left; }
+.github-result-name { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.github-result .app-view-secondary { white-space: normal; overflow-wrap: anywhere; }
+.github-result[data-state='failed'] .app-view-secondary { color: var(--err); }
+.github-result[data-state='pending'] .app-view-secondary { color: var(--warn); }
+.github-checks button:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
+.portrait .github-columns { grid-template-columns: minmax(0, 1fr); }

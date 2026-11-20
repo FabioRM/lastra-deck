@@ -1,0 +1,40 @@
+{
+  "name": "lastra-vscode",
+  "displayName": "Lastra for VS Code",
+  "description": "Show workspace context and run configured tasks on the Lastra deck.",
+  "version": "0.1.1",
+  "license": "MIT",
+  "publisher": "lastra-local",
+  "engines": { "vscode": "^1.90.0" },
+  "categories": ["Other"],
+  "extensionKind": ["ui"],
+  "activationEvents": ["onStartupFinished"],
+  "main": "./extension.js",
+  "capabilities": { "untrustedWorkspaces": { "supported": "limited", "description": "Lastra can display workspace information. Launching tasks requires VS Code Workspace Trust." } },
+  "contributes": {
+    "configuration": {
+      "title": "Lastra",
+      "properties": {
+        "lastra.enabled": {
+          "type": "boolean",
+          "default": false,
+          "scope": "application",
+          "description": "Publish local workspace state to the Lastra deck."
+        },
+        "lastra.allowedTasks": {
+          "type": "array",
+          "items": { "type": "string" },
+          "default": [],
+          "scope": "application",
+          "description": "Names of workspace tasks that Lastra can run. Use this setting only for tasks you want on the deck."
+        },
+        "lastra.jestReport": {
+          "type": "string",
+          "default": "",
+          "scope": "application",
+          "description": "Optional Jest JSON results path, relative to the active workspace folder."
+        }
+      }
+    }
+  }
+}

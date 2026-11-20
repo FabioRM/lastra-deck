@@ -1,0 +1,158 @@
+{
+  "version": 2,
+  "locale": "en-GB",
+  "grid": {
+    "cols": 6,
+    "rows": 2
+  },
+  "name": "Meeting",
+  "pages": [
+    {
+      "id": "home",
+      "name": "Meeting keys",
+      "keys": [
+        {
+          "id": "windows-mic",
+          "label": "Windows mic",
+          "icon": "mic",
+          "category": "meeting",
+          "action": {
+            "type": "audio",
+            "device": "microphone"
+          }
+        },
+        {
+          "id": "speakers",
+          "label": "Speakers",
+          "icon": "volume-2",
+          "category": "media",
+          "action": {
+            "type": "audio",
+            "device": "output"
+          }
+        },
+        {
+          "id": "sound-settings",
+          "label": "Sound settings",
+          "icon": "sliders-horizontal",
+          "category": "system",
+          "action": {
+            "type": "open",
+            "target": "ms-settings:sound"
+          }
+        },
+        {
+          "id": "teams",
+          "label": "Microsoft Teams",
+          "icon": "users",
+          "category": "meeting",
+          "action": {
+            "type": "open",
+            "target": "msteams:"
+          }
+        },
+        {
+          "id": "mic-privacy",
+          "label": "Microphone access",
+          "icon": "shield-check",
+          "category": "system",
+          "action": {
+            "type": "open",
+            "target": "ms-settings:privacy-microphone"
+          }
+        }
+      ]
+    },
+    {
+      "id": "teams",
+      "name": "Microsoft Teams",
+      "apps": [
+        "ms-teams.exe"
+      ],
+      "appIds": [
+        "msteams_8wekyb3d8bbwe!msteams"
+      ],
+      "keys": [
+        {
+          "id": "windows-mic",
+          "label": "Windows mic",
+          "icon": "mic",
+          "category": "meeting",
+          "action": {
+            "type": "audio",
+            "device": "microphone"
+          }
+        },
+        {
+          "id": "speakers",
+          "label": "Speakers",
+          "icon": "volume-2",
+          "category": "media",
+          "action": {
+            "type": "audio",
+            "device": "output"
+          }
+        },
+        {
+          "id": "teams-search",
+          "label": "Search Teams",
+          "icon": "search",
+          "category": "meeting",
+          "action": {
+            "type": "hotkey",
+            "keys": "Ctrl+E"
+          }
+        },
+        {
+          "id": "teams-chat",
+          "label": "New chat",
+          "icon": "message-square-plus",
+          "category": "meeting",
+          "action": {
+            "type": "hotkey",
+            "keys": "Ctrl+N"
+          }
+        }
+      ]
+    },
+    {
+      "id": "zoom",
+      "name": "Zoom Workplace",
+      "apps": [
+        "zoom.exe"
+      ],
+      "keys": [
+        {
+          "id": "windows-mic",
+          "label": "Windows mic",
+          "icon": "mic",
+          "category": "meeting",
+          "action": {
+            "type": "audio",
+            "device": "microphone"
+          }
+        },
+        {
+          "id": "speakers",
+          "label": "Speakers",
+          "icon": "volume-2",
+          "category": "media",
+          "action": {
+            "type": "audio",
+            "device": "output"
+          }
+        },
+        {
+          "id": "sound-settings",
+          "label": "Sound settings",
+          "icon": "sliders-horizontal",
+          "category": "system",
+          "action": {
+            "type": "open",
+            "target": "ms-settings:sound"
+          }
+        }
+      ]
+    }
+  ]
+}

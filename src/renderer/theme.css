@@ -1,0 +1,189 @@
+:root, .theme-sample {
+  color-scheme: light dark;
+  --text-scale: 1;
+
+  --background: light-dark(#f4f7f8, #171c21);
+  --surface: light-dark(#ffffff, #222a31);
+  --surface-top: light-dark(#ffffff, #242c33);
+  --pressed-surface: light-dark(#e4ebed, #1d2329);
+  --recessed-surface: light-dark(#e4ebee, #12171b);
+  --card-surface: light-dark(#ffffff, #212b31);
+  --panel-surface: light-dark(#eef3f5, #1d252b);
+  --track: light-dark(#82979f, #657681);
+  --border: light-dark(#a4b6be, #3c4a51);
+  --control-border: light-dark(#71858f, #657681);
+  --text: light-dark(#18272e, #e6e1d6);
+  --muted-text: light-dark(#43555e, #aab8bf);
+
+  --app: light-dark(#075b55, #8ac8c1);
+  --media: light-dark(#765000, #e0b45c);
+  --system: light-dark(#444e8b, #a3abda);
+  --meeting: light-dark(#813e62, #d79bb5);
+  --ok: light-dark(#17633a, #8fd19e);
+  --err: light-dark(#a1262c, #ffaaa0);
+  --warn: light-dark(#775000, #f2bf72);
+  --on-app: light-dark(#ffffff, #132426);
+  --fill-media: light-dark(#765000, #ecc676);
+  --on-media: light-dark(#ffffff, #272315);
+
+  --selected-surface: light-dark(#d9efeb, #233337);
+  --media-surface: light-dark(#fff4df, #302b23);
+  --media-border: light-dark(#8a641f, #ba9552);
+  --error-surface: light-dark(#ffedeb, #392729);
+  --error-border: light-dark(#aa4a49, #ba8078);
+  --overlay: rgb(10 13 17 / 72%);
+}
+
+:is(:root, .theme-sample)[data-theme='light'] { color-scheme: light; }
+:is(:root, .theme-sample)[data-theme='dark'] { color-scheme: dark; }
+:is(:root, .theme-sample)[data-theme='midnight'] {
+  color-scheme: dark;
+  --background: #0c1424;
+  --surface: #17253d;
+  --surface-top: #1b2b46;
+  --pressed-surface: #121f35;
+  --recessed-surface: #09101d;
+  --card-surface: #142139;
+  --panel-surface: #111c30;
+  --track: #536e98;
+  --border: #324764;
+  --control-border: #657ea4;
+  --text: #f1f5ff;
+  --muted-text: #adc0e0;
+  --app: #8cbaf8;
+  --media: #f2c28a;
+  --system: #c3b4ff;
+  --meeting: #efabd3;
+  --on-app: #0d1b29;
+  --selected-surface: #1b3656;
+}
+:is(:root, .theme-sample)[data-theme='forest'] {
+  color-scheme: dark;
+  --background: #101b17;
+  --surface: #20342c;
+  --surface-top: #233b31;
+  --pressed-surface: #192b23;
+  --recessed-surface: #0d1712;
+  --card-surface: #1b2e25;
+  --panel-surface: #16271f;
+  --track: #647f71;
+  --border: #3a5849;
+  --control-border: #6c8878;
+  --text: #eff8ed;
+  --muted-text: #aecbb8;
+  --app: #9ed7ab;
+  --media: #e9c987;
+  --system: #a2c8ed;
+  --meeting: #dfa9c3;
+  --on-app: #112218;
+  --selected-surface: #294536;
+}
+:is(:root, .theme-sample)[data-theme='ember'] {
+  color-scheme: dark;
+  --background: #241917;
+  --surface: #3d2a24;
+  --surface-top: #483027;
+  --pressed-surface: #33231e;
+  --recessed-surface: #1c1312;
+  --card-surface: #392820;
+  --panel-surface: #2f211e;
+  --track: #92756a;
+  --border: #66493e;
+  --control-border: #957267;
+  --text: #fff4e9;
+  --muted-text: #d7bcb2;
+  --app: #ffb58a;
+  --media: #f4d68a;
+  --system: #bbc6f0;
+  --meeting: #eda7ba;
+  --on-app: #2e1a12;
+  --selected-surface: #513327;
+}
+@media (forced-colors: none) {
+  :root[data-accent='custom']:not([data-high-contrast='true']) {
+    --app: color-mix(in srgb, light-dark(#122334, #f7f8ff), var(--custom-accent) 38%);
+    --on-app: light-dark(#ffffff, #10151a);
+    --selected-surface: color-mix(in srgb, var(--app) 15%, var(--card-surface));
+  }
+}
+:root[data-text-scale='115'] { --text-scale: 1.15; }
+:root[data-text-scale='125'] { --text-scale: 1.25; }
+
+.telemetry-arc {
+  --gauge-fill: var(--app);
+  position: relative;
+}
+
+.telemetry-arc::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: conic-gradient(from 270deg at 50% 100%, var(--gauge-fill) var(--telemetry-angle),
+    var(--track) var(--telemetry-angle) 180deg, transparent 180deg);
+  mask-image: radial-gradient(ellipse 50% 100% at 50% 100%, transparent 81%, #000 83% 98%, transparent 100%);
+  forced-color-adjust: none;
+}
+
+.telemetry-arc > span { position: relative; }
+
+:root[data-high-contrast='true'] {
+  --background: light-dark(#ffffff, #000000);
+  --surface: var(--background);
+  --surface-top: var(--background);
+  --pressed-surface: light-dark(#eeeeee, #171717);
+  --recessed-surface: var(--pressed-surface);
+  --card-surface: var(--background);
+  --panel-surface: var(--background);
+  --border: light-dark(#303030, #eeeeee);
+  --control-border: var(--border);
+  --track: var(--border);
+  --text: light-dark(#000000, #ffffff);
+  --muted-text: light-dark(#303030, #eeeeee);
+  --app: light-dark(#003e36, #79ffef);
+  --media: light-dark(#513300, #ffe066);
+  --system: light-dark(#2b336e, #c4c7ff);
+  --meeting: light-dark(#5e204a, #ffc4eb);
+  --ok: light-dark(#00431f, #a7ffbd);
+  --err: light-dark(#770611, #ffb1ae);
+  --warn: var(--media);
+  --on-app: var(--background);
+  --fill-media: var(--media);
+  --on-media: var(--background);
+  --selected-surface: var(--pressed-surface);
+  --media-surface: var(--background);
+  --media-border: var(--media);
+  --error-surface: var(--background);
+  --error-border: var(--err);
+}
+
+@media (forced-colors: active) {
+  :root, :root[data-theme], :root[data-high-contrast='true'] {
+    --background: Canvas;
+    --surface: ButtonFace;
+    --surface-top: ButtonFace;
+    --pressed-surface: Canvas;
+    --recessed-surface: Canvas;
+    --card-surface: Canvas;
+    --panel-surface: Canvas;
+    --border: CanvasText;
+    --control-border: ButtonText;
+    --track: CanvasText;
+    --text: CanvasText;
+    --muted-text: CanvasText;
+    --app: LinkText;
+    --media: CanvasText;
+    --system: CanvasText;
+    --meeting: CanvasText;
+    --ok: CanvasText;
+    --err: CanvasText;
+    --warn: CanvasText;
+    --on-app: HighlightText;
+    --fill-media: Highlight;
+    --on-media: HighlightText;
+    --selected-surface: Canvas;
+    --media-surface: Canvas;
+    --media-border: ButtonText;
+    --error-surface: Canvas;
+    --error-border: ButtonText;
+  }
+}

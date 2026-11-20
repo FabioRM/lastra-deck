@@ -1,0 +1,19 @@
+.vscode-view, .vscode-reading { display: grid; gap: 8px; min-width: 0; }
+.vscode-view { font-size: 22px; }
+.vscode-toolbar { display: flex; flex-wrap: wrap; gap: 8px; }
+.vscode-readings, .vscode-tasks {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+.vscode-reading {
+  padding: 7px 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--pressed-surface);
+  overflow-wrap: anywhere;
+}
+.vscode-reading dd { margin: 0; }
+#app-views-panel .vscode-tasks button { display: grid; text-align: left; overflow-wrap: anywhere; }
+.vscode-tasks .app-view-secondary, .vscode-reading dt { font-size: 19px; }
+.portrait .vscode-view { gap: 12px; }

@@ -1,0 +1,185 @@
+{
+  "version": 2,
+  "locale": "en-GB",
+  "grid": {
+    "cols": 6,
+    "rows": 2
+  },
+  "name": "Gaming",
+  "pages": [
+    {
+      "id": "home",
+      "name": "Gaming keys",
+      "keys": [
+        {
+          "id": "game-bar",
+          "label": "Game Bar",
+          "icon": "gamepad-2",
+          "category": "system",
+          "action": {
+            "type": "hotkey",
+            "keys": "Win+G"
+          }
+        },
+        {
+          "id": "steam-library",
+          "label": "Steam library",
+          "icon": "gamepad-2",
+          "category": "app",
+          "action": {
+            "type": "open",
+            "target": "steam://open/games"
+          }
+        },
+        {
+          "id": "windows-mic",
+          "label": "Windows mic",
+          "icon": "mic",
+          "category": "meeting",
+          "action": {
+            "type": "audio",
+            "device": "microphone"
+          }
+        },
+        {
+          "id": "speakers",
+          "label": "Speakers",
+          "icon": "volume-2",
+          "category": "media",
+          "action": {
+            "type": "audio",
+            "device": "output"
+          }
+        },
+        {
+          "id": "volume-down",
+          "label": "Volume down",
+          "icon": "volume-1",
+          "category": "media",
+          "action": {
+            "type": "media",
+            "key": "voldown"
+          }
+        },
+        {
+          "id": "volume-up",
+          "label": "Volume up",
+          "icon": "volume-2",
+          "category": "media",
+          "action": {
+            "type": "media",
+            "key": "volup"
+          }
+        }
+      ]
+    },
+    {
+      "id": "steam",
+      "name": "Steam",
+      "apps": [
+        "steam.exe"
+      ],
+      "keys": [
+        {
+          "id": "steam-library",
+          "label": "Steam library",
+          "icon": "gamepad-2",
+          "category": "app",
+          "action": {
+            "type": "open",
+            "target": "steam://open/games"
+          }
+        },
+        {
+          "id": "game-bar",
+          "label": "Game Bar",
+          "icon": "gamepad-2",
+          "category": "system",
+          "action": {
+            "type": "hotkey",
+            "keys": "Win+G"
+          }
+        },
+        {
+          "id": "speakers",
+          "label": "Speakers",
+          "icon": "volume-2",
+          "category": "media",
+          "action": {
+            "type": "audio",
+            "device": "output"
+          }
+        },
+        {
+          "id": "volume-down",
+          "label": "Volume down",
+          "icon": "volume-1",
+          "category": "media",
+          "action": {
+            "type": "media",
+            "key": "voldown"
+          }
+        },
+        {
+          "id": "volume-up",
+          "label": "Volume up",
+          "icon": "volume-2",
+          "category": "media",
+          "action": {
+            "type": "media",
+            "key": "volup"
+          }
+        }
+      ]
+    },
+    {
+      "id": "discord",
+      "name": "Discord",
+      "apps": [
+        "discord.exe"
+      ],
+      "keys": [
+        {
+          "id": "switcher",
+          "label": "Quick switcher",
+          "icon": "search",
+          "category": "app",
+          "action": {
+            "type": "hotkey",
+            "keys": "Ctrl+K"
+          }
+        },
+        {
+          "id": "search-channel",
+          "label": "Search channel",
+          "icon": "message-square",
+          "category": "app",
+          "action": {
+            "type": "hotkey",
+            "keys": "Ctrl+F"
+          }
+        },
+        {
+          "id": "windows-mic",
+          "label": "Windows mic",
+          "icon": "mic",
+          "category": "meeting",
+          "action": {
+            "type": "audio",
+            "device": "microphone"
+          }
+        },
+        {
+          "id": "speakers",
+          "label": "Speakers",
+          "icon": "volume-2",
+          "category": "media",
+          "action": {
+            "type": "audio",
+            "device": "output"
+          }
+        }
+      ]
+    }
+  ]
+}

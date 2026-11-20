@@ -1,0 +1,61 @@
+#dashboard-calendar-card:has(#dashboard-agenda:not([hidden])) {
+  grid-template-rows: minmax(0, 1fr) auto;
+  align-items: stretch;
+  row-gap: 5px;
+}
+
+#dashboard-calendar-card:has(#dashboard-agenda:not([hidden])) #dashboard-calendar {
+  display: grid;
+  min-height: 0;
+  align-content: center;
+}
+
+#stage:not(.portrait) #dashboard-calendar-card:has(#dashboard-agenda:not([hidden])) .dashboard-calendar-day {
+  --calendar-row: clamp(19px, 8cqh, 42px);
+}
+
+#dashboard-calendar-card:has(#dashboard-agenda:not([hidden])) #dashboard-calendar-feedback {
+  position: static;
+  text-align: end;
+}
+
+#dashboard-agenda {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 4px 15px;
+  align-items: center;
+  padding-block-start: 7px;
+  border-top: 1px solid var(--border);
+}
+
+.agenda-details { min-width: 0; }
+#agenda-title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: calc(20px * var(--text-scale));
+  font-weight: 600;
+}
+#agenda-timing, #agenda-notice { font-size: calc(15px * var(--text-scale)); color: var(--muted-text); }
+#agenda-notice { grid-column: 1 / -1; overflow-wrap: anywhere; }
+.agenda-controls { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 5px; }
+.agenda-controls button {
+  min-block-size: 44px;
+  min-inline-size: 44px;
+  max-inline-size: 100%;
+  padding-inline: 9px;
+  font-size: calc(15px * var(--text-scale));
+  border: 1px solid var(--control-border);
+  border-radius: 9px;
+  background: var(--card-surface);
+  color: var(--text);
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+.agenda-controls button:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
+.agenda-controls button:disabled { color: var(--muted-text); }
+
+.portrait #dashboard-calendar-card:has(#dashboard-agenda:not([hidden])) { grid-template-rows: auto auto; }
+.portrait #dashboard-agenda { grid-template-columns: minmax(0, 1fr); }
+.portrait .agenda-controls { justify-content: flex-start; }

@@ -1,0 +1,23 @@
+.clipboard-pins, .clipboard-pins-review, .clipboard-pins-keyboard { display: grid; gap: 10px; }
+.clipboard-pins-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.clipboard-pins-list { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+.clipboard-pins-list button { overflow-wrap: anywhere; text-align: start; }
+.clipboard-pins-list:empty, .clipboard-pins-notice:empty, .clipboard-pins-feedback:empty { display: none; }
+.clipboard-pins-review { padding: 14px; border: 1px solid var(--border); border-radius: 12px; background: var(--pressed-surface); }
+.clipboard-pins-review h4 { overflow-wrap: anywhere; }
+.clipboard-pins-text {
+  max-height: 26vh;
+  padding: 8px 12px;
+  overflow: auto;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--recessed-surface);
+  color: var(--text);
+  font: inherit;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  touch-action: pan-y;
+}
+.clipboard-pins-label { display: grid; gap: 6px; }
+.clipboard-pins-keyboard .app-views-keyboard-row { flex-wrap: wrap; }
+.portrait .clipboard-pins-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
