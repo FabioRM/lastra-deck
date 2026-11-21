@@ -98,35 +98,29 @@
     }) };
   }
 
-  function projectShortcutGroups(grid, slots, portrait, largeKeys = false, pages) {
-    const groups = new Map();
-    if (pages) for (const page of pages) groups.set(page.id, { name: page.name, indices: [] });
+  function projectShortcutPages(grid, slots, portrait, largeKeys = false, pages) {
+    const selections = new Map((pages ?? [{ id: undefined, name: undefined }])
+      .map(({ id, name }) => [id, { name, indices: [] }]));
     slots.forEach((key, index) => {
-      if (!key) return;
-      if (pages) {
-        groups.get(key.shortcutPage)?.indices.push(index);
-        return;
-      }
-      const category = key.group?.replaceAll('-', ' ');
-      const group = category ? category[0].toUpperCase() + category.slice(1) : 'Quick actions';
-      if (!groups.has(group)) groups.set(group, { name: group, indices: [] });
-      groups.get(group).indices.push(index);
+      if (key) selections.get(pages ? key.shortcutPage : undefined)?.indices.push(index);
     });
-    if (!groups.size) return projectEditingPage(grid, [], [], portrait, largeKeys);
-    let layout;
-    const grouped = [];
-    for (const { name: group, indices } of groups.values()) {
-      layout = projectEditingPage(grid, indices.map((index) => slots[index]), [], portrait, largeKeys);
-      for (const sheet of layout.sheets) {
-        grouped.push({ ...sheet, group, keys: sheet.keys.map((key) => ({ ...key,
+    const layouts = Array.from(selections.values(), ({ name, indices }) => {
+      const layout = projectEditingPage(grid, indices.map((index) => slots[index]), [], portrait, largeKeys);
+      const sheets = layout.sheets.map((sheet) => ({
+        ...sheet,
+        ...(name ? { group: name } : {}),
+        keys: sheet.keys.map((key) => ({
+          ...key,
           index: key.index === null ? null : indices[key.index],
-        })) });
-      }
-    }
-    return { ...layout, sheets: grouped };
+        })),
+      }));
+      return { ...layout, sheets };
+    });
+    const first = layouts[0] ?? projectEditingPage(grid, [], [], portrait, largeKeys);
+    return layouts.length > 1 ? { ...first, sheets: layouts.flatMap(({ sheets }) => sheets) } : first;
   }
 
-  const api = { FIXED_EDITING_KEYS, STANDARD_EDITING_CHORDS, duplicateEditingKey, projectEditingPage, projectShortcutGroups };
+  const api = { FIXED_EDITING_KEYS, STANDARD_EDITING_CHORDS, duplicateEditingKey, projectEditingPage, projectShortcutPages };
   if (typeof module === 'object') module.exports = api;
   else window.LastraEditingKeys = api;
 }

@@ -44,13 +44,14 @@ function defaultExecutable() {
  */
 class PowerShellWorker {
   /**
-   * @param {{ executable?: string, spawnImpl?: typeof spawn, idleMs?: number, log?: (...args: any[]) => void }} [options]
+   * @param {{ executable?: string, spawnImpl?: typeof spawn, idleMs?: number, mta?: boolean, log?: (...args: any[]) => void }} [options]
    */
-  constructor({ executable = defaultExecutable(), spawnImpl = spawn, idleMs = 60_000, log = () => {} } = {}) {
+  constructor({ executable = defaultExecutable(), spawnImpl = spawn, idleMs = 60_000, mta = false, log = () => {} } = {}) {
     this.executable = executable;
     this.spawnImpl = spawnImpl;
     this.idleMs = idleMs;
     this.log = log;
+    this.mta = mta;
     this.child = null;
     this.queue = [];
     this.active = null;
@@ -94,7 +95,9 @@ class PowerShellWorker {
 
   ensureChild() {
     if (this.child) return;
-    const child = this.spawnImpl(this.executable, ['-NoProfile', '-NonInteractive', '-ExecutionPolicy', 'Bypass', '-Command', LOOP], {
+    const args = ['-NoProfile', '-NonInteractive', '-ExecutionPolicy', 'Bypass'];
+    if (this.mta) args.push('-MTA');
+    const child = this.spawnImpl(this.executable, [...args, '-Command', LOOP], {
       windowsHide: true, stdio: ['pipe', 'pipe', 'ignore'],
     });
     this.child = child;

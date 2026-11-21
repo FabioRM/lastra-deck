@@ -83,6 +83,7 @@ const { PushToTalk } = require('./push-to-talk');
 const { startMicGuard } = require('./ptt-guard');
 const { AppMixerPins } = require('./app-mixer-pins');
 const { createForegroundReader } = require('./foreground-win32');
+const { createWindowShortcutMode } = require('./window-shortcut-mode');
 const { Obs } = require('./obs');
 const { ProductionTimers } = require('./production-timers');
 const { ProductionModes } = require('./production-modes');
@@ -1322,6 +1323,15 @@ function registerIpc() {
   deck('sounds:read', () => ({ ok: true, state: soundboard.snapshot() }));
   deck('sounds:stop', () => ({ ok: true, message: soundboard.stopAll() }));
   deck('tools:choices', () => toolChoices);
+  const setToolChoices = (input) => {
+    const choices = normalizeChoices(input);
+    if (!choices) return { ok: false, message: 'Enter 2–8 distinct choices of up to 32 characters each.' };
+    writeJsonSettings(path.join(app.getPath('userData'), 'tool-choices.json'), { version: 1, choices });
+    toolChoices = choices;
+    send('tools:choices', toolChoices);
+    return { ok: true, choices };
+  };
+  deck('tools:choices:set', setToolChoices);
   deck('timers:change', (command) => {
     try { return { ok: true, ...timers.change(command) }; }
     catch (error) { return { ok: false, message: error.message }; }
@@ -1396,14 +1406,7 @@ function registerIpc() {
     }
   });
   edit('editor:tools:choices:get', () => toolChoices);
-  edit('editor:tools:choices:set', (input) => {
-    const choices = normalizeChoices(input);
-    if (!choices) return { ok: false, message: 'Enter 2–8 distinct choices of up to 32 characters each.' };
-    writeJsonSettings(path.join(app.getPath('userData'), 'tool-choices.json'), { version: 1, choices });
-    toolChoices = choices;
-    send('tools:choices', toolChoices);
-    return { ok: true, choices };
-  });
+  edit('editor:tools:choices:set', setToolChoices);
   const shortcutSettings = (rows = deckShortcuts.sync()) => ({
     rows, views: VIEW_LABELS, activity: editorProfile.id,
     pages: editorProfile.store.current.pages.map(({ id, name }) => ({ id, name })),
@@ -1816,8 +1819,12 @@ function start() {
     if (appWindows === undefined) appWindows = createAppWindowReader();
     return appWindows;
   };
+  const windowShortcutMode = process.platform === 'win32'
+    ? createWindowShortcutMode({ findPack: (context) => packFor(context, store.current.webApps) }) : undefined;
+  if (windowShortcutMode) disposables.add('shortcut window mode', () => windowShortcutMode.dispose());
   readForeground = createForegroundReader({
     readAppIdentity: () => windows()?.foreground({ appId: true, title: false }),
+    windowShortcutMode,
     needsTitle: () => store.current.pages.some((page) => page.windowTitle),
   });
   runner = createActionRunner({ shell, spawn, input: createInput(), audio: { change: changeAudio },

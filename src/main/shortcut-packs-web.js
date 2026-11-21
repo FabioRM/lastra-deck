@@ -2,9 +2,10 @@
 'use strict';
 
 const { createHash } = require('node:crypto');
+const { withShortcutWorkflows } = require('./shortcut-pack-data');
 
 const docs = (name) => ({ host: 'docs.google.com', prefix: '/' + name + '/' });
-const browserExecutables = new Set(['chrome.exe', 'msedge.exe', 'brave.exe', 'arc.exe']);
+const browserExecutables = new Set(['chrome.exe', 'msedge.exe', 'brave.exe', 'arc.exe', 'vivaldi.exe']);
 const idPattern = /(?:^|\.)_crx_([a-p]{32})(?:\.|$)/i;
 const docsEditor = { mode: 'the Google Docs document editor' };
 const sheetsEditor = { mode: 'the Google Sheets spreadsheet editor' };
@@ -12,7 +13,8 @@ const slidesEditor = { mode: 'the Google Slides presentation editor' };
 const canvaEditor = { mode: 'a Canva design' };
 const miroBoard = { mode: 'a Miro board' };
 const photoshopEditor = { mode: 'the Photoshop web editor' };
-const webPacks = [
+/** @type {import('./shortcut-pack-data').ShortcutPack[]} */
+const webPacks = withShortcutWorkflows([
   { id: 'gdocs', name: 'Google Docs', sites: [docs('document')], editingMode: docsEditor.mode,
     manifests: ['https://docs.google.com/document/'],
     source: 'https://support.google.com/docs/answer/179738', keys: [
@@ -98,7 +100,10 @@ const webPacks = [
       ['zoom-fit', 'Zoom to fit', 'maximize', 'Ctrl+0', photoshopEditor],
       ['undo', 'Undo', 'undo-2', 'Ctrl+Z', photoshopEditor],
     ] },
-];
+  ...require('./shortcut-packs-web-popular'),
+  ...require('./shortcut-packs-web-work'),
+  ...require('./shortcut-packs-web-more'),
+], require('./shortcut-pack-web-workflows'));
 
 const byPack = new Map(webPacks.map((pack) => [pack.id, pack]));
 

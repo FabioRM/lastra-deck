@@ -91,6 +91,7 @@ function editBinding(command, pack, settings) {
   }
   const variant = packKeys(pack, { ...context, shortcutLanguage, shortcutOverrides })
     .find(({ id, action }) => id === command && action?.type === 'hotkey');
+  if (!variant && pack.editing === false) return { unavailable: 'No verified editing shortcut is available in this app.' };
   const chord = variant?.action.keys ?? (command === 'redo' && SHIFT_REDO.has(pack.id) ? 'Ctrl+Shift+Z' : STANDARD_EDITING_CHORDS[command]);
   const mode = pack.editingMode ?? REQUIRED_MODE[pack.id];
   const guard = mode ? packGuard(pack, { ...variant?.action.shortcutGuard, mode }) : variant?.action.shortcutGuard ?? packGuard(pack);

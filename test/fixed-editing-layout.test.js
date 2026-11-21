@@ -2,7 +2,7 @@
 
 const assert = require('node:assert/strict');
 const { test } = require('node:test');
-const { projectEditingPage, projectShortcutGroups, FIXED_EDITING_KEYS } = require('../src/shared/editing-keys');
+const { projectEditingPage, projectShortcutPages, FIXED_EDITING_KEYS } = require('../src/shared/editing-keys');
 const { cells } = require('../src/shared/widget-layout');
 
 test('the default grid has 19 ordinary cells and five fixed cells inside the original 8×3 grid', () => {
@@ -44,7 +44,7 @@ test('compact and wide widget layouts preserve action and widget data during pro
   assert.equal(view.sheets[0].widgets[0].layout.cols, 3);
 });
 
-test('large keys keep authored, grouped, and fixed keys reachable in both orientations', () => {
+test('large keys keep authored, packed, and fixed keys reachable in both orientations', () => {
   const grid = { cols: 8, rows: 3 };
   const slots = Array.from({ length: 24 }, (_, index) => index < 4 ? null
     : { id: 'key-' + index, group: index < 12 ? 'editing' : 'navigation' });
@@ -55,10 +55,11 @@ test('large keys keep authored, grouped, and fixed keys reachable in both orient
   const widgets = ['cpu', 'media'].map((id) => ({ id, stackId: 'stack', layout: { column: 0, row: 0, cols: 4, rows: 1 } }));
   for (const { portrait, cols, rows, capacity } of layouts) {
     const page = projectEditingPage(grid, slots, widgets, portrait, true);
-    const shortcuts = projectShortcutGroups(grid, slots, portrait, true);
+    const shortcuts = projectShortcutPages(grid, slots, portrait, true);
     assert.deepEqual({ cols: page.cols, rows: page.rows, capacity: page.normal }, { cols, rows, capacity });
     assert.deepEqual(page.sheets.find(({ widgets }) => widgets.length).widgets.map(({ id }) => id), ['cpu', 'media']);
-    assert.deepEqual([...new Set(shortcuts.sheets.map(({ group }) => group))], ['Editing', 'Navigation']);
+    assert.deepEqual(shortcuts.sheets.map(({ keys }) => keys.filter(({ index }) => index !== null).length),
+      Array(20 / capacity).fill(capacity));
     for (const view of [page, shortcuts]) {
       assert.deepEqual(view.editing.map(({ id }) => id), FIXED_EDITING_KEYS.map(({ id }) => id));
       const indices = view.sheets.flatMap(({ keys }) => keys.map(({ index }) => index).filter((index) => index !== null));

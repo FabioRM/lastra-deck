@@ -4,6 +4,7 @@
 const path = require('node:path');
 const { createHash } = require('node:crypto');
 const { packFor, groupedPackKeys, isInstalledWebApp } = require('./shortcut-packs');
+const { isExecutableName } = require('./executable-name');
 const { applyShortcutPages } = require('../shared/shortcut-layouts');
 
 const SHORTCUTS = [
@@ -33,8 +34,7 @@ const PACKAGE_NAMES = new Map([['windowscalculator', 'Calculator'], ['windowsnot
 function contextFor(value) {
   const input = typeof value === 'string' ? { executable: value } : value;
   if (input?.shell) return null;
-  const executable = typeof input?.executable === 'string' && /\.exe$/i.test(input.executable)
-    ? input.executable.toLowerCase() : '';
+  const executable = isExecutableName(input?.executable) ? input.executable.trim().toLowerCase() : '';
   const executablePath = typeof input?.path === 'string' ? input.path.toLowerCase() : '';
   const appId = typeof input?.appId === 'string' ? input.appId.toLowerCase() : '';
   if (!appId && (!executable || HOST_EXECUTABLES.has(executable))) return null;
@@ -54,7 +54,7 @@ function displayName(context) {
   const usePackage = packaged && context.appId.includes('!') && (!context.executable || HOST_EXECUTABLES.has(context.executable));
   const known = usePackage ? PACKAGE_NAMES.get(packaged) : DISPLAY_NAMES.get(context.executable);
   if (known) return known;
-  const raw = usePackage ? packaged : path.win32.basename(context.originalName || context.appId, '.exe').replace(/\.exe$/i, '');
+  const raw = usePackage ? packaged : path.win32.basename(context.originalName || context.appId).replace(/\.(?:exe|bin)$/i, '');
   const spaced = raw.replace(/([a-z])([A-Z])/g, '$1 $2').replace(/[_-]+/g, ' ').replace(/[\u0000-\u001f\u007f]/g, '').trim();
   if (!spaced) return 'Foreground app';
   return (spaced[0].toUpperCase() + spaced.slice(1)).slice(0, 48);
@@ -68,7 +68,8 @@ function generatedPage(context, grid, { shortcutLanguage, shortcutOverrides }, p
   }));
   const keys = pack ? groupedPackKeys(pack, { ...context, shortcutLanguage, shortcutOverrides }) : generic().slice(0, grid.cols * grid.rows);
   return { id, name: pack?.name ?? displayName(context), pack: pack?.id,
-    apps: context.executable ? [context.executable] : [], keys: custom ? applyShortcutPages(custom, keys) : keys, widgets: [],
+    apps: context.executable ? [context.executable] : [],
+    keys: custom ? applyShortcutPages(custom, keys) : keys.filter((key) => !key.alternate), widgets: [],
     ...(custom ? { shortcutPages: custom.map(({ id, name }) => ({ id, name })) } : {}),
     generated: true, target: context.identity };
 }

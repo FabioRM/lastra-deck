@@ -26,6 +26,7 @@ contextBridge.exposeInMainWorld('lastra', {
   changeDashboardPomodoro: (command) => ipcRenderer.invoke('dashboard:pomodoro:change', command),
   changeToolsPomodoro: (command) => ipcRenderer.invoke('tools:pomodoro:change', command),
   getToolChoices: () => ipcRenderer.invoke('tools:choices'),
+  setToolChoices: (choices) => ipcRenderer.invoke('tools:choices:set', choices),
   onToolChoices: (callback) => subscribe('tools:choices', callback),
   dashboardAgenda: (command) => ipcRenderer.invoke('dashboard:agenda', command),
   readTimers: () => ipcRenderer.invoke('timers:read'),

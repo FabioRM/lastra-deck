@@ -7,7 +7,7 @@
   const passive = [
     '#dashboard-switch', '#home-page', '#previous', '#next', '#page-count',
     '#page-directory-open', '#page-directory-close', '#page-directory-home', '#page-directory-path button',
-    '#quick-tools-open', '#quick-tools-close', '#quick-tools-feedback', '#quick-tools-desktop', '#pomodoro-break-close',
+    '#quick-tools-open', '#quick-tools-close', '#quick-tools-desktop', '#pomodoro-break-close',
     '#quick-tools-backlight', '#deck-backlight-close', '#deck-backlight-refresh',
     '.widget-decision .widget-action',
     '.page-directory-folder', '.page-directory-row > button:first-child',

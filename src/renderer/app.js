@@ -22,7 +22,7 @@
   const api = window.lastra;
   const { t, set: setLanguage } = window.LastraI18n;
   const measurement = window.LastraPanelMeasurement;
-  const { FIXED_EDITING_KEYS, projectEditingPage, projectShortcutGroups } = window.LastraEditingKeys;
+  const { FIXED_EDITING_KEYS, projectEditingPage, projectShortcutPages } = window.LastraEditingKeys;
   const { projectPage } = window.LastraWidgetLayout;
   const { obsSceneState } = window.LastraLinkedControls;
   const { flowFeedback } = window.LastraFlowFeedback;
@@ -37,7 +37,7 @@
   const stats = document.getElementById('stats-panel');
   const viewSwitch = document.getElementById('dashboard-switch');
   const statusEl = document.getElementById('status');
-  const barStatus = document.getElementById('bar-status');
+  const keyErrorStatus = document.getElementById('key-error-status');
   const confirmationDialog = document.getElementById('key-confirmation');
   const confirmationText = document.getElementById('key-confirmation-text');
   const confirmationCancel = document.getElementById('key-confirmation-cancel');
@@ -49,7 +49,6 @@
   const feedbackSteps = document.getElementById('key-feedback-steps');
   const feedbackStopFlow = document.getElementById('key-feedback-stop-flow');
   const feedbackLabels = { pending: 'Running', success: 'Succeeded', error: 'Failed', unavailable: 'Unavailable', cancelled: 'Stopped' };
-  const feedbackSymbols = { pending: '…', success: '✓', error: '!', unavailable: '—', cancelled: '■' };
   const keyFeedback = new Map();
   const liveKeyParts = new WeakMap();
   // Per key button: { slot, revision, unavailable, targetBound, badge }.
@@ -59,7 +58,6 @@
 
   let profile = null;
   let statusTimer = null;
-  let barStatusTimer;
   let audio = null;
   let obsState;
   let linkedPending = {};
@@ -94,7 +92,6 @@
   let savedView;
   let pendingViewSave = false;
   let pendingNavigation;
-  let lastFeedback;
 
   const quickTools = window.LastraQuickTools.mount({
     api,
@@ -105,7 +102,7 @@
       window.LastraDashboardAudio?.closeOutputPicker();
     },
     actions: {
-      feedback: () => inspectKeyFeedback(lastFeedback),
+      runningFlow: (id) => inspectKeyFeedback(keyFeedback.get(id)),
       backlight: () => window.LastraDisplayBacklight?.open(),
       output() {
         if (!profile?.viewOnly && !window.LastraDashboardAudio?.openOutputPicker()) {
@@ -126,11 +123,12 @@
       visible: Boolean(api && profile && !activeView),
       readOnly: profile?.viewOnly === true,
       revision: profile?.revision,
+      runningFlows: [...keyFeedback].filter(([, entry]) => entry.pending && entry.progress && !entry.unavailable)
+        .map(([id, { label }]) => ({ id, label })),
       clips: profile ? [...profile.slots, ...(profile.bar?.keys ?? [])]
         .filter((key) => key?.sound && !key.confirm && !key.unavailable
           && (key.id.startsWith('bar:') || !profile.targetUnavailable)) : [],
       unavailable: {
-        feedback: lastFeedback ? null : 'No action has run on this page.',
         backlight: api?.readDisplayBacklight ? null : 'Display backlight is unavailable.',
         output: profile?.viewOnly ? 'View-only mode is on.' : api?.getAudioOutputs ? null : 'Audio output selection is unavailable.',
         desktop: profile?.desktopRevealGesture ? null : 'Enable Desktop reveal in the Lastra tray.',
@@ -409,7 +407,7 @@
   function gridSignature() {
     if (signedProfile !== profile) {
       signedProfile = profile;
-      profileSignature = JSON.stringify([window.LastraI18n.language, !api && profile.editorLayout, profile.shortcutGroups, profile.shortcutPages, profile.grid, profile.slots,
+      profileSignature = JSON.stringify([window.LastraI18n.language, !api && profile.editorLayout, profile.shortcutPack, profile.shortcutPages, profile.grid, profile.slots,
         profile.widgets, profile.editingKeys, profile.gestures, profile.viewOnly, profile.page, profile.activity?.active]);
     }
     return profileSignature;
@@ -437,8 +435,8 @@
       if (authoring) {
         const placement = projectPage(profile.grid, profile.slots, profile.widgets ?? [], profile.grid.cols);
         quickLayout = { ...profile.grid, sheets: [placement], editing: [] };
-      } else if (profile.shortcutGroups) {
-        quickLayout = projectShortcutGroups(profile.grid, profile.slots, portrait, large, profile.shortcutPages);
+      } else if (profile.shortcutPack) {
+        quickLayout = projectShortcutPages(profile.grid, profile.slots, portrait, large, profile.shortcutPages);
       } else {
         quickLayout = projectEditingPage(profile.grid, profile.slots, profile.widgets ?? [], portrait, large);
       }
@@ -476,17 +474,19 @@
 
   function showIdleStatus() {
     statusEl.className = '';
-    statusEl.textContent = profile?.targetUnavailable ? window.LastraI18n.t('Bring the target window to the foreground.')
-      : profile ? t('Profile · {name}', { name: profile.name }) : '';
+    if (profile?.targetUnavailable) {
+      statusEl.textContent = t('Bring the target window to the foreground.');
+      return;
+    }
+    const activity = profile?.activity;
+    const activeLabel = activity?.choices.find(({ id }) => id === activity.active)?.label;
+    const name = profile?.name;
+    const duplicate = typeof api?.selectActivity === 'function' && activeLabel
+      && (name === activeLabel || name === t(activeLabel));
+    statusEl.textContent = name && !duplicate ? t('Profile · {name}', { name }) : '';
   }
 
   // ------------------------------------------------------------ keys
-
-  function flash(el, ok) {
-    el.classList.remove('flash-ok', 'flash-err');
-    void el.offsetWidth; // Restart the animation if the key was already flashing.
-    el.classList.add(ok ? 'flash-ok' : 'flash-err');
-  }
 
   function acceptsPress(el, slot) {
     return Boolean(api) && !profile?.viewOnly && !quickTools.open && !changingSheet && el.isConnected && el.getAttribute('aria-disabled') !== 'true'
@@ -506,16 +506,12 @@
   function renderKeyFeedback(entry) {
     const pending = pendingFor(entry);
     const state = entry.unavailable ? 'unavailable' : pending ? 'pending' : entry.last?.state;
-    const progress = state === 'pending' ? entry.progress : undefined;
-    const live = flowFeedback(progress);
-    const label = live.label || (state ? t(feedbackLabels[state]) : '');
-    entry.badge.hidden = !state;
+    const failed = !pending && (state === 'error' || (state === 'unavailable' && entry.last?.state === 'unavailable'));
+    entry.badge.hidden = !failed;
     entry.action.setAttribute('aria-busy', String(pending > 0));
-    if (label) {
+    if (failed) {
       entry.badge.dataset.state = state;
-      entry.badge.toggleAttribute('data-in-progress', Boolean(live.badge));
-      entry.badge.firstElementChild.textContent = live.badge || feedbackSymbols[state];
-      entry.badge.title = `${entry.label} · ${label}`;
+      entry.badge.title = `${entry.label} · ${t(feedbackLabels[state])}`;
       entry.badge.setAttribute('aria-label', t('{name}. Show action details', { name: entry.badge.title }));
     } else delete entry.badge.dataset.state;
     if (inspectedFeedback !== entry) return;
@@ -523,6 +519,9 @@
       closeKeyFeedback();
       return;
     }
+    const progress = state === 'pending' ? entry.progress : undefined;
+    const live = flowFeedback(progress);
+    const label = live.label || t(feedbackLabels[state]);
     feedbackTitle.textContent = entry.label;
     feedbackState.textContent = state === 'pending' && pending > 1 ? t('{label} · One press queued', { label }) : label;
     feedbackStopFlow.hidden = !progress || profile?.viewOnly === true;
@@ -533,10 +532,10 @@
   }
 
   function inspectKeyFeedback(entry) {
-    if (!entry?.badge.dataset.state || feedbackDialog.open || confirmationDialog.open) return;
+    if (!entry || feedbackDialog.open || confirmationDialog.open) return;
     inspectedFeedback = entry;
     renderKeyFeedback(entry);
-    feedbackDialog.showModal();
+    if (inspectedFeedback) feedbackDialog.showModal();
   }
 
   // A revision change clears keyFeedback, so a key that stays mounted registers a fresh entry and
@@ -556,6 +555,7 @@
     badge.className = 'key-feedback';
     const symbol = document.createElement('span');
     symbol.setAttribute('aria-hidden', 'true');
+    symbol.textContent = '×';
     badge.append(symbol);
     cell.append(action, badge);
     mountedKeys.get(action).badge = badge;
@@ -578,26 +578,20 @@
     closeKeyFeedback();
   });
 
-  function keyStatus(slot, message, ok) {
-    if (!slot.id.startsWith('bar:')) {
-      showStatus(message, ok);
-      return;
-    }
-    clearTimeout(barStatusTimer);
-    barStatus.textContent = message;
-    barStatus.classList.toggle('err', !ok);
-    barStatusTimer = setTimeout(() => { barStatus.textContent = ''; }, ok ? STATUS_MS : STATUS_MS * 2);
+  function recordKeyResult(entry, ticket, result, state) {
+    const failed = state === 'error' || state === 'unavailable';
+    const message = result.message || (failed ? 'The action failed.' : '');
+    entry.last = { ...result, state, message, ticket };
+    if (failed) keyErrorStatus.textContent = `${entry.label}: ${t(message)}`;
   }
 
   async function trigger(el, slot, kind, revision, confirmationToken, trace) {
     if (!acceptsPress(el, slot)) return;
-    const page = profile.page;
-    const activity = profile.activity?.active;
     const entry = keyFeedback.get(slot.id);
     const ticket = ++entry.ticket;
     entry.pending++;
+    keyErrorStatus.textContent = '';
     renderKeyFeedback(entry);
-    measurement.painted(trace, 'pending', entry.badge, 'pending');
     let result;
     try {
       result = await api.press(slot.id, kind, revision, confirmationToken, trace);
@@ -612,16 +606,12 @@
     }
     const state = result?.unavailable ? 'unavailable' : result?.cancelled ? 'cancelled' : result?.ok ? 'success' : 'error';
     measurement.outcome(trace, result?.ignored ? 'ignored' : state);
+    const finishedFlow = entry.progress && !entry.pending;
+    if (finishedFlow) entry.progress = undefined;
     if (result && !result.ignored && (!entry.last || ticket > entry.last.ticket)) {
-      const message = result.message || (result.ok ? '' : 'The action failed.');
-      entry.last = { ...result, state, message, ticket };
-      if (page === profile.page && activity === profile.activity?.active) {
-        lastFeedback = entry;
-        renderQuickTools();
-      }
-      if (!result.cancelled) flash(entry.action, result.ok);
-      keyStatus(slot, result.ok ? message || slot.label : `${slot.label}: ${message}`, result.ok || result.cancelled);
+      recordKeyResult(entry, ticket, result, state);
     }
+    if (finishedFlow) renderQuickTools();
     renderKeyFeedback(entry);
     if (entry.last?.ticket === ticket) measurement.painted(trace, 'feedback', entry.badge, state);
     return result;
@@ -642,6 +632,7 @@
 
   async function promptConfirmation(el, slot, revision) {
     if (pendingConfirmation || !acceptsPress(el, slot)) return;
+    keyErrorStatus.textContent = '';
     const prompt = { el, slot, revision };
     const armedAt = performance.now() + PROMPT_ARM_MS;
     pendingConfirmation = prompt;
@@ -668,7 +659,10 @@
     } catch (err) {
       if (pendingConfirmation !== prompt) return;
       closeConfirmation();
-      keyStatus(slot, `${slot.label}: ${err.message}`, false);
+      const entry = keyFeedback.get(slot.id);
+      if (!entry) return;
+      recordKeyResult(entry, ++entry.ticket, { ok: false, message: err.message }, 'error');
+      renderKeyFeedback(entry);
     }
   }
 
@@ -1151,6 +1145,7 @@
       changeQuickSheet(sheet);
       return;
     }
+    if (profile.shortcutPack) return;
     const index = profile.pages.findIndex(({ id }) => id === profile.page);
     const fallback = profile.pages.find(({ id }) => id === profile.manualPage) ?? profile.pages[0];
     selectPage(index < 0 ? fallback : profile.pages[index + offset]);
@@ -1234,6 +1229,7 @@
   function updatePageNavigation() {
     const index = profile.pages.findIndex(({ id }) => id === profile.page);
     const automatic = profile.generatedPage === true;
+    const useProfilePages = !profile.shortcutPack;
     const count = quickLayout?.sheets.length ?? 1;
     const group = quickLayout?.sheets[quickSheet]?.group;
     const part = count > 1 ? [group, t('Keys {index} / {count}', { index: quickSheet + 1, count })].filter(Boolean).join(' · ')
@@ -1243,18 +1239,16 @@
         : ['title', 'app-id', 'executable'].includes(profile.pageMatch?.reason) ? 'Rule' : '');
     pageCount.hidden = !pageCount.textContent;
     pageCount.title = pageCount.textContent;
-    previous.disabled = !api || !(quickSheet > 0 || automatic || index > 0);
-    next.disabled = !api || !(quickSheet + 1 < count || automatic || index < profile.pages.length - 1);
-    previous.hidden = next.hidden = profile.pages.length === 1 && count === 1 && !automatic;
+    previous.disabled = !api || !(quickSheet > 0 || (useProfilePages && (automatic || index > 0)));
+    next.disabled = !api || !(quickSheet + 1 < count || (useProfilePages && (automatic || index < profile.pages.length - 1)));
+    previous.hidden = next.hidden = count === 1 && (!useProfilePages || (profile.pages.length === 1 && !automatic));
   }
 
   function renderProfile(view) {
     if (profile?.activity?.active !== view.activity?.active) closePageDirectory();
     if (profile && view.revision < profile.revision) return;
     closeConfirmation();
-    if (profile?.page !== view.page || profile?.activity?.active !== view.activity?.active || profile?.revision !== view.revision) {
-      lastFeedback = undefined;
-    }
+    if (profile?.page !== view.page || profile?.activity?.active !== view.activity?.active) quickTools.close();
     if (profile?.viewOnly !== view.viewOnly || view.desktopRevealed) quickTools.close();
     if (profile?.revision !== view.revision) {
       closeKeyFeedback();
@@ -1301,7 +1295,7 @@
     showPageMatch(false);
     pageCount.toggleAttribute('data-unavailable', Boolean(view.targetUnavailable));
     home.disabled = !api;
-    directoryOpen.hidden = !api || !view.pageShortcuts;
+    directoryOpen.disabled = !api || !view.pageShortcuts;
     renderPageDirectory();
     lock.hidden = !view.followsApps;
     const lockLabel = t(view.locked ? 'Unlock page' : 'Lock page');
@@ -1501,15 +1495,11 @@
     const key = (id) => keysEl.querySelector(`[data-id="${id}"]`);
     key('terminal')?.classList.add('pressed');
     key('file-explorer')?.classList.add('pressed', 'holding');
-    key('next-track')?.classList.add('flash-ok');
-    key('mic-meet')?.classList.add('flash-err');
-    for (const [id, state] of [['next-track', 'success'], ['mic-meet', 'error']]) {
-      const entry = keyFeedback.get(id);
-      if (!entry) continue;
-      entry.last = { ticket: 0, state };
+    const entry = keyFeedback.get('start-meeting');
+    if (entry) {
+      entry.last = { ticket: 0, state: 'error', message: 'The action failed.' };
       renderKeyFeedback(entry);
     }
-    showStatus('Meet microphone · Windows blocked the shortcut', false);
   }
 
   // ------------------------------------------------------------ startup
@@ -1549,8 +1539,10 @@
     if (profile?.revision !== revision) return;
     const entry = keyFeedback.get(id);
     if (!entry) return;
+    const changed = Boolean(entry.progress) !== Boolean(progress);
     entry.progress = progress;
     renderKeyFeedback(entry);
+    if (changed) renderQuickTools();
   });
   viewSource?.onDeckAppearance?.((appearance) => {
     window.LastraAppearance.applyAppearance(document.documentElement, appearance);

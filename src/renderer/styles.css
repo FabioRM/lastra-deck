@@ -149,6 +149,9 @@ html, body {
 
 #page-app-icon { flex: 0 0 32px; width: 32px; height: 32px; object-fit: contain; align-self: center; }
 .page-label { min-width: 0; }
+#page-nav #page-directory-open { min-width: 0; height: auto; padding: 0; border: 0; background: transparent; text-align: start; }
+#page-nav #page-directory-open:disabled { opacity: 1; }
+#page-directory-open:enabled:hover #page-name { text-decoration: underline; text-underline-offset: .15em; }
 .page-label > span { display: block; text-overflow: ellipsis; overflow: hidden; }
 .page-label > span[hidden] { display: none; }
 #page-name { font-size: calc(33px * var(--text-scale)); font-weight: 600; }
@@ -333,7 +336,7 @@ button:focus-visible, input:focus-visible { outline: 3px solid var(--app); outli
   border: 0;
   border-radius: 13px;
   background: transparent;
-  color: var(--app);
+  color: var(--err);
   cursor: pointer;
   font: 700 calc(19px * var(--text-scale))/1 'Segoe UI', sans-serif;
 }
@@ -347,17 +350,6 @@ button:focus-visible, input:focus-visible { outline: 3px solid var(--app); outli
   border: 1px solid currentColor;
   background: var(--background);
 }
-.key-feedback[data-in-progress] { width: auto; min-width: 44px; padding-inline: 3px; }
-.key-feedback[data-in-progress] span {
-  width: max-content;
-  min-width: 28px;
-  padding-inline: 4px;
-  font-size: calc(13px * var(--text-scale));
-  font-variant-numeric: tabular-nums;
-}
-.key-feedback[data-state='success'] { color: var(--ok); }
-.key-feedback[data-state='error'] { color: var(--err); }
-.key-feedback:is([data-state='unavailable'], [data-state='cancelled']) { color: var(--muted-text); }
 #key-feedback-dialog { max-height: calc(100% - 32px); }
 #key-feedback-state { margin: 8px 0 4px; }
 #key-feedback-message, #key-feedback-steps { margin-bottom: 14px; }
@@ -432,25 +424,6 @@ button:focus-visible, input:focus-visible { outline: 3px solid var(--app); outli
   transition: transform var(--hold-ms) linear;
 }
 
-/* Action feedback */
-.key::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: 22px;
-  pointer-events: none;
-  opacity: 0;
-}
-
-.key.flash-ok::after { box-shadow: inset 0 0 0 3px var(--ok); animation: flash 650ms ease-out forwards; }
-.key.flash-err::after { box-shadow: inset 0 0 0 3px var(--err); animation: flash 1100ms ease-out forwards; }
-
-@keyframes flash {
-  0% { opacity: 1; }
-  60% { opacity: 1; }
-  100% { opacity: 0; }
-}
-
 .slot-empty {
   border-radius: 18px;
   background: var(--recessed-surface);
@@ -479,8 +452,8 @@ button:focus-visible, input:focus-visible { outline: 3px solid var(--app); outli
 #panel:not(.app-mixer-open, .microphone-mixer-open) > .clock { container-type: size; }
 
 #time {
-  --clock-size: 240px;
-  --clock-width-limit: 27cqw;
+  --clock-size: 280px;
+  --clock-width-limit: 32cqw;
   font-family: 'Barlow Condensed', sans-serif;
   font-weight: 300;
   font-size: calc(var(--clock-size) * var(--text-scale));
@@ -490,7 +463,7 @@ button:focus-visible, input:focus-visible { outline: 3px solid var(--app); outli
   white-space: nowrap;
 }
 
-#time:has(.clock-period) { --clock-size: 206px; --clock-width-limit: 23cqw; }
+#time:has(.clock-period) { --clock-size: 236px; --clock-width-limit: 27cqw; }
 #panel:not(.app-mixer-open, .microphone-mixer-open) > .clock #time {
   font-size: min(calc(var(--clock-size) * var(--text-scale)), 109cqh, var(--clock-width-limit));
 }
@@ -502,7 +475,7 @@ button:focus-visible, input:focus-visible { outline: 3px solid var(--app); outli
   justify-items: end;
   min-width: 0;
   padding-block: calc(var(--dashboard-control-size, 76px) + 8px) 7px;
-  font-size: calc(34px * var(--text-scale));
+  font-size: calc(42px * var(--text-scale));
   line-height: 1.15;
   text-align: end;
   overflow-wrap: anywhere;
@@ -522,6 +495,8 @@ button:focus-visible, input:focus-visible { outline: 3px solid var(--app); outli
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+#status:empty { margin-top: 0; min-height: 0; }
 
 #status.ok { color: var(--text); }
 #status.ok::before {
@@ -807,12 +782,11 @@ button:focus-visible, input:focus-visible { outline: 3px solid var(--app); outli
 
 .portrait #panel { grid-row: 1; }
 .portrait #panel > .clock { padding-block-start: calc(var(--dashboard-control-size, 76px) + 12px); }
-.portrait #time { --clock-size: 186px; }
-.portrait #time:has(.clock-period) { --clock-size: 160px; }
-.portrait #panel .when { padding-block-start: 0; font-size: calc(30px * var(--text-scale)); }
+.portrait #time { --clock-size: 218px; }
+.portrait #time:has(.clock-period) { --clock-size: 188px; }
+.portrait #panel .when { padding-block-start: 0; font-size: calc(36px * var(--text-scale)); }
 .portrait .telemetry-reading dd { --telemetry-value-size: 94px; }
 .portrait .telemetry-reading[data-state='unavailable'] dd { --telemetry-value-size: 60px; }
-.portrait #status { margin-top: 14px; }
 .portrait #deck { grid-row: 2; margin-block-start: 26px; }
 #stage.portrait #page-nav { gap: 8px; }
 .portrait #page-nav > button, .portrait .page-actions > button { white-space: nowrap; }
@@ -821,10 +795,7 @@ button:focus-visible, input:focus-visible { outline: 3px solid var(--app); outli
 
 @media (prefers-reduced-motion: reduce) {
   .key { transition: none; }
-  .key.flash-ok::after, .key.flash-err::after { animation-duration: 1ms; animation-delay: 600ms; }
 }
 
-/* Keep the feedback highlights visible in the demo preview. */
-.demo .key.flash-ok::after,
-.demo .key.flash-err::after { animation: none; opacity: 1; }
+/* Keep the hold indicator visible in the demo preview. */
 .demo .key.holding .hold-bar { transition: none; transform: scaleX(0.6); }

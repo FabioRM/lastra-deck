@@ -27,7 +27,7 @@
   function toView(profile, { icon = () => null, image = () => null, unavailable = () => undefined,
     page = profile.pages[0], editingKeys = PREVIEW_EDITING_KEYS, foregroundExecutable = undefined, deduplicateEditing = true } = {}) {
     const grid = page.grid ?? profile.grid;
-    const shortcutGroups = Boolean(page.generated && page.pack);
+    const shortcutPack = Boolean(page.generated && page.pack);
     const resolver = createProfileKeys(profile);
     function effectiveKey(placement, owningPage) {
       try { return resolver.resolve(placement, owningPage); }
@@ -63,8 +63,7 @@
         ...(shortcut ? { shortcut } : {}),
         ...(reason ? { unavailable: reason } : {}),
         ...(key.span ? { span: key.span } : {}),
-        ...(shortcutGroups && !prefix && key.group ? { group: key.group } : {}),
-        ...(shortcutGroups && !prefix && key.shortcutPage ? { shortcutPage: key.shortcutPage } : {}),
+        ...(shortcutPack && !prefix && key.shortcutPage ? { shortcutPage: key.shortcutPage } : {}),
         audio,
         ...(key.controlId ? { controlId: key.controlId } : {}),
         ...(liveSource ? { liveSource } : {}),
@@ -75,7 +74,7 @@
         ...(readout ? { readout } : {}),
       };
     }
-    const slotCount = shortcutGroups ? page.keys.length : grid.cols * grid.rows;
+    const slotCount = shortcutPack ? page.keys.length : grid.cols * grid.rows;
     const slots = Array.from({ length: slotCount }, (_, index) => {
       const key = effectiveKey(page.keys[index], page);
       return deduplicateEditing && duplicateEditingKey(key, editingKeys, { generated: page.generated, executable: foregroundExecutable })
@@ -85,7 +84,7 @@
       icons: Object.fromEntries(compositionIcons(widget.settings.composition).map((name) => [name, icon(name)])) } : widget;
     return {
       name: profile.name, locale: profile.locale, grid, gestures: profile.gestures,
-      ...(shortcutGroups ? { shortcutGroups } : {}),
+      ...(shortcutPack ? { shortcutPack } : {}),
       ...(page.shortcutPages ? { shortcutPages: page.shortcutPages } : {}),
       slots, editingKeys: editingKeys.map((key) => surfaceKey(key)), widgets: (page.widgets ?? []).map(surfaceWidget), bar: {
         keys: (profile.bar?.keys ?? []).map((key) => surfaceKey(effectiveKey(key), 'bar:')),

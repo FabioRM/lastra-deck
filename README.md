@@ -8,7 +8,7 @@ Lastra turns the **CORSAIR XENEON EDGE** into a touchscreen macro deck for Windo
 
 ![Deck Keys toolbar with the Tools, Emoji, and page lock icons](docs/preview-toolbar.png)
 
-Bring an app like Visual Studio Code to the foreground and Deck Keys opens its shortcut page. Create multiple pages, rearrange the commands, and hide the ones you rarely use. [Configure app shortcut pages](docs/shortcut-packs.md#configure-app-shortcut-pages) · [Watch pages switch](docs/preview-shortcuts.gif)
+Bring an app like Visual Studio Code to the foreground and Deck Keys loads its shortcuts. Automatic packs fill the first screen before opening a second. The built-in library covers 342 Windows and installed web apps, with five additional packs for app editions and window variants. You can also create your own pages, rearrange commands, and hide individual keys. [Shortcut packs](docs/shortcut-packs.md) · [Watch pages switch](docs/preview-shortcuts.gif)
 
 [Getting started](#getting-started) · [Tools and Pomodoro](#tools-and-pomodoro) · [Deck views](#deck-views) · [Profile editor](#profile-editor) · [Local MCP integration](#local-mcp-integration) · [License](#license)
 
@@ -27,7 +27,7 @@ Bring an app like Visual Studio Code to the foreground and Deck Keys opens its s
 
 Set the XENEON EDGE to **Extend these displays** in Windows Display settings. The panel runs at 2560 × 720 in landscape and 720 × 2560 in portrait.
 
-**Install the app.** Download `Lastra-Setup-<version>.exe` from the [latest GitHub release](https://github.com/FabioRM/lastra-deck/releases/latest). The installer runs on Windows x64, installs for the current user without administrator rights, and adds Start menu and desktop shortcuts. The initial public installer is unsigned, so Windows SmartScreen may show a warning. The release includes a SHA-256 checksum you can compare with `Get-FileHash .\Lastra-Setup-<version>.exe -Algorithm SHA256` in PowerShell.
+**Install the app.** Download `Lastra-Setup-<version>.exe` from the [latest GitHub release](https://github.com/FabioRM/lastra-deck/releases/latest). The installer runs on Windows x64, installs for the current user without administrator rights, and adds Start menu and desktop shortcuts. The installer is unsigned, so Windows SmartScreen may show a warning. The release includes a SHA-256 checksum you can compare with `Get-FileHash .\Lastra-Setup-<version>.exe -Algorithm SHA256` in PowerShell.
 
 Installed copies download updates from GitHub Releases in the background and install them when Lastra quits. **Lastra → Settings → System → Updates** offers an immediate check and shows when a restart can install the update. Set `LASTRA_DISABLE_UPDATES=1` to turn update checks off. Settings and profiles live in `%APPDATA%\Lastra` and survive updates and uninstalls.
 

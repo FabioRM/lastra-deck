@@ -52,7 +52,8 @@ const { BAR_GRID, catalog: widgetCatalog, cells: widgetCells, occupiedCells, can
 const { captureKeyGroup, placeKeyGroup, findKeyGroupPosition, keyGroupMoves, applyKeyAppearance } = window.LastraKeyGroups;
 const { FIXED_EDITING_KEYS, duplicateEditingKey, projectEditingPage } = window.LastraEditingKeys;
 const { planGridResize } = window.LastraGridResize;
-const { shortcutRows, filterShortcutRows, withShortcutOverride, captureShortcut, shortcutGuardForAction } = window.LastraShortcutLibrary;
+const { shortcutRows, filterShortcutRows, withShortcutOverride, captureShortcut, shortcutGuardForAction,
+  MAX_WEB_APP_MANIFESTS } = window.LastraShortcutLibrary;
 const { MAX_CONTROLS, linkedControl, controlFromKey, linkKey, detachKey,
   clipboardControls, countPlacements, canRepeatTap } = window.LastraLinkedControls;
 const { createMacroResolver, actionValueType } = window.LastraParameterizedMacros;
@@ -800,7 +801,7 @@ function renderShortcutDetail(row) {
     controls.append(open);
   }
   if (copyableShortcut(key)) {
-    if (pack.starterIds) {
+    if (pack.defaultShortcutIds) {
       const reason = packChoice.value === pack.id ? shortcutPageEditor.addStatus(key.id) : undefined;
       const add = button(t('Add to shortcut page'), () => {
         if (packChoice.value !== pack.id) {
@@ -969,7 +970,8 @@ async function showShortcutPacks() {
     ({ packs: availablePacks, icons: packIcons } = await api.shortcutPacks(draft.shortcutLanguage));
     if (!packDialog.open) return;
     catalogRows = shortcutRows(availablePacks);
-    fillShortcutFilter(packChoice, 'All apps', availablePacks.map(({ id, name }) => [id, name]));
+    const apps = [...availablePacks].sort((a, b) => a.name.localeCompare(b.name));
+    fillShortcutFilter(packChoice, 'All apps', apps.map(({ id, name }) => [id, name]));
     fillShortcutFilter(shortcutPlatform, 'All platforms', [...new Set(catalogRows.map(({ platform }) => platform))]
       .sort().map((platform) => [platform, shortcutPlatforms[platform] ?? platform]));
     fillShortcutFilter(shortcutContext, 'All contexts', [...new Set(catalogRows.flatMap(({ contexts }) => contexts))]
@@ -999,7 +1001,9 @@ packWebApp.addEventListener('submit', async (event) => {
     if (!packDialog.open || packChoice.value !== pack || draft !== profile) return;
     const entries = draft.webApps ?? [];
     if (entries.some((entry) => entry.manifestId === match.manifestId)) throw new Error(t('This manifest ID is already attached.'));
-    if (entries.length >= 32) throw new Error(t('The profile can attach up to 32 manifest IDs.'));
+    if (entries.length >= MAX_WEB_APP_MANIFESTS) {
+      throw new Error(t('The profile can attach up to {number} manifest IDs.', { number: MAX_WEB_APP_MANIFESTS }));
+    }
     edit(() => { draft.webApps = [...entries, match]; });
     packWebApp.reset();
     renderShortcutPack();

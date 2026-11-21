@@ -68,11 +68,37 @@ function previewControls(devtools) {
 }
 
 async function openPreviewTools(devtools) {
-  const { click, waitFor } = previewControls(devtools);
+  const { click, waitFor, evaluate } = previewControls(devtools);
   await click('quick-tools-open');
-  await waitFor(`document.getElementById('quick-tools').open
+  await waitFor(`!document.getElementById('quick-tools').hidden
     && document.querySelector('#tools-timers .widget-timer-list li')
     && !document.getElementById('tools-pomodoro-primary')?.disabled`, 'The sample Tools and Pomodoro did not open.');
+  const valid = await evaluate(`(() => {
+    const tools = document.getElementById('quick-tools');
+    const bounds = tools.getBoundingClientRect();
+    const stage = document.getElementById('stage').getBoundingClientRect();
+    const mode = document.getElementById('dashboard-switch').getBoundingClientRect();
+    const close = document.getElementById('quick-tools-close').getBoundingClientRect();
+    const same = (left, right) => ['x', 'y', 'width', 'height'].every(key => Math.abs(left[key] - right[key]) < 1);
+    const gears = [...tools.querySelectorAll('.tools-options-toggle:not([hidden])')];
+    const content = document.getElementById('tools-content');
+    const cards = [...tools.querySelectorAll('.tools-configurable')];
+    const dialog = document.getElementById('tools-options-dialog');
+    const closeOptions = document.getElementById('tools-options-close');
+    return !document.querySelector('dialog[open]') && same(bounds, stage) && same(mode, close)
+      && !tools.querySelector('#page-directory-open, #quick-tools-feedback') && gears.length === 3 && gears.every(gear => {
+        const form = document.getElementById('tools-' + gear.dataset.toolOptions + '-options');
+        const sizes = cards.map(card => card.getBoundingClientRect());
+        const { scrollTop, scrollHeight } = content;
+        gear.click();
+        const unchanged = () => content.scrollTop === scrollTop && content.scrollHeight === scrollHeight
+          && cards.every((card, index) => same(card.getBoundingClientRect(), sizes[index]));
+        const opened = dialog.matches(':modal') && !form.hidden && dialog.scrollHeight <= dialog.clientHeight + 1 && unchanged();
+        closeOptions.click();
+        return opened && !dialog.open && form.hidden && document.activeElement === gear && unchanged();
+      });
+  })()`);
+  if (!valid) throw new Error('Tools must fill the stage, align its close button with the mode switch, and open settings without scrolling or resizing cards.');
 }
 
 async function startPreviewBreak(devtools) {
@@ -89,7 +115,7 @@ async function captureDemo({ devtools, send, directory, width, height, shortcutP
   fs.mkdirSync(directory, { recursive: true });
   const frames = [];
   async function capture(seconds, name = `frame-${String(frames.length).padStart(3, '0')}`) {
-    const file = `${name}.png`;
+    const file = name + '.png';
     await capturePreview(devtools, path.join(directory, file), width, height);
     frames.push({ file, seconds });
   }
@@ -123,11 +149,11 @@ async function captureDemo({ devtools, send, directory, width, height, shortcutP
       await capture(1);
     }
     await click('pomodoro-break-close');
-    await waitFor(`!document.getElementById('pomodoro-break').open && document.getElementById('quick-tools').open`,
+    await waitFor(`!document.getElementById('pomodoro-break').open && !document.getElementById('quick-tools').hidden`,
       'Closing the sample break did not return to Tools.');
     await capture(1.5);
     await click('quick-tools-close');
-    await waitFor(`!document.getElementById('quick-tools').open`, 'Closing the sample Tools did not return to Deck Keys.');
+    await waitFor(`document.getElementById('quick-tools').hidden`, 'Closing the sample Tools did not return to Deck Keys.');
     await capture(0.75);
   } else {
     await capture(1.75);

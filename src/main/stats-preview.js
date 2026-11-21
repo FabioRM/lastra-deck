@@ -26,6 +26,7 @@ function sampleStatsHardware() {
 function inspectStatsLayout() {
   const panel = document.getElementById('stats-panel');
   const grid = document.getElementById('stats-readings');
+  const toolbar = document.getElementById('stats-controls');
   const device = /** @type {HTMLSelectElement} */ (document.getElementById('stats-device'));
   const next = /** @type {HTMLButtonElement} */ (document.getElementById('stats-next'));
   const previous = /** @type {HTMLButtonElement} */ (document.getElementById('stats-prev'));
@@ -69,6 +70,14 @@ function inspectStatsLayout() {
 
   function inspect(label, counts) {
     const viewport = grid.getBoundingClientRect();
+    const options = [...toolbar.querySelectorAll(':scope > :not([hidden]) > :not([hidden])')];
+    const centers = options.map((option) => {
+      const { top, height } = option.getBoundingClientRect();
+      return top + height / 2;
+    });
+    if (!centers.length || Math.max(...centers) - Math.min(...centers) > 1 || toolbar.scrollHeight > toolbar.clientHeight + 1) {
+      throw new Error(label + ' does not fit its controls on one row');
+    }
     if (panel.scrollHeight > panel.clientHeight + 1 || grid.scrollHeight > grid.clientHeight + 1) {
       throw new Error(label + ' requires vertical scrolling');
     }

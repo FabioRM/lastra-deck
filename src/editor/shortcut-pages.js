@@ -14,7 +14,7 @@
     const layout = () => read(pack.id) ?? { enabled: true };
     const current = (pages) => pages?.find(({ id }) => id === selected.get(pack.id)) ?? pages?.[0];
     const newPage = (name, shortcuts = []) => ({ id: crypto.randomUUID(), name, shortcuts });
-    const initialPages = () => [newPage(t('Quick actions'), pack.starterIds.map((id) => ({ id })))];
+    const initialPages = () => [newPage(t('App shortcuts'), pack.defaultShortcutIds.map((id) => ({ id })))];
     const check = (label, checked, handler, className = 'check') => {
       const control = Object.assign(element('input'), { type: 'checkbox', checked });
       control.addEventListener('change', () => handler(control.checked));
@@ -59,7 +59,7 @@
     function render(nextPack, focus) {
       if (pack !== nextPack) status.textContent = '';
       pack = nextPack;
-      root.hidden = !pack?.starterIds;
+      root.hidden = !pack?.defaultShortcutIds;
       if (root.hidden) {
         body.replaceChildren();
         return;
@@ -149,15 +149,16 @@
     function toggleHint(message) { body.append(element('p', 'muted', t(message))); }
 
     function addStatus(keyId) {
-      if (!pack?.starterIds) return;
+      if (!pack?.defaultShortcutIds) return;
       const { pages } = layout();
-      const chosen = current(pages)?.shortcuts ?? pack.starterIds.map((id) => ({ id }));
-      if (chosen.some(({ id }) => id === keyId)) return 'Already on this page';
-      if (chosen.length >= limits.shortcuts) return 'This shortcut page is full.';
+      const duplicate = pages ? current(pages).shortcuts.some(({ id }) => id === keyId) : pack.defaultShortcutIds.includes(keyId);
+      if (duplicate) return 'Already on this page';
+      const count = pages ? pages.reduce((total, page) => total + page.shortcuts.length, 0) : pack.defaultShortcutIds.length;
+      if (count >= limits.shortcuts) return 'This app shortcut layout is full.';
     }
 
     function add(keyId) {
-      if (!pack?.starterIds || addStatus(keyId)) return;
+      if (!pack?.defaultShortcutIds || addStatus(keyId)) return;
       const next = structuredClone(layout());
       next.pages ??= initialPages();
       current(next.pages).shortcuts.push({ id: keyId });

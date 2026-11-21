@@ -7,7 +7,9 @@ const { loadWin32, fn, readProcessPath } = require('./win32');
 const SHELL_HOSTS = new Set(['startmenuexperiencehost.exe', 'shellexperiencehost.exe', 'searchhost.exe', 'searchapp.exe']);
 const DESKTOP_CLASSES = new Set(['Progman', 'WorkerW', 'Shell_TrayWnd', 'Shell_SecondaryTrayWnd']);
 
-function createForegroundReader({ readAppIdentity = () => null, needsTitle = () => false } = {}) {
+/** @param {{ readAppIdentity?: () => any, needsTitle?: () => boolean,
+ *   windowShortcutMode?: ReturnType<typeof import('./window-shortcut-mode').createWindowShortcutMode> }} [options] */
+function createForegroundReader({ readAppIdentity = () => null, needsTitle = () => false, windowShortcutMode } = {}) {
   if (process.platform !== 'win32') return () => null;
   const { koffi, pointerSize } = loadWin32();
   const foreground = fn('GetForegroundWindow');
@@ -74,13 +76,17 @@ function createForegroundReader({ readAppIdentity = () => null, needsTitle = () 
 
   function context({ fresh = false } = {}) {
     const active = activeWindow();
-    if (!active) return null;
+    if (!active) {
+      windowShortcutMode?.read(null);
+      return null;
+    }
     if (!fresh && cached?.id === active.id) {
       const { title, mode: titleMode } = titleContext(active, cached.executable);
       const observed = observeShortcutMode(cached.executable, active, activeWindow, readSurface);
       if (!observed) return null;
       const { keyboardLayout, keyboardHandle } = observed.active;
-      const mode = observed.mode ?? titleMode;
+      const verifiedMode = windowShortcutMode?.read(cached);
+      const mode = observed.mode ?? titleMode ?? verifiedMode;
       if (cached.keyboardHandle !== keyboardHandle || cached.mode !== mode || cached.title !== title) {
         cached = { ...cached, keyboardLayout, keyboardHandle, mode, title };
       }
@@ -106,8 +112,10 @@ function createForegroundReader({ readAppIdentity = () => null, needsTitle = () 
     const observed = observeShortcutMode(executable, current, activeWindow, readSurface);
     if (!observed) return null;
     const { keyboardLayout, keyboardHandle } = observed.active;
-    cached = { id: active.id, windowId: active.windowId, pid: active.pid, keyboardLayout, keyboardHandle,
-      executable, name, path: executablePath.toLowerCase(), appId, shell, mode: observed.mode ?? titleMode, title };
+    const target = { id: active.id, windowId: active.windowId, pid: active.pid, keyboardLayout, keyboardHandle,
+      executable, name, path: executablePath.toLowerCase(), appId, shell, title };
+    const verifiedMode = windowShortcutMode?.read(target);
+    cached = { ...target, mode: observed.mode ?? titleMode ?? verifiedMode };
     return cached;
   }
 
@@ -115,6 +123,7 @@ function createForegroundReader({ readAppIdentity = () => null, needsTitle = () 
     return context()?.executable ?? null;
   }
   readForeground.context = context;
+  readForeground.refreshMode = (target, mode) => windowShortcutMode?.refresh(target, mode);
   readForeground.textTarget = () => {
     const active = activeWindow();
     if (!active) return null;

@@ -2,6 +2,8 @@
 'use strict';
 
 const { CURSOR_AGENTS_MODE } = require('./shortcut-surface');
+const { illustratorKeys, claudeKeys } = require('./shortcut-pack-workflows');
+const { acrobatKeys, afterEffectsKeys, premiereKeys, resolveKeys, lightroomKeys, blenderKeys, figmaKeys } = require('./shortcut-pack-creative-workflows');
 
 // Application defaults only. Commands with a panel or mode requirement remain
 // visible but unavailable until that context is known.
@@ -11,6 +13,7 @@ module.exports = [
       ['find', 'Find', 'search', 'Ctrl+F'],
       ['advanced-search', 'Advanced search', 'file-search', 'Ctrl+Shift+F'],
       ['properties', 'Document properties', 'file-cog', 'Ctrl+D'],
+      ...acrobatKeys,
     ] },
   { id: 'aftereffects', name: 'Adobe After Effects', executables: ['afterfx.exe'],
     source: 'https://helpx.adobe.com/after-effects/desktop/get-started/keyboard-shortcuts/keyboard-shortcuts-reference.html', keys: [
@@ -18,6 +21,7 @@ module.exports = [
       ['import', 'Import files', 'file-up', 'Ctrl+I'],
       ['render-queue', 'Add to render queue', 'list-video', 'Ctrl+Shift+/',
         { usLayout: true, mode: 'a selected composition or project item', notation: 'Ctrl+Shift+/' }],
+      ...afterEffectsKeys,
     ] },
   { id: 'antigravity', name: 'Google Antigravity', executables: ['antigravity.exe'], appIds: ['com.google.antigravity'],
     source: 'https://antigravity.google/docs/getting-started#navigation-shortcuts', keys: [
@@ -49,6 +53,7 @@ module.exports = [
       ['save', 'Save file', 'save', 'Ctrl+S'],
       ['save-as', 'Save as', 'file-plus', 'Ctrl+Shift+S'],
       ['frame-all', 'Frame all', 'maximize', 'Home', { mode: 'the 3D viewport' }],
+      ...blenderKeys,
     ] },
   // The current Windows desktop package hosts ChatGPT, Work and Codex in the same window.
   { id: 'chatgpt-codex', name: 'ChatGPT and Codex', executables: [], appIds: ['openai.codex_2p2nqsd0c76g0!app'],
@@ -73,12 +78,7 @@ module.exports = [
       ['companion', 'Open companion', 'message-circle', 'Alt+Space'],
     ] },
   { id: 'claude', name: 'Claude Desktop', executables: [], appIds: ['claude_pzs8sxrjxfjjc!claude'],
-    source: 'https://code.claude.com/docs/en/desktop#keyboard-shortcuts', keys: [
-      ['new-code-session', 'New Code session', 'message-square-plus', 'Ctrl+N'],
-      ['code-shortcuts', 'Code shortcuts', 'keyboard', 'Ctrl+/'],
-      ['previous-code-session', 'Previous Code session', 'chevron-left', 'Ctrl+Shift+Tab'],
-      ['next-code-session', 'Next Code session', 'chevron-right', 'Ctrl+Tab'],
-    ] },
+    source: 'https://code.claude.com/docs/en/desktop#keyboard-shortcuts', keys: claudeKeys },
   { id: 'cursor', name: 'Cursor', executables: ['cursor.exe'], appIds: ['anysphere.cursor'],
     source: 'https://cursor.com/docs/reference/keyboard-shortcuts', keys: [
       ['palette', 'Command palette', 'command', 'Ctrl+Shift+P'],
@@ -103,10 +103,12 @@ module.exports = [
       ['save', 'Save project', 'save', 'Ctrl+S'],
       ['keyboard', 'Keyboard customization', 'keyboard', 'Ctrl+Alt+K'],
       ['split', 'Split clip', 'scissors', 'Ctrl+B', { mode: 'the Edit timeline' }],
+      ...resolveKeys,
     ] },
   { id: 'figma', name: 'Figma', executables: ['figma.exe'],
     source: 'https://help.figma.com/hc/en-us/articles/23570416033943-Use-the-actions-menu-in-Figma-Design', keys: [
       ['actions', 'Actions', 'command', 'Ctrl+K'],
+      ...figmaKeys,
     ] },
   { id: 'github-desktop', name: 'GitHub Desktop', executables: ['githubdesktop.exe'], appIds: ['com.squirrel.githubdesktop.githubdesktop'],
     source: 'https://docs.github.com/en/desktop/overview/github-desktop-keyboard-shortcuts?platform=windows', keys: [
@@ -126,6 +128,7 @@ module.exports = [
       ['keyboard', 'Keyboard shortcuts', 'keyboard', 'Ctrl+Alt+Shift+K'],
       ['place-file', 'Place file', 'file-input', 'Ctrl+Shift+P'],
       ['save-copy', 'Save a copy', 'copy', 'Ctrl+Alt+S'],
+      ...illustratorKeys,
     ] },
   { id: 'intellij', name: 'IntelliJ IDEA', executables: ['idea64.exe'],
     source: 'https://www.jetbrains.com/help/idea/mastering-keyboard-shortcuts.html', keys: [
@@ -140,6 +143,7 @@ module.exports = [
       ['export', 'Export selected photos', 'image-down', 'Ctrl+Shift+E'],
       ['develop', 'Develop', 'sliders-horizontal', 'D', { mode: 'the photo library' }],
       ['loupe', 'Loupe view', 'scan-eye', 'E', { mode: 'the photo library' }],
+      ...lightroomKeys,
     ] },
   { id: 'notepad', name: 'Windows Notepad', executables: [], appIds: ['microsoft.windowsnotepad_8wekyb3d8bbwe!app'],
     source: 'https://github.com/microsoft/PowerToys/blob/6b3db15615e3e549b89790e0bd83c82d262c22e0/src/modules/ShortcutGuide/ShortcutGuide.Ui/Assets/ShortcutGuide/Manifests/%2BWindowsNT.Notepad.en-US.yml', keys: [
@@ -202,6 +206,7 @@ module.exports = [
       ['save', 'Save project', 'save', 'Ctrl+S'],
       ['import', 'Import media', 'file-up', 'Ctrl+I'],
       ['shortcuts', 'Keyboard shortcuts', 'keyboard', 'Ctrl+Alt+K'],
+      ...premiereKeys,
     ] },
   { id: 'slack', name: 'Slack', executables: ['slack.exe'],
     source: 'https://slack.com/help/articles/201374536-Slack-keyboard-shortcuts', keys: [

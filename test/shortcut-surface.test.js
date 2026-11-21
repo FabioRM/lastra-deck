@@ -74,7 +74,9 @@ test('document and canvas shortcuts stay unavailable in the installed web app ho
     for (const mode of [undefined, 'the app home']) {
       const foreground = { ...context, mode };
       const keys = packKeys(pack, foreground);
-      assert.deepEqual(keys.filter((key) => key.unavailable).map((key) => key.id), guarded, id);
+      const unavailable = keys.filter((key) => key.unavailable);
+      assert.deepEqual(unavailable.filter((key) => !key.group).map((key) => key.id), guarded, id);
+      assert.ok(keys.filter((key) => key.group).every((key) => unavailable.includes(key)), id);
       const fixed = fixedEditingKeys({ shortcutLanguage: 'en-US' }, foreground, { platform: 'win32' });
       assert.equal(fixed.length, 5);
       assert.equal(fixed.every((key) => !key.action), true);
@@ -85,7 +87,7 @@ test('document and canvas shortcuts stay unavailable in the installed web app ho
     const undo = fixedEditingKeys({ shortcutLanguage: 'en-US' }, active, { platform: 'win32' }).find((key) => key.id === 'edit:undo');
     assert.equal(undo.action.shortcutGuard.mode, pack.editingMode, id);
     const preview = previews.find((item) => item.id === id);
-    for (const key of preview.keys.filter((item) => guarded.includes(item.id))) {
+    for (const key of preview.keys.filter((item) => guarded.includes(item.id) || pack.keys.some((row) => row[0] === item.id && row[4]?.group))) {
       const copy = decodeEditorClipboard('key', encodeEditorClipboard('key', key));
       assert.equal(copy.action.shortcutGuard.mode, pack.editingMode, `${id} ${key.id}`);
     }

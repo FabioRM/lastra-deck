@@ -67,7 +67,7 @@
   line-height: 1.12;
 }
 
-#dashboard-switch, #home-page {
+#dashboard-switch, #home-page, #quick-tools-close {
   position: absolute;
   z-index: 1;
   top: var(--pad);

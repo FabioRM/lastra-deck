@@ -14,9 +14,9 @@ Lastra marks system readings as stale after 3 seconds. The stale threshold for L
 
 ## Stats
 
-Use the view switch to cycle **Deck Keys → Dashboard → Stats**. The header shows a clock and short date beside the group tabs. Open a group, then use **Device** to change devices or the arrows to see more readings. In portrait the tabs wrap beside the clock. Comparable charts share a scale and show the latest minute of samples. Cards show the measurement unit and source. A **Cached** card retains the last measured value and opens the original sample time when you select its label. An unavailable sensor shows **N/A**.
+Use the view switch to cycle **Deck Keys → Dashboard → Stats**. The header shows a clock and short date beside the group tabs. **Device** and the reading arrows appear in the same row as **Layout** when available. Swipe that row horizontally on a narrow display. In portrait the tabs wrap beside the clock. Comparable charts share a scale and show the latest minute of samples. Cards show the measurement unit and source. A **Cached** card retains the last measured value and opens the original sample time when you select its label. An unavailable sensor shows **N/A**.
 
-Stats hides unavailable readings by default. Turn on **Show unavailable** to see missing readings and the reason the source could not supply them. Readings explicitly placed in the Overview keep their positions when a sensor goes offline.
+**CPU temperature** remains visible in **Processor** and the default **Overview** when the sensor is unavailable. Turn on **Show unavailable** to see other missing readings and the reason the source could not supply them. Readings explicitly placed in the Overview keep their positions when a sensor goes offline.
 
 The desktop Stats settings list groups unavailable readings at the end in a different color. They can be selected and arranged like any other reading.
 

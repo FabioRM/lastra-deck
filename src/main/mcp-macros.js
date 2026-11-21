@@ -4,6 +4,7 @@
 const { validateProfile } = require('./profile');
 const { packs, packFor } = require('./shortcut-packs');
 const { webPacks } = require('./shortcut-packs-web');
+const { isExecutableName } = require('./executable-name');
 const { shortcutRequirements, shortcutUnavailable, needsShortcutConfirmation } = require('./shortcut-guards');
 const { parseCombo, resolveCombo, mediaKey, VK } = require('./actions/keys');
 const { layouts, mapSampleCharacter } = require('./actions/keyboard-samples');
@@ -67,7 +68,7 @@ function environmentOf(raw = {}) {
   if (foreground !== undefined) {
     allowFields(foreground, inputSchema.properties.environment.properties.foreground.properties, 'foreground sample');
     if ((!foreground.executable && !foreground.appId) || Object.values(foreground).some((value) => typeof value !== 'string' ||
-      !/^\P{Cc}{1,191}$/u.test(value)) || (foreground.executable && !/^[^\\/:*?"<>|]+\.exe$/i.test(foreground.executable))) {
+      !/^\P{Cc}{1,191}$/u.test(value)) || (foreground.executable && !isExecutableName(foreground.executable))) {
       throw new Error('Choose a foreground executable name or Windows app ID.');
     }
   }

@@ -459,6 +459,7 @@
       try {
         const reply = await window.lastra?.changeTimers?.(command);
         if (!reply?.ok) error = reply?.message || 'Timer control unavailable';
+        return reply?.ok === true;
       } catch {
         error = 'Timer control unavailable';
       } finally {
@@ -470,6 +471,10 @@
     render();
     return {
       root: view.root,
+      async startCountdown(label, durationMs) {
+        const ok = await change({ type: 'start', label, durationMs });
+        return ok ? { ok: true } : { ok: false, message: error || 'Timer control unavailable' };
+      },
       setReadOnly(value) { readOnly = value; render(); },
       setVisible(visible) {
         stop?.();

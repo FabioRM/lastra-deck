@@ -44,8 +44,20 @@
 #stats-detail-controls, #stats-pages, #stats-device-choice, #stats-view-options, #stats-layout-control, #stats-history-control, #stats-power-mode {
   display: flex; align-items: center; gap: 10px;
 }
-#stats-detail-controls, #stats-view-options { flex-wrap: wrap; font-size: calc(24px * var(--text-scale)); }
-#stats-view-options { gap: 8px 24px; }
+#stats-controls {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 4px;
+  overflow-x: auto;
+  scrollbar-width: thin;
+  touch-action: pan-x;
+  white-space: nowrap;
+  font-size: calc(24px * var(--text-scale));
+}
+#stats-controls:not(:has(> :not([hidden]))) { display: none; }
+#stats-controls > * { flex: none; }
+#stats-view-options { gap: 24px; }
 .stats-option { display: inline-flex; align-items: center; gap: 10px; min-height: 48px; }
 .stats-option input { width: 24px; height: 24px; accent-color: var(--app); }
 #stats-page-count { min-width: 56px; text-align: center; font-variant-numeric: tabular-nums; }
@@ -187,7 +199,6 @@
   grid-template-columns: repeat(auto-fit, minmax(min(100%, calc(150px * var(--text-scale))), 1fr));
   gap: 6px;
 }
-.portrait #stats-detail-controls { width: 100%; justify-content: space-between; }
 .portrait .stats-group { min-height: 54px; padding-inline: 6px; line-height: 1.05; }
 .portrait :is(#stats-device, #stats-history, #stats-layout, #stats-power-view) { max-width: 325px; min-height: 64px; }
 .portrait #stats-readings:is([data-mode='overview'], [data-mode='details']) {

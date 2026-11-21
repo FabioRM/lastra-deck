@@ -51,16 +51,17 @@
       paint();
     }, { interval: (response) => response.state?.status === 'running' ? 500 : 2000, error: unavailable });
 
-    async function change(type) {
+    async function change(type, fields = {}) {
       if (readOnly || !visible || pending || !state) return;
       pending = true;
       message = '';
       paint();
       try {
-        const result = await api.changeDashboardPomodoro({ type, revision: state.revision });
+        const result = await api.changeDashboardPomodoro({ type, revision: state.revision, ...fields });
         if (result.ok) state = result.state;
-        else message = result.message || unavailable;
-      } catch { message = unavailable; }
+        else message = t(result.message || unavailable);
+        return result.ok;
+      } catch { message = t(unavailable); }
       finally {
         pending = false;
         paint();
@@ -72,6 +73,11 @@
     reset.addEventListener('click', () => void change('reset'));
     document.addEventListener('lastra-language', paint);
     return {
+      get durations() { return state?.durations ?? { focus: 25 * 60_000, break: 5 * 60_000 }; },
+      async configure(durations) {
+        const ok = await change('configure', { durations });
+        return ok ? { ok: true } : { ok: false, message: message || readError || unavailable };
+      },
       setReadOnly(value) { readOnly = value; paint(); },
       setVisible(active) {
         if (visible === active) return;
@@ -93,7 +99,7 @@
     const time = document.getElementById('pomodoro-break-time');
     const progress = document.getElementById('pomodoro-break-progress');
     const paused = document.getElementById('pomodoro-break-paused');
-    const otherDialog = 'dialog[open]:not(#pomodoro-break, #quick-tools)';
+    const otherDialog = 'dialog[open]:not(#pomodoro-break)';
     let active;
     let deadline;
     let dismissed = false;

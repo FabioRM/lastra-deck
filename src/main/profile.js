@@ -17,6 +17,8 @@ const { toView, confirmationMode } = require('../shared/deck-view');
 const { conditionFields, waitFields, repeatFields, choiceFields, randomFields, delayMs, stepPolicy } = require('../shared/action-flow');
 const { keyLayout, occupiedCells, canPlace, cells } = require('../shared/widget-layout');
 const { normalizeWebApp, chromiumWebAppId } = require('./shortcut-packs-web');
+const { isExecutableName } = require('./executable-name');
+const { MAX_WEB_APP_MANIFESTS } = require('../shared/shortcut-library');
 const { READOUTS } = require('../shared/key-readouts');
 const { validShortcutGuard, shortcutNeedsConfirmation } = require('./shortcut-guards');
 const { validateShortcutOverrides } = require('./shortcut-overrides');
@@ -58,13 +60,8 @@ function fail(msg, code) {
 
 const VALID_ID = /^[a-z0-9_-]{1,40}$/i;
 const MAX_PAGES = 16;
-const EXECUTABLE_NAME = /^[^\\/:*?"<>|\x00-\x1f]+\.exe$/i;
 const APP_ID = /^[a-z0-9][a-z0-9._!{}-]{0,190}$/i;
 const WINDOW_TITLE_MODES = new Set(['contains', 'starts-with', 'exact']);
-
-function isExecutableName(value) {
-  return typeof value === 'string' && EXECUTABLE_NAME.test(value.trim());
-}
 
 function checkAction(action, where, depth = 0, step = false, expanded = false, insideRepeat = false) {
   if (!action || typeof action !== 'object' || Array.isArray(action)) fail(`${where}: missing action`);
@@ -271,7 +268,7 @@ function validateWidgets(raw, grid, label, keys = []) {
 
 function validateWebApps(raw) {
   if (raw === undefined) return [];
-  if (!Array.isArray(raw) || raw.length > 32) fail('"webApps" must list up to 32 installed web apps');
+  if (!Array.isArray(raw) || raw.length > MAX_WEB_APP_MANIFESTS) fail(`"webApps" must list up to ${MAX_WEB_APP_MANIFESTS} installed web apps`);
   const seen = new Set();
   return raw.map((entry) => {
     let app;

@@ -1,5 +1,14 @@
 # Lastra changelog
 
+## 0.2.6 · 2026-11-21
+
+- Automatic shortcut packs fill each screen before opening another. The default 8×3 grid fits 19 app shortcuts and five fixed editing keys per screen. New custom layouts start from one compact shortcut list.
+- The shortcut library covers 342 Windows and installed web apps, plus five packs for specific editions or window variants. [Shortcut packs](docs/shortcut-packs.md)
+- Commands that require a specific editor, panel, canvas, or browser app surface check the current Windows focus before sending input.
+- Refine Tools and Pomodoro controls and expand the hardware readings available in Stats.
+
+[Windows downloads](https://github.com/FabioRM/lastra-deck/releases/tag/v0.2.6) · [Project site](https://fabiorm.github.io/lastra-deck/)
+
 ## 0.2.5 · 2026-11-20
 
 - Enlarge the Tools panel and its touch controls. Close it with the red × in the top-right corner.

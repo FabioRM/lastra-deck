@@ -119,10 +119,10 @@
         <button id="next" type="button" aria-label="Next page">›</button>
         <div class="page-current">
           <img id="page-app-icon" alt="" hidden>
-          <div class="page-label">
+          <button id="page-directory-open" class="page-label" type="button" title="Pages" aria-haspopup="dialog" aria-controls="page-directory" disabled>
             <span id="page-name"></span>
             <span id="page-folder" hidden></span>
-          </div>
+          </button>
           <button id="page-count" type="button" aria-label="Why this page?" aria-controls="page-match" aria-expanded="false" hidden></button>
           <p id="page-match" hidden></p>
         </div>
@@ -135,7 +135,7 @@
         </div>
         <div class="page-actions">
           <button id="quick-tools-open" class="dashboard-icon-button" type="button" aria-label="Tools" title="Tools"
-            aria-haspopup="dialog" aria-controls="quick-tools" aria-expanded="false" hidden>
+            aria-controls="quick-tools" aria-expanded="false" hidden>
             <svg class="dashboard-icon" viewBox="0 0 24 24" aria-hidden="true">
               <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.1-3.1a6 6 0 0 1-7.3 7.3l-7.9 7.9a2.1 2.1 0 0 1-3-3l7.9-7.9a6 6 0 0 1 7.3-7.3z"/>
             </svg>
@@ -458,27 +458,29 @@
           <button id="stats-processes-open" type="button" class="stats-group" aria-haspopup="dialog" aria-controls="stats-processes-dialog">Processes</button>
         </nav>
       </header>
-      <div id="stats-view-options" hidden>
-        <label id="stats-layout-control">Layout<select id="stats-layout"></select></label>
-        <label id="stats-power-mode" hidden>Power view
-          <select id="stats-power-view">
-            <option value="combined">Load and watts</option>
-            <option value="separate">Separate readings</option>
-          </select>
-        </label>
-        <label class="stats-option"><input id="stats-show-unavailable" type="checkbox">Show unavailable</label>
-        <label id="stats-history-control" hidden>History
-          <select id="stats-history"><option value="60000">Last minute</option></select>
-        </label>
-      </div>
-      <div id="stats-detail-controls" hidden>
-        <label id="stats-device-choice">Device
-          <select id="stats-device"></select>
-        </label>
-        <div id="stats-pages" role="group" aria-label="Reading pages">
-          <button id="stats-prev" type="button" class="stats-group" aria-label="Previous readings">‹</button>
-          <span id="stats-page-count" aria-live="polite"></span>
-          <button id="stats-next" type="button" class="stats-group" aria-label="Next readings">›</button>
+      <div id="stats-controls">
+        <div id="stats-view-options" hidden>
+          <label id="stats-layout-control">Layout<select id="stats-layout"></select></label>
+          <label id="stats-power-mode" hidden>Power view
+            <select id="stats-power-view">
+              <option value="combined">Load and watts</option>
+              <option value="separate">Separate readings</option>
+            </select>
+          </label>
+          <label class="stats-option"><input id="stats-show-unavailable" type="checkbox">Show unavailable</label>
+          <label id="stats-history-control" hidden>History
+            <select id="stats-history"><option value="60000">Last minute</option></select>
+          </label>
+        </div>
+        <div id="stats-detail-controls" hidden>
+          <label id="stats-device-choice">Device
+            <select id="stats-device"></select>
+          </label>
+          <div id="stats-pages" role="group" aria-label="Reading pages">
+            <button id="stats-prev" type="button" class="stats-group" aria-label="Previous readings">‹</button>
+            <span id="stats-page-count" aria-live="polite"></span>
+            <button id="stats-next" type="button" class="stats-group" aria-label="Next readings">›</button>
+          </div>
         </div>
       </div>
       <p id="stats-message" role="status" hidden></p>
@@ -486,8 +488,76 @@
       <div id="stats-readings" aria-label="Telemetry readings"></div>
     </section>
     <section id="widget-bar" class="lastra-widget-grid" aria-label="Persistent bar" hidden></section>
-    <p id="bar-status" role="status"></p>
+    <p id="key-error-status" class="dashboard-sr-only" role="status"></p>
+    <section id="quick-tools" aria-labelledby="quick-tools-title" hidden>
+      <header class="tools-heading"><h2 id="quick-tools-title">Tools</h2></header>
+      <button id="quick-tools-close" class="dashboard-icon-button" type="button" aria-label="Close Tools" title="Close Tools">
+        <svg class="dashboard-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg>
+      </button>
+      <svg class="dashboard-sr-only" aria-hidden="true">
+        <symbol id="tools-gear" viewBox="0 0 24 24">
+          <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.38a2 2 0 0 0-.73-2.73l-.15-.09a2 2 0 0 1-1-1.74v-.51a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/>
+        </symbol>
+      </svg>
+      <div id="tools-content">
+        <section class="tools-configurable" aria-label="Timers">
+          <div id="tools-timers"></div>
+          <button class="tools-options-toggle" type="button" aria-label="Timer options" title="Timer options" aria-haspopup="dialog" aria-controls="tools-options-dialog" data-tool-options="timer">
+            <svg class="dashboard-icon" aria-hidden="true"><use href="#tools-gear"/></svg>
+          </button>
+        </section>
+        <div class="tools-column">
+          <section class="tools-configurable" aria-label="Pomodoro">
+            <div id="tools-pomodoro" hidden></div>
+            <button class="tools-options-toggle" type="button" aria-label="Pomodoro options" title="Pomodoro options" aria-haspopup="dialog" aria-controls="tools-options-dialog" data-tool-options="pomodoro" hidden>
+              <svg class="dashboard-icon" aria-hidden="true"><use href="#tools-gear"/></svg>
+            </button>
+          </section>
+          <section id="tools-decisions" class="tools-card tools-configurable" aria-label="Quick decision">
+            <div id="tools-decision-card"></div>
+            <button class="tools-options-toggle" type="button" aria-label="Quick decision options" title="Quick decision options" aria-haspopup="dialog" aria-controls="tools-options-dialog" data-tool-options="decision">
+              <svg class="dashboard-icon" aria-hidden="true"><use href="#tools-gear"/></svg>
+            </button>
+          </section>
+        </div>
+        <section id="tools-soundboard" class="tools-card" aria-labelledby="tools-soundboard-title">
+          <h3 id="tools-soundboard-title">Soundboard</h3>
+          <p id="tools-sound-state" role="status"></p>
+          <div id="tools-sound-clips"></div>
+          <button id="tools-sound-stop" type="button" disabled>Stop all sounds</button>
+        </section>
+        <section id="quick-tools-actions" class="tools-card" aria-labelledby="tools-controls-title">
+          <h3 id="tools-controls-title">Deck controls</h3>
+          <button id="app-views-tab" data-tool-dismiss type="button" aria-controls="app-views-panel" aria-expanded="false">Apps</button>
+          <div id="quick-tools-running-flows"></div>
+          <button type="button" id="quick-tools-output" data-quick-tool="output">Audio output<small hidden></small></button>
+          <button type="button" id="quick-tools-backlight" data-quick-tool="backlight">Display backlight<small hidden></small></button>
+          <button type="button" id="quick-tools-desktop" data-quick-tool="desktop">Reveal desktop<small hidden></small></button>
+        </section>
+      </div>
+    </section>
   </main>
+  <dialog id="tools-options-dialog" aria-labelledby="tools-options-title" closedby="closerequest">
+    <header>
+      <h2 id="tools-options-title"></h2>
+      <button id="tools-options-close" type="button" autofocus>Close</button>
+    </header>
+    <form id="tools-timer-options" class="tools-options" hidden>
+      <label>Timer name<input name="label" maxlength="40"></label>
+      <label>Minutes<input name="minutes" type="number" min="1" max="1440" value="5" required></label>
+      <button type="submit">Start countdown</button>
+    </form>
+    <form id="tools-pomodoro-options" class="tools-options" hidden>
+      <label>Focus minutes<input name="focus" type="number" min="1" max="1440" required></label>
+      <label>Break minutes<input name="break" type="number" min="1" max="1440" required></label>
+      <button type="submit">Save durations</button>
+    </form>
+    <form id="tools-decision-options" class="tools-options" hidden>
+      <label>Quick decision pick list<textarea name="choices" rows="4" maxlength="600" required></textarea></label>
+      <button type="submit">Save pick list</button>
+    </form>
+    <p id="tools-options-status" role="status"></p>
+  </dialog>
   <dialog id="windows-session-cover" aria-labelledby="windows-session-message">
     <p id="windows-session-message">Windows session locked or suspended</p>
   </dialog>
@@ -506,38 +576,6 @@
     <nav id="page-directory-path" aria-label="Folder path" hidden></nav>
     <div id="page-directory-list"></div>
     <p id="page-directory-error" role="status"></p>
-  </dialog>
-  <dialog id="quick-tools" aria-labelledby="quick-tools-title" closedby="any">
-    <header class="tools-heading">
-      <h2 id="quick-tools-title">Tools</h2>
-      <button id="quick-tools-close" class="tools-dismiss" type="button" aria-label="Close Tools" title="Close Tools" autofocus>
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg>
-      </button>
-    </header>
-    <div id="tools-content">
-      <div id="tools-timers"></div>
-      <div class="tools-column">
-        <section id="tools-pomodoro" aria-label="Pomodoro" hidden></section>
-        <section id="tools-decisions" class="tools-card" aria-label="Quick decision">
-          <div id="tools-decision-card"></div>
-        </section>
-      </div>
-      <section id="tools-soundboard" class="tools-card" aria-labelledby="tools-soundboard-title">
-        <h3 id="tools-soundboard-title">Soundboard</h3>
-        <p id="tools-sound-state" role="status"></p>
-        <div id="tools-sound-clips"></div>
-        <button id="tools-sound-stop" type="button" disabled>Stop all sounds</button>
-      </section>
-      <section id="quick-tools-actions" class="tools-card" aria-labelledby="tools-controls-title">
-        <h3 id="tools-controls-title">Deck controls</h3>
-        <button id="page-directory-open" data-tool-dismiss type="button" aria-haspopup="dialog" aria-controls="page-directory" hidden>Pages</button>
-        <button id="app-views-tab" data-tool-dismiss type="button" aria-controls="app-views-panel" aria-expanded="false">Apps</button>
-        <button type="button" id="quick-tools-feedback" data-quick-tool="feedback">Last action<small hidden></small></button>
-        <button type="button" id="quick-tools-output" data-quick-tool="output">Audio output<small hidden></small></button>
-        <button type="button" id="quick-tools-backlight" data-quick-tool="backlight">Display backlight<small hidden></small></button>
-        <button type="button" id="quick-tools-desktop" data-quick-tool="desktop">Reveal desktop<small hidden></small></button>
-      </section>
-    </div>
   </dialog>
   <dialog id="pomodoro-break" aria-labelledby="pomodoro-break-title" closedby="closerequest">
     <button id="pomodoro-break-close" class="tools-dismiss" type="button" aria-label="Close full-screen break"

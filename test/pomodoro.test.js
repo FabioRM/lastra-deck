@@ -107,6 +107,29 @@ test('bad persistence does not start or mutate a round, and view-only still read
   assert.equal(deckRequestAllowed('dashboard:pomodoro:change', { type: 'start' }), false);
 });
 
+test('Pomodoro durations persist without changing the active round or its deadline', (t) => {
+  const { create, elapsed, file } = fixture(t);
+  fs.writeFileSync(file, JSON.stringify({ version: 1, phase: 'focus', status: 'idle', remainingMs: FOCUS, deadlineAt: null, revision: 0 }));
+  const timer = create();
+  apply(timer, 'start');
+  elapsed(30_000);
+  const deadline = JSON.parse(fs.readFileSync(file, 'utf8')).deadlineAt;
+  const durations = { focus: 40 * 60_000, break: 8 * 60_000 };
+  const changed = timer.change({ type: 'configure', revision: timer.snapshot().revision, durations });
+  assert.deepEqual(changed.durations, durations);
+  assert.equal(changed.durationMs, FOCUS);
+  assert.equal(changed.remainingMs, FOCUS - 30_000);
+  assert.equal(JSON.parse(fs.readFileSync(file, 'utf8')).deadlineAt, deadline);
+  assert.throws(() => timer.change({ type: 'configure', revision: changed.revision, durations: { ...durations, break: '60000' } }), /whole/);
+  timer.close();
+  assert.deepEqual(create().snapshot(), changed);
+  const restored = create();
+  elapsed(FOCUS - 30_000);
+  assert.equal(apply(restored, 'start').remainingMs, durations.break);
+  assert.equal(apply(restored, 'reset').durationMs, durations.break);
+  assert.equal(deckRequestAllowed('tools:choices:set', ['Tea', 'Coffee']), false);
+});
+
 test('Pomodoro reports break start, pause, resume and completion to the deck', async (t) => {
   const { create, elapsed, wallJump } = fixture(t);
   const states = [];

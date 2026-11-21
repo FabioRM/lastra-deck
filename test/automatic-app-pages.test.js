@@ -272,21 +272,21 @@ test('the stock profile uses the actual browser and VS Code packs, and customise
   assert.equal(pages.current(stock).id, 'home');
 });
 
-test('automatic shortcut packs expose guarded groups after quick actions and keep the five fixed positions', () => {
+test('automatic shortcut packs fill available cells and keep guarded keys and the five fixed positions', () => {
   const stock = validateProfile(require('../profiles/default.json'));
   const pages = new Pages();
   pages.observe({ executable: 'chrome.exe', windowId: 1n });
   const page = pages.current(stock);
   const view = toView(stock, { page });
-  assert.equal(view.shortcutGroups, true);
+  assert.equal(view.shortcutPack, true);
   for (const portrait of [false, true]) {
     const { sheets, editing, grid } = describeLayoutView(view, page.id, portrait);
-    assert.deepEqual(sheets.map(({ group }) => group), ['Quick actions', 'Tabs', 'Navigation']);
+    const visible = view.slots.filter(Boolean);
+    assert.equal(sheets.length, 1);
     assert.equal(sheets[0].keys[0].id, 'new-tab');
-    const reviewed = sheets.slice(1).flatMap((sheet) => sheet.keys);
-    assert.equal(new Set(reviewed.map(({ id }) => id)).size, reviewed.length);
-    assert.ok(reviewed.every(({ id }) => page.keys.find((key) => key.id === id).action.shortcutGuard.pack === 'chrome'));
-    assert.ok(sheets.every(({ keys }) => keys.length <= 19));
+    assert.deepEqual(sheets[0].keys.map(({ id }) => id), visible.map(({ id }) => id));
+    assert.ok(sheets[0].keys.some(({ id }) => id.startsWith('catalog-')));
+    assert.ok(page.keys.every(({ action }) => action.shortcutGuard.pack === 'chrome'));
     assert.deepEqual(editing.map(({ layout }) => [layout.column, layout.row]),
       [0, 1, 2, 3, 4].map((offset) => [grid.cols - 5 + offset, grid.rows - 1]));
   }

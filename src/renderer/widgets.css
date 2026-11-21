@@ -29,22 +29,6 @@
 .portrait #widget-bar .key .label { font-size: calc(18px * var(--text-scale)); }
 .portrait #widget-bar .key .glyph :is(img, svg) { width: 30px; height: 30px; }
 
-#bar-status {
-  position: absolute;
-  z-index: 2;
-  inset-inline-start: var(--pad);
-  inset-block-end: calc(var(--pad) + 114px);
-  max-width: calc(100% - var(--pad) * 2);
-  padding: 8px 14px;
-  border: 1px solid var(--control-border);
-  border-radius: 10px;
-  background: var(--background);
-  color: var(--text);
-  font: 500 calc(23px * var(--text-scale)) 'Barlow Semi Condensed', sans-serif;
-}
-#bar-status:empty { display: none; }
-#bar-status.err { color: var(--err); border-color: var(--error-border); }
-
 .lastra-widget {
   container-type: inline-size;
   background: var(--panel-surface);

@@ -37,6 +37,16 @@ function shortcutRequirements(rule, { build = WINDOWS_BUILD, keyboardLayout, mod
   if (rule.language && rule.language !== shortcutLanguage) return `Requires Office shortcut language ${rule.language}.`;
 }
 
+/** Copies made before an editor mode was added still use the original starter chord. */
+function requiredShortcutMode(rule, activePack, keys) {
+  if (rule.mode) return rule.mode;
+  const chord = typeof keys === 'string' ? keys.toLowerCase().replace(/\s/g, '') : '';
+  if (chord && activePack?.editingMode && activePack.keys.some(([, , , starter, requirements]) =>
+    requirements?.mode === activePack.editingMode && typeof starter === 'string' && starter.toLowerCase() === chord)) {
+    return activePack.editingMode;
+  }
+}
+
 /**
  * @param {any} rule A validated shortcut guard.
  * @param {{ platform?: string, activePack?: any, context?: any, shortcutLanguage?: string, build?: number, keys?: unknown }} [target]
@@ -48,12 +58,8 @@ function shortcutUnavailable(rule, { platform = process.platform, activePack, co
     return rule.platform === 'web' ? `Bring the verified ${rule.application} web app to the foreground.`
       : `Bring ${rule.application} to the foreground.`;
   }
-  // Copies made before an editor mode was added still use the original starter chord.
-  const chord = typeof keys === 'string' ? keys.toLowerCase().replace(/\s/g, '') : '';
-  const legacyMode = !rule.mode && chord && activePack.editingMode && activePack.keys.some(([, , , starter, requirements]) =>
-    requirements?.mode === activePack.editingMode && typeof starter === 'string' && starter.toLowerCase() === chord)
-    ? activePack.editingMode : undefined;
-  return shortcutRequirements(legacyMode ? { ...rule, mode: legacyMode } : rule,
+  const mode = requiredShortcutMode(rule, activePack, keys);
+  return shortcutRequirements(mode !== rule.mode ? { ...rule, mode } : rule,
     { keyboardLayout: context.keyboardLayout, mode: context.mode, shortcutLanguage, build });
 }
 
@@ -96,5 +102,5 @@ function needsShortcutConfirmation(id, keys) {
   return chord.includes('shift') && (chord.includes('delete') || chord.includes('del'));
 }
 
-module.exports = { US_LAYOUT, validShortcutGuard, shortcutRequirements, shortcutUnavailable, hasShortcutRule,
+module.exports = { US_LAYOUT, validShortcutGuard, shortcutRequirements, requiredShortcutMode, shortcutUnavailable, hasShortcutRule,
   needsShortcutConfirmation, shortcutNeedsConfirmation, actionNeedsShortcutTarget, sameShortcutWindow };

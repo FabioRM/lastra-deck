@@ -11,18 +11,17 @@ test('one PowerShell process answers several scripts in turn, with per-request e
   const { spawn } = require('node:child_process');
   const worker = new PowerShellWorker({ spawnImpl: (...args) => { spawned++; return spawn(...args); } });
   t.after(() => worker.dispose());
-  const run = (script, options) => worker.run(script, { timeout: 20_000, ...options });
   const [a, b] = await Promise.all([
-    run("[PSCustomObject]@{ n = 1 + 1 } | ConvertTo-Json -Compress"),
-    run('"host=$env:LASTRA_TEST_VALUE"', { env: { LASTRA_TEST_VALUE: 'déjà vu' } }),
+    worker.run("[PSCustomObject]@{ n = 1 + 1 } | ConvertTo-Json -Compress"),
+    worker.run('"host=$env:LASTRA_TEST_VALUE"', { env: { LASTRA_TEST_VALUE: 'déjà vu' } }),
   ]);
   assert.deepEqual(JSON.parse(a), { n: 2 });
   assert.equal(b.trim(), 'host=déjà vu');
-  assert.equal((await run('"[$env:LASTRA_TEST_VALUE]"')).trim(), '[]');
+  assert.equal((await worker.run('"[$env:LASTRA_TEST_VALUE]"')).trim(), '[]');
   // A script that changes its error preference does not affect the next one.
-  await run("$ErrorActionPreference = 'SilentlyContinue'; Get-Item 'C:\\definitely\\missing' | Out-Null; 'ok'");
-  await assert.rejects(run("throw 'No echo reply'"), /No echo reply/);
-  assert.equal((await run("'still running'")).trim(), 'still running');
+  await worker.run("$ErrorActionPreference = 'SilentlyContinue'; Get-Item 'C:\\definitely\\missing' | Out-Null; 'ok'");
+  await assert.rejects(worker.run("throw 'No echo reply'"), /No echo reply/);
+  assert.equal((await worker.run("'still running'")).trim(), 'still running');
   assert.equal(spawned, 1);
 });
 
@@ -32,7 +31,7 @@ test('a script that hangs is stopped and the next request gets a fresh process',
   const worker = new PowerShellWorker({ spawnImpl: (...args) => { spawned++; return spawn(...args); } });
   t.after(() => worker.dispose());
   await assert.rejects(worker.run('Start-Sleep -Seconds 30', { timeout: 1_500 }), /did not answer in time/);
-  assert.equal((await worker.run("'recovered'", { timeout: 20_000 })).trim(), 'recovered');
+  assert.equal((await worker.run("'recovered'")).trim(), 'recovered');
   assert.equal(spawned, 2);
 });
 

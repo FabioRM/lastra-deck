@@ -67,7 +67,67 @@ test('hidden packs fall back safely and custom pages work in explicitly configur
   assert.throws(() => validateProfile({ ...raw, shortcutLayouts: { chrome: { enabled: true, pages: [{ ...tabs, shortcuts: [
     { id: 'new-tab', action: { type: 'launch', target: 'other.exe' } },
   ] }] } } }), /shortcut/);
-  assert.ok(previewPacks('en-US').find(({ id }) => id === 'chrome').starterIds.includes('new-tab'));
+  assert.ok(previewPacks('en-US').find(({ id }) => id === 'chrome').defaultShortcutIds.includes('new-tab'));
+});
+
+test('customizing a compact pack preserves its default keys and fills each screen before adding another', () => {
+  const library = previewPacks('en-US');
+  const samples = [
+    { id: 'illustrator', executable: 'illustrator.exe', sizes: [19, 19, 19, 19, 19, 19, 10] },
+    { id: 'claude', executable: 'claude.exe', appId: 'claude_pzs8sxrjxfjjc!claude', sizes: [19, 16] },
+    { id: 'chrome', executable: 'chrome.exe' },
+    { id: 'obs-studio', executable: 'obs64.exe' },
+  ];
+  for (const { id, executable, appId, sizes } of samples) {
+    const context = { executable, appId, windowId: 15n, keyboardLayout: 0x04090409 };
+    const baseline = validateProfile({ pages: raw.pages, shortcutLanguage: 'en-US' });
+    const pack = library.find((entry) => entry.id === id);
+    const pages = [{ id: 'customized', name: 'App shortcuts', shortcuts: pack.defaultShortcutIds.map((id) => ({ id })) }];
+    const automaticPage = select(baseline, context);
+    const automaticView = toView(baseline, { page: automaticPage });
+    assert.deepEqual(pack.defaultShortcutIds, automaticView.slots.filter(Boolean).map(({ id }) => id));
+    const customized = validateProfile({ ...baseline, shortcutLayouts: { [id]: { enabled: true, pages } } });
+    const customizedPage = select(customized, context);
+    for (const portrait of [false, true]) {
+      const automatic = describeLayoutView(automaticView, automaticPage.id, portrait);
+      const custom = describeLayoutView(toView(customized, { page: customizedPage }), customizedPage.id, portrait);
+      assert.deepEqual(custom.sheets.map(({ keys }) => keys.map(({ id }) => id.split(':').at(-1))),
+        automatic.sheets.map(({ keys }) => keys.map(({ id }) => id)));
+      if (sizes) assert.deepEqual(automatic.sheets.map(({ keys }) => keys.length), sizes);
+    }
+    if (id === 'claude') {
+      const alternateId = 'previous-session-bracket';
+      assert.ok(pack.keys.find(({ id: keyId }) => keyId === alternateId)?.action);
+      assert.ok(!automaticPage.keys.some(({ id: keyId }) => keyId === alternateId));
+      const saved = validateProfile({ ...baseline, shortcutLayouts: { claude: { enabled: true, pages: [
+        { id: 'sessions', name: 'Sessions', shortcuts: [{ id: alternateId }] },
+      ] } } });
+      assert.equal(select(saved, context).keys[0].action.keys, 'Ctrl+Shift+char:[');
+    }
+  }
+});
+
+test('expanded bundles add guarded native and web pages alongside their original quick actions', () => {
+  const catalog = new Map(previewPacks('en-US').map((pack) => [pack.id, pack]));
+  const fixtures = [
+    ['slack', 'Views and conversations', 'slack-threads', 'Ctrl+Shift+T'],
+    ['notion', 'Page editor and blocks', 'move-block-up', 'Ctrl+Shift+Up'],
+    ['excel', 'Data and charts', 'chart-sheet', 'F11'],
+    ['gdocs', 'Review and document tools', 'word-count', 'Ctrl+Shift+C'],
+  ];
+  for (const [id, group, shortcut, chord] of fixtures) {
+    const pack = catalog.get(id);
+    const key = pack.keys.find((item) => item.id === shortcut);
+    assert.ok(pack.defaultShortcutIds.includes(shortcut));
+    assert.equal(key.group, group);
+    assert.equal(key.action.shortcutGuard.pack, id);
+    assert.equal(key.action.keys, chord);
+  }
+  const wordCount = catalog.get('gdocs').keys.find(({ id }) => id === 'word-count');
+  assert.equal(wordCount.action.shortcutGuard.mode, 'the Google Docs document editor');
+  assert.match(wordCount.unavailable, /Google Docs document editor/);
+  const participants = catalog.get('zoom').keys.find(({ id }) => id === 'participants');
+  assert.equal(participants.action.shortcutGuard.mode, 'a Zoom meeting');
 });
 
 test('MCP draft edits atomically validate app shortcut page settings and preserve revision guards', () => {

@@ -10,7 +10,7 @@ const { WAIT_CONDITIONS, MAX_REPEAT_STEPS, CHOICE_LIMIT, RANDOM_LIMIT, condition
 const { timerFields } = require('../../shared/timers');
 const { soundFields } = require('../../shared/sounds');
 const { packFor } = require('../shortcut-packs');
-const { actionNeedsShortcutTarget, shortcutUnavailable, sameShortcutWindow } = require('../shortcut-guards');
+const { actionNeedsShortcutTarget, requiredShortcutMode, shortcutUnavailable, sameShortcutWindow } = require('../shortcut-guards');
 
 const MAX_DEPTH = 3;
 const MAX_STEPS = 20;
@@ -351,6 +351,14 @@ function createActionRunner({ shell, spawn, input, audio, toggleSpotify, selectO
       case 'hotkey': {
         verifyForeground(action, pageApps);
         const keys = parseCombo(action.keys);
+        const rule = action.shortcutGuard;
+        const mode = rule?.mode ?? (rule?.platform === 'web'
+          ? requiredShortcutMode(rule, packFor(shortcutTarget, readShortcutSettings().webApps), action.keys) : undefined);
+        const recheck = mode && readForeground?.refreshMode?.(shortcutTarget, mode);
+        if (recheck) {
+          if (!await recheck) throw new ActionTargetChanged('Requires ' + mode + '.');
+          checkCancellation?.();
+        }
         verifyTarget();
         const target = verifyShortcut(action, shortcutTarget);
         const layout = targetLayout(target);

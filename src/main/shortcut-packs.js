@@ -7,6 +7,8 @@ const { webPacks, installedWebPack, isInstalledWebApp } = require('./shortcut-pa
 const { PHOTOSHOP_EXECUTABLES } = require('./shortcut-surface');
 const { US_LAYOUT, shortcutRequirements, needsShortcutConfirmation } = require('./shortcut-guards');
 const { annotateShortcut } = require('./shortcut-overrides');
+const { withShortcutWorkflows } = require('./shortcut-pack-data');
+const { FIXED_EDITING_KEYS, duplicateEditingKey } = require('../shared/editing-keys');
 const { withShortcutOverride, shortcutGuardForAction } = require('../shared/shortcut-library');
 
 const MANIFEST_REVISION = '6b3db15615e3e549b89790e0bd83c82d262c22e0';
@@ -29,7 +31,8 @@ const browserKeys = (previous, next) => [
   ['close-tab', 'Close tab', 'x', 'Ctrl+W', { confirm: true }],
 ];
 
-const packs = [
+/** @type {import('./shortcut-pack-data').ShortcutPack[]} */
+const packs = withShortcutWorkflows([
   { id: 'photoshop', name: 'Adobe Photoshop', executables: PHOTOSHOP_EXECUTABLES, previewMode: photoshop.mode,
     source: 'https://helpx.adobe.com/content/dam/help/en/photoshop/using/default-keyboard-shortcuts/photoshop-keyboard-shortcuts.pdf', keys: [
     ['layer-copy', 'Layer via copy', 'layers-2', 'Ctrl+J', photoshop],
@@ -161,11 +164,26 @@ const packs = [
     ['repeat', 'Repeat', 'repeat', 'Ctrl+R'],
   ] },
   ...desktopPacks,
-];
+  ...require('./shortcut-packs-office'),
+  ...require('./shortcut-packs-creative'),
+  ...require('./shortcut-packs-development'),
+  ...require('./shortcut-packs-utilities'),
+  ...require('./shortcut-packs-design'),
+  ...require('./shortcut-packs-technical'),
+  ...require('./shortcut-packs-windows-utilities'),
+  ...require('./shortcut-packs-desktop-more'),
+  ...require('./shortcut-packs-authoring'),
+], {
+  ...require('./shortcut-pack-communication'),
+  ...require('./shortcut-pack-productivity'),
+  ...require('./shortcut-pack-jetbrains'),
+  ...require('./shortcut-pack-authoring-workflows'),
+});
 
 const byExecutable = new Map(packs.filter(({ windowMode }) => !windowMode).flatMap((pack) => pack.executables.map((exe) => [exe, pack])));
 const byAppId = new Map(packs.flatMap((pack) => (pack.appIds ?? []).map((id) => [id, pack])));
 const windowPacks = packs.filter(({ windowMode }) => windowMode);
+const versionedPacks = packs.filter(({ executablePattern }) => executablePattern);
 
 function packFor(context, webApps) {
   if (!context || context.shell) return null;
@@ -173,7 +191,8 @@ function packFor(context, webApps) {
   if (isInstalledWebApp(context)) return installedWebPack(context, webApps);
   const windowPack = windowPacks.find(({ executables, windowMode }) => windowMode === context.mode && executables.includes(context.executable));
   if (windowPack) return windowPack;
-  const pack = byAppId.get(context.appId) ?? byExecutable.get(context.executable);
+  const pack = byAppId.get(context.appId) ?? byExecutable.get(context.executable)
+    ?? versionedPacks.find(({ executablePattern }) => executablePattern.test(context.executable ?? ''));
   if (!pack || (pack.pathContains && !context.path?.includes(pack.pathContains))) return null;
   return pack;
 }
@@ -205,6 +224,10 @@ function starterPackKeys(pack, { build, keyboardLayout, mode, shortcutLanguage }
       id, label, icon, category: requirements?.spotify ? 'media' : 'app',
       ...(source ? { source } : {}),
       ...(requirements?.notation ? { notation: requirements.notation } : {}),
+      ...(requirements?.group ? { group: requirements.group } : {}),
+      ...(requirements?.alternate ? { alternate: true } : {}),
+      ...(requirements?.context || requirements?.group
+        ? { contexts: [requirements?.group, requirements?.context].filter(Boolean) } : {}),
       action: requirements?.spotify ? { type: 'spotify-playback', shortcutGuard } : {
         type: 'hotkey', keys, shortcutGuard,
         ...(requirements?.notation ? { notation: requirements.notation } : {}),
@@ -278,6 +301,16 @@ function reviewedPackKeys(pack, owner, starter, shortcutLanguage) {
   });
 }
 
+function reviewedExtras(reviewed, starterCount) {
+  return reviewed.slice(starterCount).filter((key) => shortcutGuardForAction(key.action));
+}
+
+function defaultShortcutIds(starter, reviewed) {
+  return [...starter, ...reviewedExtras(reviewed, starter.length)]
+    .filter((key) => !key.alternate && !duplicateEditingKey(key, FIXED_EDITING_KEYS, { generated: true }))
+    .map(({ id }) => id);
+}
+
 function previewPacks(shortcutLanguage) {
   const covered = new Set();
   const builtIn = packs.map((pack) => {
@@ -285,9 +318,10 @@ function previewPacks(shortcutLanguage) {
     const owner = catalogOwner(pack);
     covered.add(owner);
     const starter = starterPackKeys(pack, { shortcutLanguage, mode: pack.previewMode });
+    const keys = reviewedPackKeys(pack, owner, starter, shortcutLanguage);
     return { id, name, apps: pack.pathContains || pack.windowMode ? [] : pack.executables, appIds: pack.appIds ?? [],
-      starterIds: starter.map((key) => key.id),
-      keys: reviewedPackKeys(pack, owner, starter, shortcutLanguage).map((key) => annotateShortcut(pack, key)), catalogVersion: catalog.version,
+      defaultShortcutIds: defaultShortcutIds(starter, keys),
+      keys: keys.map((key) => annotateShortcut(pack, key)), catalogVersion: catalog.version,
       source: pack.source, ...(MANIFEST_PACKS.has(id) ? { revision: MANIFEST_REVISION } : id === 'spotify' ? { revision: null } : {}) };
   });
   const web = webPacks.map((pack) => {
@@ -295,7 +329,7 @@ function previewPacks(shortcutLanguage) {
     const starter = starterPackKeys(pack, { shortcutLanguage });
     const keys = reviewedPackKeys(pack, pack.id, starter, shortcutLanguage);
     return { id: pack.id, name: pack.name, apps: [], appIds: [], installedWebApp: true, manifestExample: pack.manifestExample ?? pack.manifests[0],
-      starterIds: starter.map((key) => key.id),
+      defaultShortcutIds: defaultShortcutIds(starter, keys),
       source: pack.source, catalogVersion: catalog.version, keys: keys.map((key) => ({
         ...annotateShortcut(pack, key), unavailable: key.unavailable ?? 'Available in the matching installed web app.',
       })) };
@@ -305,13 +339,11 @@ function previewPacks(shortcutLanguage) {
 
 function groupedPackKeys(pack, context) {
   const quick = packKeys(pack, context);
-  const extras = reviewedPackKeys(pack, catalogOwner(pack), starterPackKeys(pack, context), context.shortcutLanguage)
-    .slice(quick.length)
-    .filter((key) => shortcutGuardForAction(key.action))
-    .map((key) => {
-      const candidate = withShortcutOverride(annotateShortcut(pack, key), context.shortcutOverrides);
-      return { ...candidate, unavailable: shortcutRequirements(shortcutGuardForAction(candidate.action), context) };
-    });
+  const reviewed = reviewedPackKeys(pack, catalogOwner(pack), starterPackKeys(pack, context), context.shortcutLanguage);
+  const extras = reviewedExtras(reviewed, quick.length).map((key) => {
+    const candidate = withShortcutOverride(annotateShortcut(pack, key), context.shortcutOverrides);
+    return { ...candidate, unavailable: shortcutRequirements(shortcutGuardForAction(candidate.action), context) };
+  });
   return [...quick, ...extras];
 }
 

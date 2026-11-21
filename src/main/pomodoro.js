@@ -3,27 +3,39 @@
 
 const { readJsonSettings, writeJsonSettings, isMissing } = require('./json-settings-file');
 
-const DURATIONS = Object.freeze({ focus: 25 * 60_000, break: 5 * 60_000 });
+const MINUTE = 60_000;
+const DURATIONS = Object.freeze({ focus: 25 * MINUTE, break: 5 * MINUTE });
 const STATES = ['idle', 'running', 'paused', 'complete'];
-const COMMANDS = ['start', 'pause', 'resume', 'reset'];
-const FIELDS = ['version', 'phase', 'status', 'remainingMs', 'deadlineAt', 'revision'];
-const initial = { version: 1, phase: 'focus', status: 'idle', remainingMs: DURATIONS.focus, deadlineAt: null, revision: 0 };
+const COMMANDS = ['start', 'pause', 'resume', 'reset', 'configure'];
+const FIELDS = ['version', 'phase', 'status', 'durationMs', 'durations', 'remainingMs', 'deadlineAt', 'revision'];
+const initial = { version: 1, phase: 'focus', status: 'idle', durations: DURATIONS, durationMs: DURATIONS.focus,
+  remainingMs: DURATIONS.focus, deadlineAt: null, revision: 0 };
 const isRecord = (value) => value !== null && typeof value === 'object' && !Array.isArray(value);
 const nonnegative = (value) => Number.isSafeInteger(value) && value >= 0;
 const nextRevision = (revision) => revision === Number.MAX_SAFE_INTEGER ? 0 : revision + 1;
 const readFailure = 'The saved Pomodoro could not be read.';
 const writeFailure = 'Lastra could not save the Pomodoro.';
 
+function validDuration(ms) { return Number.isSafeInteger(ms) && ms % MINUTE === 0 && ms >= MINUTE && ms <= 1440 * MINUTE; }
+
+function configuredDurations(value) {
+  if (!isRecord(value) || Object.keys(value).length !== 2 || !validDuration(value.focus) || !validDuration(value.break)) return null;
+  return value.focus === DURATIONS.focus && value.break === DURATIONS.break ? DURATIONS : { focus: value.focus, break: value.break };
+}
+
 function storedState(data) {
   if (!isRecord(data) || Object.keys(data).some((key) => !FIELDS.includes(key)) || data.version !== 1
-      || !Object.hasOwn(DURATIONS, data.phase) || !STATES.includes(data.status) || !nonnegative(data.revision)
-      || !nonnegative(data.remainingMs) || data.remainingMs > DURATIONS[data.phase]) return null;
+      || !Object.hasOwn(DURATIONS, data.phase) || !STATES.includes(data.status) || !nonnegative(data.revision)) return null;
+  const durations = Object.hasOwn(data, 'durations') ? configuredDurations(data.durations) : DURATIONS;
+  if (!durations) return null;
+  const durationMs = Object.hasOwn(data, 'durationMs') ? data.durationMs : durations[data.phase];
+  if (!validDuration(durationMs) || !nonnegative(data.remainingMs) || data.remainingMs > durationMs) return null;
   const { status, remainingMs, deadlineAt } = data;
   if (status === 'running' && (!nonnegative(deadlineAt) || !remainingMs)) return null;
   if (status !== 'running' && deadlineAt !== null) return null;
   if ((status === 'paused' && !remainingMs) || (status === 'complete' && remainingMs)
-      || (status === 'idle' && remainingMs !== DURATIONS[data.phase])) return null;
-  return data;
+      || (status === 'idle' && (remainingMs !== durationMs || durationMs !== durations[data.phase]))) return null;
+  return { ...data, durationMs, durations };
 }
 
 function readTimer(file) {
@@ -58,8 +70,9 @@ class Pomodoro {
   }
 
   snapshot() {
-    const { phase, status, remainingMs, revision } = this.current();
-    return { phase, status, durationMs: DURATIONS[phase], remainingMs, revision, warning: this.warning };
+    const { phase, status, remainingMs, revision, durationMs, durations } = this.current();
+    return { phase, status, durationMs, remainingMs, revision, warning: this.warning,
+      ...(durations !== DURATIONS ? { durations } : {}) };
   }
 
   restoreClock() {
@@ -90,36 +103,46 @@ class Pomodoro {
   }
 
   change(command) {
-    if (!isRecord(command) || Object.keys(command).some((key) => !['type', 'revision'].includes(key)) || !COMMANDS.includes(command.type)) {
+    const fields = command?.type === 'configure' ? ['type', 'revision', 'durations'] : ['type', 'revision'];
+    if (!isRecord(command) || Object.keys(command).some((key) => !fields.includes(key)) || !COMMANDS.includes(command.type)) {
       throw new Error('Choose a Pomodoro control.');
     }
     const current = this.current();
     if (command.revision !== current.revision) throw new Error('The Pomodoro changed. Try the current control.');
-    const { status, phase, remainingMs } = current;
-    let next;
+    const { status, phase, remainingMs, durationMs, durations } = current;
+    let next = { phase, status, remainingMs, durationMs, durations };
     switch (command.type) {
       case 'start': {
         if (status !== 'idle' && status !== 'complete') throw new Error('This Pomodoro is already active.');
         const round = status === 'complete' ? (phase === 'focus' ? 'break' : 'focus') : phase;
-        next = { phase: round, status: 'running', remainingMs: DURATIONS[round] };
+        next = { ...next, phase: round, status: 'running', durationMs: durations[round], remainingMs: durations[round] };
         break;
       }
       case 'pause':
         if (status !== 'running') throw new Error('There is no active Pomodoro to pause.');
-        next = { phase, status: 'paused', remainingMs };
+        next.status = 'paused';
         break;
       case 'resume':
         if (status !== 'paused') throw new Error('There is no paused Pomodoro to resume.');
-        next = { phase, status: 'running', remainingMs };
+        next.status = 'running';
         break;
       case 'reset':
         if (status === 'idle') return this.snapshot();
-        next = { phase, status: 'idle', remainingMs: DURATIONS[phase] };
+        next = { ...next, status: 'idle', durationMs: durations[phase], remainingMs: durations[phase] };
         break;
+      case 'configure': {
+        const settings = configuredDurations(command.durations);
+        if (!settings) throw new Error('Enter whole Pomodoro durations from 1 to 1440 minutes.');
+        next.durations = settings;
+        if (status === 'idle') next.durationMs = next.remainingMs = settings[phase];
+        break;
+      }
     }
     const running = next.status === 'running';
-    const due = running ? this.monotonic() + next.remainingMs : undefined;
-    const record = { version: 1, ...next, deadlineAt: running ? this.wall() + next.remainingMs : null, revision: nextRevision(current.revision) };
+    const keepDeadline = running && command.type === 'configure';
+    const due = keepDeadline ? this.due : running ? this.monotonic() + next.remainingMs : undefined;
+    const deadlineAt = keepDeadline ? current.deadlineAt : running ? this.wall() + next.remainingMs : null;
+    const record = { version: 1, ...next, deadlineAt, revision: nextRevision(current.revision) };
     this.save(record);
     this.state = record;
     this.due = due;

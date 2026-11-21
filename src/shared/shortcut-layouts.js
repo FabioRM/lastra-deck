@@ -1,7 +1,7 @@
 'use strict';
 
 {
-  const LIMITS = Object.freeze({ apps: 64, pages: 16, shortcuts: 48 });
+  const LIMITS = Object.freeze({ apps: 512, pages: 16, shortcuts: 768 });
   const PACK = /^[a-z0-9-]{1,48}$/;
   const PAGE = /^[a-z0-9_-]{1,40}$/i;
   const SHORTCUT = /^[a-z0-9_-]{1,64}$/i;
@@ -20,12 +20,15 @@
         throw new Error('Choose one to sixteen pages for an app shortcut layout.');
       }
       const pageIds = new Set();
+      let remaining = LIMITS.shortcuts;
       const pages = layout.pages.map((page) => {
         if (!hasOnly(page, ['id', 'name', 'shortcuts']) || typeof page.id !== 'string' || !PAGE.test(page.id)
             || pageIds.has(page.id) || typeof page.name !== 'string' || !/^\P{C}{1,40}$/u.test(page.name.trim())
-            || !Array.isArray(page.shortcuts) || page.shortcuts.length > LIMITS.shortcuts) {
-          throw new Error('App shortcut pages need unique IDs, a name, and at most 48 shortcuts.');
+            || !Array.isArray(page.shortcuts)) {
+          throw new Error('App shortcut pages need unique IDs, a name, and a list of shortcuts.');
         }
+        remaining -= page.shortcuts.length;
+        if (remaining < 0) throw new Error(`An app shortcut layout can contain at most ${LIMITS.shortcuts} shortcuts.`);
         pageIds.add(page.id);
         const stored = new Set();
         const shortcuts = page.shortcuts.map((key) => {

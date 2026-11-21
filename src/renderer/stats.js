@@ -310,7 +310,8 @@
     readings.dataset.mode = ['overview', 'power'].includes(group) ? group : 'details';
     readings.toggleAttribute('data-custom-overview', customOverview);
     const now = api.fixtureTime ?? Date.now();
-    const visibleItems = (items) => showUnavailable.checked ? items : items.filter(({ status }) => status !== 'unavailable');
+    const visibleItems = (items) => showUnavailable.checked ? items
+      : items.filter(({ id, status }) => id === 'cpuTemp' || status !== 'unavailable');
     if (group === 'overview') {
       const preferred = preferredOverview(snapshot, preferences.selected);
       const items = preferences.selected === null ? visibleItems(preferred) : preferred;
