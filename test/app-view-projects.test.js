@@ -135,7 +135,7 @@ test('the project document uses its real path and skips a junction to an externa
   const { change, data, actions, write: update } = setup(t, { files: fs.promises });
   update([{ id: 'manual', name: 'Manual', directory: root, documentation: 'README.md' }]);
   await change(data('manual', 'documentation'));
-  assert.deepEqual(actions, [{ document: fs.realpathSync(path.join(root, 'README.md')) }]);
+  assert.deepEqual(actions, [{ document: fs.realpathSync.native(path.join(root, 'README.md')) }]);
   update([{ id: 'manual', name: 'Manual', directory: root, documentation: 'linked/README.md' }]);
   await assert.rejects(change(data('manual', 'documentation')), /document is unavailable/);
   assert.equal(actions.length, 1);

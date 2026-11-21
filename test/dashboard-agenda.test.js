@@ -102,7 +102,7 @@ test('Dashboard agenda persists only a confirmed local source and dispatches a f
   assert.doesNotMatch(JSON.stringify(selectedView), /private-calendar-name|private-agenda-id|meet.google.com|organizer|attendee/i);
   assert.deepEqual(opened, []);
   const saved = JSON.parse(fs.readFileSync(settings, 'utf8'));
-  assert.equal(saved.source, fs.realpathSync(selected));
+  assert.equal(saved.source, fs.realpathSync.native(selected));
   const read = await new DashboardAgenda(settings, providers).request({ type: 'read' }, allowed);
   assert.equal(read.state.event.title, 'Calendar fixture');
   assert.notEqual(read.state.event.join, selectedView.state.event.join, 'tokens are limited to the current session');

@@ -145,7 +145,7 @@ test('only local audio files within the size limit are read', async () => {
   assert.equal(await missing.soundboard.play(clip({ id: 'other' })).catch(() => 'still rejects'), 'still rejects');
 });
 
-test('a clip the player cannot decode, a silent player and a closed player all fail cleanly', async () => {
+test('a clip the player cannot decode, a silent player and a closed player all fail cleanly', async (t) => {
   const broken = board({ answer: 'failed' });
   await assert.rejects(broken.soundboard.play(clip()), /not a playable audio clip/);
   assert.deepEqual(broken.soundboard.snapshot().playing, []);
@@ -153,7 +153,12 @@ test('a clip the player cannot decode, a silent player and a closed player all f
   assert.equal(await broken.soundboard.play(clip()), 'Playing applause', 'the same clip can be tried again');
 
   const silent = board({ answer: 'silent' });
-  await assert.rejects(silent.soundboard.play(clip()), /did not answer/);
+  t.mock.timers.enable({ apis: ['setTimeout'] });
+  const timeout = assert.rejects(silent.soundboard.play(clip()), /did not answer/);
+  await new Promise((resolve) => setImmediate(resolve));
+  t.mock.timers.tick(30);
+  await timeout;
+  t.mock.timers.reset();
 
   const closing = board({ answer: 'silent' });
   const pending = closing.soundboard.play(clip());
