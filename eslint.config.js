@@ -44,4 +44,8 @@ module.exports = [
     files: ['src/preload/**/*.js'],
     languageOptions: { sourceType: 'commonjs', globals: { ...globals.browser, ...globals.node } },
   },
+  {
+    files: ['extensions/lastra-wayland/**/*.{mjs,js}'],
+    languageOptions: { sourceType: 'module', globals: { ARGV: 'readonly', print: 'readonly', printerr: 'readonly' } },
+  },
 ];

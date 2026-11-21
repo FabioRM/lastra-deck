@@ -1,0 +1,139 @@
+'use strict';
+
+const pack = (id, name, appIds, source, keys, options) => ({ id: 'linux-' + id, name, appIds, source, keys, ...options });
+const open = ['open', 'Open file', 'folder-open', 'Ctrl+O'];
+const save = ['save', 'Save', 'save', 'Ctrl+S'];
+const saveAs = ['save-as', 'Save as', 'save-all', 'Ctrl+Shift+S'];
+const newFile = ['new', 'New file', 'file-plus', 'Ctrl+N'];
+const find = ['find', 'Find', 'search', 'Ctrl+F'];
+const print = ['print', 'Print', 'printer', 'Ctrl+P'];
+const selectAll = ['select-all', 'Select all', 'square-dashed', 'Ctrl+A'];
+const fileManager = [
+  ['new-tab', 'New tab', 'square-plus', 'Ctrl+T'], ['new-window', 'New window', 'panels-top-left', 'Ctrl+N'],
+  ['new-folder', 'New folder', 'folder-plus', 'Ctrl+Shift+N'], ['location', 'Enter location', 'link', 'Ctrl+L'],
+  ['parent', 'Parent folder', 'folder-up', 'Alt+Up'], ['back', 'Back', 'arrow-left', 'Alt+Left'],
+  ['forward', 'Forward', 'arrow-right', 'Alt+Right'], ['hidden', 'Show hidden files', 'eye', 'Ctrl+H'],
+  ['rename', 'Rename selection', 'pencil', 'F2'], ['refresh', 'Refresh view', 'refresh-cw', 'F5'],
+  ['close-tab', 'Close tab', 'x', 'Ctrl+W'], selectAll,
+];
+const terminal = [
+  ['new-tab', 'New tab', 'square-plus', 'Ctrl+Shift+T'], ['new-window', 'New window', 'panels-top-left', 'Ctrl+Shift+N'],
+  ['close-tab', 'Close tab', 'x', 'Ctrl+Shift+W'], ['find', 'Find in output', 'search', 'Ctrl+Shift+F'],
+  ['copy', 'Copy selection', 'copy', 'Ctrl+Shift+C'], ['paste', 'Paste into terminal', 'clipboard', 'Ctrl+Shift+V'],
+  ['full-screen', 'Toggle full screen', 'maximize', 'F11'],
+];
+const playback = [
+  ['play-pause', 'Play or pause', 'circle-play', 'Space'], ['rewind', 'Play backward', 'rewind', 'J'],
+  ['stop', 'Stop shuttle', 'circle-stop', 'K'], ['forward', 'Play forward', 'fast-forward', 'L'],
+  ['mark-in', 'Set in point', 'brackets', 'I'], ['mark-out', 'Set out point', 'brackets', 'O'],
+];
+
+module.exports = [
+  pack('nautilus', 'GNOME Files', ['nautilus', 'org.gnome.nautilus'], 'https://gitlab.gnome.org/GNOME/nautilus/-/blob/main/src/nautilus-window.c', [
+    ...fileManager, find, ['home', 'Home folder', 'house', 'Alt+Home'], ['properties', 'Properties', 'info', 'Alt+Enter'],
+  ]),
+  pack('dolphin', 'Dolphin', ['dolphin', 'org.kde.dolphin'], 'https://docs.kde.org/stable_kf6/en/dolphin/dolphin/command-reference.html', [
+    ...fileManager, ['split', 'Split view', 'columns-2', 'F3'], ['terminal', 'Terminal panel', 'square-terminal', 'F4'],
+    ['filter', 'Filter files', 'list-filter', 'Ctrl+I'], ['places', 'Places panel', 'map-pin', 'F9'],
+    ['details', 'Details view', 'list', 'Ctrl+3'], ['icons', 'Icons view', 'grid-2x2', 'Ctrl+1'],
+  ]),
+  pack('thunar', 'Thunar', ['thunar', 'org.xfce.thunar'], 'https://gitlab.xfce.org/xfce/thunar/-/blob/master/thunar/thunar-window.c', [
+    ...fileManager, ['home', 'Home folder', 'house', 'Alt+Home'], ['properties', 'Properties', 'info', 'Alt+Enter'],
+    ['compact', 'Compact view', 'columns-2', 'Ctrl+3'], ['details', 'Detailed list', 'list', 'Ctrl+2'],
+  ]),
+  pack('gnome-terminal', 'GNOME Terminal', ['gnome-terminal', 'gnome-terminal-server', 'org.gnome.terminal'],
+    'https://help.gnome.org/gnome-terminal/adv-keyboard-shortcuts.html', [
+      ...terminal, ['next-tab', 'Next tab', 'chevron-right', 'Ctrl+PageDown'],
+      ['previous-tab', 'Previous tab', 'chevron-left', 'Ctrl+PageUp'], ['reset-zoom', 'Normal text size', 'type', 'Ctrl+0'],
+      ['zoom-out', 'Smaller text', 'zoom-out', 'Ctrl+minus'],
+    ], { editing: false }),
+  pack('konsole', 'Konsole', ['konsole', 'org.kde.konsole'], 'https://docs.kde.org/stable_kf6/en/konsole/konsole/konsole.pdf', [
+    ...terminal, ['next-tab', 'Next tab', 'chevron-right', 'Shift+Right'], ['previous-tab', 'Previous tab', 'chevron-left', 'Shift+Left'],
+    ['split-left-right', 'Split left and right', 'columns-2', 'Ctrl+char:('],
+  ], { editing: false }),
+  pack('gimp', 'GIMP', ['gimp', 'gimp-2.10', 'gimp-3.0', 'org.gimp.gimp'], 'https://docs.gimp.org/3.0/pdf/gimp-keys-en.pdf', [
+    open, save, saveAs, ['export-as', 'Export as', 'file-output', 'Ctrl+Shift+E'], ['export', 'Export again', 'download', 'Ctrl+E'],
+    ['open-layers', 'Open as layers', 'layers', 'Ctrl+Alt+O'], ['new-layer', 'New layer', 'layers-2', 'Ctrl+Shift+N'],
+    ['search-actions', 'Search actions', 'search', 'char:slash'], ['paintbrush', 'Paintbrush tool', 'paintbrush', 'P'],
+    ['move', 'Move tool', 'move', 'M'], ['rect-select', 'Rectangle select', 'square-dashed', 'R'],
+    ['deselect', 'Deselect', 'x', 'Ctrl+Shift+A'], ['redo', 'Redo', 'redo-2', 'Ctrl+Y'],
+  ]),
+  pack('krita', 'Krita', ['krita', 'org.kde.krita'], 'https://docs.krita.org/en/user_manual/getting_started/navigation.html', [
+    newFile, open, save, saveAs, ['brush', 'Freehand brush', 'paintbrush', 'B'], ['erase', 'Eraser mode', 'eraser', 'E'],
+    ['swap-colors', 'Swap colors', 'repeat', 'X'], ['default-colors', 'Default colors', 'palette', 'D'],
+    ['mirror', 'Mirror canvas', 'flip-horizontal', 'M'], ['canvas-only', 'Canvas only', 'maximize', 'Tab'],
+    ['transform', 'Transform selection', 'scaling', 'Ctrl+T'], ['deselect', 'Deselect', 'square-dashed', 'Ctrl+Shift+A'],
+    ['redo', 'Redo', 'redo-2', 'Ctrl+Shift+Z'],
+  ]),
+  pack('inkscape', 'Inkscape', ['inkscape', 'org.inkscape.inkscape'], 'https://inkscape.org/doc/keys.html', [
+    open, save, saveAs, ['duplicate', 'Duplicate selection', 'copy', 'Ctrl+D'], ['group', 'Group selection', 'group', 'Ctrl+G'],
+    ['ungroup', 'Ungroup selection', 'ungroup', 'Ctrl+Shift+G'], ['object-path', 'Object to path', 'spline', 'Ctrl+Shift+C'],
+    ['export', 'Export panel', 'file-output', 'Ctrl+Shift+E'], ['fill-stroke', 'Fill and stroke', 'paint-bucket', 'Ctrl+Shift+F'],
+    ['document-properties', 'Document properties', 'settings', 'Ctrl+Shift+D'], ['zoom-page', 'Zoom to page', 'maximize', '5'],
+    ['zoom-selection', 'Zoom to selection', 'scan-eye', '3'], ['redo', 'Redo', 'redo-2', 'Ctrl+Shift+Z'],
+  ]),
+  pack('blender', 'Blender', ['blender', 'org.blender.blender'], 'https://docs.blender.org/manual/en/latest/interface/keymap/blender_default.html', [
+    open, save, saveAs, ['search', 'Search actions', 'search', 'F3'], ['render', 'Render frame', 'image', 'F12'],
+    ['show-render', 'Show render', 'scan-eye', 'F11'], ['maximize-area', 'Maximize area', 'maximize', 'Ctrl+Space'],
+    ['play-pause', 'Play or pause animation', 'circle-play', 'Space'],
+    ['hide-side', 'Sidebar', 'panel-right', 'N', { context: '3D viewport' }],
+    ['frame-selected', 'Frame selection', 'scan-eye', 'decimal', { context: '3D viewport' }],
+    ['redo', 'Redo', 'redo-2', 'Ctrl+Shift+Z'], ['undo', 'Undo', 'undo-2', 'Ctrl+Z'],
+  ], { editing: false }),
+  pack('shotcut', 'Shotcut', ['shotcut', 'org.shotcut.shotcut'], 'https://shotcut.org/howtos/keyboard-shortcuts/', [
+    open, save, saveAs, ...playback, ['split', 'Split at playhead', 'scissors', 'S', { context: 'Timeline' }],
+    ['split-all', 'Split all tracks', 'scissors', 'Shift+S', { context: 'Timeline' }],
+    ['previous-frame', 'Previous frame', 'step-back', 'Left'], ['next-frame', 'Next frame', 'step-forward', 'Right'],
+    ['redo', 'Redo', 'redo-2', 'Ctrl+Shift+Z'],
+  ]),
+  pack('kdenlive', 'Kdenlive', ['kdenlive', 'org.kde.kdenlive'], 'https://docs.kdenlive.org/en/user_interface/shortcuts.html', [
+    open, save, saveAs, ...playback, ['select-tool', 'Selection tool', 'mouse-pointer', 'S'],
+    ['razor-tool', 'Razor tool', 'scissors', 'X'], ['cut-at-playhead', 'Cut at playhead', 'scissors', 'Shift+R', { context: 'Timeline' }],
+    ['redo', 'Redo', 'redo-2', 'Ctrl+Shift+Z'],
+  ]),
+  pack('vlc', 'VLC media player', ['vlc', 'org.videolan.vlc'], 'https://docs.videolan.me/vlc-user/desktop/3.0/en/basic/hotkeys.html', [
+    open, ['play-pause', 'Play or pause', 'circle-play', 'Space'], ['previous', 'Previous item', 'skip-back', 'P'],
+    ['next', 'Next item', 'skip-forward', 'N'], ['short-back', 'Short jump back', 'rewind', 'Shift+Left'],
+    ['short-forward', 'Short jump forward', 'fast-forward', 'Shift+Right'], ['mute', 'Mute VLC', 'volume-x', 'M'],
+    ['volume-down', 'VLC volume down', 'volume-1', 'Ctrl+Down'], ['volume-up', 'VLC volume up', 'volume-2', 'Ctrl+Up'],
+    ['full-screen', 'Toggle full screen', 'maximize', 'F'], ['playlist', 'Playlist', 'list-music', 'Ctrl+L'],
+    ['subtitles', 'Cycle subtitles', 'captions', 'V'],
+  ], { editing: false }),
+  pack('qgis', 'QGIS', ['qgis', 'qgis-bin', 'org.qgis.qgis'], 'https://docs.qgis.org/testing/en/docs/user_manual/introduction/qgis_gui.html', [
+    newFile, open, save, saveAs, ['attributes', 'Attribute table', 'table', 'F6'],
+    ['selected-attributes', 'Selected feature table', 'table', 'Shift+F6'], ['measure', 'Measure line', 'ruler', 'Ctrl+Shift+M'],
+    ['refresh', 'Refresh map', 'refresh-cw', 'F5'], ['show-all-layers', 'Show all layers', 'layers', 'Ctrl+Shift+U'],
+  ], { editing: false }),
+  pack('libreoffice-writer', 'LibreOffice Writer', ['libreoffice-writer', 'org.libreoffice.libreoffice.writer'], 'https://help.libreoffice.org/latest/en-US/text/swriter/04/01020000.html?System=UNIX', [
+    newFile, open, save, saveAs, find, print, ['bold', 'Bold', 'bold', 'Ctrl+B'], ['italic', 'Italic', 'italic', 'Ctrl+I'],
+    ['align-left', 'Align left', 'align-left', 'Ctrl+L'], ['align-center', 'Center', 'align-center', 'Ctrl+E'],
+    ['justify', 'Justify', 'align-justify', 'Ctrl+J'], ['page-break', 'Page break', 'file-minus', 'Ctrl+Enter'],
+    ['navigator', 'Navigator', 'compass', 'F5'], ['spellcheck', 'Spelling', 'spell-check', 'F7'],
+  ]),
+  pack('libreoffice-calc', 'LibreOffice Calc', ['libreoffice-calc', 'org.libreoffice.libreoffice.calc'], 'https://help.libreoffice.org/latest/en-US/text/scalc/04/01020000.html?System=UNIX', [
+    newFile, open, save, saveAs, find, print, ['edit-cell', 'Edit cell', 'pencil', 'F2'],
+    ['format-cells', 'Format cells', 'settings', 'Ctrl+1'], ['fill-down', 'Fill down', 'arrow-down', 'Ctrl+D'],
+    ['next-sheet', 'Next sheet', 'chevron-right', 'Ctrl+PageDown'], ['previous-sheet', 'Previous sheet', 'chevron-left', 'Ctrl+PageUp'],
+  ]),
+  pack('libreoffice-impress', 'LibreOffice Impress', ['libreoffice-impress', 'org.libreoffice.libreoffice.impress'], 'https://help.libreoffice.org/latest/en-US/text/simpress/04/01020000.html?System=UNIX', [
+    newFile, open, save, saveAs, find, print, ['slideshow', 'Start slideshow', 'presentation', 'F5'],
+    ['slideshow-here', 'Present from current slide', 'play', 'Shift+F5'], ['new-slide', 'New slide', 'square-plus', 'Ctrl+M'],
+    ['group', 'Group objects', 'group', 'Ctrl+Shift+G'], ['ungroup', 'Ungroup objects', 'ungroup', 'Ctrl+Alt+Shift+G'],
+  ]),
+  pack('sublime-text', 'Sublime Text', ['sublime_text', 'sublime-text', 'com.sublimetext.three', 'com.sublimetext.four'],
+    'https://www.sublimetext.com/docs/command_palette.html', [
+      open, save, saveAs, find, ['goto', 'Go to anything', 'file-search', 'Ctrl+P'],
+      ['palette', 'Command palette', 'command', 'Ctrl+Shift+P'], ['find-files', 'Find in files', 'search', 'Ctrl+Shift+F'],
+      ['select-next', 'Select next match', 'scan-text', 'Ctrl+D'], ['comment', 'Toggle comment', 'message-square', 'Ctrl+char:slash'],
+      ['line', 'Select line', 'text-select', 'Ctrl+L'], ['full-screen', 'Full screen', 'maximize', 'F11'],
+    ]),
+  pack('thunderbird', 'Mozilla Thunderbird', ['thunderbird', 'thunderbird-esr', 'org.mozilla.thunderbird'],
+    'https://support.mozilla.org/en-US/kb/keyboard-shortcuts-thunderbird', [
+      ['compose', 'New message', 'mail-plus', 'Ctrl+N'], ['reply', 'Reply', 'reply', 'Ctrl+R'],
+      ['reply-all', 'Reply to all', 'reply-all', 'Ctrl+Shift+R'], ['forward', 'Forward message', 'forward', 'Ctrl+L'],
+      ['addresses', 'Address book', 'book-user', 'Ctrl+Shift+B'], ['get-mail', 'Get new mail', 'download', 'F5'],
+      ['get-all-mail', 'Check all accounts', 'inbox', 'Shift+F5'], ['global-search', 'Search all messages', 'search', 'Ctrl+K'],
+      ['archive', 'Archive message', 'archive', 'A'], ['next-unread', 'Next unread message', 'chevron-down', 'N'],
+      ['previous-unread', 'Previous unread message', 'chevron-up', 'P'], find,
+    ]),
+];

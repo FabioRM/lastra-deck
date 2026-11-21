@@ -83,6 +83,7 @@ const { PushToTalk } = require('./push-to-talk');
 const { startMicGuard } = require('./ptt-guard');
 const { AppMixerPins } = require('./app-mixer-pins');
 const { createForegroundReader } = require('./foreground-win32');
+const { createLinuxDesktop, linuxForeground, linuxInput, DECK_WINDOW_TITLE } = require('./desktop-linux');
 const { createWindowShortcutMode } = require('./window-shortcut-mode');
 const { Obs } = require('./obs');
 const { ProductionTimers } = require('./production-timers');
@@ -215,6 +216,7 @@ let audio = null;
 let pushToTalk = null;
 let appMixerPins = null;
 let readForeground = null;
+let linuxDesktop;
 let foregroundTimer = null;
 let exportingDiagnostics = false;
 let panelMeasurement = null;
@@ -529,7 +531,7 @@ function createSoundHost(onEvent, onClosed) {
 // ---------------------------------------------------------------- window
 
 function deckDisplay() {
-  return opts.windowed ? null : findEdgeDisplay(screen.getAllDisplays(), preferredDisplay);
+  return opts.windowed ? null : findEdgeDisplay(screen.getAllDisplays(), preferredDisplay, process.platform);
 }
 
 function backlightWindow() {
@@ -582,6 +584,7 @@ function createDeckWindow(display = deckDisplay()) {
     log('XENEON EDGE:', describeDisplay(edge));
     win = new BrowserWindow({
       ...edge.bounds,
+      ...(linuxDesktop ? { title: DECK_WINDOW_TITLE } : {}),
       frame: false,
       focusable: false, // Touch keeps focus on the current app.
       alwaysOnTop: true,
@@ -597,6 +600,7 @@ function createDeckWindow(display = deckDisplay()) {
       webPreferences,
     });
     const deck = win;
+    if (linuxDesktop) deck.on('page-title-updated', (event) => event.preventDefault());
     deck.once('ready-to-show', () => {
       if (win !== deck || edgeExit) return;
       deckReady = true;
@@ -710,7 +714,10 @@ function restoreDeck(display = deckDisplay(), force = false) {
     createDeckWindow(display);
     return;
   }
-  const moved = restoreDeckWindow(win, display, { previous: force ? null : edge, ready: deckReady });
+  // A native Wayland toplevel is placed by the compositor. The Hyprland Deck rule also keeps it unfocusable.
+  const wayland = linuxDesktop && !linuxDesktop.xwayland && !['x11', 'unavailable'].includes(linuxDesktop.kind);
+  const moved = !wayland && restoreDeckWindow(win, display, { previous: force ? null : edge, ready: deckReady });
+  if (wayland && deckReady && !win.isVisible()) win.show();
   edge = display;
   if (moved && !force) {
     void pushToTalk?.cancel(win.webContents);
@@ -1154,7 +1161,8 @@ function queueDeckPress(press, { deckPress = false, trace = undefined, allowed =
   const flowKey = `${revision}/${id}`;
   const queueKey = `${page.id}/${id}`;
   const scope = store.file;
-  const shortcutTarget = actionNeedsShortcutTarget(action) ? foregroundShortcutTarget() : undefined;
+  const shortcutTarget = actionNeedsShortcutTarget(action) || (linuxDesktop && hasShortcutRule(action, (_, step) => step.type === 'hotkey'))
+    ? foregroundShortcutTarget() : undefined;
   const actionPage = editing ? { ...page, generated: true, pack: page.pack ?? 'editing-keys' } : page;
   const actionBinding = editing ? { active: true, target: editingTarget } : binding;
   const at = Date.now();
@@ -1422,13 +1430,13 @@ function registerIpc() {
     }
   });
   edit('editor:shortcut-packs', (language) => {
-    const packs = previewPacks(typeof language === 'string' ? language : undefined);
+    const packs = previewPacks(typeof language === 'string' ? language : undefined, process.platform);
     return { packs, icons: shortcutPackIcons(packs) };
   });
   edit('editor:shortcut-override', (chord) => normalizeOverrideChord(chord));
   edit('editor:shortcut-source', (url) => {
     const allowed = typeof url === 'string' && ['en-US', 'it-IT'].some((language) =>
-      previewPacks(language).some((pack) =>
+      previewPacks(language, process.platform).some((pack) =>
         /** @type {any} */ (pack).source === url || pack.keys.some((key) => (key.binding?.source ?? key.source) === url)));
     if (!allowed) {
       throw new Error('This source is unavailable in the shortcut catalog.');
@@ -1674,6 +1682,12 @@ function registerIpc() {
 
 function start() {
   if (process.platform === 'win32') setSecretStorage(safeStorage);
+  if (process.platform === 'linux') {
+    linuxDesktop = createLinuxDesktop({ log, x11Window: app.commandLine.getSwitchValue('ozone-platform') === 'x11',
+      onChange: () => { if (win && readForeground) refreshPage(true); } });
+    if (linuxDesktop.reason) log(linuxDesktop.reason);
+    if (linuxDesktop.close) disposables.add('Linux desktop', linuxDesktop.close);
+  }
   // Lastra's own pages use no camera, microphone, notification or similar browser permission;
   // refuse them all in the default session as a second line of defence.
   session.defaultSession.setPermissionRequestHandler((_contents, _permission, callback) => callback(false));
@@ -1822,12 +1836,12 @@ function start() {
   const windowShortcutMode = process.platform === 'win32'
     ? createWindowShortcutMode({ findPack: (context) => packFor(context, store.current.webApps) }) : undefined;
   if (windowShortcutMode) disposables.add('shortcut window mode', () => windowShortcutMode.dispose());
-  readForeground = createForegroundReader({
+  readForeground = linuxDesktop ? linuxForeground(linuxDesktop) : createForegroundReader({
     readAppIdentity: () => windows()?.foreground({ appId: true, title: false }),
     windowShortcutMode,
     needsTitle: () => store.current.pages.some((page) => page.windowTitle),
   });
-  runner = createActionRunner({ shell, spawn, input: createInput(), audio: { change: changeAudio },
+  runner = createActionRunner({ shell, spawn, input: linuxDesktop ? linuxInput(linuxDesktop) : createInput(), audio: { change: changeAudio },
     toggleSpotify: (verifyTarget) => nowPlaying.toggle('spotify', verifyTarget), readForeground,
     selectObsScene: (action) => changeObsScene(obs, action),
     readShortcutSettings: () => store.current,
@@ -2339,7 +2353,7 @@ function start() {
     },
   });
   // Installed builds check GitHub Releases quietly and install when Lastra quits; dev and preview runs skip it.
-  updater = createUpdater({ app, log, preview: Boolean(opts.preview), onChange: () => trayMenu?.refresh() });
+  updater = createUpdater({ app, log, preview: Boolean(opts.preview), supported: process.platform === 'win32', onChange: () => trayMenu?.refresh() });
   disposables.add('updates', () => updater.stop());
   updater.start();
   if (!opts.windowed) {
@@ -2356,6 +2370,7 @@ function start() {
     disposables.add('display watcher', () => displayWatcher.stop());
   }
   createDeckWindow(display);
+  if (opts.enableWaylandKeyboard) void linuxDesktop?.enable?.();
   if (opts.editor) openEditor('profile');
   else if (opts.settings) openEditor();
 
@@ -2419,6 +2434,7 @@ function failStartup(err) {
 }
 
 app.setAppUserModelId(APP_ID);
+if (process.platform === 'linux') app.commandLine.appendSwitch('class', 'lastra');
 declarePreviewScheme(protocol);
 
 if (opts.preview) {
@@ -2431,6 +2447,7 @@ if (opts.preview) {
   app.on('second-instance', (_event, argv) => {
     if (edgeExit) return;
     const requested = parseArgs(argv);
+    if (requested.enableWaylandKeyboard) void linuxDesktop?.enable?.();
     if ((requested.editor || requested.settings) && store) openEditor(requested.editor ? 'profile' : 'settings');
     else if (store) showDeck();
   });

@@ -10,7 +10,7 @@ const { WAIT_CONDITIONS, MAX_REPEAT_STEPS, CHOICE_LIMIT, RANDOM_LIMIT, condition
 const { timerFields } = require('../../shared/timers');
 const { soundFields } = require('../../shared/sounds');
 const { packFor } = require('../shortcut-packs');
-const { actionNeedsShortcutTarget, requiredShortcutMode, shortcutUnavailable, sameShortcutWindow } = require('../shortcut-guards');
+const { actionNeedsShortcutTarget, hasShortcutRule, requiredShortcutMode, shortcutUnavailable, sameShortcutWindow } = require('../shortcut-guards');
 
 const MAX_DEPTH = 3;
 const MAX_STEPS = 20;
@@ -196,7 +196,7 @@ function createActionRunner({ shell, spawn, input, audio, toggleSpotify, selectO
   }
 
   function verifyShortcut(action, expected) {
-    if (!action.shortcutGuard && !layoutTokens(action.keys)) return;
+    if (!input?.requiresTarget && !action.shortcutGuard && !layoutTokens(action.keys)) return;
     const context = readForeground?.context?.({ fresh: true });
     if (action.shortcutGuard) {
       const { webApps, shortcutLanguage, platform, build } = readShortcutSettings();
@@ -204,7 +204,7 @@ function createActionRunner({ shell, spawn, input, audio, toggleSpotify, selectO
       const unavailable = shortcutUnavailable(action.shortcutGuard, { activePack, context, shortcutLanguage, platform, build, keys: action.keys });
       if (unavailable) throw new ActionTargetChanged(unavailable);
     }
-    if (!sameShortcutWindow(expected, context) || readForeground?.windowId?.() !== context.windowId) {
+    if (!sameShortcutWindow(expected, context) || (!input?.requiresTarget && readForeground?.windowId?.() !== context.windowId)) {
       throw new ActionTargetChanged('The shortcut target window changed.');
     }
     if (targetLayout(expected) !== targetLayout(context)) throw new ActionTargetChanged('The foreground keyboard layout changed.');
@@ -217,7 +217,13 @@ function createActionRunner({ shell, spawn, input, audio, toggleSpotify, selectO
   }
 
   function hotkeyProblem(action, target) {
-    if (action?.type !== 'hotkey' || !layoutTokens(action.keys)) return;
+    if (action?.type !== 'hotkey') return;
+    if (input?.checkChord) {
+      try { input.checkChord(parseCombo(action.keys), target); }
+      catch (error) { return error.message; }
+      return;
+    }
+    if (!layoutTokens(action.keys)) return;
     if (target?.windowId == null) return 'Bring the target window to the foreground.';
     try { resolveCombo(parseCombo(action.keys), targetLayout(target), input?.mapCharacter); }
     catch (error) { return error.message; }
@@ -351,6 +357,13 @@ function createActionRunner({ shell, spawn, input, audio, toggleSpotify, selectO
       case 'hotkey': {
         verifyForeground(action, pageApps);
         const keys = parseCombo(action.keys);
+        if (input?.checkChord) {
+          input.checkChord(keys, shortcutTarget);
+          verifyTarget();
+          const target = verifyShortcut(action, shortcutTarget);
+          await input.sendChord(keys, undefined, target);
+          return null;
+        }
         const rule = action.shortcutGuard;
         const mode = rule?.mode ?? (rule?.platform === 'web'
           ? requiredShortcutMode(rule, packFor(shortcutTarget, readShortcutSettings().webApps), action.keys) : undefined);
@@ -519,7 +532,10 @@ function createActionRunner({ shell, spawn, input, audio, toggleSpotify, selectO
             await sleep(Math.min(remaining, 150));
           }
         });
-        if (shortcutTarget === undefined && actionNeedsShortcutTarget(action)) shortcutTarget = readForeground?.context?.({ fresh: true });
+        if (shortcutTarget === undefined && (actionNeedsShortcutTarget(action)
+          || (input?.requiresTarget && hasShortcutRule(action, (_, step) => step.type === 'hotkey')))) {
+          shortcutTarget = readForeground?.context?.({ fresh: true });
+        }
         const message = await run(action, { pageApps, verifyTarget, trace, shortcutTarget, onProgress, onStepProgress,
           checkCancellation, pause }, warnings);
         return { ok: true, message: warnings.length ? `Continued after ${warnings.join(' · ')}` : message, ...tracedSteps() };

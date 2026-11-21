@@ -27,15 +27,16 @@ function edgeOrientation(display) {
   return null;
 }
 
-/** A display override still requires Windows to detect the XENEON EDGE. */
-function findEdgeDisplay(displays, preferredId) {
+function findEdgeDisplay(displays, preferredId, platform = 'win32') {
+  const preferred = preferredId === undefined || preferredId === null || preferredId === '' ? null
+    : displays.find((display) => String(display.id) === String(preferredId));
+  if (platform === 'linux' && preferred) return preferred;
   const edge = displays.find((d) => /\bxeneon\s+edge\b/i.test(d.label || ''));
-  if (!edge) return null;
-  if (preferredId !== undefined && preferredId !== null && preferredId !== '') {
-    const forced = displays.find((d) => String(d.id) === String(preferredId));
-    if (forced) return forced;
-  }
-  return edge;
+  if (edge) return preferred ?? edge;
+  // Some Linux sessions report a connector name instead of the EDID model name.
+  if (platform !== 'linux') return null;
+  const candidates = displays.filter(edgeOrientation);
+  return candidates.length === 1 ? candidates[0] : null;
 }
 
 function describeDisplay(display) {

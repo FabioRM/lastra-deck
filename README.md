@@ -1,14 +1,14 @@
 # Lastra
 
-Lastra turns the **CORSAIR XENEON EDGE** into a touchscreen macro deck for Windows 10 and 11. **Switch apps and Lastra automatically loads the shortcuts for the new foreground app.** Run macros and keep the Windows mixer, media controls, and system telemetry within reach. Lastra runs on Electron and works while iCUE is closed.
+Lastra turns the **CORSAIR XENEON EDGE** into a touchscreen macro deck for Windows 10 and 11 and Linux x86-64. **Switch apps and Lastra automatically loads the shortcuts for the new foreground app.** Run macros and keep the Windows mixer, media controls, and system telemetry within reach. Lastra runs on Electron and works while iCUE is closed.
 
-[Download for Windows x64](https://github.com/FabioRM/lastra-deck/releases/latest) · [Project site](https://fabiorm.github.io/lastra-deck/) · [Changelog](CHANGELOG.md) · [Report an issue](https://github.com/FabioRM/lastra-deck/issues)
+[Download Windows and Linux packages](https://github.com/FabioRM/lastra-deck/releases/latest) · [Project site](https://fabiorm.github.io/lastra-deck/) · [Changelog](CHANGELOG.md) · [Report an issue](https://github.com/FabioRM/lastra-deck/issues)
 
 ![Lastra Deck Keys showing an example Home layout with shortcuts, audio controls, and sample telemetry](docs/preview-home.png)
 
 ![Deck Keys toolbar with the Tools, Emoji, and page lock icons](docs/preview-toolbar.png)
 
-Bring an app like Visual Studio Code to the foreground and Deck Keys loads its shortcuts. Automatic packs fill the first screen before opening a second. The built-in library covers 420 Windows and installed web apps, with nine additional packs for app editions and window variants. You can also create your own pages, rearrange commands, and hide individual keys. [Shortcut packs](docs/shortcut-packs.md) · [Watch pages switch](docs/preview-shortcuts.gif)
+Bring an app like Visual Studio Code to the foreground and Deck Keys loads its shortcuts. Automatic packs fill the first screen before opening a second. The built-in library covers 446 Windows and installed web apps, with nine additional packs for app editions and window variants. You can also create your own pages, rearrange commands, and hide individual keys. [Shortcut packs](docs/shortcut-packs.md) · [Watch pages switch](docs/preview-shortcuts.gif)
 
 [Getting started](#getting-started) · [Tools and Pomodoro](#tools-and-pomodoro) · [Deck views](#deck-views) · [Profile editor](#profile-editor) · [Local MCP integration](#local-mcp-integration) · [License](#license)
 
@@ -24,6 +24,8 @@ Bring an app like Visual Studio Code to the foreground and Deck Keys loads its s
 </details>
 
 ## Getting started
+
+**Linux setup.** Install the x86-64 Debian package or AppImage for X11, GNOME, KDE Plasma or Hyprland. On GNOME and KDE use the keyboard permission command in the setup guide to enable shortcuts. [Linux installation and Wayland setup](docs/linux-deck.md)
 
 Set the XENEON EDGE to **Extend these displays** in Windows Display settings. The panel runs at 2560 × 720 in landscape and 720 × 2560 in portrait.
 

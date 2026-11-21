@@ -1837,7 +1837,7 @@ function actionForm(title, action, replace, depth = 0, sequenceStep = false, ins
   }
   if (action.shortcutGuard) {
     const { application, platform, mode, layout, language, minBuild, confirm } = action.shortcutGuard;
-    const details = [platform === 'web' ? `${application} installed web app` : `${application} on Windows`,
+    const details = [platform === 'web' ? `${application} installed web app` : `${application} on ${shortcutPlatforms[platform] ?? platform}`,
       language && `Office language ${language}`, layout === 0x04090409 ? 'US keyboard layout' : layout && 'Verified keyboard layout',
       mode, minBuild && `Windows build ${minBuild} or later`, confirm && 'Confirmation required'];
     body.append(node('p', 'muted', details.filter(Boolean).join(' · ')));

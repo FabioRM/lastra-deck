@@ -4,6 +4,7 @@
 const path = require('node:path');
 const { createHash } = require('node:crypto');
 const { packFor, groupedPackKeys, isInstalledWebApp } = require('./shortcut-packs');
+const { LINUX_TERMINALS } = require('./shortcut-packs-linux');
 const { isExecutableName } = require('./executable-name');
 const { applyShortcutPages } = require('../shared/shortcut-layouts');
 
@@ -38,7 +39,7 @@ function contextFor(value) {
   const executablePath = typeof input?.path === 'string' ? input.path.toLowerCase() : '';
   const appId = typeof input?.appId === 'string' ? input.appId.toLowerCase() : '';
   if (!appId && (!executable || HOST_EXECUTABLES.has(executable))) return null;
-  return { executable, appId, path: executablePath, identity: JSON.stringify([executablePath || executable, appId]),
+  return { executable, appId, path: executablePath, platform: input.platform, identity: JSON.stringify([executablePath || executable, appId]),
     id: input.id, windowId: input.windowId, keyboardLayout: input.keyboardLayout, keyboardHandle: input.keyboardHandle,
     mode: input.mode, title: input.title,
     originalName: typeof input.name === 'string' ? input.name : executable };
@@ -62,7 +63,8 @@ function displayName(context) {
 
 function generatedPage(context, grid, { shortcutLanguage, shortcutOverrides }, pack, custom) {
   const id = 'auto:' + createHash('sha256').update(context.identity).digest('hex').slice(0, 20);
-  const choices = TERMINALS.has(context.executable) ? TERMINAL_SHORTCUTS : SHORTCUTS;
+  const choices = context.platform === 'linux' && LINUX_TERMINALS.has(context.appId) ? []
+    : TERMINALS.has(context.executable) ? TERMINAL_SHORTCUTS : SHORTCUTS;
   const generic = () => choices.map(([key, label, icon, chord]) => ({
     id: key, label, icon, category: 'app', action: { type: 'hotkey', keys: chord },
   }));

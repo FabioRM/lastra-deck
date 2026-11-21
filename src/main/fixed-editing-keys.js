@@ -4,6 +4,7 @@
 const { FIXED_EDITING_KEYS, STANDARD_EDITING_CHORDS } = require('../shared/editing-keys');
 const { catalog } = require('./shortcut-catalog');
 const { packFor, packKeys, isInstalledWebApp } = require('./shortcut-packs');
+const { LINUX_TERMINALS } = require('./shortcut-packs-linux');
 const { US_LAYOUT, shortcutUnavailable } = require('./shortcut-guards');
 const { annotateShortcut } = require('./shortcut-overrides');
 const { withShortcutOverride } = require('../shared/shortcut-library');
@@ -23,7 +24,7 @@ const CATALOG = new Map(catalog.apps.map((app) => [app.id, app.bindings]));
 /** @typedef {{ chord?: string, guard?: any, unavailable?: string }} EditBinding */
 
 function packGuard(pack, requirements = {}) {
-  return { pack: pack.id, application: pack.name, platform: pack.sites ? 'web' : 'windows', ...requirements };
+  return { pack: pack.id, application: pack.name, platform: pack.platform ?? (pack.sites ? 'web' : 'windows'), ...requirements };
 }
 
 function bindingMode(pack, mode) {
@@ -82,6 +83,9 @@ function editBinding(command, pack, settings) {
     return { chord: variant?.action?.keys, guard, unavailable: shortcutUnavailable(guard, settings) };
   }
   if (CONSOLES.has(context.executable.toLowerCase())) return { unavailable: 'A verified editing shortcut is unavailable in this console.' };
+  if (!pack && context.platform === 'linux' && LINUX_TERMINALS.has(context.appId)) {
+    return { unavailable: 'Configure an editing shortcut for this terminal in a custom app page.' };
+  }
   if (!pack) {
     return isInstalledWebApp(context) ? { unavailable: 'The installed web app is unverified.' } : { chord: STANDARD_EDITING_CHORDS[command] };
   }
@@ -103,8 +107,9 @@ function fixedEditingKeys(profile, context, { pageActive = true, platform = proc
   const pack = packFor(context, profile.webApps);
   const { shortcutLanguage, shortcutOverrides } = profile;
   const settings = { context, activePack: pack, shortcutLanguage, shortcutOverrides, platform };
-  const reason = platform !== 'win32' ? 'Requires Windows.' : !pageActive ? 'The target window is unavailable.'
-    : context?.windowId == null || context.shell || !context.executable ? 'Bring a verified app window to the foreground.' : undefined;
+  const reason = !['win32', 'linux'].includes(platform) ? 'Requires Windows or Linux.' : !pageActive ? 'The target window is unavailable.'
+    : context?.windowId == null || context.shell || !(platform === 'linux' ? context.appId : context.executable)
+      ? 'Bring a verified app window to the foreground.' : undefined;
   return FIXED_EDITING_KEYS.map((/** @type {{ id: string, label: string, icon: string }} */ key) => {
     const command = key.id.slice('edit:'.length);
     const { chord, guard, unavailable = chord ? undefined : 'No verified shortcut binding is available.' } = reason

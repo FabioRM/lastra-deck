@@ -1,4 +1,5 @@
-name: Windows release
+name: Desktop release
+
 on:
   push:
     tags: ['v*']
@@ -14,11 +15,6 @@ jobs:
   windows:
     runs-on: windows-latest
     timeout-minutes: 40
-    permissions:
-      contents: write
-    defaults:
-      run:
-        shell: pwsh
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -30,36 +26,69 @@ jobs:
         env:
           CSC_LINK: ${{ secrets.WIN_CSC_LINK }}
           CSC_KEY_PASSWORD: ${{ secrets.WIN_CSC_KEY_PASSWORD }}
-      - name: Save the release files
-        uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v4
         with:
-          name: lastra-windows-${{ github.ref_name }}
+          name: lastra-windows
           path: |
             out/Lastra-Setup-*.exe
             out/Lastra-Setup-*.exe.blockmap
             out/Lastra-Setup-*.exe.sha256
             out/latest.yml
           if-no-files-found: error
+
+  linux:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libarchive-tools
+          npm ci
+        env:
+          ELECTRON_SKIP_BINARY_DOWNLOAD: '1'
+      - name: Check Linux profiles and build the distribution packages
+        run: |
+          node --test test/linux-deck.test.js
+          sh scripts/release-linux.sh "$GITHUB_REF_NAME"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: lastra-linux
+          path: |
+            out/Lastra-*-linux-*.deb
+            out/Lastra-*-linux-*.AppImage
+            out/Lastra-*-linux-*.sha256
+            out/lastra-wayland@fabiorm.github.io.zip
+            out/lastra-wayland@fabiorm.github.io.zip.sha256
+          if-no-files-found: error
+
+  release:
+    needs: [windows, linux]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: lastra-*
+          path: release-files
+          merge-multiple: true
       - name: Create the draft release
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          $tag = $env:GITHUB_REF_NAME
-          $version = $tag.Substring(1)
-          $installer = "out/Lastra-Setup-$version.exe"
-          $files = @($installer, "$installer.blockmap", "$installer.sha256", 'out/latest.yml')
-          $existing = gh release view $tag --repo $env:GITHUB_REPOSITORY --json isDraft,assets 2>$null
-          if ($LASTEXITCODE -eq 0) {
-            $release = $existing | ConvertFrom-Json
-            $missing = $files | Where-Object { (Split-Path -Leaf $_) -notin $release.assets.name }
-            if ($release.isDraft -and $missing) {
-              gh release upload $tag @files --repo $env:GITHUB_REPOSITORY --clobber
-              exit $LASTEXITCODE
-            }
-            Write-Host "A release already exists for $tag with its assets and notes."
-            exit 0
-          }
-          git for-each-ref --format='%(contents)' "refs/tags/$tag" |
-            gh release create $tag @files --repo $env:GITHUB_REPOSITORY --draft --verify-tag `
-              --title "Lastra $tag" --notes-file -
-          exit $LASTEXITCODE
+          tag="$GITHUB_REF_NAME"
+          if gh release view "$tag" --json isDraft > /dev/null 2>&1; then
+            if [ "$(gh release view "$tag" --json isDraft --jq .isDraft)" = true ]; then
+              gh release upload "$tag" release-files/* --clobber
+            fi
+          else
+            git for-each-ref --format='%(contents)' "refs/tags/$tag" |
+              gh release create "$tag" release-files/* --draft --verify-tag --title "Lastra $tag" --notes-file -
+          fi

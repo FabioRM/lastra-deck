@@ -24,6 +24,7 @@ const path = require('node:path');
  * @property {boolean} [verifyHomeNotification] Check the Home notification and clock geometry.
  * @property {boolean} [previewLargeKeys] Render with the large Deck Keys layout.
  * @property {boolean} [measureDeck] Enable the panel measurement recorder.
+ * @property {boolean} [enableWaylandKeyboard] Ask the desktop portal for keyboard permission.
  */
 
 /**
@@ -57,6 +58,7 @@ function parseArgs(argv, { cwd } = {}) {
     else if (arg === '--verify-audio-faders') opts.verifyFaders = true;
     else if (arg === '--verify-home-notification') opts.verifyHomeNotification = true;
     else if (arg === '--measure-deck') opts.measureDeck = true;
+    else if (arg === '--enable-wayland-keyboard') opts.enableWaylandKeyboard = true;
     else if (arg === '--editor') opts.editor = true;
     else if (arg === '--settings') opts.settings = true;
     else if (arg.startsWith('--profile=')) {

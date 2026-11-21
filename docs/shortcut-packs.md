@@ -2,7 +2,7 @@
 
 In Deck Keys, Lastra uses the focused app's built-in pack when no custom page matches. The Main activity uses the VS Code pack or the actual browser's pack when the corresponding app takes focus. Custom pages keep their matching rules and priority. Each browser pack uses that browser's native tab bindings.
 
-The built-in library covers 420 Windows and installed web apps, with nine additional packs for editions and window variants. The lists include examples and sources for each pack. [First 200 apps](200-applications.md) · [Next 80 apps](additional-applications.md) · [Next 50 apps](catalog-expansion.md) · [Next 12 apps](authoring-shortcuts.md) · [Next 40 apps](workspace-shortcuts.md) · [Next 30 apps](studio-and-service-shortcuts.md) · [Engineering apps and editors](engineering-shortcuts.md)
+The built-in library covers 446 Windows and installed web apps, with nine additional packs for editions and window variants. The lists include examples and sources for each pack. [First 200 apps](200-applications.md) · [Next 80 apps](additional-applications.md) · [Next 50 apps](catalog-expansion.md) · [Next 12 apps](authoring-shortcuts.md) · [Next 40 apps](workspace-shortcuts.md) · [Next 30 apps](studio-and-service-shortcuts.md) · [Engineering apps and editors](engineering-shortcuts.md) · [Next 26 apps](specialist-shortcuts.md)
 
 Automatic packs put quick actions first and fill each screen before opening another. Commands from different workflow groups share the available space. On the standard 8×3 grid, each screen holds up to 19 app shortcuts and five fixed editing keys. Use the page arrows or swipe if the pack spans multiple screens. A command whose app mode, layout, or language cannot be verified shows its availability reason.
 

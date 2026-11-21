@@ -1,0 +1,6 @@
+{
+  "uuid": "lastra-wayland@fabiorm.github.io",
+  "name": "Lastra Wayland Profiles",
+  "description": "Reports the foreground application to the Lastra Deck. Keyboard permission is managed by the desktop portal.",
+  "shell-version": ["46", "47", "48", "49", "50"]
+}

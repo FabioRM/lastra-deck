@@ -1,4 +1,4 @@
-# Releasing Lastra for Windows
+# Releasing Lastra
 
 Lastra ships as a per-user NSIS installer for Windows x64, built with electron-builder. Installed copies update themselves from GitHub Releases through electron-updater. The build configuration is in [`electron-builder.yml`](../electron-builder.yml), and the update logic is in [`src/main/updater.js`](../src/main/updater.js).
 
@@ -18,6 +18,10 @@ The script runs `npm ci`, lint, type checks, and tests, then builds the x64 inst
 - `latest.yml`
 
 Add `-Tag v0.2.4` to require a clean checkout of that tag and matching versions in the package files. For a quick packaging check, use `npm run dist:dir` after installing dependencies. Run `out\win-unpacked\Lastra.exe --preview=preview.png` to check the packaged app without the panel. Git ignores `out/`.
+
+## Linux x86-64 packages
+
+On Linux with Node.js 22.12 or later and libarchive tools, run `npm ci` followed by `sh scripts/release-linux.sh`. The script builds the Debian package, AppImage, GNOME extension ZIP and SHA-256 checksums in `out/`. The Linux launcher uses XWayland for the Deck on GNOME and KDE Plasma. [Linux setup](linux-deck.md)
 
 ## Packaged layout
 

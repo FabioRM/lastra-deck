@@ -15,7 +15,7 @@ function validShortcutGuard(value) {
     && typeof value.pack === 'string' && /^[a-z0-9-]{1,48}$/.test(value.pack)
     && typeof value.application === 'string' && value.application.trim() === value.application
     && /^\P{Cc}{1,80}$/u.test(value.application)
-    && ['windows', 'web'].includes(value.platform)
+    && ['windows', 'web', 'linux'].includes(value.platform)
     && (value.layout === undefined || (Number.isSafeInteger(value.layout) && value.layout > 0 && value.layout <= 0xffffffff))
     && (value.mode === undefined || (typeof value.mode === 'string' && /^\P{Cc}{1,120}$/u.test(value.mode)))
     && (value.language === undefined || LANGUAGES.has(value.language))
@@ -53,8 +53,11 @@ function requiredShortcutMode(rule, activePack, keys) {
  * @returns {string | undefined}
  */
 function shortcutUnavailable(rule, { platform = process.platform, activePack, context, shortcutLanguage, build, keys } = {}) {
-  if (platform !== 'win32') return 'Requires Windows.';
-  if (context?.windowId == null || activePack?.id !== rule.pack || Boolean(activePack?.sites) !== (rule.platform === 'web')) {
+  if (rule.platform === 'linux' ? platform !== 'linux' : platform !== 'win32') {
+    return rule.platform === 'linux' ? 'Requires Linux.' : 'Requires Windows.';
+  }
+  const packPlatform = activePack?.platform ?? (activePack?.sites ? 'web' : 'windows');
+  if (context?.windowId == null || activePack?.id !== rule.pack || packPlatform !== rule.platform) {
     return rule.platform === 'web' ? `Bring the verified ${rule.application} web app to the foreground.`
       : `Bring ${rule.application} to the foreground.`;
   }

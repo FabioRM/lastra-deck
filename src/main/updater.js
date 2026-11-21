@@ -49,6 +49,7 @@ function defaultHasUpdateConfig() {
  * @param {{ isPackaged: boolean }} options.app Electron `app`.
  * @param {(...args: unknown[]) => void} options.log Lastra logger.
  * @param {boolean} [options.preview] True for `--preview` and other one-shot runs.
+ * @param {boolean} [options.supported] Whether this installer has a configured update feed.
  * @param {NodeJS.ProcessEnv} [options.env]
  * @param {() => any} [options.loadAutoUpdater] Returns electron-updater's `autoUpdater` (injected in tests).
  * @param {() => boolean} [options.hasUpdateConfig]
@@ -60,7 +61,7 @@ function defaultHasUpdateConfig() {
  * @param {number} [options.intervalMs]
  */
 function createUpdater({
-  app, log, preview = false, env = process.env,
+  app, log, preview = false, supported = true, env = process.env,
   loadAutoUpdater = () => require('electron-updater').autoUpdater,
   hasUpdateConfig = defaultHasUpdateConfig, onChange = () => {},
   timers = { setTimeout, clearTimeout, setInterval, clearInterval }, now = Date.now,
@@ -70,6 +71,7 @@ function createUpdater({
   let disabledReason = null;
   if (!app.isPackaged) disabledReason = 'not-packaged';
   else if (preview) disabledReason = 'preview';
+  else if (!supported) disabledReason = 'unsupported-platform';
   else if (env.LASTRA_DISABLE_UPDATES === '1') disabledReason = 'LASTRA_DISABLE_UPDATES';
   else if (!hasUpdateConfig()) disabledReason = 'no-update-config';
 

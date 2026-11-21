@@ -106,6 +106,7 @@ const webPacks = withShortcutWorkflows([
   ...require('./shortcut-packs-web-workspaces'),
   ...require('./shortcut-packs-web-service-tools'),
   ...require('./shortcut-packs-web-engineering'),
+  ...require('./shortcut-packs-web-specialists'),
 ], require('./shortcut-pack-web-workflows'));
 
 const byPack = new Map(webPacks.map((pack) => [pack.id, pack]));

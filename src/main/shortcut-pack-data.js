@@ -9,7 +9,7 @@
  * }]} StarterKey
  *
  * @typedef {{ id: string, name: string, source: string, keys: any[][], executables?: string[],
- *   appIds?: string[], executablePattern?: RegExp, pathContains?: string, windowMode?: string, previewMode?: string,
+ *   appIds?: string[], platform?: 'linux', executablePattern?: RegExp, pathContains?: string, windowMode?: string, previewMode?: string,
  *   hostedWindows?: { executables: string[], mode: string },
  *   localizedSources?: Record<string, string>, editingMode?: string, editing?: boolean,
  *   sites?: { host?: string, subdomain?: string, prefix?: string }[], manifests?: string[], manifestExample?: string

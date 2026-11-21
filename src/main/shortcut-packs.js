@@ -33,6 +33,10 @@ const browserKeys = (previous, next) => [
 ];
 
 /** @type {import('./shortcut-pack-data').ShortcutPack[]} */
+const linuxPacks = require('./shortcut-packs-linux').linuxShortcutPacks(browserKeys);
+const linuxByAppId = new Map(linuxPacks.flatMap((pack) => pack.appIds.map((id) => [id, pack])));
+
+/** @type {import('./shortcut-pack-data').ShortcutPack[]} */
 const packs = withShortcutWorkflows([
   { id: 'photoshop', name: 'Adobe Photoshop', executables: PHOTOSHOP_EXECUTABLES, previewMode: photoshop.mode,
     source: 'https://helpx.adobe.com/content/dam/help/en/photoshop/using/default-keyboard-shortcuts/photoshop-keyboard-shortcuts.pdf', keys: [
@@ -178,6 +182,7 @@ const packs = withShortcutWorkflows([
   ...require('./shortcut-packs-creative-studios'),
   ...require('./shortcut-packs-windows-specialty'),
   ...require('./shortcut-packs-engineering'),
+  ...require('./shortcut-packs-desktop-specialists'),
 ], {
   ...require('./shortcut-pack-communication'),
   ...require('./shortcut-pack-productivity'),
@@ -196,6 +201,7 @@ const versionedPacks = packs.filter(({ executablePattern }) => executablePattern
 
 function packFor(context, webApps) {
   if (!context || context.shell) return null;
+  if (context.platform === 'linux') return linuxByAppId.get(context.appId?.toLowerCase()) ?? null;
   context = { executable: context.executable?.toLowerCase(), appId: context.appId?.toLowerCase(), path: context.path?.toLowerCase(), mode: context.mode };
   if (isInstalledWebApp(context)) return installedWebPack(context, webApps);
   const window = windowPacks.find(({ executables, mode }) => mode === context.mode && executables.includes(context.executable));
@@ -207,7 +213,7 @@ function packFor(context, webApps) {
 }
 
 function packIdentity(pack) {
-  return { pack: pack.id, application: pack.name, platform: pack.sites ? 'web' : 'windows' };
+  return { pack: pack.id, application: pack.name, platform: pack.platform ?? (pack.sites ? 'web' : 'windows') };
 }
 
 /**
@@ -280,6 +286,7 @@ function packKeys(pack, context = {}) {
 }
 
 function reviewedPackKeys(pack, owner, starter, shortcutLanguage) {
+  if (pack.platform === 'linux') return starter;
   const identity = packIdentity(pack);
   return mergeVerifiedKeys(owner, starter, shortcutLanguage, identity.platform).map((key) => {
     const binding = key.binding;
@@ -327,7 +334,12 @@ function defaultShortcutIds(starter, reviewed) {
     .map(({ id }) => id);
 }
 
-function previewPacks(shortcutLanguage) {
+function previewPacks(shortcutLanguage, platform = 'win32') {
+  if (platform === 'linux') return linuxPacks.map((pack) => {
+    const keys = starterPackKeys(pack).map((key) => annotateShortcut(pack, key));
+    return { id: pack.id, name: pack.name, apps: [], appIds: pack.appIds, source: pack.source, keys,
+      defaultShortcutIds: defaultShortcutIds(keys, keys) };
+  });
   const covered = new Set();
   const builtIn = packs.map((pack) => {
     const { id, name } = pack;

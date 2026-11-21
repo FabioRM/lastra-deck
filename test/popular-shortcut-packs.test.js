@@ -27,6 +27,7 @@ const addedDesktop = [
   ...require('../src/main/shortcut-packs-creative-studios'),
   ...require('../src/main/shortcut-packs-windows-specialty'),
   ...require('../src/main/shortcut-packs-engineering'),
+  ...require('../src/main/shortcut-packs-desktop-specialists'),
 ];
 const addedWeb = [
   ...require('../src/main/shortcut-packs-web-popular'),
@@ -35,6 +36,7 @@ const addedWeb = [
   ...require('../src/main/shortcut-packs-web-workspaces'),
   ...require('../src/main/shortcut-packs-web-service-tools'),
   ...require('../src/main/shortcut-packs-web-engineering'),
+  ...require('../src/main/shortcut-packs-web-specialists'),
 ];
 
 const windows = { platform: 'win32', osRelease: '10.0.26100' };
@@ -43,13 +45,13 @@ const webWindow = (manifestId, executable = 'msedge.exe') => ({
   executable, appId: executable + '._crx_' + chromiumWebAppId(manifestId), keyboardLayout: US_LAYOUT, windowId: 42n,
 });
 
-test('420 distinct app products have active packs with separate packs for nine variants', () => {
+test('446 distinct app products have active packs with separate packs for nine variants', () => {
   const all = [...packs, ...webPacks];
   const variants = new Set(['outlook-classic', 'antigravity-workbench', 'chatgpt-companion', 'cursor-agents', 'photoshop-web',
     'kicad-schematic', 'kicad-footprint', 'kicad-symbol', 'kicad-gerbview']);
   assert.equal(new Set(all.map(({ id }) => id)).size, all.length);
-  assert.equal(all.filter(({ id }) => !variants.has(id)).length, 420);
-  assert.equal(addedDesktop.length + addedWeb.length, 369);
+  assert.equal(all.filter(({ id }) => !variants.has(id)).length, 446);
+  assert.equal(addedDesktop.length + addedWeb.length, 395);
   const layouts = Object.fromEntries(all.map(({ id }) => [id, { enabled: true }]));
   assert.deepEqual(validateProfile({ ...profile, shortcutLayouts: layouts }).shortcutLayouts, layouts);
 });
@@ -101,6 +103,9 @@ test('all new app identities open usable, guarded shortcut pages and appear in t
   assert.equal(packFor({ executable: 'other_godot_v4.6.3-stable_win64.exe' }), null);
   assert.equal(packFor({ executable: 'VEGAS230.exe' }).id, 'vegas-pro');
   assert.equal(packFor({ executable: 'another-vegas230.exe' }), null);
+  assert.equal(packFor({ executable: 'Vectorworks2026.exe' }).id, 'vectorworks');
+  assert.equal(packFor({ executable: 'MobaXterm_Personal_25.3.exe' }).id, 'mobaxterm');
+  assert.equal(packFor({ executable: 'PAD.Console.Host.exe' }), null);
 });
 
 function titledWindow(executable, title) {

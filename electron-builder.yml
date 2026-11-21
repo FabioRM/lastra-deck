@@ -1,4 +1,4 @@
-# Windows packaging for Lastra. See docs/releasing.md.
+# Windows and Linux packaging for Lastra. See docs/releasing.md.
 appId: lastra.deck # Matches APP_ID in src/main/main.js (AppUserModelID, Start menu shortcut, uninstall key).
 productName: Lastra
 copyright: Copyright (c) Fabio Angeletti
@@ -20,6 +20,7 @@ asar: false
 
 # koffi ships a prebuilt Node-API binary; there is nothing to rebuild for Electron.
 npmRebuild: false
+afterPack: scripts/attach-linux-launcher.js
 
 files:
   - package.json
@@ -57,7 +58,24 @@ nsis:
   deleteAppDataOnUninstall: false
   artifactName: Lastra-Setup-${version}.${ext}
 
+linux:
+  executableName: lastra
+  syncDesktopName: true
+  category: Utility
+  icon: assets/icon.png
+  artifactName: Lastra-${version}-linux-${arch}.${ext}
+  target: [deb, AppImage]
+
+deb:
+  maintainer: Fabio Angeletti <FabioRM@users.noreply.github.com>
+  appArmorProfile: scripts/linux-apparmor.tpl
+  depends: ['libgtk-3-0 | libgtk-3-0t64', libnotify4, libnss3, libxss1, libxtst6, libx11-xcb1, libxcb1,
+    'libasound2 | libasound2t64', xdg-utils, 'libatspi2.0-0 | libatspi2.0-0t64', libuuid1, libsecret-1-0]
+  recommends: [gjs, xwayland, xdg-desktop-portal]
+
 publish:
   provider: github
   owner: FabioRM
   repo: lastra-deck
+  # CI uploads to a draft release. Updates reach installed decks only after the draft is published.
+  releaseType: draft

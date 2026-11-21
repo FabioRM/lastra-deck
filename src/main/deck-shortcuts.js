@@ -114,7 +114,7 @@ class DeckShortcuts {
         try {
           if (this.shortcuts.register(chord, () => this.dispatch(command, chord))) this.active.set(command, chord);
         } catch {
-          this.log('Windows rejected a deck shortcut registration.');
+          this.log('The desktop rejected a deck shortcut registration.');
         }
       }
       row.status = this.active.has(command) ? 'Active' : 'Unavailable or already in use';
