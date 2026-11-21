@@ -2,7 +2,7 @@
 'use strict';
 
 const path = require('node:path');
-const { cursorSurface, photoshopSurface, observeShortcutMode } = require('./shortcut-surface');
+const { usesShortcutWindowTitle, shortcutTitleMode, photoshopSurface, observeShortcutMode } = require('./shortcut-surface');
 const { loadWin32, fn, readProcessPath } = require('./win32');
 const SHELL_HOSTS = new Set(['startmenuexperiencehost.exe', 'shellexperiencehost.exe', 'searchhost.exe', 'searchapp.exe']);
 const DESKTOP_CLASSES = new Set(['Progman', 'WorkerW', 'Shell_TrayWnd', 'Shell_SecondaryTrayWnd']);
@@ -67,11 +67,11 @@ function createForegroundReader({ readAppIdentity = () => null, needsTitle = () 
 
   function titleContext({ window }, executable) {
     const includeTitle = needsTitle();
-    if (!includeTitle && executable !== 'cursor.exe') return {};
+    if (!includeTitle && !usesShortcutWindowTitle(executable)) return {};
     const buffer = Buffer.alloc(2_048);
     const length = getWindowText(window, buffer, buffer.length / 2);
     const title = buffer.toString('utf16le', 0, length * 2);
-    return { title: includeTitle ? title : undefined, mode: cursorSurface(executable, title) };
+    return { title: includeTitle ? title : undefined, mode: shortcutTitleMode(executable, title) };
   }
 
   function context({ fresh = false } = {}) {

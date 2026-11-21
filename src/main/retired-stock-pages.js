@@ -2,11 +2,13 @@
 'use strict';
 
 const { createHash } = require('node:crypto');
+const { isButtonOnlyPage } = require('../shared/editing-keys');
 
 // The original 8×3 Home before removing the four duplicate launch and mute controls.
 const STOCK_HOME = '66914e027550fabdbcc0a67977253c48433a8efea146488c69f2b0716e3e1566';
 const RETIRED_HOME_KEYS = new Set(['vscode', 'claude', 'windows-microphone', 'mute-speakers']);
 const RETIRED_APP_MIC_KEYS = new Map([['mic-teams', 'ctrl+shift+m'], ['mic-meet', 'ctrl+d']]);
+const RETIRED_HOME_VOLUME_KEYS = new Map([['volume-down', 'voldown'], ['volume-up', 'volup']]);
 
 // Default pages from the original and English releases, before and after an editor save.
 const STOCK = {
@@ -66,4 +68,20 @@ function retireHomeAppMicrophones(text) {
   return JSON.stringify(profile, null, 2) + '\n';
 }
 
-module.exports = { isRetiredStockPageId, retireStockPages, compactStockHome, retireHomeAppMicrophones };
+function retireHomeVolumeKeys(text) {
+  const profile = JSON.parse(text.replace(/^\uFEFF/, ''));
+  const home = profile?.pages?.find((page) => page.id === 'home');
+  if (!Array.isArray(home?.keys)) return null;
+  const retired = (key) => key?.action?.type === 'media'
+    && RETIRED_HOME_VOLUME_KEYS.has(key.id)
+    && RETIRED_HOME_VOLUME_KEYS.get(key.id) === key.action.key?.toLowerCase();
+  if (!home.keys.some(retired)) return null;
+  home.keys = home.keys.map((key) => retired(key) ? null : key);
+  if (isButtonOnlyPage(home.keys, home.widgets)) {
+    const buttons = home.keys.filter(Boolean);
+    home.keys = Array.from({ length: home.keys.length }, (_, index) => buttons[index] ?? null);
+  }
+  return JSON.stringify(profile, null, 2) + '\n';
+}
+
+module.exports = { isRetiredStockPageId, retireStockPages, compactStockHome, retireHomeAppMicrophones, retireHomeVolumeKeys };

@@ -3,13 +3,14 @@
 
 /**
  * The expansion uses the same starter-key tuples as the original packs.
- * @typedef {[id: string, label: string, icon: string, chord: string, options?: {
+ * @typedef {[id: string, label: string, icon: string, chord: string | string[], options?: {
  *   usLayout?: boolean, notation?: string, confirm?: boolean, source?: string, context?: string, mode?: string,
  *   group?: string, alternate?: boolean, minWindowsBuild?: number
  * }]} StarterKey
  *
  * @typedef {{ id: string, name: string, source: string, keys: any[][], executables?: string[],
  *   appIds?: string[], executablePattern?: RegExp, pathContains?: string, windowMode?: string, previewMode?: string,
+ *   hostedWindows?: { executables: string[], mode: string },
  *   localizedSources?: Record<string, string>, editingMode?: string, editing?: boolean,
  *   sites?: { host?: string, subdomain?: string, prefix?: string }[], manifests?: string[], manifestExample?: string
  * }} ShortcutPack
@@ -21,7 +22,8 @@
  * @param {string[]} executables Foreground processes, excluding shared hosts and launchers.
  * @param {string} source
  * @param {StarterKey[]} keys
- * @param {{ appIds?: string[], editing?: boolean, executablePattern?: RegExp }} [options]
+ * @param {{ appIds?: string[], editing?: boolean, executablePattern?: RegExp, windowMode?: string,
+ *   previewMode?: string, hostedWindows?: ShortcutPack['hostedWindows'] }} [options]
  */
 function desktopPack(id, name, executables, source, keys, options = {}) {
   return { id, name, executables, source, keys, ...options };

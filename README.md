@@ -8,7 +8,7 @@ Lastra turns the **CORSAIR XENEON EDGE** into a touchscreen macro deck for Windo
 
 ![Deck Keys toolbar with the Tools, Emoji, and page lock icons](docs/preview-toolbar.png)
 
-Bring an app like Visual Studio Code to the foreground and Deck Keys loads its shortcuts. Automatic packs fill the first screen before opening a second. The built-in library covers 342 Windows and installed web apps, with five additional packs for app editions and window variants. You can also create your own pages, rearrange commands, and hide individual keys. [Shortcut packs](docs/shortcut-packs.md) · [Watch pages switch](docs/preview-shortcuts.gif)
+Bring an app like Visual Studio Code to the foreground and Deck Keys loads its shortcuts. Automatic packs fill the first screen before opening a second. The built-in library covers 420 Windows and installed web apps, with nine additional packs for app editions and window variants. You can also create your own pages, rearrange commands, and hide individual keys. [Shortcut packs](docs/shortcut-packs.md) · [Watch pages switch](docs/preview-shortcuts.gif)
 
 [Getting started](#getting-started) · [Tools and Pomodoro](#tools-and-pomodoro) · [Deck views](#deck-views) · [Profile editor](#profile-editor) · [Local MCP integration](#local-mcp-integration) · [License](#license)
 
@@ -71,7 +71,7 @@ Start a **Pomodoro break** from Tools or Dashboard to fill the XENEON EDGE with 
 
 ## Deck views
 
-- **Deck Keys** combines app-aware shortcut pages, a persistent widget bar, and Windows audio controls. The default **Home** fits the 19 shortcuts and five fixed editing keys on one screen in either orientation. [Shortcut packs](docs/shortcut-packs.md) · [Macros](docs/macros.md) · [Widgets](docs/widgets.md)
+- **Deck Keys** combines app-aware shortcut pages, a persistent widget bar, and Windows audio controls. The default **Home** fits 15 shortcuts and five fixed editing keys on one screen in either orientation. Deck notifications appear above the clock in a reserved space. [Shortcut packs](docs/shortcut-packs.md) · [Macros](docs/macros.md) · [Widgets](docs/widgets.md)
 - **Tools** opens a dedicated screen from Deck Keys with countdowns, a stopwatch, Pomodoro, Quick decision, the soundboard, and deck controls. Open **Pages** or **Apps** from Tools. Set the Quick decision pick list in **Tools settings** in the desktop editor.
 - **Dashboard** shows a clock, calendar, Pomodoro timer, and Now Playing for the default Windows media session. Use **Previous**, **Play or Pause**, and **Next**, or drag the progress bar to seek when supported. [Now Playing](docs/now-playing.md) · [Pomodoro](docs/pomodoro.md)
 - **Stats** shows current readings and one-minute graphs. Reorder or resize overview cards and configure up to four readings on one chart, such as CPU load in percent and package power in watts. [Telemetry guide](docs/telemetry.md)
@@ -92,7 +92,7 @@ Open **Monitoring watchlist** in **Apps** to keep selected hardware, app, and se
 ## Pages and keys
 
 - Use the arrows, swipe horizontally, scroll sideways on a trackpad, or turn the mouse wheel over Deck Keys to change pages. A swipe cancels the key where it started. **Home** returns to the first page. The default profile starts on **Home**. VS Code and each browser open their own automatic shortcut pack when they take focus.
-- Deck opens a configured page for the foreground Windows app when one exists. Otherwise, it uses a matching built-in shortcut pack or a temporary **Auto** page with common shortcuts. Use a page's **Windows app IDs** for an exact Store app or installed web app match. Browser packs cover ordinary browser tabs. [Shortcut pack guide](docs/shortcut-packs.md)
+- Deck opens a configured page for the foreground Windows app when one exists. Otherwise, it uses a matching built-in shortcut pack or a temporary **Auto** page with common shortcuts. Use a page's **Windows app IDs** for an exact Store app or installed web app match. Browser packs cover ordinary browser tabs. [Shortcut pack guide](docs/shortcut-packs.md) · [Engineering shortcut packs](docs/engineering-shortcuts.md)
 - A page's **Context rules** can match a project or document within an assigned executable or Windows app ID. Lastra takes the highest **Rule priority**, then the most specific match. At equal priority, exact titles beat prefixes and partial titles, and Windows app IDs beat executable names for otherwise equal rules. Page order resolves a tie. Tap the page count or **Auto** to see why the page opened.
 - Use **Home** or either arrow from an **Auto** page to return to a configured page. A manual selection holds until the foreground app changes. **Lock page** keeps the displayed page until you unlock it. If an automatic page is locked when Lastra closes, the configured fallback opens locked next time.
 - In Lastra Settings, open **Display, activity and navigation options → After an app page** to choose **Home** or **Last manually selected page**. The deck uses this choice when the foreground stops matching an app page. It keeps the last manual page for each activity. The default is **Last manually selected page**.
@@ -183,6 +183,8 @@ Stock profiles ship with English labels. The unchanged original stock profile up
 At startup, Lastra retires untouched copies of the original VS Code and Browser pages from the Main activity. It keeps customised pages and saves a copy of the original profile in `profile.json.before-automatic-pages.bak`. If the saved selection referred to a retired page, Lastra falls back to the first page and keeps the existing lock setting.
 
 An untouched older **Home** in the Main activity is compacted to the single-screen layout. The original profile is available in **Backups** and in `profile.json.before-compact-home.bak`.
+
+Activity profiles with the old system volume buttons in **Home** use the audio sliders. Lastra removes the two buttons on startup and saves the previous profile in **Backups**.
 
 ### JSON format
 

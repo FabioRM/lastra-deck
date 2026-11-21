@@ -26,9 +26,10 @@ test('stock Home fits one screen in both orientations and old profiles get a rec
   fs.writeFileSync(file, before);
   const migrated = store.load({ upgradeStock: true });
   const { grid, slots, widgets } = toView(migrated);
-  assert.equal(slots.filter(Boolean).length, 17);
+  assert.equal(slots.filter(Boolean).length, 15);
+  assert.ok(slots.slice(0, 15).every(Boolean) && slots.slice(15).every((slot) => !slot));
   for (const portrait of [false, true]) assert.equal(projectEditingPage(grid, slots, widgets, portrait).sheets.length, 1);
-  for (const id of ['vscode', 'claude', 'windows-microphone', 'mute-speakers', 'mic-teams', 'mic-meet']) {
+  for (const id of ['vscode', 'claude', 'windows-microphone', 'mute-speakers', 'mic-teams', 'mic-meet', 'volume-down', 'volume-up']) {
     assert.ok(!slots.some((key) => key?.id === id));
   }
   assert.equal(fs.readFileSync(`${file}.before-compact-home.bak`, 'utf8'), before);
@@ -36,10 +37,10 @@ test('stock Home fits one screen in both orientations and old profiles get a rec
   const backup = store.editorBackups().versions.find((version) => version.id === store.backupVersions()
     .find((entry) => entry.text === before).id);
   store.restoreBackup(backup.id, store.editorSnapshot().token);
-  assert.equal(store.load({ upgradeStock: true }).pages[0].keys.filter(Boolean).length, 21);
+  assert.equal(store.load().pages[0].keys.filter(Boolean).length, 23);
 });
 
-test('stock Home migration leaves a customised Home untouched', (t) => {
+test('older customised Home preserves edited actions and removes stock volume controls', (t) => {
   const { file, store } = temporaryProfile(t);
   const profile = require('./fixtures/home-before-compaction.json');
   const custom = structuredClone(profile);
@@ -51,9 +52,31 @@ test('stock Home migration leaves a customised Home untouched', (t) => {
   });
   const text = JSON.stringify(custom);
   fs.writeFileSync(file, text);
-  assert.equal(store.load({ upgradeStock: true }).pages[0].keys[1].label, 'My editor');
-  assert.equal(fs.readFileSync(file, 'utf8'), text);
+  const { keys } = store.load({ upgradeStock: true }).pages[0];
+  assert.equal(keys[1].label, 'My editor');
+  assert.equal(keys.find((key) => key?.id === 'mic-meet').action.keys, 'ctrl+alt+d');
+  assert.ok(!keys.some((key) => key?.id === 'volume-up' || key?.id === 'volume-down'));
+  assert.equal(fs.readFileSync(`${file}.before-home-volume-removal.bak`, 'utf8'), text);
   assert.equal(fs.existsSync(`${file}.before-compact-home.bak`), false);
+});
+
+test('volume migration only retires the Home media keys and keeps the other buttons in order', (t) => {
+  const { file, store } = temporaryProfile(t);
+  const profile = require(defaultFile);
+  const [volumeDown, volumeUp] = require('./fixtures/home-before-compaction.json').pages[0].keys
+    .filter((key) => ['volume-down', 'volume-up'].includes(key?.id));
+  const [terminal, explorer] = profile.pages[0].keys;
+  const rebound = { ...volumeUp, action: { type: 'hotkey', keys: 'Ctrl+R' } };
+  const pages = [{ id: 'home', keys: [terminal, volumeDown, null, explorer, rebound] },
+    { id: 'media', keys: [volumeDown, volumeUp] }];
+  const before = JSON.stringify({ ...profile, pages });
+  fs.writeFileSync(file, before);
+  const migrated = store.load({ upgradeHomeVolume: true });
+  assert.deepEqual(migrated.pages[0].keys.map((key) => key?.id ?? null), ['terminal', 'file-explorer', 'volume-up', null, null]);
+  assert.deepEqual(migrated.pages[0].keys[2].action, rebound.action);
+  assert.deepEqual(migrated.pages[1].keys.map((key) => key.id), ['volume-down', 'volume-up']);
+  assert.equal(fs.readFileSync(`${file}.before-home-volume-removal.bak`, 'utf8'), before);
+  assert.deepEqual(store.load({ upgradeHomeVolume: true }), migrated);
 });
 
 test('Home removes the stock app microphone shortcuts and leaves the same keys on other pages', (t) => {

@@ -67,6 +67,37 @@ function previewControls(devtools) {
   return { evaluate, waitFor, click };
 }
 
+async function verifyPreviewHomeNotification(devtools, send, publishProfile) {
+  const { evaluate, waitFor } = previewControls(devtools);
+  const geometry = `JSON.stringify(['time', 'date', 'status', 'telemetry', 'mixer', 'keys'].map(id =>
+    document.getElementById(id).getBoundingClientRect().toJSON()))`;
+  const notice = `document.getElementById('home-notification')`;
+  const baseline = await evaluate(geometry);
+  const message = 'Profile reloaded';
+  send('status', { ok: true, message });
+  await waitFor(`${notice}.textContent.length > 0`, 'The Home notification did not appear.');
+  if (await evaluate(geometry) !== baseline) throw new Error('The Home notification moved the layout.');
+
+  publishProfile();
+  await waitFor(`document.getElementById('status').textContent === ''`, 'The empty profile status did not render.');
+  if (!await evaluate(`${notice}.textContent.length > 0`)) throw new Error('A profile refresh cleared the Home notification.');
+  // Wait for the same success timeout that the live deck uses.
+  for (let elapsed = 0; elapsed < 5000 && await evaluate(`${notice}.textContent.length`); elapsed += 100) await pause(100);
+  if (await evaluate(`${notice}.textContent.length`) || await evaluate(geometry) !== baseline) {
+    throw new Error('The Home notification did not expire without moving the layout.');
+  }
+
+  send('status', { ok: false, message: 'Could not reload the profile. '.repeat(20).trim() });
+  await waitFor(`${notice}.classList.contains('err')`, 'The Home error notification did not appear.');
+  const fits = await evaluate(`(() => {
+    const bounds = ${notice}.getBoundingClientRect();
+    const time = document.getElementById('time').getBoundingClientRect();
+    const controls = document.getElementById('home-page').getBoundingClientRect();
+    return bounds.width > 0 && bounds.bottom <= time.top && (bounds.top >= controls.bottom || bounds.right <= controls.left);
+  })()`);
+  if (!fits || await evaluate(geometry) !== baseline) throw new Error('The Home error must fit above the clock and clear the toolbar.');
+}
+
 async function openPreviewTools(devtools) {
   const { click, waitFor, evaluate } = previewControls(devtools);
   await click('quick-tools-open');
@@ -462,6 +493,10 @@ async function startPreview({ opts, ipcMain, BrowserWindow, quit, fail, log, ren
       if (opts.verifyFaders) {
         await verifyPreviewFaders(devtools, previewAudio, previewAudioWrites);
         log('Horizontal and vertical audio faders verified.');
+      }
+      if (opts.verifyHomeNotification) {
+        await verifyPreviewHomeNotification(devtools, send, () => send('profile', { ...previewView(), name: '' }));
+        log('Home notifications verified without layout shifts.');
       }
       if (opts.verifyStats) {
         const { inspectStatsLayout, inspectCustomOverview, inspectChartSeries } = require('./stats-preview');

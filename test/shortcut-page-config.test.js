@@ -70,6 +70,33 @@ test('hidden packs fall back safely and custom pages work in explicitly configur
   assert.ok(previewPacks('en-US').find(({ id }) => id === 'chrome').defaultShortcutIds.includes('new-tab'));
 });
 
+test('Chrome uses one tab pair by default and shares history navigation with the persistent bar', () => {
+  const pack = previewPacks('en-US').find(({ id }) => id === 'chrome');
+  const alternate = pack.keys.find(({ action }) => action?.keys === 'Ctrl+Tab');
+  const profile = validateProfile({ pages: raw.pages, bar: { keys: [
+    { id: 'browser-back', label: 'Back', action: { type: 'hotkey', keys: 'Alt+Left' } },
+    { id: 'other-forward', label: 'Forward', action: { type: 'hotkey', keys: 'Alt+Right', targetApps: ['msedge.exe'] } },
+  ] } });
+  const page = select(profile);
+  const count = (keys, chord) => keys.filter(({ action }) => action?.keys === chord).length;
+  for (const chord of ['Ctrl+PageUp', 'Ctrl+PageDown', 'Alt+Left', 'Alt+Right']) assert.equal(count(page.keys, chord), 1);
+  for (const chord of ['Ctrl+Tab', 'Ctrl+Shift+Tab']) assert.equal(count(page.keys, chord), 0);
+  assert.equal(alternate.alternateFor, 'next-tab');
+  assert.ok(!pack.defaultShortcutIds.includes(alternate.id));
+  const view = toView(profile, { page });
+  assert.ok(view.bar.keys.find((key) => key?.id === 'bar:browser-back'));
+  assert.ok(!view.slots.some((key) => key?.shortcut === 'Alt+Left'));
+  assert.ok(view.slots.some((key) => key?.shortcut === 'Alt+Right'));
+  assert.ok(toView(profile, { page, unavailable: ({ id }) => id === 'browser-back' ? 'Unavailable' : undefined })
+    .slots.some((key) => key?.shortcut === 'Alt+Left'));
+
+  const customized = (hidden) => validateProfile({ pages: raw.pages, shortcutLayouts: { chrome: { enabled: true, pages: [
+    { id: 'chrome-tabs', name: 'Chrome tabs', shortcuts: [{ id: alternate.id }, { id: 'next-tab', hidden }] },
+  ] } } });
+  assert.deepEqual(select(customized(false)).keys.map(({ action }) => action.keys), ['Ctrl+PageDown']);
+  assert.deepEqual(select(customized(true)).keys.map(({ action }) => action.keys), ['Ctrl+Tab']);
+});
+
 test('customizing a compact pack preserves its default keys and fills each screen before adding another', () => {
   const library = previewPacks('en-US');
   const samples = [

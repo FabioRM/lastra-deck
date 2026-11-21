@@ -14,6 +14,7 @@ const { withShortcutOverride, shortcutGuardForAction } = require('../shared/shor
 const MANIFEST_REVISION = '6b3db15615e3e549b89790e0bd83c82d262c22e0';
 const MANIFEST_PACKS = new Set(['chrome', 'edge', 'firefox', 'brave', 'explorer', 'vscode', 'terminal',
   'outlook-classic', 'outlook-new', 'excel', 'word', 'powerpoint', 'teams', 'discord']);
+const CHROME_TAB_ALTERNATES = new Set(['next-tab', 'previous-tab']);
 const terminal = 'microsoft.windowsterminal_8wekyb3d8bbwe!app';
 const newOutlook = 'microsoft.outlookforwindows_8wekyb3d8bbwe!microsoft.outlookforwindows';
 const outlookSource = 'https://support.microsoft.com/en-us/accessibility/outlook/keyboard-shortcuts-for-outlook';
@@ -173,24 +174,32 @@ const packs = withShortcutWorkflows([
   ...require('./shortcut-packs-windows-utilities'),
   ...require('./shortcut-packs-desktop-more'),
   ...require('./shortcut-packs-authoring'),
+  ...require('./shortcut-packs-desktop-workspaces'),
+  ...require('./shortcut-packs-creative-studios'),
+  ...require('./shortcut-packs-windows-specialty'),
+  ...require('./shortcut-packs-engineering'),
 ], {
   ...require('./shortcut-pack-communication'),
   ...require('./shortcut-pack-productivity'),
   ...require('./shortcut-pack-jetbrains'),
   ...require('./shortcut-pack-authoring-workflows'),
+  ...require('./shortcut-pack-engineering-workflows'),
 });
 
 const byExecutable = new Map(packs.filter(({ windowMode }) => !windowMode).flatMap((pack) => pack.executables.map((exe) => [exe, pack])));
 const byAppId = new Map(packs.flatMap((pack) => (pack.appIds ?? []).map((id) => [id, pack])));
-const windowPacks = packs.filter(({ windowMode }) => windowMode);
+const windowPacks = packs.flatMap((pack) => {
+  const windows = pack.hostedWindows ?? (pack.windowMode && { executables: pack.executables, mode: pack.windowMode });
+  return windows ? [{ ...windows, pack }] : [];
+});
 const versionedPacks = packs.filter(({ executablePattern }) => executablePattern);
 
 function packFor(context, webApps) {
   if (!context || context.shell) return null;
   context = { executable: context.executable?.toLowerCase(), appId: context.appId?.toLowerCase(), path: context.path?.toLowerCase(), mode: context.mode };
   if (isInstalledWebApp(context)) return installedWebPack(context, webApps);
-  const windowPack = windowPacks.find(({ executables, windowMode }) => windowMode === context.mode && executables.includes(context.executable));
-  if (windowPack) return windowPack;
+  const window = windowPacks.find(({ executables, mode }) => mode === context.mode && executables.includes(context.executable));
+  if (window) return window.pack;
   const pack = byAppId.get(context.appId) ?? byExecutable.get(context.executable)
     ?? versionedPacks.find(({ executablePattern }) => executablePattern.test(context.executable ?? ''));
   if (!pack || (pack.pathContains && !context.path?.includes(pack.pathContains))) return null;
@@ -207,10 +216,11 @@ function packIdentity(pack) {
  */
 function starterPackKeys(pack, { build, keyboardLayout, mode, shortcutLanguage } = {}) {
   return pack.keys.map(([id, label, icon, chord, requirements]) => {
-    const language = chord && typeof chord === 'object'
+    const sequence = Array.isArray(chord);
+    const language = chord && typeof chord === 'object' && !sequence
       ? (Object.hasOwn(chord, shortcutLanguage) ? shortcutLanguage : Object.keys(chord)[0]) : undefined;
     const keys = language ? chord[language] : chord;
-    const confirm = requirements?.confirm || needsShortcutConfirmation(id, keys);
+    const confirm = requirements?.confirm || (sequence ? keys : [keys]).some((step) => needsShortcutConfirmation(id, step));
     const shortcutGuard = { ...packIdentity(pack),
       ...(language ? { language } : {}),
       ...(requirements?.minWindowsBuild ? { minBuild: requirements.minWindowsBuild } : {}),
@@ -220,19 +230,23 @@ function starterPackKeys(pack, { build, keyboardLayout, mode, shortcutLanguage }
     };
     const unavailable = shortcutRequirements(shortcutGuard, { build, keyboardLayout, mode, shortcutLanguage });
     const source = requirements?.source ?? pack.localizedSources?.[language];
+    const notation = requirements?.notation ?? (sequence ? keys.join(' → ') : undefined);
+    const action = sequence ? { type: 'sequence', steps: keys.map((step) => ({ type: 'hotkey', keys: step, shortcutGuard })) }
+      : requirements?.spotify ? { type: 'spotify-playback', shortcutGuard } : {
+        type: 'hotkey', keys, shortcutGuard,
+        ...(requirements?.notation ? { notation: requirements.notation } : {}),
+        ...(requirements?.requiresPhotoshopWorkspace ? { requiresPhotoshopWorkspace: true } : {}),
+      };
     return {
       id, label, icon, category: requirements?.spotify ? 'media' : 'app',
       ...(source ? { source } : {}),
-      ...(requirements?.notation ? { notation: requirements.notation } : {}),
+      ...(notation ? { notation } : {}),
+      ...(sequence ? { shortcut: notation } : {}),
       ...(requirements?.group ? { group: requirements.group } : {}),
       ...(requirements?.alternate ? { alternate: true } : {}),
       ...(requirements?.context || requirements?.group
         ? { contexts: [requirements?.group, requirements?.context].filter(Boolean) } : {}),
-      action: requirements?.spotify ? { type: 'spotify-playback', shortcutGuard } : {
-        type: 'hotkey', keys, shortcutGuard,
-        ...(requirements?.notation ? { notation: requirements.notation } : {}),
-        ...(requirements?.requiresPhotoshopWorkspace ? { requiresPhotoshopWorkspace: true } : {}),
-      },
+      action,
       ...(confirm ? { confirm: true } : {}),
       ...(unavailable ? { unavailable } : {}),
     };
@@ -295,7 +309,9 @@ function reviewedPackKeys(pack, owner, starter, shortcutLanguage) {
     const unavailable = shortcutRequirements(shortcutGuard, { shortcutLanguage });
     const guarded = (step, notation) => ({ ...step, shortcutGuard, ...(notation ? { notation } : {}) });
     const action = sequence ? { ...key.action, steps: steps.map((step) => guarded(step, step.keys)) } : guarded(key.action, binding.notation);
+    const alternateFor = pack.id === 'chrome' && key.id !== binding.id && CHROME_TAB_ALTERNATES.has(binding.id) ? binding.id : undefined;
     return { ...key, action, ...(sequence ? { shortcut: binding.notation } : {}),
+      ...(alternateFor ? { alternate: true, alternateFor } : {}),
       ...(confirm ? { confirm: true } : {}),
       ...(unavailable ? { unavailable } : {}) };
   });

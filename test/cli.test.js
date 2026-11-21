@@ -45,9 +45,10 @@ test('preview Tools and the full-screen break in the offscreen renderer', () => 
 });
 
 test('verification and measurement flags', () => {
-  const opts = parseArgs(['--verify-deck-swipe', '--verify-audio-faders', '--measure-deck', '--editor', '--windowed']);
+  const opts = parseArgs(['--verify-deck-swipe', '--verify-audio-faders', '--verify-home-notification', '--measure-deck', '--editor', '--windowed']);
   assert.equal(opts.verifySwipe, true);
   assert.equal(opts.verifyFaders, true);
+  assert.equal(opts.verifyHomeNotification, true);
   assert.equal(opts.measureDeck, true);
   assert.equal(opts.editor, true);
   assert.equal(opts.windowed, true);

@@ -9,7 +9,7 @@ const path = require('node:path');
 const { EventEmitter } = require('node:events');
 const { createHash } = require('node:crypto');
 const { writeAtomic } = require('./write-atomic');
-const { retireStockPages, compactStockHome, retireHomeAppMicrophones } = require('./retired-stock-pages');
+const { retireStockPages, compactStockHome, retireHomeAppMicrophones, retireHomeVolumeKeys } = require('./retired-stock-pages');
 const { normalizeWidgetInstances, BAR_GRID } = require('./widgets');
 const { embeddedImageDataUrl } = require('./icons');
 const { normalizeCompositionPresets } = require('../shared/widget-composition');
@@ -41,6 +41,7 @@ const LEGACY_STOCK_PROFILE_HASH = 'e8ae3e69c367063cfbb31c3789928025edfcfecaab817
 const AUTO_PAGES_BACKUP = '.before-automatic-pages.bak';
 const HOME_LAYOUT_BACKUP = '.before-compact-home.bak';
 const HOME_MIC_BACKUP = '.before-home-mic-removal.bak';
+const HOME_VOLUME_BACKUP = '.before-home-volume-removal.bak';
 /** @type {[(text: string) => string | null | undefined | false, string][]} */
 const STOCK_LAYOUT_UPGRADES = [
   [retireStockPages, AUTO_PAGES_BACKUP], [compactStockHome, HOME_LAYOUT_BACKUP], [retireHomeAppMicrophones, HOME_MIC_BACKUP],
@@ -461,7 +462,7 @@ class ProfileStore extends EventEmitter {
     this.timer = null;
   }
 
-  load({ upgradeStock = false } = {}) {
+  load({ upgradeStock = false, upgradeHomeVolume = upgradeStock } = {}) {
     let text = readProfileText(this.file);
     if (text === null) {
       if (this.backupVersions().length) throw new Error('Profile file is missing');
@@ -482,7 +483,9 @@ class ProfileStore extends EventEmitter {
       text = replacement;
     }
     let profile = parseProfile(text);
-    for (const [upgrade, suffix] of upgradeStock ? STOCK_LAYOUT_UPGRADES : []) {
+    const upgrades = upgradeStock ? [...STOCK_LAYOUT_UPGRADES] : [];
+    if (upgradeHomeVolume) upgrades.push([retireHomeVolumeKeys, HOME_VOLUME_BACKUP]);
+    for (const [upgrade, suffix] of upgrades) {
       const migrated = upgrade(text);
       if (!migrated) continue;
       const replacement = parseProfile(migrated);
@@ -533,7 +536,7 @@ class ProfileStore extends EventEmitter {
     const versions = this.recentVersions();
     for (const [suffix, source] of [['.before-english.bak', 'before-english'],
       [AUTO_PAGES_BACKUP, 'before-automatic-pages'], [HOME_LAYOUT_BACKUP, 'before-compact-home'],
-      [HOME_MIC_BACKUP, 'before-home-mic-removal']]) {
+      [HOME_MIC_BACKUP, 'before-home-mic-removal'], [HOME_VOLUME_BACKUP, 'before-home-volume-removal']]) {
       const checkpoint = readStandaloneVersion(this.file + suffix, source);
       if (checkpoint && !versions.some((version) => version.id === checkpoint.id)) versions.push(checkpoint);
     }

@@ -36,7 +36,7 @@ test('compact and wide widget layouts preserve action and widget data during pro
   const compact = projectEditingPage({ cols: 1, rows: 1 }, [{ id: 'only-key' }], [], false);
   assert.equal(compact.cols, 5);
   assert.equal(compact.sheets[0].keys[0].index, 0);
-  assert.deepEqual(compact.editing.map(({ layout }) => layout.column), [0, 1, 2, 3, 4]);
+  assert.deepEqual(compact.editing.flatMap(({ layout }) => cells(layout, compact.cols)), [5, 6, 7, 8, 9]);
   const widget = { id: 'wide', settings: { device: 'output' }, layout: { column: 0, row: 0, cols: 4, rows: 2 } };
   const view = projectEditingPage({ cols: 4, rows: 2 }, [], [widget], false);
   assert.deepEqual(view.sheets[0].widgets[0].settings, widget.settings);
@@ -68,6 +68,36 @@ test('large keys keep authored, packed, and fixed keys reachable in both orienta
         const occupied = [...sheet.keys, ...view.editing, ...sheet.widgets.slice(0, 1)].flatMap(({ layout }) => cells(layout, cols));
         assert.equal(occupied.length, cols * rows);
         assert.equal(new Set(occupied).size, occupied.length);
+      }
+    }
+  }
+});
+
+test('sparse and named pages compact regular shortcuts while keeping the same final five cells', () => {
+  const grid = { cols: 8, rows: 3 };
+  const slots = Array.from({ length: 28 }, (_, index) => index < 3 || index === 7 ? null : {
+    id: 'key-' + index, ...(index === 6 ? { unavailable: 'Requires a different mode.' } : {}),
+    shortcutPage: index < 27 ? 'first' : 'second',
+  });
+  for (const portrait of [false, true]) {
+    for (const largeKeys of [false, true]) {
+      const manual = projectEditingPage(grid, slots.slice(0, 24), [], portrait, largeKeys);
+      const named = projectShortcutPages(grid, slots, portrait, largeKeys,
+        [{ id: 'first', name: 'First' }, { id: 'second', name: 'Second' }]);
+      assert.equal(named.sheets.at(-1).group, 'Second');
+      for (const view of [manual, named]) {
+        const firstEditingCell = view.rows * view.cols - 5;
+        assert.deepEqual(view.editing.map(({ id }) => id), ['edit:cut', 'edit:copy', 'edit:paste', 'edit:undo', 'edit:redo']);
+        assert.deepEqual(view.editing.flatMap(({ layout }) => cells(layout, view.cols)),
+          [0, 1, 2, 3, 4].map((offset) => firstEditingCell + offset));
+        for (const sheet of view.sheets) {
+          const used = sheet.keys.filter(({ index }) => index !== null);
+          assert.deepEqual(used.flatMap(({ layout }) => cells(layout, view.cols)), used.map((_, index) => index));
+          assert.ok(sheet.keys.every(({ layout }) => cells(layout, view.cols)[0] < firstEditingCell));
+        }
+        const keys = view === manual ? slots.slice(0, 24) : slots;
+        assert.deepEqual(view.sheets.flatMap(({ keys }) => keys.flatMap(({ index }) => index === null ? [] : [index])),
+          keys.flatMap((key, index) => key ? [index] : []));
       }
     }
   }

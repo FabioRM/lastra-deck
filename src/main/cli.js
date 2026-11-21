@@ -21,6 +21,7 @@ const path = require('node:path');
  * @property {boolean} [verifyStats] Check the Stats preview layout.
  * @property {boolean} [verifySwipe] Check that a swipe on a wide key changes pages.
  * @property {boolean} [verifyFaders] Check horizontal and vertical audio faders.
+ * @property {boolean} [verifyHomeNotification] Check the Home notification and clock geometry.
  * @property {boolean} [previewLargeKeys] Render with the large Deck Keys layout.
  * @property {boolean} [measureDeck] Enable the panel measurement recorder.
  */
@@ -54,6 +55,7 @@ function parseArgs(argv, { cwd } = {}) {
     else if (arg === '--verify-stats-layout') opts.stats = opts.verifyStats = true;
     else if (arg === '--verify-deck-swipe') opts.verifySwipe = true;
     else if (arg === '--verify-audio-faders') opts.verifyFaders = true;
+    else if (arg === '--verify-home-notification') opts.verifyHomeNotification = true;
     else if (arg === '--measure-deck') opts.measureDeck = true;
     else if (arg === '--editor') opts.editor = true;
     else if (arg === '--settings') opts.settings = true;

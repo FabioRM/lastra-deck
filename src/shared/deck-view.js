@@ -23,6 +23,12 @@
     return value === true ? 'hold' : value?.mode;
   }
 
+  function browserHistoryChord(key) {
+    if (key?.action?.type !== 'hotkey' || typeof key.action.keys !== 'string' || key.hold || key.double || key.confirm) return undefined;
+    const chord = key.action.keys.toLowerCase().replace(/\s/g, '');
+    return chord === 'alt+left' || chord === 'alt+right' ? chord : undefined;
+  }
+
   // The display receives gesture hints and visual assets. Commands stay with the profile.
   function toView(profile, { icon = () => null, image = () => null, unavailable = () => undefined,
     page = profile.pages[0], editingKeys = PREVIEW_EDITING_KEYS, foregroundExecutable = undefined, deduplicateEditing = true } = {}) {
@@ -74,10 +80,20 @@
         ...(readout ? { readout } : {}),
       };
     }
+    const barKeys = (profile.bar?.keys ?? []).map((key) => effectiveKey(key));
+    const barSlots = barKeys.map((key) => surfaceKey(key, 'bar:'));
+    const barHistory = shortcutPack && page.pack === 'chrome' ? new Set(barKeys.map((key, index) => {
+      const targets = key?.action?.targetApps;
+      const guard = key?.action?.shortcutGuard;
+      if (!barSlots[index]?.unavailable && (!targets?.length || targets.some((app) => app.trim().toLowerCase() === 'chrome.exe'))
+          && (!guard || guard.pack === 'chrome')) return browserHistoryChord(key);
+      return undefined;
+    }).filter(Boolean)) : null;
     const slotCount = shortcutPack ? page.keys.length : grid.cols * grid.rows;
     const slots = Array.from({ length: slotCount }, (_, index) => {
       const key = effectiveKey(page.keys[index], page);
-      return deduplicateEditing && duplicateEditingKey(key, editingKeys, { generated: page.generated, executable: foregroundExecutable })
+      return barHistory?.has(browserHistoryChord(key))
+        || (deduplicateEditing && duplicateEditingKey(key, editingKeys, { generated: page.generated, executable: foregroundExecutable }))
         ? null : surfaceKey(key);
     });
     const surfaceWidget = (widget) => widget.type === 'composition' ? { ...widget,
@@ -87,7 +103,7 @@
       ...(shortcutPack ? { shortcutPack } : {}),
       ...(page.shortcutPages ? { shortcutPages: page.shortcutPages } : {}),
       slots, editingKeys: editingKeys.map((key) => surfaceKey(key)), widgets: (page.widgets ?? []).map(surfaceWidget), bar: {
-        keys: (profile.bar?.keys ?? []).map((key) => surfaceKey(effectiveKey(key), 'bar:')),
+        keys: barSlots,
         widgets: (profile.bar?.widgets ?? []).map(surfaceWidget),
       },
     };

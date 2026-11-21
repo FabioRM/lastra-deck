@@ -1,6 +1,6 @@
 # 12 nuove app desktop e 8 pacchetti ampliati
 
-Il catalogo di Lastra arriva a 342 applicazioni. Il gruppo di nuovi pacchetti aggiunge 77 scorciatoie. Gli otto pacchetti ampliati ne aggiungono altre 80. [Catalogo precedente](catalog-expansion.md) · [Guida al Deck](shortcut-packs.md)
+Questo aggiornamento ha portato il catalogo di Lastra a 342 applicazioni. I 12 nuovi pacchetti aggiungono 77 scorciatoie e gli otto pacchetti ampliati ne aggiungono altre 80. [Catalogo precedente](catalog-expansion.md) · [Altre 40 app](workspace-shortcuts.md) · [Guida al Deck](shortcut-packs.md)
 
 ## Nuove app
 

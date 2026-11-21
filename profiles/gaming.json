@@ -50,26 +50,6 @@
             "type": "audio",
             "device": "output"
           }
-        },
-        {
-          "id": "volume-down",
-          "label": "Volume down",
-          "icon": "volume-1",
-          "category": "media",
-          "action": {
-            "type": "media",
-            "key": "voldown"
-          }
-        },
-        {
-          "id": "volume-up",
-          "label": "Volume up",
-          "icon": "volume-2",
-          "category": "media",
-          "action": {
-            "type": "media",
-            "key": "volup"
-          }
         }
       ]
     },

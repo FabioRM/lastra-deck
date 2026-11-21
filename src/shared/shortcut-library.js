@@ -108,7 +108,7 @@
       && Object.keys(step.shortcutGuard).length === fields.length && fields.every((field) => step.shortcutGuard[field] === guard[field]))) return guard;
   }
 
-  const api = { shortcutRows, filterShortcutRows, withShortcutOverride, captureShortcut, shortcutGuardForAction, MAX_WEB_APP_MANIFESTS: 96 };
+  const api = { shortcutRows, filterShortcutRows, withShortcutOverride, captureShortcut, shortcutGuardForAction, MAX_WEB_APP_MANIFESTS: 192 };
   if (typeof module === 'object') module.exports = api;
   else window.LastraShortcutLibrary = api;
 }

@@ -205,11 +205,6 @@ module.exports = [
     ['resize', 'Resize or resample', 'scaling', 'Ctrl+R'],
     ['fullscreen', 'Full screen', 'maximize', 'Enter'],
   ], { editing: false }),
-  pack('kicad', 'KiCad PCB Editor', ['pcbnew.exe'], 'https://docs.kicad.org/9.0/en/pcbnew/pcbnew.html', [
-    ['save', 'Save board', 'save', 'Ctrl+S'],
-    ['viewer', 'Open 3D Viewer', 'box', 'Alt+3'],
-    ['shortcuts', 'List hotkeys', 'keyboard', 'Ctrl+F1'],
-  ]),
   pack('faststone', 'FastStone Image Viewer', ['fsviewer.exe'], 'https://www.faststone.org/FSIVTutorial.htm', [
     ['fullscreen', 'Full screen or browser', 'maximize', 'Enter'],
     ['rotate-left', 'Rotate left', 'rotate-ccw', 'L'],

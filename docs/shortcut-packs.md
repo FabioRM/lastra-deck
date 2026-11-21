@@ -2,9 +2,11 @@
 
 In Deck Keys, Lastra uses the focused app's built-in pack when no custom page matches. The Main activity uses the VS Code pack or the actual browser's pack when the corresponding app takes focus. Custom pages keep their matching rules and priority. Each browser pack uses that browser's native tab bindings.
 
-The built-in library covers 342 Windows and installed web apps, with five additional packs for editions and window variants. The lists include examples and sources for each pack. [First 200 apps](200-applications.md) · [Next 80 apps](additional-applications.md) · [Next 50 apps](catalog-expansion.md) · [12 more apps and expanded packs](authoring-shortcuts.md)
+The built-in library covers 420 Windows and installed web apps, with nine additional packs for editions and window variants. The lists include examples and sources for each pack. [First 200 apps](200-applications.md) · [Next 80 apps](additional-applications.md) · [Next 50 apps](catalog-expansion.md) · [Next 12 apps](authoring-shortcuts.md) · [Next 40 apps](workspace-shortcuts.md) · [Next 30 apps](studio-and-service-shortcuts.md) · [Engineering apps and editors](engineering-shortcuts.md)
 
 Automatic packs put quick actions first and fill each screen before opening another. Commands from different workflow groups share the available space. On the standard 8×3 grid, each screen holds up to 19 app shortcuts and five fixed editing keys. Use the page arrows or swipe if the pack spans multiple screens. A command whose app mode, layout, or language cannot be verified shows its availability reason.
+
+Chrome uses `Ctrl+PageUp` and `Ctrl+PageDown` for the previous and next tab in the default Deck. The keyboard alternatives are available in **App shortcuts**. If the persistent bar has an active Back or Forward hotkey for Chrome, the app pack leaves that direction on the bar.
 
 In the profile editor, choose **App shortcuts** to search offline by action, alias, or chord and filter by app, platform, and context. Select a result to see its source, exact variant, and any reason it is unavailable. **Copy to this page** places one action in the first free slot. **Copy pack to a new page** links app IDs or executable aliases that are free in the profile. Copied actions preserve their app, platform, layout, language, and mode requirements. Unresolved bindings stay in the catalog for review. Closing, permanent deletion, ending a call, and sending commands require confirmation.
 
@@ -66,7 +68,7 @@ Run `node scripts/build-shortcut-catalog.js` from the repository to regenerate t
 
 1. In **Editor → App shortcuts**, select the app and expand **Configure app shortcut pages**. Select **Customize pages** to start from one list of the shortcuts shown in the automatic pack. The deck fills each screen from this list.
 2. Create, name, reorder or remove pages. Pick a command from the catalog and select **Add to shortcut page**. Use the row arrows to reorder commands. Select **Hide** to retain a command in the configuration while removing it from the deck.
-3. Select **Save profile** and bring the target app to the foreground. Use the arrows or swipe to switch between the named pages. A page with more controls than fit continues on another screen. The fixed editing row stays in place.
+3. Select **Save profile** and bring the target app to the foreground. Use the arrows or swipe to switch between the named pages. A page with more controls than fit continues on another screen. The final five cells stay reserved for editing on every screen.
 
 Turn off **Show automatic pages for this app** to keep the last manual page or Home when that app has focus. Explicit app rules on saved pages still take priority. **Restore automatic pages** discards the custom page arrangement and restores the compact pack. These preferences belong to the current activity profile. A copied key on a manually edited page remains independent of the automatic pack.
 
@@ -74,7 +76,7 @@ The configuration stores pack IDs and catalog shortcut IDs, so it keeps each bin
 
 ## Fixed editing keys
 
-The standard Deck Keys grid has 24 positions across three rows of eight. Its final five positions hold **Cut**, **Copy**, **Paste**, **Undo**, and **Redo**. Equivalent shortcuts appear once, and the other 19 positions hold quick actions and widgets. Use the page arrows or swipe horizontally to reach any overflow. The five buttons stay on the bottom row when you change pages or rotate the deck. Compact profiles and the editor's live preview use the same arrangement with at least five columns. Lastra preserves the original keys and widget layouts in the profile.
+The standard Deck Keys grid has 24 positions across three rows of eight. The final five positions always hold **Cut**, **Copy**, **Paste**, **Undo**, and **Redo**, in that order. Standard shortcuts fill the available cells from the top left. Pages with widgets or multi-cell buttons use the authored layout. Equivalent shortcuts appear once. Use the page arrows or swipe horizontally to reach any overflow.
 
 The keys follow the current verified foreground window. A contextual page whose target has moved out of the foreground keeps the five buttons visible and unavailable. Lastra uses reviewed variants where the active app differs from the Windows editing defaults. Adobe Illustrator, Premiere, and Photoshop use `Ctrl+Shift+Z` for Redo. Reviewed language, keyboard-layout, and app-mode requirements still apply. [Windows shortcuts](https://support.microsoft.com/en-us/windows/keyboard-shortcuts-in-windows) · [Illustrator](https://helpx.adobe.com/illustrator/desktop/get-started/preferences-and-settings/default-keyboard-shortcuts-for-illustrator.html) · [Premiere](https://helpx.adobe.com/premiere/desktop/get-started/keyboard-shortcuts/default-keyboard-shortcuts.html) · [Photoshop Undo and Redo](https://helpx.adobe.com/photoshop/desktop/get-started/set-up-toolbars-panels/use-undo-redo-commands.html)
 

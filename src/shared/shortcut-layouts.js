@@ -45,10 +45,14 @@
 
   function applyShortcutPages(pages, available) {
     const byId = new Map(available.map((key) => [key.id, key]));
-    return pages.flatMap(({ id, shortcuts }) => shortcuts.flatMap(({ id: keyId, hidden }) => {
-      const key = byId.get(keyId);
-      return hidden || !key ? [] : [{ ...key, id: 'app-shortcut:' + id + ':' + keyId, shortcutPage: id }];
-    }));
+    return pages.flatMap(({ id, shortcuts }) => {
+      const selected = new Set(shortcuts.filter(({ hidden }) => !hidden).map((shortcut) => shortcut.id));
+      return shortcuts.flatMap(({ id: keyId, hidden }) => {
+        const key = byId.get(keyId);
+        return hidden || !key || selected.has(key.alternateFor)
+          ? [] : [{ ...key, id: 'app-shortcut:' + id + ':' + keyId, shortcutPage: id }];
+      });
+    });
   }
 
   const api = { validateShortcutLayouts, applyShortcutPages, SHORTCUT_LAYOUT_LIMITS: LIMITS };

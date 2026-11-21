@@ -8,7 +8,8 @@ const { US_LAYOUT, shortcutUnavailable } = require('./shortcut-guards');
 const { annotateShortcut } = require('./shortcut-overrides');
 const { withShortcutOverride } = require('../shared/shortcut-library');
 
-const SHIFT_REDO = new Set(['photoshop', 'photoshop-web', 'illustrator', 'premiere']);
+const SHIFT_REDO = new Set(['photoshop', 'photoshop-web', 'illustrator', 'premiere', 'kicad', 'kicad-schematic',
+  'kicad-footprint', 'kicad-symbol']);
 const CONSOLES = new Set(['cmd.exe', 'powershell.exe', 'pwsh.exe', 'conhost.exe', 'openconsole.exe',
   'wsl.exe', 'wslhost.exe', 'wt.exe', 'mintty.exe', 'git-bash.exe']);
 const REQUIRED_MODE = {

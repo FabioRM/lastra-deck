@@ -46,7 +46,7 @@ class ActivityProfiles extends EventEmitter {
     const store = this.#storeFor(id);
     let warning = null;
     try {
-      store.load({ upgradeStock: id === 'main' && !this.explicitFile });
+      store.load({ upgradeStock: id === 'main' && !this.explicitFile, upgradeHomeVolume: !this.explicitFile });
     } catch (error) {
       warning = error.message;
       store.fallback();

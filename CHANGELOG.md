@@ -1,5 +1,14 @@
 # Lastra changelog
 
+## 0.2.7 · 2026-11-21
+
+- Expand automatic shortcut coverage to 420 Windows and installed web apps, plus nine edition and editor packs. Add Altium Designer and Simulink, and extend SOLIDWORKS, KiCad, and MATLAB. [Engineering shortcuts](docs/engineering-shortcuts.md)
+- Keep one default pair of Chrome tab controls. Reuse Back and Forward on the persistent bar when those controls already apply to Chrome.
+- Remove the redundant system volume buttons from Home and compact its shortcuts. Cut, Copy, Paste, Undo, and Redo keep the final five cells on every screen.
+- Show Deck notifications above the Home clock without moving the clock, shortcuts, or mixer.
+
+[Windows downloads](https://github.com/FabioRM/lastra-deck/releases/tag/v0.2.7) · [Project site](https://fabiorm.github.io/lastra-deck/)
+
 ## 0.2.6 · 2026-11-21
 
 - Automatic shortcut packs fill each screen before opening another. The default 8×3 grid fits 19 app shortcuts and five fixed editing keys per screen. New custom layouts start from one compact shortcut list.

@@ -37,6 +37,7 @@
   const stats = document.getElementById('stats-panel');
   const viewSwitch = document.getElementById('dashboard-switch');
   const statusEl = document.getElementById('status');
+  const homeNotification = document.getElementById('home-notification');
   const keyErrorStatus = document.getElementById('key-error-status');
   const confirmationDialog = document.getElementById('key-confirmation');
   const confirmationText = document.getElementById('key-confirmation-text');
@@ -467,13 +468,14 @@
 
   function showStatus(message, ok) {
     clearTimeout(statusTimer);
-    statusEl.className = ok ? 'ok' : 'err';
-    statusEl.textContent = typeof message === 'string' ? t(message) : '';
-    statusTimer = setTimeout(showIdleStatus, ok ? STATUS_MS : STATUS_MS * 2);
+    const text = typeof message === 'string' ? t(message) : '';
+    homeNotification.classList.toggle('err', Boolean(text && !ok));
+    homeNotification.textContent = text;
+    homeNotification.title = text;
+    if (text) statusTimer = setTimeout(() => showStatus('', true), ok ? STATUS_MS : STATUS_MS * 2);
   }
 
   function showIdleStatus() {
-    statusEl.className = '';
     if (profile?.targetUnavailable) {
       statusEl.textContent = t('Bring the target window to the foreground.');
       return;

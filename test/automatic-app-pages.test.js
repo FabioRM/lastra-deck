@@ -272,7 +272,7 @@ test('the stock profile uses the actual browser and VS Code packs, and customise
   assert.equal(pages.current(stock).id, 'home');
 });
 
-test('automatic shortcut packs fill available cells and keep guarded keys and the five fixed positions', () => {
+test('automatic shortcut packs compact guarded keys and reserve the final five cells', () => {
   const stock = validateProfile(require('../profiles/default.json'));
   const pages = new Pages();
   pages.observe({ executable: 'chrome.exe', windowId: 1n });
@@ -287,8 +287,9 @@ test('automatic shortcut packs fill available cells and keep guarded keys and th
     assert.deepEqual(sheets[0].keys.map(({ id }) => id), visible.map(({ id }) => id));
     assert.ok(sheets[0].keys.some(({ id }) => id.startsWith('catalog-')));
     assert.ok(page.keys.every(({ action }) => action.shortcutGuard.pack === 'chrome'));
-    assert.deepEqual(editing.map(({ layout }) => [layout.column, layout.row]),
-      [0, 1, 2, 3, 4].map((offset) => [grid.cols - 5 + offset, grid.rows - 1]));
+    const cell = ({ layout }) => layout.row * grid.cols + layout.column;
+    assert.deepEqual(sheets[0].keys.map(cell), Array.from({ length: visible.length }, (_, index) => index));
+    assert.deepEqual(editing.map(cell), Array.from({ length: 5 }, (_, index) => grid.cols * grid.rows - 5 + index));
   }
 
   pages.observe({ executable: 'code.exe', windowId: 2n });

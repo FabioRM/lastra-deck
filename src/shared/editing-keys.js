@@ -48,13 +48,29 @@
     return { cols: columns, rows, normal: Math.min(columns * rows - fixed, total > fixed ? total - fixed : total) };
   }
 
+  function isButtonOnlyPage(slots, widgets = []) {
+    return !widgets.length && slots.every((slot) => (slot?.span?.cols ?? 1) === 1 && (slot?.span?.rows ?? 1) === 1);
+  }
+
+  function projectButtonSheets(surface, slots) {
+    const indices = slots.flatMap((slot, index) => slot ? [index] : []);
+    return Array.from({ length: Math.max(1, Math.ceil(indices.length / surface.normal)) }, (_, sheet) => {
+      const start = sheet * surface.normal;
+      const keys = Array.from({ length: surface.normal }, (_, cell) => ({
+        index: indices[start + cell] ?? null, layout: keyLayout(null, cell, surface),
+      }));
+      return { keys, widgets: [] };
+    });
+  }
+
   function projectEditingPage(grid, slots, widgets, portrait, largeKeys = false) {
     const surface = projectedGrid(grid, portrait, largeKeys);
     const size = surface.cols * surface.rows;
-    const reserved = new Set(Array.from({ length: size - surface.normal }, (_, offset) => surface.normal + offset));
     const editing = FIXED_EDITING_KEYS.map(({ id }, offset) => ({ id,
       layout: keyLayout(null, size - FIXED_EDITING_KEYS.length + offset, surface),
     }));
+    if (isButtonOnlyPage(slots, widgets)) return { ...surface, editing, sheets: projectButtonSheets(surface, slots) };
+    const reserved = new Set(Array.from({ length: size - surface.normal }, (_, offset) => surface.normal + offset));
     const authored = slots.flatMap((slot, index) => slot ? [{ index, layout: keyLayout(slot, index, grid) }] : []);
     authored.push(...groupWidgetPlacements(widgets).map(({ members, layout }) => ({ members, layout })));
     authored.sort((a, b) => a.layout.row - b.layout.row || a.layout.column - b.layout.column);
@@ -120,7 +136,7 @@
     return layouts.length > 1 ? { ...first, sheets: layouts.flatMap(({ sheets }) => sheets) } : first;
   }
 
-  const api = { FIXED_EDITING_KEYS, STANDARD_EDITING_CHORDS, duplicateEditingKey, projectEditingPage, projectShortcutPages };
+  const api = { FIXED_EDITING_KEYS, STANDARD_EDITING_CHORDS, duplicateEditingKey, isButtonOnlyPage, projectEditingPage, projectShortcutPages };
   if (typeof module === 'object') module.exports = api;
   else window.LastraEditingKeys = api;
 }

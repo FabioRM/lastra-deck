@@ -2,6 +2,7 @@
 'use strict';
 
 const { desktopPack: pack } = require('./shortcut-pack-data');
+const { MATLAB_DESKTOP_MODE } = require('./shortcut-surface');
 
 /** @type {import('./shortcut-pack-data').StarterKey[]} */
 const jetBrains = [
@@ -64,7 +65,7 @@ module.exports = [
     ['new-script', 'New script', 'file-plus', 'Ctrl+N'],
     ['open-file', 'Open file', 'folder-open', 'Ctrl+O'],
     ['find-files', 'Find files', 'file-search', 'Ctrl+Shift+F'],
-  ]),
+  ], { hostedWindows: { executables: ['matlabwindow.exe'], mode: MATLAB_DESKTOP_MODE } }),
   pack('spyder', 'Spyder', ['spyder.exe'], 'https://docs.spyder-ide.org/current/panes/editor.html', [
     ['save', 'Save script', 'save', 'Ctrl+S'],
     ['run', 'Run current file', 'play', 'F5'],
