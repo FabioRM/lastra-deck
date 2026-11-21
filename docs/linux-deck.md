@@ -1,6 +1,6 @@
 # Lastra Deck on Linux
 
-Linux support is experimental. Automatic profiles use the foreground window's application ID (the class from `WM_CLASS` on X11). The built-in Linux catalog has 37 profiles, including Firefox, Dolphin, Konsole, LibreOffice, GIMP, Blender, Kdenlive, QGIS, Audacity, Kate, Obsidian, Zed, VS Code and six JetBrains IDEs. You can link a custom page using its `appIds` property and optionally a window title. Use lowercase app IDs, such as `org.mozilla.firefox` or `code`.
+Linux support is experimental. Automatic profiles use the foreground window's application ID (the class from `WM_CLASS` on X11). Lastra 0.2.8 ships 37 Linux profiles, including Firefox, Dolphin, Konsole, LibreOffice, GIMP, Blender, Kdenlive, QGIS, Audacity, Kate, Obsidian, Zed, VS Code and six JetBrains IDEs. The current source has 46 Linux profiles. You can link a custom page using its `appIds` property and optionally a window title. Use lowercase app IDs, such as `org.mozilla.firefox` or `code`.
 
 ## Install
 

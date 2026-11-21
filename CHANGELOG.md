@@ -1,5 +1,9 @@
 # Lastra changelog
 
+## Unreleased
+
+- Add nine Linux profiles with 82 shortcut entries for Slack, Signal Desktop, Discord, Telegram Desktop, mpv, FileZilla, Geany, DBeaver and Wireshark.
+
 ## 0.2.8
 
 - Ship the Linux x86-64 `.deb`, AppImage and GNOME Shell extension. The Deck follows the foreground app and sends shortcuts on X11, GNOME, KDE Plasma and Hyprland. [Linux setup](docs/linux-deck.md)
