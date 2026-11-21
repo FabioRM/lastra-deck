@@ -83,7 +83,7 @@ module.exports = [
   ]),
   pack('dbeaver', 'DBeaver', ['dbeaver.exe'], 'https://dbeaver.com/docs/dbeaver/Shortcuts/', [
     ['shortcuts', 'Show keyboard shortcuts', 'keyboard', 'Ctrl+Shift+L'],
-    ['open-editor', 'Open SQL console', 'square-terminal', 'Ctrl+Alt+L'],
+    ['open-editor', 'Open SQL console', 'square-terminal', 'Ctrl+Alt+Enter'],
     ['find', 'Find in editor', 'text-search', 'Ctrl+F'],
   ]),
   pack('ssms', 'SQL Server Management Studio', ['ssms.exe'], 'https://learn.microsoft.com/en-us/ssms/sql-server-management-studio-keyboard-shortcuts', [

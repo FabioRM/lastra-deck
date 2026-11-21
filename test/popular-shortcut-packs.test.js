@@ -28,6 +28,7 @@ const addedDesktop = [
   ...require('../src/main/shortcut-packs-windows-specialty'),
   ...require('../src/main/shortcut-packs-engineering'),
   ...require('../src/main/shortcut-packs-desktop-specialists'),
+  ...require('../src/main/shortcut-packs-portable').newWindowsPacks,
 ];
 const addedWeb = [
   ...require('../src/main/shortcut-packs-web-popular'),
@@ -45,13 +46,13 @@ const webWindow = (manifestId, executable = 'msedge.exe') => ({
   executable, appId: executable + '._crx_' + chromiumWebAppId(manifestId), keyboardLayout: US_LAYOUT, windowId: 42n,
 });
 
-test('446 distinct app products have active packs with separate packs for nine variants', () => {
+test('451 distinct app products have active packs with separate packs for nine variants', () => {
   const all = [...packs, ...webPacks];
   const variants = new Set(['outlook-classic', 'antigravity-workbench', 'chatgpt-companion', 'cursor-agents', 'photoshop-web',
     'kicad-schematic', 'kicad-footprint', 'kicad-symbol', 'kicad-gerbview']);
   assert.equal(new Set(all.map(({ id }) => id)).size, all.length);
-  assert.equal(all.filter(({ id }) => !variants.has(id)).length, 446);
-  assert.equal(addedDesktop.length + addedWeb.length, 395);
+  assert.equal(all.filter(({ id }) => !variants.has(id)).length, 451);
+  assert.equal(addedDesktop.length + addedWeb.length, 400);
   const layouts = Object.fromEntries(all.map(({ id }) => [id, { enabled: true }]));
   assert.deepEqual(validateProfile({ ...profile, shortcutLayouts: layouts }).shortcutLayouts, layouts);
 });

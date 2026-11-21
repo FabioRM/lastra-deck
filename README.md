@@ -8,7 +8,7 @@ Lastra turns the **CORSAIR XENEON EDGE** into a touchscreen macro deck for Windo
 
 ![Deck Keys toolbar with the Tools, Emoji, and page lock icons](docs/preview-toolbar.png)
 
-Bring an app like Visual Studio Code to the foreground and Deck Keys loads its shortcuts. Automatic packs fill the first screen before opening a second. The built-in library covers 446 Windows and installed web apps, with nine additional packs for app editions and window variants. You can also create your own pages, rearrange commands, and hide individual keys. [Shortcut packs](docs/shortcut-packs.md) · [Watch pages switch](docs/preview-shortcuts.gif)
+Bring an app like Visual Studio Code to the foreground and Deck Keys loads its shortcuts. Automatic packs fill the first screen before opening a second. The built-in library covers 451 Windows and installed web apps, with nine additional packs for app editions and window variants. You can also create your own pages, rearrange commands, and hide individual keys. [Shortcut packs](docs/shortcut-packs.md) · [Watch pages switch](docs/preview-shortcuts.gif)
 
 [Getting started](#getting-started) · [Tools and Pomodoro](#tools-and-pomodoro) · [Deck views](#deck-views) · [Profile editor](#profile-editor) · [Local MCP integration](#local-mcp-integration) · [License](#license)
 

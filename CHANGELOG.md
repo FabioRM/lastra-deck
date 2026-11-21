@@ -1,8 +1,9 @@
 # Lastra changelog
 
-## Unreleased
+## 0.2.9
 
-- Add nine Linux profiles with 82 shortcut entries for Slack, Signal Desktop, Discord, Telegram Desktop, mpv, FileZilla, Geany, DBeaver and Wireshark.
+- Ship 70 Linux profiles with 985 shortcut entries, including FreeCAD, KiCad's standalone editors, Godot, OBS Studio, kitty, Anki, Zotero and OpenShot. Expand Shotcut, DBeaver, Telegram, Signal, KeePassXC, FileZilla, Wireshark and QGIS. [Linux setup](docs/linux-deck.md)
+- Expand Windows and installed web coverage to 451 apps, plus nine edition and editor variants. Add yEd, Natron, Hydrogen, WezTerm and Alacritty, and deepen existing packs including Autodesk Fusion, FreeCAD, Shotcut and DBeaver. [Shortcut packs](docs/shortcut-packs.md)
 
 ## 0.2.8
 

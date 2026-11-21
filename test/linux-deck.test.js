@@ -22,8 +22,11 @@ const chrome = { platform: 'linux', appId: 'google-chrome', executable: '', name
 test('Linux app IDs select documented Deck profiles and keep the fixed editing keys', async () => {
   const profile = validateProfile({ name: 'Linux', grid: { cols: 8, rows: 3 }, pages: [{ id: 'home', name: 'Home', keys: [] }] });
   const packs = previewPacks('en-US', 'linux');
-  for (const pack of packs) validateProfile({ ...profile, pages: [{ id: pack.id, name: pack.name, appIds: pack.appIds,
-    keys: pack.keys }] });
+  for (const pack of packs) {
+    validateProfile({ ...profile, grid: { cols: 10, rows: 4 }, pages: [{ id: pack.id, name: pack.name, appIds: pack.appIds,
+      keys: pack.keys }] });
+    for (const appId of pack.appIds) assert.equal(packFor({ ...chrome, appId }).id, pack.id, appId);
+  }
   const pages = new Pages();
   pages.observe(chrome);
   const page = pages.current(profile);
@@ -59,7 +62,7 @@ test('a Linux macro captures the original window across a delay even without a p
 
 test('Linux terminal packs use clipboard shortcuts without exposing shell Ctrl+C as Copy', () => {
   const profile = { webApps: {} };
-  for (const appId of ['org.gnome.terminal', 'org.kde.konsole']) {
+  for (const appId of ['org.gnome.terminal', 'org.kde.konsole', 'net.kovidgoyal.kitty', 'org.wezfurlong.wezterm', 'org.alacritty.alacritty']) {
     const context = { ...chrome, appId };
     assert.ok(packFor(context));
     const [cut, copy, paste, undo, redo] = fixedEditingKeys(profile, context, { platform: 'linux' });

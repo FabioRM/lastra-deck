@@ -8,6 +8,8 @@ const { PHOTOSHOP_EXECUTABLES } = require('./shortcut-surface');
 const { US_LAYOUT, shortcutRequirements, needsShortcutConfirmation } = require('./shortcut-guards');
 const { annotateShortcut } = require('./shortcut-overrides');
 const { withShortcutWorkflows } = require('./shortcut-pack-data');
+const { extendShortcutPacks, newWindowsPacks, windowsAdditions } = require('./shortcut-packs-portable');
+const { windowsWorkflows } = require('./shortcut-pack-platform-workflows');
 const { FIXED_EDITING_KEYS, duplicateEditingKey } = require('../shared/editing-keys');
 const { withShortcutOverride, shortcutGuardForAction } = require('../shared/shortcut-library');
 
@@ -37,7 +39,7 @@ const linuxPacks = require('./shortcut-packs-linux').linuxShortcutPacks(browserK
 const linuxByAppId = new Map(linuxPacks.flatMap((pack) => pack.appIds.map((id) => [id, pack])));
 
 /** @type {import('./shortcut-pack-data').ShortcutPack[]} */
-const packs = withShortcutWorkflows([
+const packs = extendShortcutPacks(withShortcutWorkflows([
   { id: 'photoshop', name: 'Adobe Photoshop', executables: PHOTOSHOP_EXECUTABLES, previewMode: photoshop.mode,
     source: 'https://helpx.adobe.com/content/dam/help/en/photoshop/using/default-keyboard-shortcuts/photoshop-keyboard-shortcuts.pdf', keys: [
     ['layer-copy', 'Layer via copy', 'layers-2', 'Ctrl+J', photoshop],
@@ -183,13 +185,14 @@ const packs = withShortcutWorkflows([
   ...require('./shortcut-packs-windows-specialty'),
   ...require('./shortcut-packs-engineering'),
   ...require('./shortcut-packs-desktop-specialists'),
+  ...newWindowsPacks,
 ], {
   ...require('./shortcut-pack-communication'),
   ...require('./shortcut-pack-productivity'),
   ...require('./shortcut-pack-jetbrains'),
   ...require('./shortcut-pack-authoring-workflows'),
   ...require('./shortcut-pack-engineering-workflows'),
-});
+}), { ...windowsAdditions, ...windowsWorkflows });
 
 const byExecutable = new Map(packs.filter(({ windowMode }) => !windowMode).flatMap((pack) => pack.executables.map((exe) => [exe, pack])));
 const byAppId = new Map(packs.flatMap((pack) => (pack.appIds ?? []).map((id) => [id, pack])));

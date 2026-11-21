@@ -1,6 +1,9 @@
 'use strict';
 
 const additionalPacks = require('./shortcut-packs-linux-apps');
+const { extendShortcutPacks, linuxPortablePacks } = require('./shortcut-packs-portable');
+const { linuxWorkflows } = require('./shortcut-pack-platform-workflows');
+const tools = require('./shortcut-packs-linux-tools');
 
 const LINUX_TERMINALS = new Set(['alacritty', 'com.mitchellh.ghostty', 'com.raggesilver.blackbox', 'com.system76.cosmicterm',
   'foot', 'footclient', 'gnome-terminal', 'gnome-terminal-server', 'kitty', 'konsole', 'org.gnome.console', 'org.gnome.terminal',
@@ -22,7 +25,7 @@ function linuxShortcutPacks(browserKeys) {
   const chromium = [['private-window', 'Incognito window', 'eye-off', 'Ctrl+Shift+N'],
     ['bookmarks', 'Bookmarks manager', 'bookmark', 'Ctrl+Shift+O']];
   const privateWindow = (label) => [[chromium[0][0], label, ...chromium[0].slice(2)], chromium[1]];
-  return [
+  return extendShortcutPacks([
     browser('chrome', 'Google Chrome', ['google-chrome', 'google-chrome-stable', 'google-chrome-beta', 'com.google.chrome'], chromeSource, chromium),
     browser('chromium', 'Chromium', ['chromium', 'chromium-browser', 'org.chromium.chromium'], chromeSource, chromium),
     browser('brave', 'Brave', ['brave', 'brave-browser', 'com.brave.browser'],
@@ -55,7 +58,9 @@ function linuxShortcutPacks(browserKeys) {
       ['redo', 'Redo', 'redo-2', 'Ctrl+Shift+Z'],
     ] },
     ...additionalPacks,
-  ].map((pack) => ({ ...pack, platform: /** @type {const} */ ('linux'), executables: [] }));
+    ...linuxPortablePacks,
+    ...tools,
+  ], linuxWorkflows).map((pack) => ({ ...pack, platform: /** @type {const} */ ('linux'), executables: [] }));
 }
 
 module.exports = { linuxShortcutPacks, LINUX_TERMINALS };

@@ -245,7 +245,7 @@ module.exports = [
     ['compile', 'Compile', 'hammer', 'F8'], ['build', 'Build', 'boxes', 'F9'], ['run', 'Run', 'circle-play', 'F5'],
   ]),
   pack('dbeaver', 'DBeaver', ['dbeaver', 'dbeaver-ce', 'dbeaver-ee', 'io.dbeaver.dbeavercommunity'], 'https://dbeaver.com/docs/dbeaver/Shortcuts/', [
-    ['shortcuts', 'Show shortcut list', 'keyboard', 'Ctrl+Shift+L'], ['sql-editor', 'Open SQL console', 'square-terminal', 'Ctrl+Alt+L'],
+    ['shortcuts', 'Show shortcut list', 'keyboard', 'Ctrl+Shift+L'], ['sql-editor', 'Open SQL console', 'square-terminal', 'Ctrl+Alt+Enter'],
     ['format', 'Format SQL', 'align-left', 'Ctrl+Shift+F', { context: 'SQL editor' }],
     ['completion', 'SQL completion', 'list-plus', 'Ctrl+Space', { context: 'SQL editor' }],
     ['find', 'Find in editor', 'search', 'Ctrl+F'], ['properties', 'View selected object', 'database', 'F4'], save,

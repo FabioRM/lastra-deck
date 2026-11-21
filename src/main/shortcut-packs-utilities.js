@@ -75,7 +75,7 @@ module.exports = [
     ['rename', 'Rename file', 'pencil', 'F2'],
     ['refresh', 'Refresh', 'refresh-cw', 'Ctrl+R'],
   ], { editing: false }),
-  pack('qbittorrent', 'qBittorrent', ['qbittorrent.exe'], 'https://github.com/qbittorrent/qBittorrent/wiki/Keyboard-shortcuts', [
+  pack('qbittorrent', 'qBittorrent', ['qbittorrent.exe'], 'https://github.com/qbittorrent/qBittorrent/wiki/Frequently-Asked-Questions#hotkeys', [
     ['add-torrent-file', 'Add torrent file', 'file-plus', 'Ctrl+O'],
     ['add-torrent-link', 'Add torrent link', 'link', 'Ctrl+Shift+O'],
     ['preferences', 'Preferences', 'settings', 'Alt+O'],

@@ -1,13 +1,13 @@
 # Lastra Deck on Linux
 
-Linux support is experimental. Automatic profiles use the foreground window's application ID (the class from `WM_CLASS` on X11). Lastra 0.2.8 ships 37 Linux profiles, including Firefox, Dolphin, Konsole, LibreOffice, GIMP, Blender, Kdenlive, QGIS, Audacity, Kate, Obsidian, Zed, VS Code and six JetBrains IDEs. The current source has 46 Linux profiles. You can link a custom page using its `appIds` property and optionally a window title. Use lowercase app IDs, such as `org.mozilla.firefox` or `code`.
+Linux support is experimental. Automatic profiles use the foreground window's application ID (the class from `WM_CLASS` on X11). Lastra 0.2.9 ships 70 Linux profiles with 985 shortcut entries. They cover apps such as Firefox, LibreOffice, GIMP, Blender, FreeCAD, Godot, OBS Studio, Kdenlive, Shotcut, DBeaver, Telegram Desktop and kitty. KiCad has separate profiles when the standalone PCB and Schematic Editors report their own app IDs. You can link a custom page using its `appIds` property and optionally a window title. Use lowercase app IDs, such as `org.mozilla.firefox` or `code`.
 
 ## Install
 
 Download the x86-64 packages and SHA-256 checksums from the [latest Lastra Deck release](https://github.com/FabioRM/lastra-deck/releases/latest).
 
-- **Debian, Ubuntu or Mint.** Run `sudo apt install ./Lastra-0.2.8-linux-amd64.deb`, then open **Lastra** from the app menu or run `lastra`.
-- **AppImage.** Run `chmod +x Lastra-0.2.8-linux-x86_64.AppImage`, then launch it directly. On systems without FUSE, try `--appimage-extract-and-run`.
+- **Debian, Ubuntu or Mint.** Run `sudo apt install ./Lastra-0.2.9-linux-amd64.deb`, then open **Lastra** from the app menu or run `lastra`.
+- **AppImage.** Run `chmod +x Lastra-0.2.9-linux-x86_64.AppImage`, then launch it directly. On systems without FUSE, try `--appimage-extract-and-run`.
 - **Source.** Run `npm ci` with Node.js 22.12 or later, then `npm start`. `npm run dev` opens a focusable development window for inspecting profiles.
 
 Update Linux builds by downloading a new package. Lastra selects the XENEON EDGE by name or by physical resolution if exactly one display matches. Pass `--display=<id>` to select an Electron display explicitly. Switch to **Deck Keys** to see the active app's shortcuts.
