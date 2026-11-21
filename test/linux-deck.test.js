@@ -57,6 +57,18 @@ test('a Linux macro captures the original window across a delay even without a p
   assert.match(result.message, /target window changed/i);
 });
 
+test('Linux terminal packs use clipboard shortcuts without exposing shell Ctrl+C as Copy', () => {
+  const profile = { webApps: {} };
+  for (const appId of ['org.gnome.terminal', 'org.kde.konsole']) {
+    const context = { ...chrome, appId };
+    assert.ok(packFor(context));
+    const [cut, copy, paste, undo, redo] = fixedEditingKeys(profile, context, { platform: 'linux' });
+    assert.equal(copy.action.keys, 'Ctrl+Shift+C');
+    assert.equal(paste.action.keys, 'Ctrl+Shift+V');
+    for (const key of [cut, undo, redo]) assert.equal(key.action, undefined);
+  }
+});
+
 test('X11 verifies the keyboard focus while holding the server before sending a chord', () => {
   let focused = true;
   let grabbed = false;

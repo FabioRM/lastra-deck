@@ -3,7 +3,7 @@
 ## 0.2.8
 
 - Ship the Linux x86-64 `.deb`, AppImage and GNOME Shell extension. The Deck follows the foreground app and sends shortcuts on X11, GNOME, KDE Plasma and Hyprland. [Linux setup](docs/linux-deck.md)
-- Add 24 Linux profiles with 334 shortcut entries, including Konsole, Dolphin, GIMP, Krita, Blender, Kdenlive, LibreOffice and QGIS.
+- Ship 37 Linux profiles with 523 shortcut entries, including Konsole, Dolphin, LibreOffice, Blender, QGIS, Audacity, Kate, Zed and six JetBrains IDEs.
 - Expand the Windows and installed-web catalog to 446 apps, alongside nine edition and editor packs. [Specialist shortcuts](docs/specialist-shortcuts.md)
 
 ## 0.2.7 · 2026-11-21

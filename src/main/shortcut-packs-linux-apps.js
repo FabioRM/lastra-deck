@@ -27,6 +27,17 @@ const playback = [
   ['stop', 'Stop shuttle', 'circle-stop', 'K'], ['forward', 'Play forward', 'fast-forward', 'L'],
   ['mark-in', 'Set in point', 'brackets', 'I'], ['mark-out', 'Set out point', 'brackets', 'O'],
 ];
+const jetbrains = [
+  ['palette', 'Find action', 'command', 'Ctrl+Shift+A'], ['go-to-class', 'Go to class', 'braces', 'Ctrl+N'],
+  ['go-to-file', 'Go to file', 'file-search', 'Ctrl+Shift+N'], ['recent-files', 'Recent files', 'history', 'Ctrl+E'],
+  ['project', 'Project tool window', 'folder', 'Alt+1'], ['find-in-files', 'Find in files', 'search', 'Ctrl+Shift+F'],
+  ['replace-in-files', 'Replace in files', 'replace', 'Ctrl+Shift+R'], ['go-to-declaration', 'Go to declaration', 'signpost', 'Ctrl+B'],
+  ['find-usages', 'Find usages', 'scan-search', 'Alt+F7'], ['rename', 'Rename symbol', 'pencil', 'Shift+F6'],
+  ['reformat', 'Reformat code', 'align-left', 'Ctrl+Alt+L'], ['quick-fix', 'Show intentions', 'lightbulb', 'Alt+Enter'],
+  ['terminal', 'Terminal tool window', 'square-terminal', 'Alt+F12'], ['run', 'Run configuration', 'circle-play', 'Shift+F10'],
+  ['debug', 'Debug configuration', 'bug', 'Shift+F9'], ['breakpoint', 'Toggle breakpoint', 'circle-dot', 'Ctrl+F8'],
+  ['undo', 'Undo', 'undo-2', 'Ctrl+Z'], ['redo', 'Redo', 'redo-2', 'Ctrl+Shift+Z'],
+];
 
 module.exports = [
   pack('nautilus', 'GNOME Files', ['nautilus', 'org.gnome.nautilus'], 'https://gitlab.gnome.org/GNOME/nautilus/-/blob/main/src/nautilus-window.c', [
@@ -136,4 +147,60 @@ module.exports = [
       ['archive', 'Archive message', 'archive', 'A'], ['next-unread', 'Next unread message', 'chevron-down', 'N'],
       ['previous-unread', 'Previous unread message', 'chevron-up', 'P'], find,
     ]),
+  pack('audacity', 'Audacity', ['audacity', 'org.audacityteam.audacity'], 'https://manual.audacityteam.org/man/keyboard_shortcut_reference.html', [
+    newFile, open, save, ['import-audio', 'Import audio', 'file-input', 'Ctrl+Shift+I'],
+    ['play-pause', 'Play or stop', 'circle-play', 'Space'], ['pause', 'Pause', 'pause', 'P'],
+    ['record', 'Record', 'mic', 'R', { confirm: true }], ['selection-tool', 'Selection tool', 'mouse-pointer', 'F1'],
+    ['envelope', 'Envelope tool', 'activity', 'F2'], ['split', 'Split clip', 'scissors', 'Ctrl+I'],
+    ['trim', 'Trim to selection', 'scissors', 'Ctrl+T'], ['fit-project', 'Fit project', 'maximize', 'Ctrl+F'],
+    ['fit-selection', 'Fit selection', 'scan-eye', 'Ctrl+E'], ['fit-tracks', 'Fit vertically', 'move-vertical', 'Ctrl+Shift+F'],
+    ['redo', 'Redo', 'redo-2', 'Ctrl+Y'],
+  ]),
+  pack('okular', 'Okular', ['okular', 'org.kde.okular'], 'https://docs.kde.org/stable_kf6/en/okular/okular/okular.pdf', [
+    open, find, print, ['go-to-page', 'Go to page', 'file-search', 'Ctrl+G'],
+    ['next-page', 'Next page', 'chevron-right', 'PageDown'], ['previous-page', 'Previous page', 'chevron-left', 'PageUp'],
+    ['browse', 'Browse mode', 'mouse-pointer', 'Ctrl+1'], ['zoom', 'Zoom tool', 'zoom-in', 'Ctrl+2'],
+    ['fit-window', 'Fit window to page', 'maximize', 'Ctrl+J'], ['bookmark', 'Toggle bookmark', 'bookmark', 'Ctrl+B'],
+    ['presentation', 'Presentation mode', 'presentation', 'Ctrl+Shift+P'], ['copy', 'Copy selection', 'copy', 'Ctrl+C'],
+  ], { editing: false }),
+  pack('evince', 'Evince', ['evince', 'org.gnome.evince'], 'https://help.gnome.org/evince/shortcuts.html', [
+    open, find, print, ['next-page', 'Next page', 'chevron-right', 'Ctrl+PageDown'],
+    ['previous-page', 'Previous page', 'chevron-left', 'Ctrl+PageUp'], ['first-page', 'First page', 'chevrons-left', 'Ctrl+Home'],
+    ['last-page', 'Last page', 'chevrons-right', 'Ctrl+End'], ['fullscreen', 'Toggle full screen', 'maximize', 'F11'],
+    ['presentation', 'Presentation mode', 'presentation', 'F5'], ['zoom-in', 'Zoom in', 'zoom-in', 'Ctrl+char:plus'],
+    ['zoom-out', 'Zoom out', 'zoom-out', 'Ctrl+minus'], ['copy', 'Copy selection', 'copy', 'Ctrl+C'],
+  ], { editing: false }),
+  pack('kate', 'Kate', ['kate', 'org.kde.kate'], 'https://docs.kde.org/stable_kf6/en/kate/kate/edit-menu.html', [
+    newFile, open, save, saveAs, find, print, ['replace', 'Replace', 'replace', 'Ctrl+R'],
+    ['find-next', 'Find next', 'chevron-down', 'F3'], ['find-previous', 'Find previous', 'chevron-up', 'Shift+F3'],
+    ['go-to-line', 'Go to line', 'list-ordered', 'Ctrl+G'], ['comment', 'Comment selection', 'message-square', 'Ctrl+D'],
+    ['uncomment', 'Uncomment selection', 'message-square-off', 'Ctrl+Shift+D'], ['redo', 'Redo', 'redo-2', 'Ctrl+Shift+Z'],
+  ]),
+  pack('obsidian', 'Obsidian', ['obsidian', 'md.obsidian.obsidian'], 'https://obsidian.md/help/hotkeys', [
+    ['new-note', 'New note', 'file-plus', 'Ctrl+N'], ['quick-switcher', 'Quick switcher', 'file-search', 'Ctrl+O'],
+    ['palette', 'Command palette', 'command', 'Ctrl+P'], ['search-vault', 'Search vault', 'search', 'Ctrl+Shift+F'],
+    ['reading-view', 'Toggle reading view', 'book-open', 'Ctrl+E'], ['new-tab', 'New tab', 'square-plus', 'Ctrl+T'],
+    ['close-tab', 'Close tab', 'x', 'Ctrl+W'], find, ['bold', 'Bold', 'bold', 'Ctrl+B'], ['italic', 'Italic', 'italic', 'Ctrl+I'],
+    ['redo', 'Redo', 'redo-2', 'Ctrl+Shift+Z'],
+  ]),
+  pack('keepassxc', 'KeePassXC', ['keepassxc', 'org.keepassxc.keepassxc'], 'https://keepassxc.org/docs/KeePassXC_UserGuide#_keyboard_shortcuts', [
+    ['open', 'Open database', 'folder-open', 'Ctrl+O'], ['save', 'Save database', 'save', 'Ctrl+S'],
+    ['new-database', 'New database', 'database', 'Ctrl+Shift+N'], ['new-entry', 'New entry', 'square-plus', 'Ctrl+N'],
+    ['edit-entry', 'Edit selected entry', 'pencil', 'Ctrl+E'], ['search', 'Search entries', 'search', 'Ctrl+F'],
+    ['lock', 'Lock databases', 'lock', 'Ctrl+L'],
+  ], { editing: false }),
+  pack('zed', 'Zed', ['zed', 'dev.zed.zed'], 'https://github.com/zed-industries/zed/blob/main/assets/keymaps/default-linux.json', [
+    open, save, find, ['palette', 'Command palette', 'command', 'Ctrl+Shift+P'], ['go-to-file', 'Go to file', 'file-search', 'Ctrl+P'],
+    ['find-in-project', 'Find in project', 'search', 'Ctrl+Shift+F'], ['definition', 'Go to definition', 'signpost', 'F12'],
+    ['go-to-line', 'Go to line', 'list-ordered', 'Ctrl+G'], ['comment', 'Toggle comment', 'message-square', 'Ctrl+char:slash'],
+    ['rename', 'Rename symbol', 'pencil', 'F2'], ['redo', 'Redo', 'redo-2', 'Ctrl+Shift+Z'],
+  ]),
+  ...[
+    ['intellij', 'IntelliJ IDEA', ['jetbrains-idea', 'jetbrains-idea-ce', 'com.jetbrains.intellij-idea-community', 'com.jetbrains.intellij-idea-ultimate'], 'idea'],
+    ['pycharm', 'PyCharm', ['jetbrains-pycharm', 'jetbrains-pycharm-ce', 'com.jetbrains.pycharm-community', 'com.jetbrains.pycharm-professional'], 'pycharm'],
+    ['webstorm', 'WebStorm', ['jetbrains-webstorm', 'com.jetbrains.webstorm'], 'webstorm'],
+    ['clion', 'CLion', ['jetbrains-clion', 'com.jetbrains.clion'], 'clion'],
+    ['goland', 'GoLand', ['jetbrains-goland', 'com.jetbrains.goland'], 'go'],
+    ['phpstorm', 'PhpStorm', ['jetbrains-phpstorm', 'com.jetbrains.phpstorm'], 'phpstorm'],
+  ].map(([id, name, appIds, help]) => pack(id, name, appIds, `https://www.jetbrains.com/help/${help}/reference-keymap-win-default.html`, jetbrains)),
 ];
