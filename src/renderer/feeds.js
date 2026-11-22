@@ -196,7 +196,7 @@
     const items = [
       ...(snapshot.quotes?.rows ?? []).map((item) => ({ ...item, title: item.symbol || '', name: item.symbol ? labels[item.symbol] : '' })),
       ...(snapshot.currencies?.rows ?? []).map((item) => ({ ...item, title: item.pair ? `${item.pair.slice(0, 3)} → ${item.pair.slice(3)}` : '' })),
-    ];
+    ].slice(0, 8);
     paintBoard(items);
   }
 

@@ -279,7 +279,7 @@
 .dashboard-media-meta { display: flex; align-items: baseline; gap: 14px; min-width: 0; }
 .dashboard-media-meta:not(:has(> :not([hidden]))) { display: none; }
 #dashboard-playback { color: var(--media); font-size: calc(24px * var(--text-scale)); }
-#dashboard-track { color: var(--text); font-size: calc(62px * var(--text-scale)); line-height: .98; overflow: hidden; overflow-wrap: anywhere; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+#dashboard-track { color: var(--text); font-size: calc(62px * var(--text-scale)); line-height: 1.15; overflow: hidden; overflow-wrap: anywhere; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
 #dashboard-artist, #dashboard-album, #dashboard-source { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 #dashboard-artist { color: var(--text); font-size: calc(34px * var(--text-scale)); }
 #dashboard-album, #dashboard-source { color: var(--muted-text); font-size: calc(24px * var(--text-scale)); }
@@ -332,8 +332,9 @@
 @container (height < 365px) {
   #stage:not(.portrait) .dashboard-media-copy { gap: 4px; }
   #stage:not(.portrait) #dashboard-track {
-    font-size: min(calc(49px * var(--text-scale)), 19cqh);
-    -webkit-line-clamp: 1;
+    font-size: min(calc(42px * var(--text-scale)), 16cqh);
+    line-height: 1.2;
+    -webkit-line-clamp: 2;
   }
   #stage:not(.portrait) #dashboard-artist { font-size: calc(27px * var(--text-scale)); line-height: 1; }
   #stage:not(.portrait) :is(#dashboard-album, #dashboard-source, #dashboard-playback, .dashboard-timeline-times) { line-height: 1; }

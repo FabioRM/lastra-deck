@@ -4,6 +4,12 @@ Completed items from the former TODO, grouped by the section that tracked them. 
 
 Entries grouped under **0.2.1** record the completed work through the first reviewed source release.
 
+## 1.0.1
+
+- Keep the market grid to eight columns. Currency pairs include the day's high, low, and previous close when Yahoo reports them.
+- Let the Dashboard media title wrap instead of clipping the last letters.
+- Fill the Cursor Agents page with the published chat shortcuts.
+
 ## 1.0.0
 
 - Arrange Settings in the same order as the deck views: Deck keys, Dashboard, Stats, Feeds, Tools, then OBS. Display and System sit under Setup.

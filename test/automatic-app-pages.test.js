@@ -376,8 +376,11 @@ test('Cursor Agents uses its own commands and rejects editor shortcuts after a s
   pages.observe(agents);
   const agentsPage = pages.current(profile);
   assert.equal(agentsPage.pack, 'cursor-agents');
-  assert.deepEqual(agentsPage.keys.map(({ action }) => action.keys),
-    ['Ctrl+Shift+P', 'Ctrl+P', 'Ctrl+Shift+F', 'Ctrl+Shift+D', 'Ctrl+L', 'Esc']);
+  assert.deepEqual(agentsPage.keys.map(({ action }) => action.keys), [
+    'Ctrl+Shift+P', 'Ctrl+P', 'Ctrl+Shift+F', 'Ctrl+Shift+D', 'Ctrl+L', 'Esc',
+    'Ctrl+N', 'Ctrl+T', 'Ctrl+W', 'Ctrl+period', 'Ctrl+E', 'Shift+Tab', 'Ctrl+Enter', 'Ctrl+Shift+Backspace',
+    'Ctrl+Shift+L', 'Ctrl+Shift+V', 'Ctrl+Shift+Space', 'Ctrl+Shift+J', 'Ctrl+char:,',
+  ]);
   assert.ok(agentsPage.keys.every(({ action, unavailable }) => action.shortcutGuard.mode === agents.mode && !unavailable));
   const read = { context: () => agents, windowId: () => agents.windowId };
   const runner = createActionRunner({ input: { sendChord: () => assert.fail('Cursor changed surfaces') } });

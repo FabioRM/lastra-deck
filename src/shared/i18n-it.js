@@ -79,6 +79,8 @@
     "Quotes": "Titoli",
     "Weather": "Meteo",
     "{count} of {max} symbols": "{count} di {max} simboli",
+    "{count} of {max} on the deck": "{count} di {max} sul deck",
+    "Quotes and currencies share 8 columns.": "Titoli e valute condividono 8 colonne.",
     "Saved location": "Posizione salvata",
     "Enter a currency pair such as EURUSD.": "Inserisci una coppia come EURUSD.",
     "Current location": "Posizione attuale",

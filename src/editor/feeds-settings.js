@@ -8,8 +8,7 @@ window.bindLastraFeeds = function bindLastraFeeds(api) {
   const symbolList = byId('feeds-symbol-list');
   const symbolCount = byId('feeds-symbol-count');
   const currencyList = byId('feeds-currency-list');
-  const maxSymbols = 12;
-  const maxPairs = 6;
+  const boardLimit = 8;
   if (!byId('feeds-enabled') || !api.getFeeds) return;
 
   const fields = {
@@ -47,13 +46,14 @@ window.bindLastraFeeds = function bindLastraFeeds(api) {
       delete labels[symbol];
       paintLists();
     })));
-    symbolCount.textContent = t('{count} of {max} symbols', { count: symbols.length, max: maxSymbols });
+    symbolCount.textContent = t('{count} of {max} on the deck', { count: symbols.length + pairs.length, max: boardLimit });
     currencyList.replaceChildren(...pairs.map((pair) => chip(pair, () => {
       pairs = pairs.filter((item) => item !== pair);
       paintLists();
     })));
-    fields.symbolQuery.disabled = symbols.length >= maxSymbols;
-    byId('feeds-currency-add').disabled = pairs.length >= maxPairs;
+    const full = symbols.length + pairs.length >= boardLimit;
+    fields.symbolQuery.disabled = full;
+    byId('feeds-currency-add').disabled = full;
   }
 
   function show(settings) {
@@ -142,7 +142,7 @@ window.bindLastraFeeds = function bindLastraFeeds(api) {
     if (!query) { fields.symbolResults.hidden = true; return; }
     symbolTimer = setTimeout(async () => {
       try { results(fields.symbolResults, await api.searchFeedSymbols(query), (item) => {
-        if (symbols.length >= maxSymbols || symbols.includes(item.symbol)) return;
+        if (symbols.length + pairs.length >= boardLimit || symbols.includes(item.symbol)) return;
         symbols.push(item.symbol);
         labels[item.symbol] = item.name;
         fields.symbolQuery.value = '';
@@ -154,7 +154,7 @@ window.bindLastraFeeds = function bindLastraFeeds(api) {
   });
   byId('feeds-currency-add').addEventListener('click', () => {
     const pair = fields.currencyQuery.value.trim().toUpperCase();
-    if (!/^[A-Z]{6}$/.test(pair) || pairs.includes(pair) || pairs.length >= maxPairs) {
+    if (!/^[A-Z]{6}$/.test(pair) || pairs.includes(pair) || symbols.length + pairs.length >= boardLimit) {
       status.textContent = t('Enter a currency pair such as EURUSD.');
       return;
     }

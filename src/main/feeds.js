@@ -401,11 +401,12 @@ class Feeds {
   async #fx(pair) {
     if (pair.includes('JPN')) throw new Error('Yen uses JPY. Add EURJPY.');
     try {
-      const url = new URL('https://query1.finance.yahoo.com/v7/finance/quote');
-      url.searchParams.set('symbols', `${pair}=X`);
+      const url = new URL(`https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(`${pair}=X`)}`);
+      url.searchParams.set('range', '1d');
+      url.searchParams.set('interval', '1d');
       const response = await this.#yahoo(url);
       if (response.ok) {
-        const stats = sessionStats((await response.json())?.quoteResponse?.result?.[0]);
+        const stats = sessionStats((await response.json())?.chart?.result?.[0]?.meta);
         if (stats.price != null) return { pair, rate: stats.price, change: stats.change, open: stats.open, high: stats.high, low: stats.low, close: stats.close };
       }
     } catch { /* Frankfurter still has the rate. */ }
