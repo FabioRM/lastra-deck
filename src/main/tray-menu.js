@@ -22,6 +22,21 @@ const DESKTOP_MENUS = Object.freeze({
     'Reload interface', 'Developer tools'],
 });
 
+const freezeSets = (sets) => Object.freeze(sets.map((scopes) => Object.freeze([...scopes])));
+const GRANT_SETS = freezeSets([
+  ['layout'], ['providers'], ['layout', 'providers'], ['drafts'], ['layout', 'drafts'], ['drafts', 'apply'], ['drafts', 'telemetry'], ['agent-choices'],
+  ['profile-switch'], ['layout', 'navigate'], ['layout', 'actions'], ['telemetry'], ['audio'], ['media'], ['spotify'], ['obs'],
+  ['telemetry', 'alert-actions'], ['obs', 'obs-actions'], ['obs', 'obs-output-actions'],
+  ['audio', 'audio-actions'], ['audio', 'audio-mute'], ['audio', 'audio-routing'], ['audio', 'audio-app-level'], ['workspaces'],
+  ['workspaces', 'workspace-actions'], ['workspaces', 'workspace-targets'], ['workspaces', 'workspace-external'],
+  ['media', 'media-actions'], ['projects'],
+  ['spotify', 'spotify-control'],
+  ['projects', 'project-actions'], [RUN_SCOPE],
+]);
+const TEMPORARY_GRANT_SETS = freezeSets([
+  ['layout'], ['providers'], ['layout', 'providers'], ['telemetry'], ['audio'], ['media'], ['spotify'], ['obs'], ['workspaces'], ['projects'],
+]);
+
 /**
  * @typedef {object} AgentServices The local agent access services; present only on Windows without `--profile=`.
  * @property {any} access
@@ -172,19 +187,11 @@ function agentMenu({ agent, activity, dialog, clipboard, root, refresh }) {
       { label: agentService.locked ? 'Windows session unavailable' : `${connected.size} connected`, enabled: false },
       {
         label: 'Grant access', enabled: grantEnabled,
-        submenu: [['layout'], ['providers'], ['layout', 'providers'], ['drafts'], ['layout', 'drafts'], ['drafts', 'apply'], ['drafts', 'telemetry'], ['agent-choices'],
-          ['profile-switch'], ['layout', 'navigate'], ['layout', 'actions'], ['telemetry'], ['audio'], ['media'], ['spotify'], ['obs'],
-          ['telemetry', 'alert-actions'], ['obs', 'obs-actions'], ['obs', 'obs-output-actions'],
-          ['audio', 'audio-actions'], ['audio', 'audio-mute'], ['audio', 'audio-routing'], ['audio', 'audio-app-level'], ['workspaces'],
-          ['workspaces', 'workspace-actions'], ['workspaces', 'workspace-targets'], ['workspaces', 'workspace-external'],
-          ['media', 'media-actions'], ['projects'],
-          ['spotify', 'spotify-control'],
-          ['projects', 'project-actions'], [RUN_SCOPE]].map((scopes) => grantItem(scopes)),
+        submenu: GRANT_SETS.map((scopes) => grantItem(scopes)),
       },
       {
         label: 'Grant read access for 15 minutes', enabled: grantEnabled,
-        submenu: [['layout'], ['providers'], ['layout', 'providers'], ['telemetry'], ['audio'], ['media'], ['spotify'], ['obs'], ['workspaces'], ['projects']]
-          .map((scopes) => grantItem(scopes, { durationMs: TEMPORARY_GRANT_MS })),
+        submenu: TEMPORARY_GRANT_SETS.map((scopes) => grantItem(scopes, { durationMs: TEMPORARY_GRANT_MS })),
       },
       {
         label: 'Grant access to one project', enabled: grantEnabled && projectTargets.length > 0,
@@ -407,4 +414,4 @@ function createTrayMenu({ tray, electron, log, startup, opts, root, platform = p
   } };
 }
 
-module.exports = { createTrayMenu, grantDetail };
+module.exports = { createTrayMenu, grantDetail, GRANT_SETS, TEMPORARY_GRANT_SETS };

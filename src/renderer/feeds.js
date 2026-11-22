@@ -12,11 +12,9 @@
   const condition = document.getElementById('feeds-condition');
   const moonState = document.getElementById('feeds-moon-state');
   const range = document.getElementById('feeds-range');
-  const quotes = document.getElementById('feeds-quotes');
-  const currencies = document.getElementById('feeds-currencies');
-  const accents = ['#8ac8c1', '#e0b45c', '#a3abda', '#d79bb5', '#8fd19e', '#f2bf72'];
+  const board = document.getElementById('feeds-board');
   let timer = null;
-  if (!weather || !place || !quotes) return;
+  if (!weather || !place || !board) return;
 
   function el(tag, className, text) {
     const node = document.createElement(tag);
@@ -104,15 +102,6 @@
     return 'clear';
   }
 
-  function accent(symbol) {
-    const total = [...String(symbol)].reduce((sum, char) => sum + char.charCodeAt(0), 0);
-    return accents[total % accents.length];
-  }
-
-  function mark(symbol) {
-    return String(symbol).replace('.US', '').replace(/[^A-Za-z0-9]/g, '').slice(0, 4);
-  }
-
   function digits(value, places) {
     return value.toLocaleString(undefined, { minimumFractionDigits: places, maximumFractionDigits: places });
   }
@@ -127,65 +116,52 @@
     return `${sign}${digits(value, 1)}%`;
   }
 
-  function orb(symbol, change) {
-    const wrap = el('div', 'feeds-orb');
-    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-    svg.setAttribute('viewBox', '0 0 80 80');
-    svg.setAttribute('aria-hidden', 'true');
-    const radius = 32;
-    const length = 2 * Math.PI * radius;
-    for (const [name, offset] of [['feeds-orb-track', length], ['feeds-orb-value', length * (1 - Math.min(1, Math.abs(change || 0) / 8))]]) {
-      const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-      circle.setAttribute('class', name);
-      circle.setAttribute('cx', '40');
-      circle.setAttribute('cy', '40');
-      circle.setAttribute('r', String(radius));
-      circle.style.strokeDasharray = String(length);
-      circle.style.strokeDashoffset = String(offset);
-      svg.append(circle);
-    }
-    wrap.append(svg, el('span', 'feeds-mark', mark(symbol)));
-    return wrap;
+  function compactCap(value) {
+    const abs = Math.abs(value);
+    const unit = abs >= 1e12 ? [1e12, 'T'] : abs >= 1e9 ? [1e9, 'B'] : abs >= 1e6 ? [1e6, 'M'] : null;
+    if (!unit) return formatQuote(value);
+    return `${digits(value / unit[0], 1)}${unit[1]}`;
   }
 
-  function quoteCard(item, label) {
-    const card = document.createElement('li');
-    card.append(el('span', 'feeds-sheen'));
-    if (item.error) {
-      card.dataset.direction = 'bad';
-      const copy = el('div', 'feeds-quote-copy');
-      copy.append(el('p', 'feeds-symbol', item.symbol || ''), el('p', 'feeds-note', t(item.error)));
-      card.append(copy);
-      return card;
-    }
-    const direction = item.change > 0.05 ? 'up' : item.change < -0.05 ? 'down' : 'flat';
-    card.dataset.direction = direction;
-    card.style.setProperty('--accent', accent(item.symbol));
-    const copy = el('div', 'feeds-quote-copy');
-    copy.append(el('p', 'feeds-symbol', item.symbol));
-    if (label) copy.append(el('p', 'feeds-name', label));
-    copy.append(el('p', 'feeds-price', formatQuote(item.price)));
-    if (item.change != null) copy.append(el('p', 'feeds-change', formatChange(item.change)));
-    card.append(orb(item.symbol, item.change), copy);
-    return card;
+  const metrics = [
+    ['Day open', 'open'], ['Day high', 'high'], ['Day low', 'low'], ['Prev close', 'close'], ['Mkt cap', 'marketCap'],
+  ];
+
+  function figure(value, cap) {
+    if (value == null) return '—';
+    if (cap) return compactCap(value);
+    return Math.abs(value) >= 20 ? formatQuote(value) : digits(value, 4);
   }
 
-  function currencyCard(item) {
-    const card = document.createElement('li');
-    if (item.error || !item.pair) {
-      card.dataset.direction = 'bad';
-      card.append(el('p', 'feeds-symbol', item.pair || ''), el('p', 'feeds-note', t(item.error || '')));
-      return card;
+  function paintBoard(items) {
+    const visible = metrics.filter(([, key]) => items.some((item) => item[key] != null));
+    board.style.setProperty('--cols', String(Math.max(items.length, 1)));
+    board.replaceChildren();
+    if (!items.length) return;
+    board.append(el('span', 'feeds-label'));
+    for (const item of items) {
+      const head = el('span', 'feeds-head');
+      head.append(el('span', 'feeds-symbol', item.title));
+      if (item.name) head.append(el('span', 'feeds-name', item.name));
+      board.append(head);
     }
-    card.style.setProperty('--accent', accent(item.pair));
-    card.append(
-      el('span', 'feeds-coin', item.pair.slice(0, 3)),
-      el('span', 'feeds-flow'),
-      el('p', 'feeds-rate', digits(item.rate, Math.abs(item.rate) >= 100 ? 2 : 4)),
-      el('span', 'feeds-flow'),
-      el('span', 'feeds-coin', item.pair.slice(3)),
-    );
-    return card;
+    board.append(el('span', 'feeds-label'));
+    for (const item of items) {
+      const price = el('span', 'feeds-price', item.error ? '' : figure(item.price ?? item.rate));
+      const direction = item.change > 0.05 ? 'up' : item.change < -0.05 ? 'down' : 'flat';
+      price.dataset.direction = item.error ? 'bad' : direction;
+      board.append(price);
+    }
+    board.append(el('span', 'feeds-label'));
+    for (const item of items) {
+      const change = el('span', 'feeds-change', item.error ? t(item.error) : item.change == null ? '—' : formatChange(item.change));
+      change.dataset.direction = item.error ? 'bad' : item.change > 0.05 ? 'up' : item.change < -0.05 ? 'down' : 'flat';
+      board.append(change);
+    }
+    for (const [label, key] of visible) {
+      board.append(el('span', 'feeds-label', t(label)));
+      for (const item of items) board.append(el('span', 'feeds-value', item[key] == null ? '—' : figure(item[key], key === 'marketCap')));
+    }
   }
 
   function show(snapshot) {
@@ -217,8 +193,11 @@
       range.textContent = '';
     }
     const labels = snapshot.quotes?.labels ?? {};
-    quotes.replaceChildren(...(snapshot.quotes?.rows ?? []).map((item) => quoteCard(item, item.symbol ? labels[item.symbol] : '')));
-    currencies.replaceChildren(...(snapshot.currencies?.rows ?? []).map(currencyCard));
+    const items = [
+      ...(snapshot.quotes?.rows ?? []).map((item) => ({ ...item, title: item.symbol || '', name: item.symbol ? labels[item.symbol] : '' })),
+      ...(snapshot.currencies?.rows ?? []).map((item) => ({ ...item, title: item.pair ? `${item.pair.slice(0, 3)} → ${item.pair.slice(3)}` : '' })),
+    ];
+    paintBoard(items);
   }
 
   async function refresh() {

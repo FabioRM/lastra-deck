@@ -58,7 +58,7 @@ function sealSecret(file, raw, field, log = () => {}) {
 }
 
 /** Protect several plain top-level secrets in one rewrite of the settings file. */
-function sealSecrets(file, raw, fields, log = () => {}) {
+function sealSecrets(file, raw, fields, log = (..._args) => {}) {
   let next = { ...raw };
   let changed = false;
   for (const field of fields) {

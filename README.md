@@ -31,11 +31,11 @@ The loop opens **Emoji** from **Home**, then shows **Dashboard**, **Stats**, and
 
 ## Getting started
 
-Download the installer or browse the reviewed source on the public release page. [Lastra v0.2.10](https://github.com/FabioRM/lastra-deck/releases/tag/v0.2.10) · [Windows x64 installer](https://github.com/FabioRM/lastra-deck/releases/download/v0.2.10/Lastra-Setup-0.2.10.exe) · [SHA‑256 checksum](https://github.com/FabioRM/lastra-deck/releases/download/v0.2.10/Lastra-Setup-0.2.10.exe.sha256) · [Catalog redistribution review](docs/catalog-redistribution.md)
+Download the installer or browse the reviewed source on the public release page. [Lastra v1.0.0](https://github.com/FabioRM/lastra-deck/releases/tag/v1.0.0) · [Windows x64 installer](https://github.com/FabioRM/lastra-deck/releases/download/v1.0.0/Lastra-Setup-1.0.0.exe) · [SHA‑256 checksum](https://github.com/FabioRM/lastra-deck/releases/download/v1.0.0/Lastra-Setup-1.0.0.exe.sha256) · [Catalog redistribution review](docs/catalog-redistribution.md)
 
 Set the XENEON EDGE to **Extend these displays** in Windows Display settings. The panel runs at 2560 × 720 in landscape and 720 × 2560 in portrait.
 
-**Install the app.** Download `Lastra-Setup-0.2.10.exe` and run it on Windows x64. It installs for the current user in `%LOCALAPPDATA%\Programs\Lastra` and adds Start menu and desktop shortcuts. The Windows installer is unsigned. Settings and profiles live in `%APPDATA%\Lastra` and survive updates and uninstalls. [Latest release](https://github.com/FabioRM/lastra-deck/releases/latest) · [Update behavior](https://github.com/FabioRM/lastra-deck/blob/main/docs/releasing.md#update-behavior)
+**Install the app.** Download `Lastra-Setup-1.0.0.exe` and run it on Windows x64. It installs for the current user in `%LOCALAPPDATA%\Programs\Lastra` and adds Start menu and desktop shortcuts. The Windows installer is unsigned. Settings and profiles live in `%APPDATA%\Lastra` and survive updates and uninstalls. [Latest release](https://github.com/FabioRM/lastra-deck/releases/latest) · [Update behavior](https://github.com/FabioRM/lastra-deck/blob/main/docs/releasing.md#update-behavior)
 
 **Run from source.** Install **Node.js 22.12.0 or later**, as required by the Electron installer, then run these commands from the project directory. Source runs never check for updates. To build the installer yourself, see [Releasing](docs/releasing.md).
 
@@ -50,20 +50,20 @@ Click the Lastra icon in the Windows notification area to open desktop Settings.
 
 When Windows changes the display layout, rotates the screen, or wakes from sleep, Lastra rechecks the display after a short delay and puts the deck back without taking focus. A brief interruption while Windows detects the Edge can recover in the same window. If Lastra has already exited after a disconnect, reconnect the Edge and start Lastra again.
 
-Lastra opens **Dashboard** on first launch. The switch in the top-right corner cycles through **Deck Keys → Dashboard → Stats → Feeds**. The clock and date stay in the top-left corner while those views change. Later launches restore the last manually opened view, selected deck page, and page lock.
+Lastra opens **Dashboard** on first launch. The switch in the top-right corner cycles through **Deck Keys → Dashboard → Stats → Feeds**. Dashboard, Stats, and Feeds keep the clock and date in the top-left corner. Deck Keys leaves that corner to the page title. Later launches restore the last manually opened view, selected deck page, and page lock.
 
 The **Speakers** and **Windows microphones** icons stay next to the view switch on **Dashboard** and **Deck keys**. Use them to mute the default Windows output or mute and restore the Windows inputs as a group. They reflect changes made in Windows.
 
 ### Mapping touch to the XENEON EDGE
 
-In **Lastra → Settings → System → Diagnostics and deck maintenance**, **Touch diagnostics** shows which monitor receives touch events, with physical coordinates and DPI. **Configure Windows touch** opens **Tablet PC Settings**. You can also open it through Control Panel or with `control.exe /name Microsoft.TabletPCSettings`.
+In **Lastra → Settings → System → Diagnostics**, **Touch diagnostics** shows which monitor receives touch events, with physical coordinates and DPI. **Configure Windows touch** opens **Tablet PC Settings**. You can also open it through Control Panel or with `control.exe /name Microsoft.TabletPCSettings`.
 
 1. Select **Setup**. If Windows asks for the input type, choose **Touch input**.
 2. Press **Enter** to skip the other monitors.
 3. When the white prompt appears on the XENEON EDGE, tap the display once with one finger. If setup continues on another monitor, press **Enter** to skip it.
 4. Return to Lastra and try changing pages with a touch. The layout also adapts when you rotate the display to portrait.
 
-Use **Export diagnostics…** under **Settings → System → Diagnostics and deck maintenance** to save a JSON report for troubleshooting. It includes display geometry and touch mapping, audio mute and volume status, sensor availability, and integration status. Service health appears as totals. The report omits device names and IDs, file paths, URLs, credentials, media titles, and profile contents. Export reads the current state without starting providers or sending the report anywhere.
+Use **Export diagnostics…** under **Settings → System → Diagnostics** to save a JSON report for troubleshooting. It includes display geometry and touch mapping, audio mute and volume status, sensor availability, and integration status. Service health appears as totals. The report omits device names and IDs, file paths, URLs, credentials, media titles, and profile contents. Export reads the current state without starting providers or sending the report anywhere.
 
 ## Tools and Pomodoro
 

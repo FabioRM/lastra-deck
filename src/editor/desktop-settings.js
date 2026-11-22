@@ -37,6 +37,7 @@
     try {
       updateLanguage(await api.setLanguage(language.value));
       languageStatus.textContent = t('Interface language saved.');
+      void window.LastraMaintenance?.refresh();
     } catch {
       language.value = savedLanguage;
       languageStatus.textContent = t('Could not save the interface language.');
@@ -110,9 +111,9 @@
       panel.hidden = panel.id !== id;
       if (!panel.hidden) panel.open = true;
     }
-    byId('desktop-menu-status').textContent = '';
-    if (id === 'appearance-settings') void calendar('read');
+    if (id === 'dashboard-settings') void calendar('read');
     if (id === 'stats-settings') void loadGrafana();
+    if (id === 'stats-settings' || id === 'system-settings') void window.LastraMaintenance?.refresh();
     void showProduction(id === 'production-settings');
   }
 
@@ -126,17 +127,6 @@
 
   for (const tab of tabs) tab.addEventListener('click', () => showTab(tab.dataset.desktopTab));
   for (const control of sections) control.addEventListener('click', () => showSection(control.dataset.settingsSection));
-  for (const control of settings.querySelectorAll('[data-desktop-menu]')) {
-    control.addEventListener('click', async () => {
-      const status = byId('desktop-menu-status');
-      status.textContent = '';
-      try {
-        if (!await api.openDesktopMenu(control.dataset.desktopMenu)) status.textContent = t('This group is currently unavailable.');
-      } catch {
-        status.textContent = t('Could not open these options.');
-      }
-    });
-  }
   byId('settings-integrations').addEventListener('click', () => byId('integration-setup-open').click());
   calendarPick.addEventListener('click', () => void calendar('pick'));
   calendarClear.addEventListener('click', () => void calendar('clear'));
@@ -157,5 +147,5 @@
   });
   api.onDesktopSection((name) => showTab(name === 'profile' ? 'profile' : 'settings'));
   showTab('settings');
-  showSection('appearance-settings');
+  showSection('deck-shortcut-settings');
 }

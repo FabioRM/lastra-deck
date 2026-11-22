@@ -123,19 +123,41 @@ details[open].editor-menu summary::after, details[open].canvas-details > summary
 }
 .editor-menu button { text-align: start; background: transparent; border-color: transparent; }
 #desktop-settings {
-  grid-template-columns: minmax(160px, 218px) minmax(0, 1fr);
+  grid-template-columns: minmax(188px, 236px) minmax(0, 1fr);
 }
 #desktop-settings-nav {
+  position: sticky;
+  top: 62px;
+  height: calc(100dvh - 62px);
   display: grid;
   align-content: start;
-  gap: 6px;
-  padding: 18px;
+  gap: 4px;
+  padding: 18px 14px;
+  overflow: auto;
   border-right: 1px solid var(--border);
   background: var(--panel);
 }
-#desktop-settings-nav button { text-align: start; border-color: transparent; background: transparent; }
-#desktop-settings-content { width: min(100%, 980px); padding: 24px 28px; }
-#desktop-settings-content [data-settings-panel] { border: 0; padding: 0; }
+.settings-nav-label {
+  margin: 12px 8px 4px;
+  color: var(--muted);
+  font-size: .75rem;
+  font-weight: 650;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+.settings-nav-label:first-child { margin-top: 4px; }
+#desktop-settings-nav button { text-align: start; border-color: transparent; background: transparent; border-radius: 10px; }
+#desktop-settings-content { width: min(100%, 920px); padding: 28px 32px 48px; }
+#desktop-settings-content [data-settings-panel] { display: grid; gap: 12px; border: 0; padding: 0; }
+.maintenance { display: grid; gap: 12px; }
+.maintenance h4 { margin: 4px 0 0; }
+.maintenance-list { display: grid; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.maintenance-list li {
+  display: flex; justify-content: space-between; align-items: center; gap: 12px;
+  padding: 10px 12px; border: 1px solid var(--editor-border); border-radius: 10px; background: var(--surface);
+}
+.maintenance-list div { display: grid; gap: 2px; min-width: 0; }
+.maintenance-list strong, .maintenance-list span { overflow-wrap: anywhere; }
 #desktop-settings-content [data-settings-panel] > summary {
   cursor: default;
   list-style: none;
@@ -144,7 +166,6 @@ details[open].editor-menu summary::after, details[open].canvas-details > summary
   margin-block-end: 12px;
 }
 #desktop-settings-content [data-settings-panel] > summary::-webkit-details-marker { display: none; }
-.desktop-menu-buttons { display: flex; flex-wrap: wrap; gap: 8px; margin-block: 14px; }
 .desktop-production { display: grid; gap: 12px; }
 .desktop-production :is(.obs-mode-fields, .production-segments) { display: grid; gap: 8px; }
 .desktop-production :is(.obs-mode-fields fieldset, .production-segment) {
@@ -266,7 +287,6 @@ main {
 .theme-sample i:last-child { background: var(--app); }
 .feeds-toggles, .feeds-row { display: flex; flex-wrap: wrap; gap: 10px; align-items: end; }
 .deck-behavior { display: grid; gap: 12px; margin-block: 12px; }
-#calendar-settings { margin-top: 12px; }
 .deck-choice { display: grid; grid-template-columns: repeat(auto-fit, minmax(108px, 1fr)); gap: 6px; margin: 0; padding: 0; border: 0; }
 .deck-choice legend { padding: 0; margin-block-end: 7px; color: var(--muted); }
 .deck-choice label {

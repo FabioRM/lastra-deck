@@ -2,9 +2,7 @@
 'use strict';
 
 // Background updates for installed (NSIS) builds through electron-updater and GitHub Releases.
-// The deck is a touch surface without a keyboard nearby, so this module never opens a dialog or
-// steals focus: it checks quietly, downloads in the background, and installs when Lastra quits.
-// The tray can show the state and offer "Check for updates" or "Restart to update".
+// Checks start on their own. A downloaded update is offered on the deck and also installs when Lastra quits.
 
 const fs = require('node:fs');
 const path = require('node:path');

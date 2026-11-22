@@ -12,6 +12,7 @@ const PASSIVE = new Set([
   'stats:read', 'stats:stop', 'stats:tab', 'media:snapshot', 'display:backlight:read',
   'app-views:list', 'app-views:data', 'deck:badges:read', 'audio:peaks', 'audio:apps:list',
   'audio:outputs:list', 'key:confirmation:cancel', 'emoji:catalog', 'desktop-reveal:begin', 'obs:preview', 'obs:timing', 'production:timers:read',
+  'update:status', 'feeds:read',
 ]);
 
 function deckRequestAllowed(channel, command) {

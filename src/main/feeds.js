@@ -35,6 +35,26 @@ function quoteLabels(value, symbols) {
   }));
 }
 
+function finite(value) {
+  const number = Number(value);
+  return Number.isFinite(number) ? number : null;
+}
+
+function sessionStats(quote) {
+  const price = finite(quote?.regularMarketPrice);
+  const previous = finite(quote?.regularMarketPreviousClose ?? quote?.previousClose ?? quote?.chartPreviousClose);
+  const reported = finite(quote?.regularMarketChangePercent);
+  const change = reported ?? (price != null && previous ? Math.round((price - previous) / previous * 1000) / 10 : null);
+  return {
+    price,
+    change,
+    open: finite(quote?.regularMarketOpen),
+    high: finite(quote?.regularMarketDayHigh),
+    low: finite(quote?.regularMarketDayLow),
+    close: previous,
+    marketCap: finite(quote?.marketCap),
+  };
+}
 function yahooSymbol(symbol) {
   const bare = symbol.endsWith('.US') ? symbol.slice(0, -3) : symbol;
   return SYMBOL.test(bare) ? bare : symbol;
@@ -64,7 +84,7 @@ function readRaw(file) {
 }
 
 class Feeds {
-  constructor(file, { legacyWeather, fetch: fetchImpl = globalThis.fetch, onChange = () => {}, log = () => {} } = {}) {
+  constructor(file, { legacyWeather = '', fetch: fetchImpl = globalThis.fetch, onChange = () => {}, log = () => {} } = {}) {
     this.file = file;
     this.fetch = fetchImpl;
     this.onChange = onChange;
@@ -319,17 +339,24 @@ class Feeds {
   }
 
   async #yahooQuote(symbol) {
-    const url = new URL(`https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(yahooSymbol(symbol))}`);
-    url.searchParams.set('range', '1d');
-    url.searchParams.set('interval', '1d');
-    const response = await this.#yahoo(url);
-    if (!response.ok) throw new Error(`Yahoo Finance has no price for ${symbol}.`);
-    const meta = (await response.json())?.chart?.result?.[0]?.meta;
-    const price = meta?.regularMarketPrice;
-    const previous = meta?.chartPreviousClose;
-    if (!Number.isFinite(price)) throw new Error(`Yahoo Finance has no price for ${symbol}.`);
-    const change = Number.isFinite(previous) && previous ? Math.round((price - previous) / previous * 1000) / 10 : null;
-    return { symbol, price, change };
+    const yahoo = yahooSymbol(symbol);
+    let stats = null;
+    try {
+      const url = new URL('https://query1.finance.yahoo.com/v7/finance/quote');
+      url.searchParams.set('symbols', yahoo);
+      const response = await this.#yahoo(url);
+      if (response.ok) stats = sessionStats((await response.json())?.quoteResponse?.result?.[0]);
+    } catch { stats = null; }
+    if (stats?.price == null) {
+      const url = new URL(`https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(yahoo)}`);
+      url.searchParams.set('range', '1d');
+      url.searchParams.set('interval', '1d');
+      const response = await this.#yahoo(url);
+      if (!response.ok) throw new Error(`Yahoo Finance has no price for ${symbol}.`);
+      stats = sessionStats((await response.json())?.chart?.result?.[0]?.meta);
+    }
+    if (stats?.price == null) throw new Error(`Yahoo Finance has no price for ${symbol}.`);
+    return { symbol, ...stats };
   }
 
   async #yahoo(url) {
@@ -371,11 +398,25 @@ class Feeds {
     throw last;
   }
 
+  async #fx(pair) {
+    if (pair.includes('JPN')) throw new Error('Yen uses JPY. Add EURJPY.');
+    try {
+      const url = new URL('https://query1.finance.yahoo.com/v7/finance/quote');
+      url.searchParams.set('symbols', `${pair}=X`);
+      const response = await this.#yahoo(url);
+      if (response.ok) {
+        const stats = sessionStats((await response.json())?.quoteResponse?.result?.[0]);
+        if (stats.price != null) return { pair, rate: stats.price, change: stats.change, open: stats.open, high: stats.high, low: stats.low, close: stats.close };
+      }
+    } catch { /* Frankfurter still has the rate. */ }
+    return { pair, rate: await this.#rate(pair) };
+  }
+
   async #currencies(pairs) {
     if (!pairs.length) return [];
     const rows = [];
     for (const pair of pairs) {
-      try { rows.push({ pair, rate: await this.#rate(pair) }); }
+      try { rows.push(await this.#fx(pair)); }
       catch (error) {
         this.log('Could not read the currency feed.');
         rows.push({ pair, error: error.message });

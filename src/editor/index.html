@@ -43,16 +43,20 @@
   </header>
   <main id="desktop-settings" aria-label="Settings">
     <nav id="desktop-settings-nav" aria-label="Settings categories">
-      <button type="button" data-settings-section="appearance-settings">Display</button>
+      <p class="settings-nav-label">Views</p>
+      <button type="button" data-settings-section="deck-shortcut-settings">Deck keys</button>
+      <button type="button" data-settings-section="dashboard-settings">Dashboard</button>
       <button type="button" data-settings-section="stats-settings">Stats</button>
+      <button type="button" data-settings-section="feeds-settings-panel">Feeds</button>
       <button type="button" data-settings-section="tool-settings">Tools</button>
-      <button type="button" data-settings-section="deck-shortcut-settings">Keyboard shortcuts</button>
       <button type="button" data-settings-section="production-settings">OBS production</button>
+      <p class="settings-nav-label">Setup</p>
+      <button type="button" data-settings-section="appearance-settings">Display</button>
       <button type="button" data-settings-section="system-settings">System</button>
     </nav>
     <div id="desktop-settings-content">
-      <details class="profile" id="appearance-settings" data-settings-panel>
-        <summary>Deck settings</summary>
+      <details class="profile" id="appearance-settings" data-settings-panel hidden>
+        <summary>Display</summary>
         <form id="appearance-controls" class="deck-settings" inert>
           <p class="muted deck-settings-note">Changes apply immediately to the deck and its live preview.</p>
           <section class="deck-settings-card" aria-labelledby="display-settings-heading">
@@ -87,6 +91,20 @@
         </form>
         <p id="appearance-status" role="status"></p>
         <div id="deck-behavior" class="deck-behavior"></div>
+      </details>
+      <details class="profile" id="dashboard-settings" data-settings-panel hidden>
+        <summary>Dashboard</summary>
+        <section id="calendar-settings" class="deck-settings-card">
+          <h3>Dashboard calendar file</h3>
+          <div class="deck-settings-fields">
+            <button type="button" id="settings-calendar-pick">Choose .ics file</button>
+            <button type="button" id="settings-calendar-clear" disabled>Clear file</button>
+          </div>
+          <p id="settings-calendar-status" class="muted" role="status"></p>
+        </section>
+      </details>
+      <details class="profile" id="feeds-settings-panel" data-settings-panel hidden>
+        <summary>Feeds</summary>
         <section id="feeds-settings" class="deck-settings-card" aria-labelledby="feeds-settings-heading">
           <h3 id="feeds-settings-heading">Feeds</h3>
           <div class="feeds-toggles">
@@ -140,23 +158,15 @@
           <button id="feeds-save" type="button">Save feeds</button>
           <p id="feeds-status" role="status"></p>
         </section>
-        <section id="calendar-settings" class="deck-settings-card">
-          <h3>Dashboard calendar file</h3>
-          <div class="deck-settings-fields">
-            <button type="button" id="settings-calendar-pick">Choose .ics file</button>
-            <button type="button" id="settings-calendar-clear" disabled>Clear file</button>
-          </div>
-          <p id="settings-calendar-status" class="muted" role="status"></p>
-        </section>
       </details>
-      <details class="profile" id="deck-shortcut-settings" data-settings-panel hidden>
-        <summary>Deck keyboard shortcuts</summary>
+      <details class="profile" id="deck-shortcut-settings" data-settings-panel>
+        <summary>Deck keys</summary>
         <p class="muted">Assign a function key or a combination such as Ctrl+Alt+Right. Clear a shortcut and apply to release it.</p>
         <div id="deck-shortcut-rows"></div>
         <p id="deck-shortcut-status" role="status"></p>
       </details>
       <details class="profile" id="tool-settings" data-settings-panel hidden>
-        <summary>Tools settings</summary>
+        <summary>Tools</summary>
         <form id="tool-choices-form" class="deck-settings-card" inert>
           <label class="field">Quick decision pick list
             <textarea name="choices" rows="4" maxlength="600" required></textarea>
@@ -166,7 +176,7 @@
         </form>
       </details>
       <details class="profile" id="stats-settings" data-settings-panel hidden>
-        <summary>Stats settings</summary>
+        <summary>Stats</summary>
         <form id="stats-settings-form" class="deck-settings-card" inert>
           <div class="deck-settings-fields">
             <label class="field">Stats layout<select name="layout"></select></label>
@@ -195,10 +205,7 @@
           <p id="stats-settings-status" role="status"></p>
         </form>
         <p id="stats-settings-load" class="muted" role="status"></p>
-        <div class="desktop-menu-buttons">
-          <button type="button" data-desktop-menu="monitoring">History and refresh options</button>
-          <button type="button" data-desktop-menu="watchlist">Watchlist readings</button>
-        </div>
+        <div id="stats-maintenance" class="maintenance"></div>
         <form id="grafana-settings-form" class="deck-settings-card" inert>
           <label class="field">Grafana dashboard URL
             <input type="url" name="url" maxlength="2048" spellcheck="false" autocomplete="off">
@@ -229,15 +236,13 @@
           </select>
           <p class="muted" id="language-status" role="status"></p>
         </section>
-        <div class="desktop-menu-buttons">
-          <button type="button" id="settings-integrations">Integration setup</button>
-          <button type="button" data-desktop-menu="agents">Agent access</button>
-          <button type="button" data-desktop-menu="diagnostics">Diagnostics and deck maintenance</button>
-          <button type="button" data-desktop-menu="updates">Updates</button>
-          <button type="button" data-desktop-menu="files">Profile files</button>
-        </div>
+        <section class="deck-settings-card">
+          <h3>Integration setup</h3>
+          <p class="muted">Connect the services Lastra can read from this PC.</p>
+          <div class="deck-settings-fields"><button type="button" id="settings-integrations">Open integration setup</button></div>
+        </section>
+        <div id="system-maintenance" class="maintenance"></div>
       </details>
-      <p id="desktop-menu-status" role="status"></p>
     </div>
   </main>
   <main id="workspace" aria-label="Profile editor" inert hidden>
@@ -570,6 +575,7 @@
   <script src="deck-shortcuts.js"></script>
   <script src="tool-settings.js"></script>
   <script src="stats-settings.js"></script>
+  <script src="system-panel.js"></script>
   <script src="../renderer/obs-modes.js"></script>
   <script src="../renderer/obs-production.js"></script>
   <script src="desktop-settings.js"></script>

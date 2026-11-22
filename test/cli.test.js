@@ -7,7 +7,7 @@ const { parseArgs } = require('../src/main/cli');
 
 test('no switches start the deck with defaults', () => {
   assert.deepEqual(parseArgs([]), {
-    windowed: false, preview: null, states: false, portrait: false, stats: false, display: null, editor: false, profile: null,
+    windowed: false, preview: null, states: false, portrait: false, stats: false, display: null, editor: false, profile: null, reload: false,
   });
 });
 
@@ -60,6 +60,10 @@ test('a relative profile resolves against the working folder and the display sta
   assert.equal(opts.profile, path.join(cwd, 'profiles', 'test.json'));
   assert.equal(opts.display, '2779098405');
   assert.equal(parseArgs(['--profile=x.json']).profile, path.resolve('x.json'));
+});
+
+test('reload asks the running app to refresh the frontend', () => {
+  assert.equal(parseArgs(['--reload']).reload, true);
 });
 
 test('a later switch wins over an earlier one', () => {

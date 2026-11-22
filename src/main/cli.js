@@ -25,6 +25,7 @@ const path = require('node:path');
  * @property {boolean} [previewLargeKeys] Render with the large Deck Keys layout.
  * @property {boolean} [measureDeck] Enable the panel measurement recorder.
  * @property {boolean} [enableWaylandKeyboard] Ask the desktop portal for keyboard permission.
+ * @property {boolean} [reload] Ask the running Lastra to reload the deck and editor.
  */
 
 /**
@@ -36,7 +37,7 @@ const path = require('node:path');
  */
 function parseArgs(argv, { cwd } = {}) {
   /** @type {LaunchOptions} */
-  const opts = { windowed: false, preview: null, states: false, portrait: false, stats: false, display: null, editor: false, profile: null };
+  const opts = { windowed: false, preview: null, states: false, portrait: false, stats: false, display: null, editor: false, profile: null, reload: false };
   for (const arg of argv) {
     if (arg === '--windowed') opts.windowed = true;
     else if (arg === '--preview') opts.preview = 'preview.png';
@@ -61,6 +62,7 @@ function parseArgs(argv, { cwd } = {}) {
     else if (arg === '--enable-wayland-keyboard') opts.enableWaylandKeyboard = true;
     else if (arg === '--editor') opts.editor = true;
     else if (arg === '--settings') opts.settings = true;
+    else if (arg === '--reload') opts.reload = true;
     else if (arg.startsWith('--profile=')) {
       const file = arg.slice('--profile='.length);
       opts.profile = cwd === undefined ? path.resolve(file) : path.resolve(cwd, file);

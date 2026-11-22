@@ -63,6 +63,6 @@ When a signed build is installed, electron-updater checks that each update is si
 
 - Updates run only in an installed copy. Source runs, `--preview` runs, `dist:dir` builds, and runs with `LASTRA_DISABLE_UPDATES=1` never check.
 - The first check runs 90 seconds after startup, and later checks run every 4 hours.
-- A new version downloads in the background and installs silently when Lastra quits. Lastra never opens an update dialog on the deck.
+- A new version downloads in the background. When it is ready, the deck offers a restart. Otherwise it installs when Lastra quits. Lastra never opens a system dialog on the deck.
 - **Lastra → Settings → System → Updates** shows the check, download status, and restart options.
 - Update activity is written to `lastra.log` in the Lastra logs folder, under `%APPDATA%\Lastra\logs`.

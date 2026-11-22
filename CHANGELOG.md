@@ -4,6 +4,11 @@ Completed items from the former TODO, grouped by the section that tracked them. 
 
 Entries grouped under **0.2.1** record the completed work through the first reviewed source release.
 
+## 1.0.0
+
+- Arrange Settings in the same order as the deck views: Deck keys, Dashboard, Stats, Feeds, Tools, then OBS. Display and System sit under Setup.
+- Keep history, watchlist, agent access, diagnostics, updates and profile files on the page. Settings no longer opens a system menu.
+
 ## 0.2.10
 
 - Run a key's release action when a press ends or is cancelled, including after the finger leaves the key.

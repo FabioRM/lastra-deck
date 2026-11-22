@@ -59,6 +59,10 @@
       <time id="corner-time"></time>
       <time id="corner-date"></time>
     </div>
+    <section id="update-offer" hidden>
+      <p id="update-offer-text"></p>
+      <button id="update-offer-restart" type="button">Restart</button>
+    </section>
     <p id="view-only-status" role="status" hidden><strong>View only</strong> · Switch off from the Lastra tray menu</p>
     <div id="deck-audio-controls" role="group" aria-label="Windows audio">
       <div class="dashboard-audio-buttons">
@@ -501,8 +505,7 @@
       </article>
       <div class="feeds-markets">
         <p id="feeds-panel-status" role="status"></p>
-        <ul id="feeds-quotes"></ul>
-        <ul id="feeds-currencies"></ul>
+        <div class="feeds-board" id="feeds-board"></div>
       </div>
     </section>
     <section id="stats-panel" aria-label="Stats" hidden>

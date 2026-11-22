@@ -162,6 +162,7 @@ const { createDisposables } = require('./disposables');
 const { createPowerEvents } = require('./power-events');
 const { startPreview } = require('./preview-harness');
 const { createTrayMenu } = require('./tray-menu');
+const { readMaintenance, runMaintenance } = require('./desktop-maintenance');
 const { createUpdater } = require('./updater');
 
 const ROOT = path.join(__dirname, '..', '..');
@@ -1417,6 +1418,11 @@ function registerIpc() {
   edit('editor:feeds:locate', () => feeds.locate());
   edit('editor:feeds:symbols', (query) => feeds.searchSymbols(query));
   deck('feeds:read', () => feeds?.snapshot() ?? null);
+  deck('update:status', () => {
+    const current = updater?.status() ?? { state: 'disabled' };
+    return { state: current.state, version: current.version ?? null, percent: current.percent ?? null };
+  });
+  handle('update:restart', () => win, RENDERER, () => updater?.restartToUpdate() === true);
   edit('editor:configuration:export', async () => {
     const owner = editor;
     const bundle = readSettings(app.getPath('userData'));
@@ -1426,7 +1432,6 @@ function registerIpc() {
     writeExchangeFile(choice.filePath, JSON.stringify(bundle, null, 2), []);
     return true;
   });
-  edit('editor:desktop-menu', (group) => typeof group === 'string' && trayMenu.openSettings(group, editor));
   edit('editor:deck-behavior:get', () => deckBehavior());
   edit('editor:deck-behavior:set', async (command) => {
     if (!command || typeof command !== 'object') throw new Error('Invalid deck option.');
@@ -2457,9 +2462,29 @@ function start() {
     },
   });
   // Installed builds check GitHub Releases quietly and install when Lastra quits; dev and preview runs skip it.
-  updater = createUpdater({ app, log, preview: Boolean(opts.preview), supported: process.platform === 'win32', onChange: () => trayMenu?.refresh() });
+  updater = createUpdater({ app, log, preview: Boolean(opts.preview), supported: process.platform === 'win32', onChange: (status) => {
+    trayMenu?.refresh();
+    send('update:status', { state: status.state, version: status.version ?? null, percent: status.percent ?? null });
+  } });
   disposables.add('updates', () => updater.stop());
   updater.start();
+  const maintenanceContext = () => ({
+    platform: process.platform, root: ROOT, dialog, clipboard, shell, screen, window: editor,
+    store, monitoring, retainedTelemetry, watchlist, serviceHealth, updater, panelMeasurement, win,
+    activity: () => activities.current.id,
+    setMonitoringInterval: (source, intervalMs) => resources.change({ action: 'refresh', source, intervalMs }),
+    exportDiagnostics,
+    agent: agentAccess ? {
+      access: agentAccess, service: agentService, drafts: agentDrafts, gestureFixtures: agentGestureFixtures,
+      runs: agentRuns, apply: agentApply, projects: agentProjects,
+    } : null,
+  });
+  const maintain = (channel, callback) => ipcMain.handle(channel, (event, ...args) => {
+    if (!fromWindow(event, editor, EDITOR)) throw new Error('Unauthorized sender');
+    return callback(...args);
+  });
+  maintain('editor:maintenance:get', () => readMaintenance(maintenanceContext()));
+  maintain('editor:maintenance:set', (command) => runMaintenance(maintenanceContext(), command));
   if (!opts.windowed) {
     hardware = new HardwareMonitor(path.join(app.getPath('userData'), 'hardware-monitor'), log, { intervalMs: intervals.hardware, onSample });
     disposables.add('hardware monitor', () => hardware.stop());
@@ -2537,6 +2562,17 @@ function failStartup(err) {
   app.exit(1);
 }
 
+function reloadFrontend() {
+  let reloaded = 0;
+  for (const window of [win, editor]) {
+    const contents = window && !window.isDestroyed() ? window.webContents : null;
+    if (!contents || contents.isDestroyed()) continue;
+    contents.reloadIgnoringCache();
+    reloaded += 1;
+  }
+  log(reloaded ? 'Reloaded the deck interface.' : 'No deck window is open to reload.');
+}
+
 app.setAppUserModelId(APP_ID);
 if (process.platform === 'linux') app.commandLine.appendSwitch('class', 'lastra');
 declarePreviewScheme(protocol);
@@ -2551,6 +2587,10 @@ if (opts.preview) {
   app.on('second-instance', (_event, argv) => {
     if (edgeExit) return;
     const requested = parseArgs(argv);
+    if (requested.reload) {
+      reloadFrontend();
+      return;
+    }
     if (requested.enableWaylandKeyboard) void linuxDesktop?.enable?.();
     if ((requested.editor || requested.settings) && store) openEditor(requested.editor ? 'profile' : 'settings');
     else if (store) showDeck();
