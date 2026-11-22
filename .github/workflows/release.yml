@@ -1,11 +1,12 @@
-name: Desktop release
+name: Release
 
+# A release tag builds the Windows installer from the audited source export and creates a draft.
 on:
   push:
-    tags: ['v*']
+    tags: ['v*', '!v0.2.1']
 
 permissions:
-  contents: read
+  contents: write
 
 concurrency:
   group: release-${{ github.ref }}
@@ -17,78 +18,75 @@ jobs:
     timeout-minutes: 40
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - uses: actions/setup-node@v4
         with:
           node-version-file: .nvmrc
           cache: npm
-      - name: Build and verify the Windows installer
-        run: ./scripts/release-windows.ps1 -Tag $env:GITHUB_REF_NAME
+      - name: Check the tag matches package.json
+        id: version
+        run: |
+          $version = (Get-Content package.json -Raw | ConvertFrom-Json).version
+          if ("v$version" -ne $env:GITHUB_REF_NAME) { throw "Tag $env:GITHUB_REF_NAME does not match package.json version $version" }
+          "value=$version" >> $env:GITHUB_OUTPUT
+      - name: Export audited public source
+        id: source
+        run: |
+          $output = node scripts/package-public-release.js --current
+          $output
+          if ($LASTEXITCODE -ne 0) { throw 'Public source export failed.' }
+          $prefix = 'Source tree '
+          $directories = @($output | Where-Object { $_.StartsWith($prefix) })
+          if ($directories.Count -ne 1) { throw 'Expected one public source directory.' }
+          $directory = $directories[0].Substring($prefix.Length)
+          $directory = (Resolve-Path -LiteralPath $directory).Path
+          "directory=$directory" >> $env:GITHUB_OUTPUT
+      - name: Install audited source dependencies
+        working-directory: ${{ steps.source.outputs.directory }}
+        run: npm ci
         env:
+          # electron-builder downloads its own Electron build; skip the dev binary.
+          ELECTRON_SKIP_BINARY_DOWNLOAD: '1'
+      - name: Check audited source
+        working-directory: ${{ steps.source.outputs.directory }}
+        run: npm run check
+      - name: Build the Windows installer
+        working-directory: ${{ steps.source.outputs.directory }}
+        run: npm run dist
+        env:
+          # Optional. When these secrets are absent the build is unsigned.
+          # CSC_LINK: base64-encoded .pfx or an https URL; CSC_KEY_PASSWORD: its password.
           CSC_LINK: ${{ secrets.WIN_CSC_LINK }}
           CSC_KEY_PASSWORD: ${{ secrets.WIN_CSC_KEY_PASSWORD }}
-      - uses: actions/upload-artifact@v4
-        with:
-          name: lastra-windows
-          path: |
-            out/Lastra-Setup-*.exe
-            out/Lastra-Setup-*.exe.blockmap
-            out/Lastra-Setup-*.exe.sha256
-            out/latest.yml
-          if-no-files-found: error
-
-  linux:
-    runs-on: ubuntu-latest
-    timeout-minutes: 40
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version-file: .nvmrc
-          cache: npm
-      - name: Install build dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libarchive-tools
-          npm ci
+      - name: Collect release assets
         env:
-          ELECTRON_SKIP_BINARY_DOWNLOAD: '1'
-      - name: Check Linux profiles and build the distribution packages
+          SOURCE_TREE: ${{ steps.source.outputs.directory }}
+          RELEASE_VERSION: ${{ steps.version.outputs.value }}
         run: |
-          node --test test/linux-deck.test.js
-          sh scripts/release-linux.sh "$GITHUB_REF_NAME"
-      - uses: actions/upload-artifact@v4
+          $build = Join-Path $env:SOURCE_TREE 'out'
+          $installer = Join-Path $build "Lastra-Setup-$env:RELEASE_VERSION.exe"
+          $source = Join-Path $env:GITHUB_WORKSPACE "dist/lastra-$env:RELEASE_VERSION-source.zip"
+          $files = @($installer, "$installer.blockmap", (Join-Path $build 'latest.yml'), $source, "$source.sha256")
+          $destination = New-Item -ItemType Directory -Path 'dist/release' -Force
+          Copy-Item -LiteralPath $files -Destination $destination.FullName
+      - name: Keep the release bundle as a workflow artifact
+        uses: actions/upload-artifact@v4
         with:
-          name: lastra-linux
-          path: |
-            out/Lastra-*-linux-*.deb
-            out/Lastra-*-linux-*.AppImage
-            out/Lastra-*-linux-*.sha256
-            out/lastra-wayland@fabiorm.github.io.zip
-            out/lastra-wayland@fabiorm.github.io.zip.sha256
+          name: lastra-windows-${{ github.ref_name }}
+          path: dist/release/
           if-no-files-found: error
-
-  release:
-    needs: [windows, linux]
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/download-artifact@v4
-        with:
-          pattern: lastra-*
-          path: release-files
-          merge-multiple: true
-      - name: Create the draft release
+      - name: Create the draft GitHub release
         env:
-          GH_TOKEN: ${{ github.token }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          tag="$GITHUB_REF_NAME"
-          if gh release view "$tag" --json isDraft > /dev/null 2>&1; then
-            if [ "$(gh release view "$tag" --json isDraft --jq .isDraft)" = true ]; then
-              gh release upload "$tag" release-files/* --clobber
-            fi
-          else
-            git for-each-ref --format='%(contents)' "refs/tags/$tag" |
-              gh release create "$tag" release-files/* --draft --verify-tag --title "Lastra $tag" --notes-file -
-          fi
+          $tag = $env:GITHUB_REF_NAME
+          $repo = $env:GITHUB_REPOSITORY
+          gh release view $tag --repo $repo --json isDraft 2>$null | Out-Null
+          if ($LASTEXITCODE -eq 0) {
+            Write-Output "Release $tag already exists. The workflow artifact contains this build."
+            exit 0
+          }
+          $files = @(Get-ChildItem -LiteralPath 'dist/release' -File | Select-Object -ExpandProperty FullName)
+          gh release create $tag --repo $repo --verify-tag --draft --title "Lastra $tag" --generate-notes @files
+          if ($LASTEXITCODE -ne 0) { throw 'Draft release creation failed.' }

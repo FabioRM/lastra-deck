@@ -32,6 +32,7 @@
           <button id="backups" type="button" disabled>Backups</button>
           <button id="import-exchange" type="button" disabled>Import…</button>
           <button id="export-exchange" type="button" disabled>Export profile…</button>
+          <button id="export-configuration" type="button">Export configuration…</button>
           <button id="integration-setup-open" type="button" aria-haspopup="dialog" aria-controls="integration-setup">Integration setup</button>
           <button id="open-live-variables" type="button" disabled>Live variables</button>
           <button id="reload" type="button">Reload from disk</button>
@@ -85,10 +86,60 @@
           </section>
         </form>
         <p id="appearance-status" role="status"></p>
-        <div class="desktop-menu-buttons">
-          <button type="button" data-desktop-menu="navigation">Display, activity and navigation options</button>
-          <button type="button" data-desktop-menu="organization">Deck organization</button>
-        </div>
+        <div id="deck-behavior" class="deck-behavior"></div>
+        <section id="feeds-settings" class="deck-settings-card" aria-labelledby="feeds-settings-heading">
+          <h3 id="feeds-settings-heading">Feeds</h3>
+          <div class="feeds-toggles">
+            <label class="check"><input id="feeds-enabled" type="checkbox">Show Feeds</label>
+            <label class="check"><input id="feeds-dashboard" type="checkbox">Show Dashboard</label>
+            <label class="check"><input id="feeds-stats" type="checkbox">Show Stats</label>
+          </div>
+          <section class="feeds-block" aria-labelledby="feeds-weather-heading">
+            <h4 id="feeds-weather-heading">Weather</h4>
+            <div class="feeds-row">
+              <label class="field">Weather provider<select id="feeds-weather-provider">
+                <option value="open-meteo">Open-Meteo</option>
+                <option value="openweather">OpenWeather</option>
+              </select></label>
+              <label class="field">Weather API key<input id="feeds-weather-key" type="password" autocomplete="off"></label>
+              <button id="feeds-locate" type="button">Use current location</button>
+            </div>
+            <div class="feeds-search">
+              <label class="field">City<input id="feeds-place-query" placeholder="Milan, Rome, New York" autocomplete="off"></label>
+              <ul id="feeds-place-results" class="feeds-results" hidden></ul>
+            </div>
+            <p id="feeds-place" class="feeds-selected" hidden></p>
+          </section>
+          <section class="feeds-block" aria-labelledby="feeds-quotes-heading">
+            <h4 id="feeds-quotes-heading">Quotes</h4>
+            <div class="feeds-row">
+              <label class="field">Quotes provider<select id="feeds-quotes-provider">
+                <option value="yahoo">Yahoo Finance</option>
+                <option value="stooq">Stooq</option>
+                <option value="finnhub">Finnhub</option>
+              </select></label>
+              <label class="field">Quotes API key<input id="feeds-quotes-key" type="password" autocomplete="off"></label>
+            </div>
+            <div class="feeds-search">
+              <label class="field">Search a symbol<input id="feeds-symbol-query" placeholder="Apple, AAPL, MSFT" autocomplete="off"></label>
+              <ul id="feeds-symbol-results" class="feeds-results" hidden></ul>
+            </div>
+            <ul id="feeds-symbol-list" class="feeds-chips"></ul>
+            <p id="feeds-symbol-count" class="muted"></p>
+          </section>
+          <section class="feeds-block" aria-labelledby="feeds-currency-heading">
+            <h4 id="feeds-currency-heading">Currencies</h4>
+            <div class="feeds-row">
+              <label class="field">Currency pair<input id="feeds-currency-query" placeholder="EURUSD" maxlength="6" autocomplete="off"></label>
+              <button id="feeds-currency-add" type="button">Add pair</button>
+            </div>
+            <ul id="feeds-currency-list" class="feeds-chips"></ul>
+            <p class="muted">Frankfurter supplies the rates and does not need a key. Up to 6 pairs.</p>
+          </section>
+          <p class="muted">Deck Keys stays available. Dashboard, Stats and Feeds can be hidden from the view switch. Yahoo Finance search and quotes are free. Open-Meteo resolves a city name without a key.</p>
+          <button id="feeds-save" type="button">Save feeds</button>
+          <p id="feeds-status" role="status"></p>
+        </section>
         <section id="calendar-settings" class="deck-settings-card">
           <h3>Dashboard calendar file</h3>
           <div class="deck-settings-fields">
@@ -514,6 +565,8 @@
   <script src="key-groups.js"></script>
   <script src="../shared/appearance.js"></script>
   <script src="appearance.js"></script>
+  <script src="feeds-settings.js"></script>
+  <script src="deck-behavior.js"></script>
   <script src="deck-shortcuts.js"></script>
   <script src="tool-settings.js"></script>
   <script src="stats-settings.js"></script>

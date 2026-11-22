@@ -1,27 +1,29 @@
 # Lastra
 
-Lastra turns the **CORSAIR XENEON EDGE** into a touchscreen macro deck for Windows 10 and 11 and Linux x86-64. **Switch apps and Lastra automatically loads the shortcuts for the new foreground app.** Run macros and keep the Windows mixer, media controls, and system telemetry within reach. Lastra runs on Electron and works while iCUE is closed.
+Lastra turns the **CORSAIR XENEON EDGE** into a touchscreen macro deck for Windows 10 and 11. It follows the foreground app, runs shortcuts and macros, and puts the Windows mixer, media controls, and system telemetry within reach. It runs on Electron and works while iCUE is closed.
 
-[Download Windows and Linux packages](https://github.com/FabioRM/lastra-deck/releases/latest) · [Project site](https://fabiorm.github.io/lastra-deck/) · [Changelog](CHANGELOG.md) · [Report an issue](https://github.com/FabioRM/lastra-deck/issues)
+The Deck and automatic shortcut profiles also have an experimental Linux mode for X11, GNOME, KDE Plasma, and Hyprland. Linux x86-64 builds ship as a `.deb` and AppImage. [Linux setup](docs/linux-deck.md)
 
-![Lastra Deck Keys showing an example Home layout with shortcuts, audio controls, and sample telemetry](docs/preview-home.png)
+![Deck Keys toolbar with Tools, Emoji, and page lock icons](docs/preview-toolbar.png)
 
-![Deck Keys toolbar with the Tools, Emoji, and page lock icons](docs/preview-toolbar.png)
+![Landscape Deck Keys with the icon toolbar aligned to the key grid](docs/preview-states.png)
 
 ## Shortcuts for the active app
 
 ![Deck Keys switches from Claude Desktop to Codex, Chrome, File Explorer, and Photoshop, then loops back to Claude Desktop.](docs/preview-app-focus.gif)
 
-Automatic packs fill each screen before opening another. The built-in library covers 451 Windows and installed web apps, with nine additional packs for app editions and window variants. You can also create your own pages, rearrange commands, and hide individual keys. [Shortcut packs](docs/shortcut-packs.md) · [Watch custom shortcut pages](docs/preview-shortcuts.gif)
-
 [Getting started](#getting-started) · [Tools and Pomodoro](#tools-and-pomodoro) · [Deck views](#deck-views) · [Profile editor](#profile-editor) · [Local MCP integration](#local-mcp-integration) · [License](#license)
 
 <details>
-<summary>Visual Studio Code, Dashboard, and portrait previews</summary>
+<summary>Animated demo and more deck previews</summary>
 
-![The automatically selected Visual Studio Code shortcut page](docs/preview-vscode.png)
+![Lastra demo showing the Emoji grid, Dashboard, Stats, and Feeds](docs/preview-demo.gif)
 
-![Dashboard with a calendar, Pomodoro timer, and sample playback](docs/preview-dashboard.png)
+The loop opens **Emoji** from **Home**, then shows **Dashboard**, **Stats**, and **Feeds** full screen. Media, telemetry, and Feeds use sample data.
+
+![Chrome shortcut pages with a custom Navigation page on Deck Keys](docs/preview-shortcuts.png)
+
+[Watch the deck switch between custom shortcut pages](docs/preview-shortcuts.gif).
 
 <a href="docs/preview-portrait.png"><img src="docs/preview-portrait.png" alt="Deck Keys in portrait with the mixer above the macro grid" width="225"></a>
 
@@ -29,28 +31,26 @@ Automatic packs fill each screen before opening another. The built-in library co
 
 ## Getting started
 
-**Linux setup.** Install the x86-64 Debian package or AppImage for X11, GNOME, KDE Plasma or Hyprland. On GNOME and KDE use the keyboard permission command in the setup guide to enable shortcuts. [Linux installation and Wayland setup](docs/linux-deck.md)
+Download the installer or browse the reviewed source on the public release page. [Lastra v0.2.10](https://github.com/FabioRM/lastra-deck/releases/tag/v0.2.10) · [Windows x64 installer](https://github.com/FabioRM/lastra-deck/releases/download/v0.2.10/Lastra-Setup-0.2.10.exe) · [SHA‑256 checksum](https://github.com/FabioRM/lastra-deck/releases/download/v0.2.10/Lastra-Setup-0.2.10.exe.sha256) · [Catalog redistribution review](docs/catalog-redistribution.md)
 
 Set the XENEON EDGE to **Extend these displays** in Windows Display settings. The panel runs at 2560 × 720 in landscape and 720 × 2560 in portrait.
 
-**Install the app.** Download `Lastra-Setup-<version>.exe` from the [latest GitHub release](https://github.com/FabioRM/lastra-deck/releases/latest). The installer runs on Windows x64, installs for the current user without administrator rights, and adds Start menu and desktop shortcuts. The installer is unsigned, so Windows SmartScreen may show a warning. The release includes a SHA-256 checksum you can compare with `Get-FileHash .\Lastra-Setup-<version>.exe -Algorithm SHA256` in PowerShell.
+**Install the app.** Download `Lastra-Setup-0.2.10.exe` and run it on Windows x64. It installs for the current user in `%LOCALAPPDATA%\Programs\Lastra` and adds Start menu and desktop shortcuts. The Windows installer is unsigned. Settings and profiles live in `%APPDATA%\Lastra` and survive updates and uninstalls. [Latest release](https://github.com/FabioRM/lastra-deck/releases/latest) · [Update behavior](https://github.com/FabioRM/lastra-deck/blob/main/docs/releasing.md#update-behavior)
 
-Installed copies download updates from GitHub Releases in the background and install them when Lastra quits. **Lastra → Settings → System → Updates** offers an immediate check and shows when a restart can install the update. Set `LASTRA_DISABLE_UPDATES=1` to turn update checks off. Settings and profiles live in `%APPDATA%\Lastra` and survive updates and uninstalls.
-
-**Run from source.** Clone the repository or download the source archive from the release. Install **Node.js 22.12.0 or later**, then run these commands from the project directory. To build the installer yourself, see [Releasing](docs/releasing.md).
+**Run from source.** Install **Node.js 22.12.0 or later**, as required by the Electron installer, then run these commands from the project directory. Source runs never check for updates. To build the installer yourself, see [Releasing](docs/releasing.md).
 
 ```powershell
 npm ci
 npm start
 ```
 
-Lastra looks for the XENEON EDGE among the displays detected by Windows. The deck opens in a borderless, always-on-top window with activation disabled. If the Edge is absent at startup or disconnected during use, Lastra closes along with any hardware monitoring it started. While the Edge is connected, use **Lastra → Settings → Display → Display, activity and navigation options** or `npm start -- --display=<id>` to move the deck to another monitor. `npm run dev` opens a diagnostics window even when the Edge is absent.
+Lastra looks for the XENEON EDGE among the displays detected by Windows. The deck opens in a borderless, always-on-top window with activation disabled. If the Edge is absent at startup or disconnected during use, Lastra closes along with any hardware monitoring it started. While the Edge is connected, use **Lastra → Settings → Display → Deck display** or `npm start -- --display=<id>` to move the deck to another monitor. `npm run dev` opens a diagnostics window even when the Edge is absent.
 
 Click the Lastra icon in the Windows notification area to open desktop Settings. The right-click menu offers **Lastra**, **Avvio automatico**, **Info**, and **Esci**. Enable **Avvio automatico** to launch Lastra when you sign in. The setting is optional and also appears under **Startup apps** in Windows. If the Edge is disconnected when you sign in, Lastra exits. Connect it and start Lastra manually.
 
 When Windows changes the display layout, rotates the screen, or wakes from sleep, Lastra rechecks the display after a short delay and puts the deck back without taking focus. A brief interruption while Windows detects the Edge can recover in the same window. If Lastra has already exited after a disconnect, reconnect the Edge and start Lastra again.
 
-Lastra opens **Dashboard** on first launch. The switch in the top-right corner cycles through **Deck Keys → Dashboard → Stats**. Later launches restore the last manually opened view, selected deck page, and page lock.
+Lastra opens **Dashboard** on first launch. The switch in the top-right corner cycles through **Deck Keys → Dashboard → Stats → Feeds**. The clock and date stay in the top-left corner while those views change. Later launches restore the last manually opened view, selected deck page, and page lock.
 
 The **Speakers** and **Windows microphones** icons stay next to the view switch on **Dashboard** and **Deck keys**. Use them to mute the default Windows output or mute and restore the Windows inputs as a group. They reflect changes made in Windows.
 
@@ -67,27 +67,35 @@ Use **Export diagnostics…** under **Settings → System → Diagnostics and de
 
 ## Tools and Pomodoro
 
-Tap the wrench in **Deck Keys** to open **Tools**. The larger touch controls provide quick access to countdowns, the stopwatch, Pomodoro, Quick decision, the soundboard, and deck controls. Close the panel with the red **×** in the top-right corner.
+Tap the wrench icon in **Deck Keys** to open **Tools** full screen. The gears open dialogs for a custom countdown, the Pomodoro durations, and the Quick decision pick list. Tap the red **×** in the mode switch position to return to Deck Keys.
 
-![Tools overlay in landscape with larger touch controls and a red close button](docs/preview-tools.png)
+![Tools in landscape with touch controls and a red close button](docs/preview-tools.png)
 
-Start a **Pomodoro break** from Tools or Dashboard to fill the XENEON EDGE with the countdown. The red **×** returns you to the previous view while the break continues. The full-screen view closes when the countdown reaches zero. [Pomodoro guide](docs/pomodoro.md) · [Watch the Tools and break demo](docs/preview-tools.gif)
+Start a **Pomodoro break** from Tools or Dashboard to fill the XENEON EDGE with the countdown. Tap the red **×** to return to the previous view while the break continues. The full-screen view closes when the countdown reaches zero. [Pomodoro guide](docs/pomodoro.md)
 
-![Full-screen Pomodoro break countdown with a red close button in the top-right corner](docs/preview-pomodoro-break.png)
+![Pomodoro break countdown filling the XENEON EDGE with a red close button in the top-right corner](docs/preview-pomodoro-break.png)
+
+<details>
+<summary>Watch a Pomodoro break start and close</summary>
+
+![Animation opening Tools, starting a full-screen break, and returning to Tools while the break continues](docs/preview-tools.gif)
+
+</details>
 
 ## Deck views
 
-- **Deck Keys** combines app-aware shortcut pages, a persistent widget bar, and Windows audio controls. The default **Home** fits 15 shortcuts and five fixed editing keys on one screen in either orientation. Deck notifications appear above the clock in a reserved space. [Shortcut packs](docs/shortcut-packs.md) · [Macros](docs/macros.md) · [Widgets](docs/widgets.md)
-- **Tools** opens a dedicated screen from Deck Keys with countdowns, a stopwatch, Pomodoro, Quick decision, the soundboard, and deck controls. Open **Pages** or **Apps** from Tools. Set the Quick decision pick list in **Tools settings** in the desktop editor.
+- **Deck Keys** combines configurable app shortcut pages, a persistent widget bar, and Windows audio controls. The navigation row has large Tools, Emoji, and Lock buttons. The default **Home** fits 15 shortcuts and five editing keys on one screen in either orientation. [Shortcut packs](docs/shortcut-packs.md) · [Macros](docs/macros.md) · [Widgets](docs/widgets.md)
+- **Tools** also opens **Apps** from Deck Keys. [Tools and Pomodoro](#tools-and-pomodoro)
 - **Dashboard** shows a clock, calendar, Pomodoro timer, and Now Playing for the default Windows media session. Use **Previous**, **Play or Pause**, and **Next**, or drag the progress bar to seek when supported. [Now Playing](docs/now-playing.md) · [Pomodoro](docs/pomodoro.md)
-- **Stats** shows current readings and one-minute graphs. Reorder or resize overview cards and configure up to four readings on one chart, such as CPU load in percent and package power in watts. [Telemetry guide](docs/telemetry.md)
+- **Feeds** shows the weather for a saved place, stock quotes, and currency rates. The sky follows local sunrise and sunset, and the card includes the moon phase plus today's low and high.
+- **Stats** shows current readings and charts for the processor, graphics, memory, displays, app frame performance, storage, and cooling. Configure Overview card order and width, and place up to four readings on one graph with separate scales by unit. [Telemetry guide](docs/telemetry.md)
 - **OBS** shows live recording and streaming status and provides controls for scenes and sources. [OBS setup](docs/obs.md)
 - **Apps** offers searchable, pinnable views for Spotify, Docker and Compose, Kubernetes, GitHub Checks, WSL, Windows Terminal, and custom apps. **Action history** shows up to 100 completed command attempts from the current session. [App views](docs/app-views.md) · [Kubernetes](docs/kubernetes.md) · [GitHub Checks](docs/github-checks.md)
 - **Emoji** puts frequently used emoji at the top of one vertically scrollable grid. Swipe up or down, use the mouse wheel, or search with the touch keyboard. Tap an emoji to insert it into the active text field.
 
 ![Lastra Stats overview with sample CPU, GPU, memory, display, frame rate, disk, and temperature readings](docs/preview-stats.png)
 
-Under **Settings → Display → Display, activity and navigation options**, **Dashboard calendar** lets you choose what opens when you tap the calendar. Choose Google Calendar, Outlook.com Calendar, or Microsoft 365 Calendar to open it in your default browser. **Do nothing** is the default.
+Under **Settings → Display → Deck behavior**, **Dashboard calendar** lets you choose what opens when you tap the calendar. Choose Google Calendar, Outlook.com Calendar, or Microsoft 365 Calendar to open it in your default browser. **Do nothing** is the default.
 
 In **Apps**, open **Service health** to track the HTTP, TCP, DNS, and ping checks you configure. Use **Lastra resources** to see CPU and memory usage for Lastra and its managed helpers, or **Web embeds** to open approved HTTPS pages and official Spotify embeds. [Service health](docs/service-health.md) · [Resource monitoring](docs/resources.md) · [Web embeds](docs/web-embeds.md)
 
@@ -98,19 +106,19 @@ Open **Monitoring watchlist** in **Apps** to keep selected hardware, app, and se
 ## Pages and keys
 
 - Use the arrows, swipe horizontally, scroll sideways on a trackpad, or turn the mouse wheel over Deck Keys to change pages. A swipe cancels the key where it started. **Home** returns to the first page. The default profile starts on **Home**. VS Code and each browser open their own automatic shortcut pack when they take focus.
-- Deck opens a configured page for the foreground Windows app when one exists. Otherwise, it uses a matching built-in shortcut pack or a temporary **Auto** page with common shortcuts. Use a page's **Windows app IDs** for an exact Store app or installed web app match. Browser packs cover ordinary browser tabs. [Shortcut pack guide](docs/shortcut-packs.md) · [Engineering shortcut packs](docs/engineering-shortcuts.md)
+- Deck opens a configured page for the foreground Windows app when one exists. Otherwise, it uses a matching built-in shortcut pack or a temporary **Auto** page with common shortcuts. Use a page's **Windows app IDs** for an exact Store app or installed web app match. Browser packs cover ordinary browser tabs. [Engineering shortcut packs](docs/engineering-shortcuts.md) · [All shortcut packs](docs/shortcut-packs.md)
 - A page's **Context rules** can match a project or document within an assigned executable or Windows app ID. Lastra takes the highest **Rule priority**, then the most specific match. At equal priority, exact titles beat prefixes and partial titles, and Windows app IDs beat executable names for otherwise equal rules. Page order resolves a tie. Tap the page count or **Auto** to see why the page opened.
 - Use **Home** or either arrow from an **Auto** page to return to a configured page. A manual selection holds until the foreground app changes. **Lock page** keeps the displayed page until you unlock it. If an automatic page is locked when Lastra closes, the configured fallback opens locked next time.
-- In Lastra Settings, open **Display, activity and navigation options → After an app page** to choose **Home** or **Last manually selected page**. The deck uses this choice when the foreground stops matching an app page. It keeps the last manual page for each activity. The default is **Last manually selected page**.
-- To see the desktop behind the deck, select **Reveal desktop** in Tools or in **Display, activity and navigation options**. **Restore Lastra** returns to the previous view, page, and lock setting. Display settings also offer an optional swipe up from the bottom edge of Deck Keys.
-- Open **Tools → Pages** to jump to a saved page. Set favorites in **Lastra → Settings → Display → Deck organization**. Each activity keeps its own favorites and six most recently opened pages.
+- In Lastra Settings, open **Display → Deck behavior → After an app page** to choose **Home** or **Last manually selected page**. The deck uses this choice when the foreground stops matching an app page. It keeps the last manual page for each activity. The default is **Last manually selected page**.
+- To see the desktop behind the deck, select **Reveal desktop** in Tools or in **Deck behavior**. **Restore deck** returns to the previous view, page, and lock setting. Display settings also offer an optional swipe up from the bottom edge of Deck Keys.
+- Tap the current page name in Deck Keys to jump to a saved page. Set favorites in **Lastra → Settings → Display → Deck organization**. Each activity keeps its own favorites and six most recently opened pages.
 - In the editor, set a page’s **Folder path** to group its keys, for example `Work / Editing`. Deck Keys shows the current folder below the page name. **Pages** opens that folder and lets you tap a parent, **All pages**, or **Home**.
-- Switch between **Main**, **Work**, **Meeting**, **Gaming**, and **Streaming** from Deck Keys or **Activity profile** in **Display, activity and navigation options**. Each stores its own pages, backups, and navigation. An open editor continues to save to the activity shown in its title.
+- Switch between **Main**, **Work**, **Meeting**, **Gaming**, and **Streaming** from Deck Keys or **Activity profile** in **Settings → Display → Deck behavior**. Each stores its own pages, backups, and navigation. An open editor continues to save to the activity shown in its title.
 - A contextual page binds to the foreground window that it represents. Switching windows cancels pending gestures and queued work for the previous deck revision. A locked contextual page stays visible and reads **Target inactive** until its window returns. Lastra rechecks the window before each keyboard step in a contextual macro.
 - The **Apps** catalog opens separately. Its **Follow foreground** setting is optional.
 - A circle marks a **long press** of 550 ms. A dash marks a **double tap**. For double-tap keys, Lastra waits up to 320 ms before running the single-tap action.
 - A square marks a key that requires confirmation. **Lock PC** uses **Hold to confirm** on the default Home page. Browser packs also require confirmation to close a tab. Release early or move off the key to cancel a hold.
-- A key's corner indicator shows whether its action is running, succeeded, failed, or is unavailable. Tap the indicator to see the result, queue status, or reason, including individual macro steps when available.
+- A red X on a key opens the details of a failed action. In **Tools**, open a running macro to see its progress or stop it. **Action history** in Apps shows completed commands.
 
 In the profile editor, expand **Profile settings** to change gesture timing or cancellation distance. Select **Apply gesture settings**, then save the profile to apply the changes to the deck.
 
@@ -159,6 +167,8 @@ Use **Lastra → Settings → System → Interface language** to choose **System
 ## Profile editor
 
 Select **Editor** in the desktop Lastra window or run `npm run edit`. Choose a page on the left, then select a slot in the grid to edit its **Actions**, **Style**, or **Placement**. Use the arrow keys to move around the grid or drag a key to move it. Expand **Page settings** to set the apps that activate the page. **Save profile** updates the deck immediately. Find profile import, export, and backups under **More**.
+
+Open **App shortcuts**, select an app, and expand **Configure app shortcut pages**. Create, name, and reorder several pages. Select a command in the catalog and choose **Add to shortcut page**. Hide a command to keep it in your configuration for later, or remove it from the page. You can also turn off an app's automatic pages for the current activity. Choose **Save profile** to apply your changes. Use the arrows or swipe on the deck to switch pages while the app is in the foreground. [Configure app shortcut pages](docs/shortcut-packs.md#configure-app-shortcut-pages)
 
 Open **Settings → Display** to set the display theme, text size, contrast, clock, idle screen, and dimming. Enable **Large Deck Keys** for bigger, more widely spaced touch targets. Use the page arrows or swipe to reach additional keys, and find Cut, Copy, Paste, Undo, and Redo at the end of each screen. The page layout shows how many screens each orientation needs. These global settings apply when changed.
 
@@ -272,7 +282,7 @@ Enable **Agent access** under **Settings → System** and grant an MCP client ac
 
 ```powershell
 npm run dev
-npm run check
+npm test
 npm run preview
 npm run preview:states
 npm start -- --preview=preview-portrait.png --preview-portrait
@@ -283,16 +293,16 @@ npm start -- --preview=preview-pomodoro-break.png --preview-break
 
 The PNG preview commands render the deck offscreen with sample readings and save the captures in the current directory. They work without the XENEON EDGE connected.
 
-Run `node scripts/refresh-previews.js` with FFmpeg on `PATH` to regenerate the screenshots and GIFs used by the site and README. The script checks toolbar alignment and verifies the full-screen break in landscape and portrait.
+Run `node scripts/refresh-previews.js` with FFmpeg on `PATH` to regenerate the screenshots and animated demos offscreen. The generator checks toolbar alignment and captures the Tools and full-screen break flow, with a full-screen check in both orientations. It writes the PNGs to `docs/` and the repository root and the GIFs to `docs/`.
 
 Use `--verify-deck-swipe` with a preview profile that has two pages and starts with a wide key to verify that a swipe changes the page without running that key. Add `--preview-portrait` to run the gesture in portrait.
 
 The main process manages displays, profiles, and actions. The deck receives a view of the keys over IPC and sends back the key ID, gesture, and page revision. The editor opens in a separate window with access to the configuration document. On Windows, `SendInput` sends shortcuts to the active window and respects Windows integrity levels. To verify touch mapping, try a shortcut while an app is active on the primary monitor.
 
-Use the [changelog](CHANGELOG.md) for release highlights and the [catalog redistribution review](docs/catalog-redistribution.md) for the sources of the bundled shortcut data.
+See the [roadmap](ROADMAP.md) for planned features and hardware checks and the [changelog](CHANGELOG.md) for completed work.
 
 ## License
 
-The original Lastra code, documentation, and assets are released under the MIT License. The included third-party components and catalog data retain their own licenses. [MIT License](LICENSE) · [Third-party notices](THIRD_PARTY_NOTICES.md) · [Catalog redistribution review](docs/catalog-redistribution.md)
+The original Lastra code, documentation, and assets are released under the MIT License. Third-party components and material in shortcut reference catalogs remain subject to their upstream terms. Check the redistribution status of catalog data before using it in a release. [MIT License](LICENSE) · [Third-party notices and catalog sources](THIRD_PARTY_NOTICES.md)
 
 Lastra was inspired by Tessera Deck.

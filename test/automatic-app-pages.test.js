@@ -282,13 +282,15 @@ test('automatic shortcut packs compact guarded keys and reserve the final five c
   for (const portrait of [false, true]) {
     const { sheets, editing, grid } = describeLayoutView(view, page.id, portrait);
     const visible = view.slots.filter(Boolean);
-    assert.equal(sheets.length, 1);
+    assert.deepEqual(sheets.map(({ keys }) => keys.length), [19, visible.length - 19]);
     assert.equal(sheets[0].keys[0].id, 'new-tab');
-    assert.deepEqual(sheets[0].keys.map(({ id }) => id), visible.map(({ id }) => id));
-    assert.ok(sheets[0].keys.some(({ id }) => id.startsWith('catalog-')));
+    assert.deepEqual(sheets.flatMap(({ keys }) => keys.map(({ id }) => id)), visible.map(({ id }) => id));
+    assert.ok(sheets.some(({ keys }) => keys.some(({ id }) => id.startsWith('catalog-'))));
     assert.ok(page.keys.every(({ action }) => action.shortcutGuard.pack === 'chrome'));
     const cell = ({ layout }) => layout.row * grid.cols + layout.column;
-    assert.deepEqual(sheets[0].keys.map(cell), Array.from({ length: visible.length }, (_, index) => index));
+    for (const sheet of sheets) {
+      assert.deepEqual(sheet.keys.map(cell), Array.from({ length: sheet.keys.length }, (_, index) => index));
+    }
     assert.deepEqual(editing.map(cell), Array.from({ length: 5 }, (_, index) => grid.cols * grid.rows - 5 + index));
   }
 
@@ -374,7 +376,8 @@ test('Cursor Agents uses its own commands and rejects editor shortcuts after a s
   pages.observe(agents);
   const agentsPage = pages.current(profile);
   assert.equal(agentsPage.pack, 'cursor-agents');
-  assert.deepEqual(agentsPage.keys.map(({ action }) => action.keys), ['Ctrl+Shift+P', 'Ctrl+P', 'Ctrl+Shift+F']);
+  assert.deepEqual(agentsPage.keys.map(({ action }) => action.keys),
+    ['Ctrl+Shift+P', 'Ctrl+P', 'Ctrl+Shift+F', 'Ctrl+Shift+D', 'Ctrl+L', 'Esc']);
   assert.ok(agentsPage.keys.every(({ action, unavailable }) => action.shortcutGuard.mode === agents.mode && !unavailable));
   const read = { context: () => agents, windowId: () => agents.windowId };
   const runner = createActionRunner({ input: { sendChord: () => assert.fail('Cursor changed surfaces') } });

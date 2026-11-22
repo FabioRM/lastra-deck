@@ -21,6 +21,7 @@ const keys = [
   ], { context: 'While the code editor has focus with the default Windows keymap' }),
 ];
 
-const ids = ['intellij', 'pycharm', 'webstorm', 'phpstorm', 'goland', 'clion', 'rubymine', 'rustrover', 'android-studio'];
+const ids = ['intellij', 'pycharm', 'webstorm', 'phpstorm', 'goland', 'clion', 'rubymine', 'rustrover', 'android-studio',
+  'rider', 'datagrip'];
 
 module.exports = Object.fromEntries(ids.map((id) => [id, keys]));

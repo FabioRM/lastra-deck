@@ -29,6 +29,7 @@ const templateButton = document.getElementById('profile-templates-open');
 const backups = document.getElementById('backups');
 const importExchange = document.getElementById('import-exchange');
 const exportExchange = document.getElementById('export-exchange');
+const exportConfiguration = document.getElementById('export-configuration');
 const liveVariables = document.getElementById('open-live-variables');
 const inspectLiveVariables = window.createLastraLiveVariables(document.getElementById('live-variables'), () => api.previewLive('draft'));
 const exchange = window.createProfileExchange(document.getElementById('profile-exchange'), api, planExchangeImport);
@@ -86,6 +87,7 @@ const shortcutPageEditor = window.createShortcutPageEditor(document.getElementBy
     const row = catalogRows.find((item) => shortcutIdentity(item) === selectedShortcut);
     if (!shortcutDetail.hidden && row) renderShortcutDetail({ ...row, key: withShortcutOverride(row.key, draft.shortcutOverrides) });
   },
+  normalizeChord: (chord) => api.shortcutOverride(chord),
 });
 let availablePacks = [];
 let catalogRows = [];
@@ -95,6 +97,7 @@ const livePreview = window.createLastraEditorPreview(document.getElementById('li
   readAsset: api.previewAsset, readLive: api.previewLive, applyLayout: applyPreviewLayout,
 });
 let largeKeys = false;
+window.bindLastraFeeds?.(api);
 window.bindLastraAppearance(api, (settings) => {
   livePreview.setAppearance(settings);
   if (largeKeys === settings.largeKeys) return;
@@ -717,6 +720,9 @@ importExchange.addEventListener('click', () => {
 exportExchange.addEventListener('click', () => {
   editHistory.endGroup();
   void exchange.export(draft);
+});
+exportConfiguration?.addEventListener('click', () => {
+  void api.exportConfiguration().catch((error) => notice(error.message, 'error'));
 });
 
 templateButton.addEventListener('click', () => {
@@ -2071,8 +2077,10 @@ function renderInspector() {
   advanced.append(repeatField);
   actions.append(tapForm);
 
-  for (const [property, title] of [['hold', 'Long press'], ['double', 'Double tap']]) {
+  for (const [property, title, addLabel] of [['hold', 'Long press', 'Add long press'], ['double', 'Double tap', 'Add double tap'],
+    ['release', 'Release', 'Add release']]) {
     if (behavior.confirm) break;
+    if (property === 'release' ? behavior.hold || behavior.double : behavior.release) continue;
     if (behavior[property]) {
       const form = actionForm(t(title), behavior[property], (value) => { behavior[property] = value; });
       form.append(button(t('Remove gesture'), () => edit(() => {
@@ -2085,7 +2093,7 @@ function renderInspector() {
       gesture.append(node('summary', '', t(title)), form);
       actions.append(gesture);
     } else {
-      actions.append(button(t(property === 'hold' ? 'Add long press' : 'Add double tap'), () => edit(() => {
+      actions.append(button(t(addLabel), () => edit(() => {
         behavior[property] = newAction('hotkey');
         syncRepeat(true);
         renderInspector();

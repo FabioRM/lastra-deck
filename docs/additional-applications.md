@@ -8,8 +8,8 @@ In **Deck Keys**, usa le frecce o scorri orizzontalmente per passare dalle azion
 
 | Applicazione | Scorciatoie del pacchetto | Pagine tematiche |
 | --- | ---: | --- |
-| [Adobe Illustrator](https://helpx.adobe.com/illustrator/using/default-keyboard-shortcuts.html) | 124 | Documents and export · View and artboards · Selection and objects · Paths and appearance · Panels · Selection and drawing tools · Transform and color tools · Type and appearance |
-| [Claude Desktop](https://code.claude.com/docs/en/desktop#keyboard-shortcuts) | 37 | Code sessions and controls · Code environments · Artifacts and Claude Docs |
+| [Adobe Illustrator](illustrator-shortcuts.md) | 124 | Documents and export · View and artboards · Selection and objects · Paths and appearance · Panels · Selection and drawing tools · Transform and color tools · Type and appearance |
+| [Claude Desktop](claude-code-shortcuts.md) | 37 | Code sessions and controls · Code environments · Artifacts and Claude Docs |
 | [Adobe Premiere](https://helpx.adobe.com/premiere/desktop/get-started/keyboard-shortcuts/default-keyboard-shortcuts.html) | 22 | Projects and export · Timeline and clips |
 | [Adobe After Effects](https://helpx.adobe.com/after-effects/desktop/get-started/keyboard-shortcuts/keyboard-shortcuts-reference.html) | 17 | Composition and project · Timeline navigation |
 | [DaVinci Resolve](https://documents.blackmagicdesign.com/UserManuals/DaVinciResolveReferenceManual.pdf) | 16 | Media and timelines · Cut playback and marks |

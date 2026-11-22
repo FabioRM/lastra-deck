@@ -32,6 +32,7 @@ files:
   - src/**
   - extensions/**
   - docs/*.md
+  - "!docs/backlog-plan.md" # Internal planning; also left out of the public source package.
   # lucide-static: only icons/*.svg are read (src/main/icons.js). Skip the 60 MB of fonts and bundles.
   - "!**/node_modules/lucide-static/{dist,font}/**"
   - "!**/node_modules/lucide-static/{icon-nodes.json,sprite.svg,tags.json,rollup.config.mjs,tsconfig.json}"

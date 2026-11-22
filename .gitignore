@@ -4,3 +4,8 @@ preview*.png
 !docs/*.png
 out/
 /dist/*
+# Release source zips are published as GitHub Release assets, not committed.
+
+# Local research memos stay on disk and are never committed.
+docs/memorandum-scorciatoie-windows.md
+docs/memoria-progetti-deck-touchscreen.md

@@ -46,6 +46,34 @@ html, body {
   touch-action: none;
 }
 
+#corner-clock {
+  position: absolute;
+  z-index: 4;
+  top: var(--pad);
+  left: var(--pad);
+  display: none;
+  align-items: baseline;
+  gap: 16px;
+  margin: 0;
+  color: var(--text);
+  text-shadow: 0 2px 18px rgb(0 0 0 / 35%);
+  pointer-events: none;
+}
+#corner-time {
+  font: 400 calc(76px * var(--text-scale))/.9 'Barlow Condensed', 'Segoe UI', sans-serif;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -.015em;
+  white-space: nowrap;
+}
+#corner-date { color: var(--muted-text); font-size: calc(24px * var(--text-scale)); white-space: nowrap; }
+#stage[data-corner-clock] #corner-clock { display: flex; }
+#stage[data-corner-clock] :is(.stats-clock, .dashboard-clock) { visibility: hidden; }
+#stage[data-corner-clock] .feeds-clock { display: none; }
+#stage[data-view-only] #corner-clock { top: calc(var(--pad) + var(--view-only-space)); }
+#stage.portrait #corner-time { font-size: calc(58px * var(--text-scale)); }
+#stage.portrait #corner-date { font-size: calc(21px * var(--text-scale)); }
+#stage.portrait[data-corner-clock] #corner-clock { display: grid; gap: 4px; align-items: start; }
+
 #stage {
   position: absolute;
   left: 0;

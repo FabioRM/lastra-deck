@@ -57,4 +57,23 @@ function sealSecret(file, raw, field, log = () => {}) {
   }
 }
 
-module.exports = { setSecretStorage, openSecret, sealSecret, sealedField };
+/** Protect several plain top-level secrets in one rewrite of the settings file. */
+function sealSecrets(file, raw, fields, log = () => {}) {
+  let next = { ...raw };
+  let changed = false;
+  for (const field of fields) {
+    const value = next[field];
+    if (typeof value !== 'string' || !value || !available()) continue;
+    try {
+      const { [field]: _plain, ...rest } = next;
+      next = { ...rest, [sealedField(field)]: storage.encryptString(value).toString('base64') };
+      changed = true;
+    } catch (err) {
+      log(`Could not protect the ${field} in ${file}:`, err.message);
+    }
+  }
+  if (changed) writeAtomic(file, `${JSON.stringify(next, null, 2)}\n`);
+  return changed;
+}
+
+module.exports = { setSecretStorage, openSecret, sealSecret, sealSecrets, sealedField };

@@ -14,6 +14,7 @@
   <link rel="stylesheet" href="navigation-badges.css">
   <link rel="stylesheet" href="key-live-state.css">
   <link rel="stylesheet" href="dashboard.css">
+  <link rel="stylesheet" href="feeds.css">
   <link rel="stylesheet" href="dashboard-pomodoro.css">
   <link rel="stylesheet" href="dashboard-agenda.css">
   <link rel="stylesheet" href="stats.css">
@@ -54,6 +55,10 @@
 </head>
 <body>
   <main id="stage">
+    <div id="corner-clock">
+      <time id="corner-time"></time>
+      <time id="corner-date"></time>
+    </div>
     <p id="view-only-status" role="status" hidden><strong>View only</strong> · Switch off from the Lastra tray menu</p>
     <div id="deck-audio-controls" role="group" aria-label="Windows audio">
       <div class="dashboard-audio-buttons">
@@ -88,7 +93,7 @@
         <div id="speaker-output-devices" role="group" aria-label="Output devices"></div>
       </section>
     </div>
-    <button id="dashboard-switch" class="dashboard-icon-button" type="button" aria-controls="deck dashboard-panel stats-panel"
+    <button id="dashboard-switch" class="dashboard-icon-button" type="button" aria-controls="deck dashboard-panel stats-panel feeds-panel"
       data-next="dashboard" aria-label="Show Dashboard" title="Show Dashboard">
       <svg class="dashboard-icon dashboard-switch-dashboard" viewBox="0 0 24 24" aria-hidden="true">
         <rect x="3" y="3" width="7" height="10" rx="1"/>
@@ -106,6 +111,10 @@
       </svg>
       <svg class="dashboard-icon dashboard-switch-stats" viewBox="0 0 24 24" aria-hidden="true">
         <path d="M3 3v18h18M6 14l4-4 4 3 6-7"/>
+      </svg>
+      <svg class="dashboard-icon dashboard-switch-feeds" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M12 3v3M6 8a6 6 0 0 1 12 0c0 4-3 5-3 9H9c0-4-3-5-3-9M9 21h6"/>
+        <path d="M4 14h4M16 14h4"/>
       </svg>
     </button>
     <button id="home-page" class="dashboard-icon-button" type="button" aria-label="Home" title="Home" disabled>
@@ -450,6 +459,52 @@
         </section>
       </div>
     </section>
+    <section id="feeds-panel" aria-label="Feeds" hidden>
+      <article id="feeds-weather" data-scene="clear" data-phase="day">
+        <div class="feeds-clock">
+          <time id="feeds-time"></time>
+          <time id="feeds-date"></time>
+        </div>
+        <div class="feeds-sky" aria-hidden="true">
+          <div class="feeds-atmosphere"></div>
+          <div class="feeds-sun"><b></b><span></span></div>
+          <div class="feeds-moon">
+            <svg viewBox="0 0 100 100" aria-hidden="true">
+              <circle class="feeds-moon-body" cx="50" cy="50" r="46"/>
+              <path id="feeds-moon-lit" class="feeds-moon-lit"/>
+            </svg>
+          </div>
+          <div class="feeds-stars"></div>
+          <div class="feeds-bank feeds-bank-a"><i></i><i></i><i></i><i></i><i></i></div>
+          <div class="feeds-bank feeds-bank-b"><i></i><i></i><i></i><i></i></div>
+          <div class="feeds-bank feeds-bank-c"><i></i><i></i><i></i><i></i><i></i></div>
+          <div class="feeds-mist"></div>
+          <svg class="feeds-hills" viewBox="0 0 800 220" preserveAspectRatio="none">
+            <path class="feeds-hill-far" d="M0 120 C120 70 180 150 300 110 C430 66 500 140 640 96 C720 72 760 90 800 80 L800 220 L0 220 Z"/>
+            <path class="feeds-hill-near" d="M0 160 C140 120 220 190 360 150 C500 112 590 176 800 138 L800 220 L0 220 Z"/>
+          </svg>
+          <div class="feeds-fog"></div>
+          <div class="feeds-rain"></div>
+          <div class="feeds-snow"></div>
+          <div class="feeds-flash"></div>
+          <div class="feeds-meteors"></div>
+        </div>
+        <div class="feeds-weather-copy">
+          <p id="feeds-temp"></p>
+          <div class="feeds-meta">
+            <p id="feeds-place"></p>
+            <p id="feeds-condition"></p>
+            <p id="feeds-moon-state"></p>
+            <p id="feeds-range"></p>
+          </div>
+        </div>
+      </article>
+      <div class="feeds-markets">
+        <p id="feeds-panel-status" role="status"></p>
+        <ul id="feeds-quotes"></ul>
+        <ul id="feeds-currencies"></ul>
+      </div>
+    </section>
     <section id="stats-panel" aria-label="Stats" hidden>
       <header class="stats-header">
         <div class="stats-clock">
@@ -712,6 +767,7 @@
   <script src="dashboard-pomodoro.js"></script>
   <script src="dashboard-agenda.js"></script>
   <script src="dashboard.js"></script>
+  <script src="feeds.js"></script>
   <script src="stats-layout.js"></script>
   <script src="stats-timeline.js"></script>
   <script src="stats-processes.js"></script>

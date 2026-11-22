@@ -157,6 +157,6 @@ const bindings = [
 
 module.exports = {
   version: 'lastra-public-2026-11-19',
-  attribution: 'https://github.com/FabioRM/lastra-deck',
+  attribution: 'https://github.com/FabioRM/lastra',
   reviewedOn, apps, sources, bindings,
 };

@@ -1,6 +1,6 @@
-# Redistribuzione dei cataloghi di Lastra
+# Redistribuzione dei cataloghi di Lastra 0.2.0
 
-La verifica del 19 novembre 2026 definisce i cataloghi inclusi anche nel repository pubblico e nell'installer Windows di Lastra. Il materiale originale di Lastra usa la licenza MIT. Le parti riprese da fonti terze conservano le rispettive licenze.
+Verifica del 19 novembre 2026 sulla revisione Lastra `48f87f5c8d35a87f9a118b74e00ccf324837a3b4`. Il pacchetto sorgente usa MIT per il materiale originale di Lastra. Le parti riprese da fonti terze conservano le rispettive licenze.
 
 ## Materiale incluso
 
@@ -29,4 +29,4 @@ Per i cataloghi Apache 2.0, il pacchetto conserva una copia della [licenza](../l
 
 Il pacchetto contiene il codice, i profili, i cataloghi sopra elencati, le guide e i test pertinenti. Da Windows, con Node.js 22.12 o successivo, esegui `npm ci` e `npm start`. Per una prova senza il pannello, usa `npm run preview`. [Avvio e requisiti](../README.md#getting-started)
 
-Il repository pubblico parte da un'istantanea che include i cataloghi elencati sopra. Anche gli archivi sorgente automatici di GitHub e l'installer sono generati dall'albero pubblico.
+Per pubblicarlo come repository, usa il contenuto estratto come albero sorgente iniziale. Il pacchetto è un'istantanea senza cronologia Git. Le versioni precedenti nella cronologia di sviluppo possono contenere i cataloghi esclusi.

@@ -32,10 +32,12 @@
         pageIds.add(page.id);
         const stored = new Set();
         const shortcuts = page.shortcuts.map((key) => {
-          if (!hasOnly(key, ['id', 'hidden']) || typeof key.id !== 'string' || !SHORTCUT.test(key.id) || stored.has(key.id)
+          if (!hasOnly(key, ['id', 'hidden', 'custom']) || typeof key.id !== 'string' || !SHORTCUT.test(key.id) || stored.has(key.id)
               || (key.hidden !== undefined && typeof key.hidden !== 'boolean')) throw new Error('Invalid or duplicate app shortcut.');
           stored.add(key.id);
-          return { id: key.id, ...(key.hidden ? { hidden: true } : {}) };
+          if (!key.custom) return { id: key.id, ...(key.hidden ? { hidden: true } : {}) };
+          if (!/^custom-[0-9a-f-]{36}$/i.test(key.id)) throw new Error('A custom shortcut needs its own ID.');
+          return { id: key.id, custom: customShortcut(key.custom), ...(key.hidden ? { hidden: true } : {}) };
         });
         return { id: page.id, name: page.name.trim(), shortcuts };
       });
@@ -43,14 +45,31 @@
     }));
   }
 
-  function applyShortcutPages(pages, available) {
+  function customShortcut(value) {
+    if (!hasOnly(value, ['label', 'icon', 'keys']) || typeof value.label !== 'string' || !/^\P{C}{1,24}$/u.test(value.label.trim())
+        || typeof value.icon !== 'string' || !/^[a-z0-9-]{1,60}$/.test(value.icon)
+        || typeof value.keys !== 'string' || !/^\P{C}{1,80}$/u.test(value.keys.trim())) {
+      throw new Error('A custom shortcut needs a name, an icon, and one chord.');
+    }
+    return { label: value.label.trim(), icon: value.icon, keys: value.keys.trim() };
+  }
+
+  function applyShortcutPages(pages, available, guard) {
     const byId = new Map(available.map((key) => [key.id, key]));
+    const source = guard ?? available.find((key) => key.action?.shortcutGuard)?.action.shortcutGuard;
+    const shortcutGuard = source && { pack: source.pack, application: source.application, platform: source.platform };
     return pages.flatMap(({ id, shortcuts }) => {
       const selected = new Set(shortcuts.filter(({ hidden }) => !hidden).map((shortcut) => shortcut.id));
-      return shortcuts.flatMap(({ id: keyId, hidden }) => {
+      return shortcuts.flatMap((shortcut) => {
+        const keyId = shortcut.id;
+        if (shortcut.hidden) return [];
+        if (shortcut.custom) {
+          return [{ id: 'app-shortcut:' + id + ':' + keyId, label: shortcut.custom.label, icon: shortcut.custom.icon,
+            category: 'app', shortcutPage: id, action: { type: 'hotkey', keys: shortcut.custom.keys,
+              ...(shortcutGuard ? { shortcutGuard } : {}) } }];
+        }
         const key = byId.get(keyId);
-        return hidden || !key || selected.has(key.alternateFor)
-          ? [] : [{ ...key, id: 'app-shortcut:' + id + ':' + keyId, shortcutPage: id }];
+        return !key || selected.has(key.alternateFor) ? [] : [{ ...key, id: 'app-shortcut:' + id + ':' + keyId, shortcutPage: id }];
       });
     });
   }

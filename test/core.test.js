@@ -262,6 +262,16 @@ test('profiles reject incompatible gestures and duplicate executable rules', () 
   assert.equal(JSON.stringify(view).includes('ctrl+t'), false);
 });
 
+test('a release action is a single press and stays available on the deck', () => {
+  const action = { type: 'hotkey', keys: 'Ctrl+Shift+M' };
+  const release = { type: 'hotkey', keys: 'Ctrl+Shift+M' };
+  const view = toView(validateProfile({ keys: [{ id: 'talk', action, release }] }));
+  assert.equal(view.slots[0].hasRelease, true);
+  assert.equal(view.slots[0].hasHold, false);
+  assert.throws(() => validateProfile({ keys: [{ id: 'talk', action, release, hold: action }] }), /press and release only/);
+  assert.throws(() => validateProfile({ keys: [{ id: 'talk', action, release, confirm: true }] }), /single gesture/);
+});
+
 test('hold repeat is automatic for volume and opt-in for supported navigation and zoom keys', () => {
   const up = { id: 'volume', action: { type: 'media', key: 'volup' } };
   const move = { id: 'nav', action: { type: 'hotkey', keys: 'Right' } };

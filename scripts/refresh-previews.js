@@ -32,7 +32,6 @@ function animation(file, ...args) {
   run(ffmpeg, ['-hide_banner', '-loglevel', 'error', '-f', 'concat', '-i', concat,
     '-filter_complex', 'fps=12,scale=1536:432:flags=lanczos,split[a][b];[a]palettegen=stats_mode=diff[p];[b][p]paletteuse=dither=sierra2_4a:diff_mode=rectangle',
     '-loop', '0', '-t', duration.toFixed(2), file]);
-  return frames;
 }
 
 function appFocusAnimation(file) {
@@ -51,8 +50,6 @@ function refresh() {
   const temporaryRoot = fs.realpathSync(os.tmpdir());
   const staging = fs.mkdtempSync(path.join(temporaryRoot, 'lastra-previews-'));
   try {
-    preview(path.join(staging, 'preview-home.png'));
-    preview(path.join(staging, 'preview-vscode.png'), '--preview-pack=vscode');
     preview(path.join(staging, 'preview-states.png'), '--preview-states', `--preview-toolbar=${path.join(staging, 'preview-toolbar.png')}`);
     preview(path.join(staging, 'preview-portrait.png'), '--preview-states', '--preview-portrait',
       `--preview-toolbar=${path.join(staging, 'preview-toolbar-portrait.png')}`);
@@ -78,14 +75,12 @@ function refresh() {
     }));
     const shortcuts = ['--preview-pack=chrome', `--profile=${example}`];
     preview(path.join(staging, 'preview-shortcuts.png'), ...shortcuts);
-    const demo = animation(path.join(staging, 'preview-demo.gif'), '--preview-states');
-    fs.copyFileSync(path.join(demo, 'dashboard.png'), path.join(staging, 'preview-dashboard.png'));
+    animation(path.join(staging, 'preview-demo.gif'), '--preview-states');
     animation(path.join(staging, 'preview-shortcuts.gif'), ...shortcuts);
     animation(path.join(staging, 'preview-tools.gif'), '--preview-states', '--preview-break');
     appFocusAnimation(path.join(staging, 'preview-app-focus.gif'));
 
-    for (const file of ['preview-home.png', 'preview-vscode.png', 'preview-dashboard.png', 'preview-states.png',
-      'preview-portrait.png', 'preview-stats.png', 'preview-shortcuts.png',
+    for (const file of ['preview-states.png', 'preview-portrait.png', 'preview-stats.png', 'preview-shortcuts.png',
       'preview-toolbar.png', 'preview-tools.png', 'preview-pomodoro-break.png',
       'preview-demo.gif', 'preview-shortcuts.gif', 'preview-tools.gif', 'preview-app-focus.gif']) {
       fs.copyFileSync(path.join(staging, file), path.join(root, 'docs', file));

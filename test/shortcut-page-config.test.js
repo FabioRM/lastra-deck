@@ -49,6 +49,26 @@ test('configured shortcut pages retain order, metadata, guards and independent s
   assert.match(await runPageAction(page, page.keys[0].action, runner, read, pages.binding(page)), /target window.*unavailable/i);
 });
 
+test('removed catalog shortcuts stay available and a custom chord keeps the app guard', () => {
+  const customId = 'custom-11111111-1111-4111-8111-111111111111';
+  const profile = validateProfile({ pages: [{ id: 'home', keys: [] }], shortcutLayouts: { chrome: { enabled: true, pages: [{
+    id: 'mine', name: 'Mine', shortcuts: [
+      { id: 'new-tab' },
+      { id: customId, custom: { label: 'Focus terminal', icon: 'keyboard', keys: 'Ctrl+`' } },
+    ],
+  }] } } });
+  const page = select(profile);
+  assert.deepEqual(page.keys.map(({ label }) => label), ['New tab', 'Focus terminal']);
+  assert.equal(page.keys[1].action.keys, 'Ctrl+`');
+  assert.equal(page.keys[1].action.shortcutGuard.pack, 'chrome');
+  assert.equal(page.keys[1].action.shortcutGuard.application, 'Google Chrome');
+  const catalog = previewPacks('en-US').find(({ id }) => id === 'chrome');
+  assert.ok(catalog.keys.some(({ id, action }) => id === 'close-tab' && action.keys === 'Ctrl+W'));
+  assert.throws(() => validateProfile({ pages: [{ id: 'home', keys: [] }], shortcutLayouts: { chrome: { enabled: true, pages: [{
+    id: 'mine', name: 'Mine', shortcuts: [{ id: 'new-tab', custom: { label: 'Other', icon: 'keyboard', keys: 'Ctrl+S' } }],
+  }] } } }), /custom shortcut needs its own ID/i);
+});
+
 test('hidden packs fall back safely and custom pages work in explicitly configured activities', () => {
   const pages = new Pages();
   const enabled = validateProfile(raw);

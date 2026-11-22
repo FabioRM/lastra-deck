@@ -2,6 +2,7 @@
 
 const { shortcutGroup: group } = require('./shortcut-pack-data');
 const communication = require('./shortcut-pack-communication');
+const daily = require('./shortcut-pack-daily-workflows');
 
 const shared = {
   dbeaver: [
@@ -104,6 +105,7 @@ const shared = {
 
 const windowsWorkflows = {
   ...shared,
+  ...daily,
   'autodesk-fusion': [
     ['new', 'New design', 'file-plus', 'Ctrl+N'],
     ['recompute', 'Compute all', 'refresh-cw', 'Ctrl+B'],

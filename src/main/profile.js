@@ -186,10 +186,12 @@ function validateKeyBehavior(raw, where, key) {
   checkAction(key.action, where, 0, false, key.action !== raw.action);
   if (key.hold !== undefined) checkAction(key.hold, `${where} (long press)`, 0, false, key.hold !== raw.hold);
   if (key.double !== undefined) checkAction(key.double, `${where} (double tap)`, 0, false, key.double !== raw.double);
+  if (key.release !== undefined) checkAction(key.release, `${where} (release)`, 0, false, key.release !== raw.release);
   checkConfirmation(key.confirm, where);
   if (shortcutNeedsConfirmation(key.action) && !key.confirm) fail(`${where}: this shortcut requires confirmation`);
-  if ([key.hold, key.double].some(shortcutNeedsConfirmation)) fail(`${where}: assign this shortcut to a key with confirmation`);
-  if (key.confirm && (key.hold || key.double)) fail(`${where}: confirmation uses a single gesture`);
+  if ([key.hold, key.double, key.release].some(shortcutNeedsConfirmation)) fail(`${where}: assign this shortcut to a key with confirmation`);
+  if (key.confirm && (key.hold || key.double || key.release)) fail(`${where}: confirmation uses a single gesture`);
+  if (key.release && (key.hold || key.double || key.repeatOnHold)) fail(`${where}: a release action uses press and release only`);
   if (key.onBusy !== undefined && !['ignore', 'queue-one'].includes(key.onBusy)) {
     fail(`${where}: "onBusy" must be "ignore" or "queue-one"`);
   }

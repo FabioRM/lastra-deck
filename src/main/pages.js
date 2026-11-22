@@ -71,7 +71,8 @@ function generatedPage(context, grid, { shortcutLanguage, shortcutOverrides }, p
   const keys = pack ? groupedPackKeys(pack, { ...context, shortcutLanguage, shortcutOverrides }) : generic().slice(0, grid.cols * grid.rows);
   return { id, name: pack?.name ?? displayName(context), pack: pack?.id,
     apps: context.executable ? [context.executable] : [],
-    keys: custom ? applyShortcutPages(custom, keys) : keys.filter((key) => !key.alternate), widgets: [],
+    keys: custom ? applyShortcutPages(custom, keys, pack && { pack: pack.id, application: pack.name,
+      platform: pack.platform ?? (pack.sites ? 'web' : 'windows') }) : keys.filter((key) => !key.alternate), widgets: [],
     ...(custom ? { shortcutPages: custom.map(({ id, name }) => ({ id, name })) } : {}),
     generated: true, target: context.identity };
 }

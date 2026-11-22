@@ -14,10 +14,11 @@
   const REVEAL_DISTANCE = 100;
   const PROMPT_ARM_MS = 350;
   const VIEWS = {
-    'dashboard-panel': 'dashboard', 'stats-panel': 'stats', 'obs-panel': 'obs', 'app-views-panel': 'apps', 'emoji-panel': 'emoji',
+    'dashboard-panel': 'dashboard', 'stats-panel': 'stats', 'feeds-panel': 'feeds', 'obs-panel': 'obs',
+    'app-views-panel': 'apps', 'emoji-panel': 'emoji',
   };
   const VIEW_BUTTONS = { obs: 'obs-tab', apps: 'app-views-tab', emoji: 'emoji-tab' };
-  const VIEW_LABELS = { keys: 'Deck keys', dashboard: 'Dashboard', stats: 'Stats' };
+  const VIEW_LABELS = { keys: 'Deck keys', dashboard: 'Dashboard', stats: 'Stats', feeds: 'Feeds' };
 
   const api = window.lastra;
   const { t, set: setLanguage } = window.LastraI18n;
@@ -35,6 +36,8 @@
   const sidePanel = document.getElementById('panel');
   const dashboard = document.getElementById('dashboard-panel');
   const stats = document.getElementById('stats-panel');
+  const feedsPanel = document.getElementById('feeds-panel');
+  let viewCycle = ['keys', 'dashboard', 'stats', 'feeds'];
   const viewSwitch = document.getElementById('dashboard-switch');
   const statusEl = document.getElementById('status');
   const homeNotification = document.getElementById('home-notification');
@@ -142,9 +145,9 @@
   }
 
   function nextPrimaryView() {
-    if (activeView === dashboard) return 'stats';
-    if (activeView === stats) return 'keys';
-    return 'dashboard';
+    const current = VIEWS[activeView?.id] ?? 'keys';
+    const index = Math.max(0, viewCycle.indexOf(current));
+    return viewCycle[(index + 1) % viewCycle.length];
   }
 
   function updateViewSwitch() {
@@ -157,6 +160,7 @@
   function showPrimaryView(view) {
     if (view === 'dashboard') window.LastraDashboard?.setOpen(true);
     else if (view === 'stats') window.LastraStats?.setOpen(true);
+    else if (view === 'feeds') window.LastraFeeds?.setOpen(true);
     else closeActiveView();
   }
 
@@ -165,17 +169,18 @@
       pendingNavigation = next;
       return;
     }
-    savedView = next.view;
+    if (Array.isArray(next.views) && next.views.length) viewCycle = next.views;
+    savedView = ['dashboard', 'stats', 'feeds'].includes(next.view) && !viewCycle.includes(next.view) ? 'keys' : next.view;
     if (next.statsTab) window.LastraStats?.selectTab(next.statsTab);
     if (Number.isSafeInteger(next.sheet) && quickSheet !== next.sheet) {
       quickTools.close();
       quickSheet = next.sheet;
       fitStage();
     }
-    if ((VIEWS[activeView?.id] ?? 'keys') === next.view) return;
+    if ((VIEWS[activeView?.id] ?? 'keys') === savedView) return;
     closeActiveView();
-    if (Object.hasOwn(VIEW_LABELS, next.view)) showPrimaryView(next.view);
-    else document.getElementById(VIEW_BUTTONS[next.view])?.click();
+    if (Object.hasOwn(VIEW_LABELS, savedView)) showPrimaryView(savedView);
+    else document.getElementById(VIEW_BUTTONS[savedView])?.click();
   }
 
   function rememberView() {
@@ -200,11 +205,13 @@
       }
       if (open && activeView !== panel) closeActiveView();
       if (open) showPageMatch(false);
-      const wasFullPanel = activeView === dashboard || activeView === stats;
+      const fullPanel = (item) => item === dashboard || item === stats || item === feedsPanel;
+      const wasFullPanel = fullPanel(activeView);
       panel.hidden = !open;
       if (open) activeView = panel;
       else if (activeView === panel) activeView = null;
-      const isFullPanel = activeView === dashboard || activeView === stats;
+      const isFullPanel = fullPanel(activeView);
+      stage.dataset.cornerClock = isFullPanel ? 'on' : '';
       if (isFullPanel && !wasFullPanel) sidePanel.dispatchEvent(new Event('lastra:close-view'));
       deck.hidden = sidePanel.hidden = isFullPanel;
       keysEl.hidden = Boolean(activeView);
@@ -697,6 +704,7 @@
     let holdTimer = null;
     let tapTimer = null;
     let holdFired = false;
+    let releasePending = false;
     let repeatContact;
     let contact = null;
     const holdToConfirm = slot.confirm === 'hold';
@@ -728,7 +736,13 @@
       cancelDistance = gestures.cancelDistance * stageScale;
       el.setPointerCapture(e.pointerId);
       holdFired = false;
+      releasePending = false;
       el.classList.add('pressed');
+      if (slot.hasRelease) {
+        releasePending = true;
+        void run('press', trace);
+        return;
+      }
       if (slot.hasHold || holdToConfirm || slot.repeatOnHold) {
         el.classList.add('holding');
         const current = repeatContact = Symbol('key contact');
@@ -745,7 +759,13 @@
     function release(e, commit) {
       if (e.pointerId !== pointerId) return;
       const trace = contact;
+      const pendingRelease = releasePending;
+      releasePending = false;
       reset();
+      if (slot.hasRelease) {
+        if (pendingRelease) void run('release', trace);
+        return;
+      }
       if (!commit || holdFired || holdToConfirm || movedTooFar(e) || !isInside(el, e)) return;
       if (!slot.hasDouble) run('tap', trace);
       else if (tapTimer !== null) {
@@ -763,7 +783,9 @@
       return Math.hypot(event.clientX - startX, event.clientY - startY) >= cancelDistance;
     }
     el.addEventListener('pointermove', (e) => {
-      if (e.pointerId === pointerId && (movedTooFar(e) || !isInside(el, e))) reset();
+      if (e.pointerId !== pointerId || (!movedTooFar(e) && isInside(el, e))) return;
+      if (slot.hasRelease && releasePending) release(e, false);
+      else reset();
     });
     el.addEventListener('pointerup', (e) => release(e, true));
     el.addEventListener('pointercancel', (e) => release(e, false));
@@ -1444,16 +1466,20 @@
     const parts = clockFormatter.formatToParts(now);
     const inStats = activeView === stats;
     const inDashboard = activeView === dashboard;
-    const clock = document.getElementById(inStats ? 'stats-time' : inDashboard ? 'dashboard-time' : 'time');
-    renderClockTime(clock, parts, !inDashboard || showClockSeconds);
-    if (inStats) {
-      window.LastraStats?.updateDate(now, locale);
+    const inFeeds = activeView === feedsPanel;
+    if (inStats || inDashboard || inFeeds) {
+      renderClockTime(document.getElementById('corner-time'), parts, showClockSeconds);
+      const spacer = document.getElementById(inStats ? 'stats-time' : inDashboard ? 'dashboard-time' : 'feeds-time');
+      if (inStats || inDashboard) renderClockTime(spacer, parts, showClockSeconds);
+      const day = now.toLocaleDateString(locale, { weekday: 'short', month: 'short', day: 'numeric' });
+      const cornerDate = document.getElementById('corner-date');
+      if (cornerDate.textContent !== day) cornerDate.textContent = day;
+      if (inStats) window.LastraStats?.updateDate(now, locale);
+      if (inDashboard) window.LastraDashboard?.updateDate(now, locale);
       return;
     }
-    if (inDashboard) {
-      window.LastraDashboard?.updateDate(now, locale);
-      return;
-    }
+    const clock = document.getElementById('time');
+    renderClockTime(clock, parts, true);
     document.getElementById('weekday').textContent =
       now.toLocaleDateString(locale, { weekday: 'long' });
     document.getElementById('date').textContent =

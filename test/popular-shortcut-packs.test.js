@@ -46,13 +46,13 @@ const webWindow = (manifestId, executable = 'msedge.exe') => ({
   executable, appId: executable + '._crx_' + chromiumWebAppId(manifestId), keyboardLayout: US_LAYOUT, windowId: 42n,
 });
 
-test('451 distinct app products have active packs with separate packs for nine variants', () => {
+test('452 distinct app products have active packs with separate packs for nine variants', () => {
   const all = [...packs, ...webPacks];
   const variants = new Set(['outlook-classic', 'antigravity-workbench', 'chatgpt-companion', 'cursor-agents', 'photoshop-web',
     'kicad-schematic', 'kicad-footprint', 'kicad-symbol', 'kicad-gerbview']);
   assert.equal(new Set(all.map(({ id }) => id)).size, all.length);
-  assert.equal(all.filter(({ id }) => !variants.has(id)).length, 451);
-  assert.equal(addedDesktop.length + addedWeb.length, 400);
+  assert.equal(all.filter(({ id }) => !variants.has(id)).length, 452);
+  assert.equal(addedDesktop.length + addedWeb.length, 401);
   const layouts = Object.fromEntries(all.map(({ id }) => [id, { enabled: true }]));
   assert.deepEqual(validateProfile({ ...profile, shortcutLayouts: layouts }).shortcutLayouts, layouts);
 });

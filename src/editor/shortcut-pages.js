@@ -5,7 +5,7 @@
   const { t } = window.LastraI18n;
   const { SHORTCUT_LAYOUT_LIMITS: limits } = window.LastraShortcutLayouts;
 
-  function createShortcutPageEditor(root, { read, write, updated }) {
+  function createShortcutPageEditor(root, { read, write, updated, normalizeChord }) {
     const body = root.querySelector('[data-shortcut-pages]');
     const status = root.querySelector('[role="status"]');
     const selected = new Map();
@@ -117,13 +117,14 @@
         const list = element('ul', 'shortcut-page-keys');
         list.setAttribute('aria-label', t('Shortcuts on this page'));
         const keys = new Map(pack.keys.map((key) => [key.id, key]));
-        page.shortcuts.forEach(({ id, hidden }, index) => {
+        page.shortcuts.forEach(({ id, hidden, custom }, index) => {
           const item = element('li');
           const key = keys.get(id);
-          const label = key?.label ?? id;
+          const label = custom?.label ?? key?.label ?? id;
           item.toggleAttribute('data-hidden-shortcut', Boolean(hidden));
           const title = element('span', 'shortcut-page-key-title', label);
-          if (key?.notation ?? key?.action?.keys) title.append(element('code', '', key.notation ?? key.action.keys));
+          const chord = custom?.keys ?? key?.notation ?? key?.action?.keys;
+          if (chord) title.append(element('code', '', chord));
           const hide = check(t('Hide'), Boolean(hidden), (checked) => {
             edit(({ shortcuts }) => { shortcuts[index].hidden = checked; }, 'hide:' + id);
           });
@@ -141,6 +142,7 @@
         });
         if (list.childElementCount) body.append(list);
         else toggleHint('This page is empty. Add shortcuts from the catalog below.');
+        body.append(customForm());
       }
       if (focus) [...body.querySelectorAll('[data-shortcut-focus]')]
         .find((control) => control.dataset.shortcutFocus === focus)?.focus({ preventScroll: true });
@@ -162,6 +164,40 @@
       const next = structuredClone(layout());
       next.pages ??= initialPages();
       current(next.pages).shortcuts.push({ id: keyId });
+      root.open = true;
+      save(next);
+    }
+
+    function customForm() {
+      const form = element('form', 'shortcut-page-custom');
+      const label = Object.assign(element('input'), { maxLength: 24, placeholder: t('Shortcut label') });
+      label.setAttribute('aria-label', t('Shortcut label'));
+      const chord = Object.assign(element('input'), { maxLength: 80, placeholder: 'Ctrl+Shift+F' });
+      chord.setAttribute('aria-label', t('Shortcut keys'));
+      form.append(label, chord, button(t('Add your shortcut'), () => { void addCustom(label.value, chord.value); }, { className: 'quiet' }));
+      form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        void addCustom(label.value, chord.value);
+      });
+      return form;
+    }
+
+    async function addCustom(label, keys) {
+      const name = label.trim();
+      if (!/^\P{C}{1,24}$/u.test(name)) {
+        status.textContent = t('Enter a shortcut name of up to 24 characters.');
+        return;
+      }
+      let chord;
+      try {
+        chord = await normalizeChord(keys);
+      } catch (error) {
+        status.textContent = error.message;
+        return;
+      }
+      const next = structuredClone(layout());
+      next.pages ??= initialPages();
+      current(next.pages).shortcuts.push({ id: 'custom-' + crypto.randomUUID(), custom: { label: name, icon: 'keyboard', keys: chord } });
       root.open = true;
       save(next);
     }

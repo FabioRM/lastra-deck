@@ -62,6 +62,7 @@
         image: key.image ? image(key.image) : null,
         hasHold: Boolean(key.hold),
         hasDouble: Boolean(key.double),
+        hasRelease: Boolean(key.release),
         ...(repeatsTap(key) ? { repeatOnHold: true } : {}),
         confirm: confirmationMode(key.confirm) ?? null,
         confirmMs: key.confirm?.holdMs,

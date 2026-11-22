@@ -2,6 +2,8 @@
   --dashboard-control-size: 76px;
   --dashboard-control-gap: 10px;
   --dashboard-controls-width: calc(var(--dashboard-control-size) * 4 + var(--dashboard-control-gap) * 3);
+  --view-header: calc(76px * var(--text-scale) * 0.9);
+  --view-header-gap: 20px;
 }
 
 #dashboard-panel {
@@ -52,19 +54,18 @@
 #dashboard-signal .audio-peak { height: 13px; }
 
 #dashboard-time {
-  font-family: 'Barlow Condensed', 'Segoe UI', sans-serif;
-  font-size: calc(138px * var(--text-scale));
-  font-weight: 400;
+  font: 400 calc(76px * var(--text-scale))/.9 'Barlow Condensed', 'Segoe UI', sans-serif;
   font-variant-numeric: tabular-nums;
   letter-spacing: -.015em;
-  line-height: .87;
+  line-height: .9;
   white-space: nowrap;
 }
 
 #dashboard-date {
   color: var(--muted-text);
-  font-size: calc(32px * var(--text-scale));
+  font-size: calc(24px * var(--text-scale));
   line-height: 1.12;
+  white-space: nowrap;
 }
 
 #dashboard-switch, #home-page, #quick-tools-close {
@@ -79,7 +80,8 @@
 #dashboard-switch .dashboard-icon { display: none; }
 #dashboard-switch[data-next='keys'] .dashboard-switch-keys,
 #dashboard-switch[data-next='dashboard'] .dashboard-switch-dashboard,
-#dashboard-switch[data-next='stats'] .dashboard-switch-stats { display: block; }
+#dashboard-switch[data-next='stats'] .dashboard-switch-stats,
+#dashboard-switch[data-next='feeds'] .dashboard-switch-feeds { display: block; }
 
 .dashboard-sr-only {
   position: absolute;
@@ -342,6 +344,7 @@
 }
 
 .portrait #dashboard-panel { gap: 30px; }
+.portrait { --view-header: calc(58px * var(--text-scale) * 0.9 + 4px + 21px * var(--text-scale) * 1.12); --view-header-gap: 30px; }
 .portrait .dashboard-header {
   flex-direction: column;
   align-items: stretch;
@@ -352,8 +355,8 @@
 .portrait #dashboard-signal { flex: auto; }
 .portrait .dashboard-clock { display: grid; gap: 12px; margin-inline-end: 0; }
 .portrait #panel .when { padding-bottom: 0; }
-.portrait #dashboard-time { font-size: calc(152px * var(--text-scale)); }
-.portrait #dashboard-date { font-size: calc(28px * var(--text-scale)); }
+.portrait #dashboard-time { font-size: calc(58px * var(--text-scale)); }
+.portrait #dashboard-date { font-size: calc(21px * var(--text-scale)); }
 .portrait .dashboard-content { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); gap: 28px; }
 .portrait .dashboard-card { padding: 33px; }
 .portrait .dashboard-calendar-title { font-size: calc(48px * var(--text-scale)); }

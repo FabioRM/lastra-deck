@@ -8,7 +8,7 @@
   const MAX_PARAMETERS = 16;
   const TYPES = ['string', 'integer', 'boolean'];
   const ID = /^[a-z][a-z0-9_-]{0,39}$/;
-  const BEHAVIOR = ['action', 'hold', 'double'];
+  const BEHAVIOR = ['action', 'hold', 'double', 'release'];
   const SAMPLE = Symbol('Macro parameter sample');
   const CALL_FIELDS = ['type', 'macro', 'args', 'onError', 'attempts'];
 

@@ -11,6 +11,8 @@ const { spawn } = require('node:child_process');
 const { createHash } = require('node:crypto');
 const { pathToFileURL } = require('node:url');
 
+const { Feeds } = require('./feeds');
+const { readSettings } = require('./configuration-backup');
 const { findEdgeDisplay, describeDisplay } = require('./display');
 const { DisplayBacklight } = require('./display-backlight');
 const { DisplayBacklightWidgets } = require('./display-backlight-widgets');
@@ -35,7 +37,7 @@ const { normalizeOverrideChord } = require('./shortcut-overrides');
 const { actionNeedsShortcutTarget, hasShortcutRule, sameShortcutWindow, shortcutUnavailable } = require('./shortcut-guards');
 const { shortcutGuardForAction } = require('../shared/shortcut-library');
 const { normalizeWebApp } = require('./shortcut-packs-web');
-const { DeckNavigation, CALENDARS } = require('./deck-navigation');
+const { DeckNavigation, CALENDARS, CONTEXT_RETURN_CHOICES } = require('./deck-navigation');
 const { DeckShortcuts, VIEW_LABELS, stepDestination } = require('./deck-shortcuts');
 const { Pomodoro } = require('./pomodoro');
 const { Timers } = require('./timers');
@@ -245,6 +247,7 @@ let viewOnly = null;
 let deckReveal = null;
 let emojiUsage = null;
 let appearance = null;
+let feeds = null;
 let interfaceLanguage = null;
 let activities = null;
 let agentAccess = null;
@@ -945,6 +948,7 @@ function setDeckPageLock(enabled = !pages.locked) {
 
 function setDeckView(view) {
   if (view === 'obs' && !obs.enabled) throw new Error('Enable OBS in Lastra Settings.');
+  if (feeds && !feeds.allows(view)) throw new Error('That deck view is turned off.');
   const before = navigation.current.view;
   navigation.setView(view);
   if (before === 'stats' && navigation.current.view !== 'stats') processTelemetry?.stop();
@@ -1000,7 +1004,8 @@ function navigateDeck({ command, view, page: requestedPage, tab, enabled, settin
     case 'appearance': setAppearance(setting, value); break;
   }
   if (['surface', 'view', 'page', 'home', 'stats'].includes(command)) {
-    send('deck:navigation', { view: navigation.current.view, statsTab: deckStatsTab, sheet: deckSheet });
+    send('deck:navigation', { view: navigation.current.view, statsTab: deckStatsTab, sheet: deckSheet,
+      views: feeds?.cycle() ?? ['keys', 'dashboard', 'stats', 'feeds'] });
   }
 }
 
@@ -1070,6 +1075,34 @@ function setViewOnly(enabled) {
   refreshPage(true);
 }
 
+function deckBehavior() {
+  const activity = activities.current.id;
+  const favorites = pageLists.snapshot(activity, store.current.pages).favorites;
+  const appState = appViews.snapshot();
+  let mixer = [];
+  try { mixer = appMixerPins.withStatus(audio.listApps()).filter(({ pinned, canPin }) => pinned || canPin); }
+  catch { /* Mixer pins stay listed when Windows audio is quiet. */ }
+  return {
+    activity,
+    activities: ACTIVITIES,
+    viewOnly: viewOnly.enabled,
+    contextReturn: navigation.current.contextReturn,
+    contextReturns: CONTEXT_RETURN_CHOICES,
+    calendar: navigation.current.calendar,
+    calendars: Object.fromEntries(Object.entries(CALENDARS).map(([id, item]) => [id, item.label])),
+    display: preferredDisplay == null ? '' : String(preferredDisplay),
+    displays: screen.getAllDisplays().map((display) => ({ id: String(display.id), label: describeDisplay(display) })),
+    revealGesture: navigation.current.desktopRevealGesture,
+    revealed: deckReveal.active,
+    activityLocked: Boolean(opts.profile),
+    windowed: Boolean(opts.windowed),
+    pages: store.current.pages.map(({ id, name }) => ({ id, name, favorite: favorites.includes(id) })),
+    appViews: appState.views.map(({ id, name }) => ({ id, name, pinned: appState.pinned.includes(id) })),
+    followApps: appState.follow,
+    mixer: mixer.map(({ id, name, pinned }) => ({ id, name, pinned })),
+  };
+}
+
 function refreshTray() {
   trayMenu?.refresh();
 }
@@ -1130,7 +1163,7 @@ function keyId(id) {
 
 function resolveDeckPress(id, kind, revision) {
   const unavailable = (message) => ({ ok: false, unavailable: true, message });
-  if (typeof id !== 'string' || !['tap', 'hold', 'double', 'confirm'].includes(kind)) return { ok: false, message: 'Invalid request' };
+  if (typeof id !== 'string' || !['tap', 'hold', 'double', 'confirm', 'press', 'release'].includes(kind)) return { ok: false, message: 'Invalid request' };
   observeDeckForeground();
   if (revision !== pages.revision) return unavailable('The deck page or target window changed.');
   const page = keyContext(id);
@@ -1141,7 +1174,8 @@ function resolveDeckPress(id, kind, revision) {
   const key = editing ? fixedEditingKeys(store.current, editingTarget).find((item) => item.id === id) : store.findKey(keyId(id), page);
   if (!key) return { ok: false, message: 'Key not found in the profile' };
   if (key.unavailable) return unavailable(key.unavailable);
-  const actions = key.confirm ? { confirm: key.action } : { tap: key.action, hold: key.hold, double: key.double };
+  const actions = key.confirm ? { confirm: key.action } : { tap: key.action, hold: key.hold, double: key.double,
+    press: key.action, release: key.release };
   const action = actions[kind];
   if (!action) return { ok: false, message: 'No action assigned to this gesture' };
   const reason = shortcutUnavailableHere(action);
@@ -1373,7 +1407,61 @@ function registerIpc() {
   edit('editor:profile-templates', (language) => profileTemplates(typeof language === 'string' ? language : undefined));
   edit('editor:appearance:get', () => appearance.current);
   edit('editor:appearance:set', (setting, value) => setAppearance(setting, value));
+  edit('editor:feeds:get', () => feeds?.settings() ?? null);
+  edit('editor:feeds:set', async (value) => {
+    feeds.setSettings(value ?? {});
+    if (!feeds.allows(navigation.current.view)) setDeckView('keys');
+    return feeds.refresh();
+  });
+  edit('editor:feeds:places', (query) => feeds.searchPlaces(query));
+  edit('editor:feeds:locate', () => feeds.locate());
+  edit('editor:feeds:symbols', (query) => feeds.searchSymbols(query));
+  deck('feeds:read', () => feeds?.snapshot() ?? null);
+  edit('editor:configuration:export', async () => {
+    const owner = editor;
+    const bundle = readSettings(app.getPath('userData'));
+    const choice = await dialog.showSaveDialog(owner, { title: 'Export Lastra configuration',
+      defaultPath: 'lastra-configuration.json', filters: [{ name: 'Lastra JSON', extensions: ['json'] }] });
+    if (choice.canceled || !choice.filePath || editor !== owner || owner.isDestroyed()) return false;
+    writeExchangeFile(choice.filePath, JSON.stringify(bundle, null, 2), []);
+    return true;
+  });
   edit('editor:desktop-menu', (group) => typeof group === 'string' && trayMenu.openSettings(group, editor));
+  edit('editor:deck-behavior:get', () => deckBehavior());
+  edit('editor:deck-behavior:set', async (command) => {
+    if (!command || typeof command !== 'object') throw new Error('Invalid deck option.');
+    if (command.type === 'activity') switchActivity(command.id);
+    else if (command.type === 'viewOnly') setViewOnly(command.enabled === true);
+    else if (command.type === 'contextReturn') {
+      navigation.setContextReturn(command.mode);
+      pages.setContextReturn(command.mode);
+      refreshPage();
+    } else if (command.type === 'calendar') {
+      navigation.setCalendar(command.id);
+      sendDashboardCalendar();
+    } else if (command.type === 'display') {
+      preferredDisplay = command.id == null || command.id === '' ? null : String(command.id);
+      restoreDeck();
+    } else if (command.type === 'revealGesture') {
+      navigation.setDesktopRevealGesture(command.enabled === true);
+      refreshPage(true);
+    } else if (command.type === 'reveal') revealDesktop();
+    else if (command.type === 'show') showDeck();
+    else if (command.type === 'favorite') {
+      pageLists.favorite(activities.current.id, command.id, command.enabled === true, store.current.pages);
+      send('profile', currentView());
+    } else if (command.type === 'pinView') {
+      const result = await appViews.change({ type: 'pin', viewId: command.id, pinned: command.enabled === true });
+      if (result.state) send('app-views:focus', result.state);
+    } else if (command.type === 'follow') {
+      const result = await appViews.change({ type: 'follow', enabled: command.enabled === true });
+      if (result.state) send('app-views:focus', result.state);
+    } else if (command.type === 'mixer') appMixerPins.set(command.id, command.enabled === true, () => audio.listApps());
+    else if (command.type === 'editViews') await appViews.editCustom();
+    else throw new Error('Unknown deck option.');
+    refreshTray();
+    return deckBehavior();
+  });
   edit('editor:agenda:settings', async (type) => {
     if (!['read', 'pick', 'clear'].includes(type)) return { ok: false, message: 'Choose a calendar setting.' };
     const owner = editor;
@@ -1666,6 +1754,10 @@ function registerIpc() {
   ipcMain.on('renderer:ready', (event) => {
     if (!fromWindow(event, win, RENDERER)) return;
     send('deck:appearance', appearance.current);
+    if (feeds) {
+      send('feeds', feeds.snapshot());
+      send('weather', feeds.snapshot().weather ?? { line: '' });
+    }
     send('pomodoro:changed', pomodoro.snapshot());
     if (panelMeasurement?.run) send('measurement:state', panelMeasurement.run.state);
     if (liveSensors) send('sensors', { ...liveSensors, history: sensors.history.series });
@@ -1737,6 +1829,18 @@ function start() {
   viewOnly = new DeckViewOnly(path.join(userData, 'deck-view-only.json'), log);
   emojiUsage = new EmojiUsage(path.join(userData, 'emoji-usage.json'), log);
   appearance = new DeckAppearance(path.join(userData, 'deck-appearance.json'), log);
+  feeds = new Feeds(path.join(userData, 'feeds.json'), {
+    legacyWeather: path.join(userData, 'weather.json'),
+    onChange(snapshot) {
+      send('feeds', snapshot);
+      send('weather', snapshot.weather ?? { line: '' });
+      send('deck:navigation', { view: navigation.current.view, statsTab: deckStatsTab, sheet: deckSheet, views: snapshot.cycle });
+    },
+    log,
+  });
+  const feedsTimer = setInterval(() => { void feeds.refresh(); }, 60 * 1000);
+  disposables.add('feeds', () => clearInterval(feedsTimer));
+  void feeds.refresh();
   activities = new ActivityProfiles({ directory: userData, stockDirectory: path.dirname(DEFAULT_PROFILE), explicitFile: opts.profile });
   activateActivity(opts.profile ? 'main' : navigation.current.activity);
   deckShortcuts = new DeckShortcuts({ file: path.join(userData, `deck-shortcuts${profileSuffix}.json`),

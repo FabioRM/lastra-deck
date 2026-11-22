@@ -199,6 +199,8 @@ async function captureDemo({ devtools, send, directory, width, height, shortcutP
     await capture(2, 'dashboard');
     await navigate('stats', '#stats-readings .stats-card');
     await capture(2.3);
+    await navigate('feeds', '#feeds-panel:not([hidden]) #feeds-weather');
+    await capture(2.4);
   }
   fs.writeFileSync(path.join(directory, 'frames.json'), JSON.stringify(frames));
 }
@@ -429,6 +431,18 @@ async function startPreview({ opts, ipcMain, BrowserWindow, quit, fail, log, ren
     ipcMain.handle('dashboard:agenda', () => ({ ok: true, state: { status: 'ready', selected: true,
       event: { title: 'Studio review', startAt: Date.now() + 60 * 60 * 1_000 } } }));
     ipcMain.handle('dashboard:pomodoro:read', () => ({ ok: true, state: { phase: 'focus', status: 'idle', remainingMs: 25 * 60 * 1_000 } }));
+    const noon = Date.now();
+    ipcMain.handle('feeds:read', () => ({
+      weather: {
+        place: 'Rome, Italy', temperature: 18, label: 'Clear', low: 12, high: 21, latitude: 41.9,
+        sun: { dawn: noon - 7 * 3_600_000, sunrise: noon - 6 * 3_600_000, sunset: noon + 6 * 3_600_000, dusk: noon + 7 * 3_600_000 },
+      },
+      quotes: {
+        labels: { AAPL: 'Apple', MSFT: 'Microsoft' },
+        rows: [{ symbol: 'AAPL', price: 189.4, change: 1.2 }, { symbol: 'MSFT', price: 421.15, change: -0.4 }],
+      },
+      currencies: { rows: [{ pair: 'EURUSD', rate: 1.0864 }] },
+    }));
   }
   if (opts.previewToolView) {
     let breakStartedAt = null;
@@ -462,7 +476,7 @@ async function startPreview({ opts, ipcMain, BrowserWindow, quit, fail, log, ren
   });
   deck.setWindow(win);
   const devtools = win.webContents.debugger;
-  const deadline = setTimeout(() => fail(new Error('Timed out rendering the preview')), opts.previewFrames ? 30_000 : RENDER_TIMEOUT_MS);
+  const deadline = setTimeout(() => fail(new Error('Timed out rendering the preview')), opts.previewFrames ? 60_000 : RENDER_TIMEOUT_MS);
 
   ipcMain.once('renderer:ready', async () => {
     try {

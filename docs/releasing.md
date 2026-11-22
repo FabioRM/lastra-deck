@@ -4,24 +4,16 @@ Lastra ships as a per-user NSIS installer for Windows x64, built with electron-b
 
 ## Local builds
 
-Run the release script on Windows with PowerShell 7.2 or later and Node.js 22.12 or later.
+| Command | Output | Use |
+| --- | --- | --- |
+| `npm run dist:dir` | `out/win-unpacked/Lastra.exe` | Quick check of the packaged app. Has no `app-update.yml`, so updates stay off. |
+| `npm run dist` | `out/Lastra-Setup-<version>.exe`, `.blockmap`, `latest.yml` | The installer and the update metadata that a release publishes. |
+| `npm run dist:linux` | `.deb` and AppImage under `out/` | Packages the x86-64 Linux build. Run on Linux. |
+| `sh scripts/release-linux.sh` | Linux packages, GNOME extension ZIP and SHA-256 files under `out/` | Builds the Linux release bundle with `bsdtar` and `sha256sum`. |
 
-```powershell
-pwsh -File scripts/release-windows.ps1
-```
+Both commands package the directory they run in, including local working-tree files. For a public build, run the commands in the audited source export for the release commit. To check a packaged build without the panel, run `out\win-unpacked\Lastra.exe --preview=preview.png`.
 
-The script runs `npm ci`, lint, type checks, and tests, then builds the x64 installer and verifies its SHA-512 against the updater metadata. It writes four release files to `out/`.
-
-- `Lastra-Setup-<version>.exe`
-- `Lastra-Setup-<version>.exe.sha256`
-- `Lastra-Setup-<version>.exe.blockmap`
-- `latest.yml`
-
-Add `-Tag v0.2.4` to require a clean checkout of that tag and matching versions in the package files. For a quick packaging check, use `npm run dist:dir` after installing dependencies. Run `out\win-unpacked\Lastra.exe --preview=preview.png` to check the packaged app without the panel. Git ignores `out/`.
-
-## Linux x86-64 packages
-
-On Linux with Node.js 22.12 or later and libarchive tools, run `npm ci` followed by `sh scripts/release-linux.sh`. The script builds the Debian package, AppImage, GNOME extension ZIP and SHA-256 checksums in `out/`. The Linux launcher uses XWayland for the Deck on GNOME and KDE Plasma. [Linux setup](linux-deck.md)
+`out/` is ignored by Git. Do not commit build output.
 
 ## Packaged layout
 
@@ -34,33 +26,25 @@ asar is turned off. The app lives as plain files in `resources\app` under the in
 
 koffi loads its prebuilt Node-API binary from `node_modules\@koromix\koffi-win32-x64`. electron-builder does not rebuild it (`npmRebuild: false`).
 
-The package contains `src/`, `profiles/`, `extensions/`, `assets/`, the license files, `docs/*.md`, and the production dependencies.
+The package contains `src/`, `profiles/`, `extensions/`, `assets/`, the license files, `docs/*.md`, and the production dependencies. It leaves out tests, scripts, `dist/`, `rsc/`, preview images, documentation images, the internal backlog, and the unused lucide-static fonts and bundles.
 
 ## Catalog redistribution
 
-GitHub generates source archives from the tag. The installer bundles all catalogs and profiles in that same tree. Keep new catalog imports consistent with the [redistribution review](catalog-redistribution.md) and retain the applicable license texts and notices.
+`node scripts/package-public-release.js --current` exports committed `HEAD` and applies the public catalog redistribution rules. It prints the audited source directory and writes `dist/lastra-<version>-source.zip` with a SHA-256 checksum file. The Windows installer is built from that same audited directory. [Catalog redistribution](catalog-redistribution.md)
+
+For a local release build, run `npm ci`, `npm run check`, and `npm run dist` in the printed `Source tree` directory. The emitted ZIP and checksum stay under `dist/` in the repository, and the installer, blockmap and update metadata appear under `out/` in the audited directory.
 
 ## Publishing a release
 
-1. Run `npm version <version> --no-git-tag-version`, update the [changelog](../CHANGELOG.md), and commit the changes to `main`.
-2. Create an annotated tag with release notes in Markdown, for example `git tag -a v0.2.5 -F release-notes.md`. Push `main` and the tag to `origin`.
-3. The [Windows release workflow](../.github/workflows/release.yml) builds the tag and attaches the four files and the tag notes to a GitHub draft release.
-4. Check the installer and notes, then publish the draft. Installed copies find the update at their next check.
+1. Update `version` in `package.json` and `package-lock.json`, for example with `npm version 0.2.2 --no-git-tag-version`. Commit the change.
+2. Tag the commit with the same version and push the tag: `git tag v0.2.2` then `git push origin v0.2.2`.
+3. The workflow checks that the tag matches `package.json`, exports the audited source from the tag, and runs `npm run check` and `npm run dist` there. It retains the installer, its blockmap, `latest.yml`, the source ZIP and its checksum as a workflow artifact, then creates a **draft** release with the same files. Existing releases retain their assets on reruns. [Release workflow](../.github/workflows/release.yml)
+4. Review the draft and add release notes. Optionally, install it on a test PC.
+5. Publish the draft. Installed copies find the update at their next check.
 
-electron-updater reads published stable releases from `FabioRM/lastra-deck`. Keep `latest.yml` and the blockmap attached to each release to support installation and differential downloads.
+electron-updater reads only published releases from `FabioRM/lastra-deck`, and the repository must be public for installed copies to read them. Leave `latest.yml` and the `.blockmap` attached to the release, since they let installed copies verify and download updates. Pre-releases are ignored.
 
-If Actions is unavailable, build from a clean checkout with `-Tag`, then attach the local files to a draft using the authenticated GitHub CLI.
-
-```powershell
-$version = (Get-Content package.json -Raw | ConvertFrom-Json).version
-$tag = "v$version"
-$installer = "out/Lastra-Setup-$version.exe"
-git for-each-ref --format='%(contents)' "refs/tags/$tag" |
-  gh release create $tag $installer "$installer.blockmap" "$installer.sha256" out/latest.yml `
-    --repo FabioRM/lastra-deck --draft --verify-tag --title "Lastra $tag" --notes-file -
-```
-
-GitHub Pages serves [the project site](https://fabiorm.github.io/lastra-deck/) from `/docs` on `main`. The site links to the latest release, so the download link follows new public versions automatically.
+The workflow uses the built-in `GITHUB_TOKEN` with `contents: write`. If a draft already exists, review its files against the workflow artifact before publishing. The installer, update metadata and public source should all come from the same tag build.
 
 ## Code signing
 

@@ -127,11 +127,14 @@
     timers.setAttribute('aria-label', window.LastraI18n.t('Active timers'));
     const statuses = document.createElement('p');
     statuses.className = 'deck-idle-statuses';
+    const weather = document.createElement('p');
+    weather.className = 'deck-idle-statuses';
+    let weatherLine = '';
     const button = document.createElement('button');
     button.type = 'button';
     button.textContent = window.LastraI18n.t('Tap to wake');
     button.setAttribute('aria-label', window.LastraI18n.t('Wake deck'));
-    overlay.append(time, date, timers, statuses, button);
+    overlay.append(time, date, weather, timers, statuses, button);
     document.body.append(overlay);
     let profile;
     let obs;
@@ -165,6 +168,8 @@
       if (clockText !== time.textContent) { time.dateTime = now.toISOString(); time.textContent = clockText; }
       const dateText = calendar.format(now);
       if (dateText !== date.textContent) date.textContent = dateText;
+      if (weather.textContent !== weatherLine) weather.textContent = weatherLine;
+      weather.hidden = !weatherLine;
       const status = idleStatuses(profile, obs).join(' · ');
       if (status !== statuses.textContent) statuses.textContent = status;
       statuses.hidden = !status;
@@ -242,6 +247,10 @@
       visibility();
     });
     api.onObs?.((view) => { obs = view; });
+    api.onWeather?.((snapshot) => {
+      weatherLine = snapshot?.label ? `${snapshot.temperature}° · ${window.LastraI18n.t(snapshot.label)}` : '';
+      if (gate.idle) paint();
+    });
     api.onDeckAppearance((appearance) => {
       settings = appearance;
       gate.configure(appearance.idleScreenSeconds ?? 0);
