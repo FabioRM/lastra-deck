@@ -35,6 +35,18 @@ function animation(file, ...args) {
   return frames;
 }
 
+function appFocusAnimation(file) {
+  const directory = path.dirname(file);
+  const packs = ['claude', 'chatgpt-codex', 'chrome', 'explorer', 'photoshop'];
+  for (const [index, pack] of packs.entries()) {
+    preview(path.join(directory, `focus-${index}.png`), `--preview-pack=${pack}`);
+  }
+  run(ffmpeg, ['-hide_banner', '-loglevel', 'error', '-framerate', '2/5', '-start_number', '0',
+    '-i', path.join(directory, 'focus-%d.png'),
+    '-filter_complex', 'crop=1520:672:48:24,split[a][b];[a]palettegen[p];[b][p]paletteuse=dither=sierra2_4a:diff_mode=rectangle',
+    '-loop', '0', file]);
+}
+
 function refresh() {
   const temporaryRoot = fs.realpathSync(os.tmpdir());
   const staging = fs.mkdtempSync(path.join(temporaryRoot, 'lastra-previews-'));
@@ -70,11 +82,12 @@ function refresh() {
     fs.copyFileSync(path.join(demo, 'dashboard.png'), path.join(staging, 'preview-dashboard.png'));
     animation(path.join(staging, 'preview-shortcuts.gif'), ...shortcuts);
     animation(path.join(staging, 'preview-tools.gif'), '--preview-states', '--preview-break');
+    appFocusAnimation(path.join(staging, 'preview-app-focus.gif'));
 
     for (const file of ['preview-home.png', 'preview-vscode.png', 'preview-dashboard.png', 'preview-states.png',
       'preview-portrait.png', 'preview-stats.png', 'preview-shortcuts.png',
       'preview-toolbar.png', 'preview-tools.png', 'preview-pomodoro-break.png',
-      'preview-demo.gif', 'preview-shortcuts.gif', 'preview-tools.gif']) {
+      'preview-demo.gif', 'preview-shortcuts.gif', 'preview-tools.gif', 'preview-app-focus.gif']) {
       fs.copyFileSync(path.join(staging, file), path.join(root, 'docs', file));
       if (file.endsWith('.png')) fs.copyFileSync(path.join(staging, file), path.join(root, file));
     }
