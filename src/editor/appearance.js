@@ -121,7 +121,9 @@ window.bindLastraAppearance = function bindLastraAppearance(api, applyPreview) {
       status.classList.add('error');
     } finally {
       form.inert = false;
-      (target.disabled && target === resetAccent ? accent : target).focus({ preventScroll: true });
+      if (document.activeElement === document.body) {
+        (target.disabled && target === resetAccent ? accent : target).focus({ preventScroll: true });
+      }
     }
   }
   form.addEventListener('change', ({ target }) => {

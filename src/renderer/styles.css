@@ -878,3 +878,28 @@ button:focus-visible, input:focus-visible { outline: 3px solid var(--app); outli
 
 /* Keep the hold indicator visible in the demo preview. */
 .demo .key.holding .hold-bar { transition: none; transform: scaleX(0.6); }
+#panel-preview-controls:not([hidden]) {
+  position: fixed;
+  z-index: 20;
+  inset-inline: auto 12px;
+  inset-block: auto 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 7px 6px 14px;
+  border: 1px solid var(--control-border);
+  border-radius: 12px;
+  background: var(--panel-surface);
+  color: var(--text);
+  font: 600 16px/1.25 system-ui, sans-serif;
+}
+#panel-preview-close {
+  min-block-size: 44px;
+  padding-inline: 14px;
+  border: 1px solid var(--app);
+  border-radius: 8px;
+  background: var(--app);
+  color: var(--on-app);
+  font: inherit;
+  cursor: pointer;
+}

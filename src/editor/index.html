@@ -52,24 +52,63 @@
   </section>
   <main id="desktop-settings" aria-label="Settings">
     <nav id="desktop-settings-nav" aria-label="Settings categories">
-      <p class="settings-nav-label">Views</p>
-      <button type="button" data-settings-section="deck-shortcut-settings">Deck keys</button>
-      <button type="button" data-settings-section="dashboard-settings">Dashboard</button>
-      <button type="button" data-settings-section="stats-settings">Stats</button>
-      <button type="button" data-settings-section="feeds-settings-panel">Feeds</button>
-      <button type="button" data-settings-section="tool-settings">Tools</button>
-      <button type="button" data-settings-section="production-settings">OBS production</button>
-      <p class="settings-nav-label">Setup</p>
-      <button type="button" data-settings-section="appearance-settings">Display</button>
-      <button type="button" data-settings-section="system-settings">System</button>
+      <form id="settings-search-form" role="search" aria-label="Search settings">
+        <input id="settings-search" type="search" placeholder="Search settings" aria-label="Search settings" aria-controls="settings-search-results" aria-keyshortcuts="Control+F" autocomplete="off">
+      </form>
+      <div class="settings-nav-group">
+        <p class="settings-nav-label">Lastra</p>
+        <button type="button" data-settings-section="general-settings" aria-controls="general-settings">General</button>
+        <button type="button" data-settings-section="appearance-settings" aria-controls="appearance-settings">Display</button>
+        <button type="button" data-settings-section="behavior-settings" aria-controls="behavior-settings">Deck behavior</button>
+        <button type="button" data-settings-section="system-settings" aria-controls="system-settings">System</button>
+      </div>
+      <div class="settings-nav-group">
+        <p class="settings-nav-label">Views</p>
+        <button type="button" data-settings-section="deck-shortcut-settings" aria-controls="deck-shortcut-settings">Deck keys</button>
+        <button type="button" data-settings-section="dashboard-settings" aria-controls="dashboard-settings">Dashboard</button>
+        <button type="button" data-settings-section="stats-settings" aria-controls="stats-settings">Stats</button>
+        <button type="button" data-settings-section="feeds-settings-panel" aria-controls="feeds-settings-panel">Feeds</button>
+        <button type="button" data-settings-section="tool-settings" aria-controls="tool-settings">Tools</button>
+        <button type="button" data-settings-section="production-settings" aria-controls="production-settings">OBS production</button>
+      </div>
     </nav>
     <div id="desktop-settings-content">
-      <details class="profile" id="appearance-settings" data-settings-panel hidden>
-        <summary>Display</summary>
+      <section id="settings-search-results" aria-labelledby="settings-search-heading" hidden>
+        <div class="settings-page-heading"><h2 id="settings-search-heading">Search results</h2><p id="settings-search-status" class="muted" role="status"></p></div>
+        <ul id="settings-matches"></ul>
+      </section>
+      <section id="general-settings" data-settings-panel aria-labelledby="general-settings-heading">
+        <div class="settings-page-heading">
+          <h2 id="general-settings-heading" tabindex="-1">General</h2>
+          <p>Manage startup, language, and a copy of your Lastra configuration.</p>
+        </div>
+        <section class="deck-settings-card settings-option" aria-labelledby="startup-heading">
+          <div><h3 id="startup-heading" tabindex="-1">Startup</h3><p class="muted" id="startup-description">Start Lastra when you sign in to Windows and the XENEON EDGE is connected.</p></div>
+          <label class="check"><input id="windows-startup" type="checkbox" aria-describedby="startup-description" disabled>Start with Windows</label>
+          <p class="settings-status" id="startup-status" role="status"></p>
+        </section>
+        <section class="deck-settings-card settings-option" aria-labelledby="language-heading">
+          <div><h3 id="language-heading" tabindex="-1"><label for="interface-language">Interface language</label></h3><p class="muted">Applies to the desktop window and the deck.</p></div>
+          <select id="interface-language" disabled>
+            <option value="system">System language</option>
+            <option value="it" lang="it">Italiano</option>
+            <option value="en" lang="en">English</option>
+          </select>
+          <p class="settings-status" id="language-status" role="status"></p>
+        </section>
+        <section class="deck-settings-card settings-option" aria-labelledby="configuration-heading">
+          <div><h3 id="configuration-heading" tabindex="-1">Configuration backup</h3><p class="muted">Save your settings and activity profiles in one JSON file. Credentials stay on this PC.</p></div>
+          <button type="button" id="settings-export-configuration">Export configuration…</button>
+          <p class="settings-status" id="settings-export-status" role="status"></p>
+        </section>
+      </section>
+      <section id="appearance-settings" data-settings-panel aria-labelledby="appearance-settings-heading" hidden>
+        <div class="settings-page-heading"><h2 id="appearance-settings-heading" tabindex="-1">Display</h2><p>Choose the screen and tune the look of the deck. Appearance changes apply immediately.</p></div>
+        <div id="deck-display-settings" class="deck-behavior"></div>
+        <p id="appearance-status" class="settings-status" role="status"></p>
         <form id="appearance-controls" class="deck-settings" inert>
-          <p class="muted deck-settings-note">Changes apply immediately to the deck and its live preview.</p>
           <section class="deck-settings-card" aria-labelledby="display-settings-heading">
-            <h3 id="display-settings-heading">Display</h3>
+            <h3 id="display-settings-heading" tabindex="-1">Appearance</h3>
             <fieldset class="theme-palette">
               <legend>Theme</legend>
               <div id="theme-options" class="theme-options"></div>
@@ -83,7 +122,7 @@
             <label class="check"><input type="checkbox" name="largeKeys">Large Deck Keys</label>
           </section>
           <section class="deck-settings-card" aria-labelledby="clock-settings-heading">
-            <h3 id="clock-settings-heading">Clock and idle</h3>
+            <h3 id="clock-settings-heading" tabindex="-1">Clock and idle</h3>
             <div class="deck-settings-fields">
               <label class="field">Idle screen after<select name="idleScreenSeconds"></select></label>
               <label class="field">Night dimming<select name="screenDim"></select></label>
@@ -92,101 +131,110 @@
           </section>
           <section class="deck-settings-card deck-telemetry-settings" aria-labelledby="telemetry-settings-heading">
             <div class="deck-settings-heading">
-              <h3 id="telemetry-settings-heading">Telemetry</h3>
+              <h3 id="telemetry-settings-heading" tabindex="-1">Telemetry</h3>
               <label class="check"><input type="checkbox" name="showPercentSigns">Show percent signs</label>
             </div>
             <div id="appearance-readouts"></div>
           </section>
         </form>
-        <p id="appearance-status" role="status"></p>
+      </section>
+      <section id="behavior-settings" data-settings-panel aria-labelledby="behavior-settings-heading" hidden>
+        <div class="settings-page-heading"><h2 id="behavior-settings-heading" tabindex="-1">Deck behavior</h2><p>Choose the activity, navigation, and what stays within reach on the deck. Changes apply immediately.</p></div>
         <div id="deck-behavior" class="deck-behavior"></div>
-      </details>
-      <details class="profile" id="dashboard-settings" data-settings-panel hidden>
-        <summary>Dashboard</summary>
+      </section>
+      <section id="dashboard-settings" data-settings-panel aria-labelledby="dashboard-settings-heading" hidden>
+        <div class="settings-page-heading"><h2 id="dashboard-settings-heading" tabindex="-1">Dashboard</h2><p>Choose the calendar shown on the deck and what opens when you tap it.</p></div>
+        <div id="deck-calendar-settings" class="deck-behavior"></div>
         <section id="calendar-settings" class="deck-settings-card">
-          <h3>Dashboard calendar file</h3>
+          <h3 id="calendar-file-heading" tabindex="-1">Dashboard calendar file</h3>
           <div class="deck-settings-fields">
             <button type="button" id="settings-calendar-pick">Choose .ics file</button>
             <button type="button" id="settings-calendar-clear" disabled>Clear file</button>
           </div>
           <p id="settings-calendar-status" class="muted" role="status"></p>
         </section>
-      </details>
-      <details class="profile" id="feeds-settings-panel" data-settings-panel hidden>
-        <summary>Feeds</summary>
-        <section id="feeds-settings" class="deck-settings-card" aria-labelledby="feeds-settings-heading">
-          <h3 id="feeds-settings-heading">Feeds</h3>
-          <div class="feeds-toggles">
-            <label class="check"><input id="feeds-enabled" type="checkbox">Show Feeds</label>
-            <label class="check"><input id="feeds-dashboard" type="checkbox">Show Dashboard</label>
-            <label class="check"><input id="feeds-stats" type="checkbox">Show Stats</label>
-          </div>
-          <section class="feeds-block" aria-labelledby="feeds-weather-heading">
-            <h4 id="feeds-weather-heading">Weather</h4>
-            <div class="feeds-row">
-              <label class="field">Weather provider<select id="feeds-weather-provider">
-                <option value="open-meteo">Open-Meteo</option>
-                <option value="openweather">OpenWeather</option>
-              </select></label>
-              <label class="field">Weather API key<input id="feeds-weather-key" type="password" autocomplete="off"></label>
-              <button id="feeds-locate" type="button">Use current location</button>
+      </section>
+      <section id="feeds-settings-panel" data-settings-panel aria-labelledby="feeds-settings-heading" hidden>
+        <div class="settings-page-heading"><h2 id="feeds-settings-heading" tabindex="-1">Feeds</h2><p>Configure the visible deck views, weather, and market data. Use Save feeds to apply changes.</p></div>
+        <section id="feeds-settings" class="deck-settings-card" aria-label="Feeds options">
+          <fieldset id="feeds-fields" disabled aria-label="Feeds options">
+            <h3 id="feeds-views-heading" tabindex="-1">Visible views</h3>
+            <div class="feeds-toggles">
+              <label class="check"><input id="feeds-enabled" type="checkbox">Show Feeds</label>
+              <label class="check"><input id="feeds-dashboard" type="checkbox">Show Dashboard</label>
+              <label class="check"><input id="feeds-stats" type="checkbox">Show Stats</label>
             </div>
-            <div class="feeds-search">
-              <label class="field">City<input id="feeds-place-query" placeholder="Milan, Rome, New York" autocomplete="off"></label>
-              <ul id="feeds-place-results" class="feeds-results" hidden></ul>
-            </div>
-            <p id="feeds-place" class="feeds-selected" hidden></p>
-          </section>
-          <section class="feeds-block" aria-labelledby="feeds-quotes-heading">
-            <h4 id="feeds-quotes-heading">Quotes</h4>
-            <div class="feeds-row">
-              <label class="field">Quotes provider<select id="feeds-quotes-provider">
-                <option value="yahoo">Yahoo Finance</option>
-                <option value="stooq">Stooq</option>
-                <option value="finnhub">Finnhub</option>
-              </select></label>
-              <label class="field">Quotes API key<input id="feeds-quotes-key" type="password" autocomplete="off"></label>
-            </div>
-            <div class="feeds-search">
-              <label class="field">Search a symbol<input id="feeds-symbol-query" placeholder="Apple, AAPL, MSFT" autocomplete="off"></label>
-              <ul id="feeds-symbol-results" class="feeds-results" hidden></ul>
-            </div>
-            <ul id="feeds-symbol-list" class="feeds-chips"></ul>
-            <p id="feeds-symbol-count" class="muted"></p>
-          </section>
-          <section class="feeds-block" aria-labelledby="feeds-currency-heading">
-            <h4 id="feeds-currency-heading">Currencies</h4>
-            <div class="feeds-row">
-              <label class="field">Currency pair<input id="feeds-currency-query" placeholder="EURUSD" maxlength="6" autocomplete="off"></label>
-              <button id="feeds-currency-add" type="button">Add pair</button>
-            </div>
-            <ul id="feeds-currency-list" class="feeds-chips"></ul>
-            <p class="muted">Frankfurter supplies the rates and does not need a key. Quotes and currencies share 8 columns.</p>
-          </section>
-          <p class="muted">Deck Keys stays available. Dashboard, Stats and Feeds can be hidden from the view switch. Yahoo Finance search and quotes are free. Open-Meteo resolves a city name without a key.</p>
-          <button id="feeds-save" type="button">Save feeds</button>
-          <p id="feeds-status" role="status"></p>
+            <section class="feeds-block" aria-labelledby="feeds-weather-heading">
+              <h4 id="feeds-weather-heading" tabindex="-1">Weather</h4>
+              <div class="feeds-row">
+                <label class="field">Weather provider<select id="feeds-weather-provider">
+                  <option value="open-meteo">Open-Meteo</option>
+                  <option value="openweather">OpenWeather</option>
+                </select></label>
+                <label class="field">Weather API key<input id="feeds-weather-key" type="password" autocomplete="off"></label>
+                <button id="feeds-locate" type="button">Use current location</button>
+              </div>
+              <div class="feeds-search">
+                <label class="field">City<input id="feeds-place-query" placeholder="Milan, Rome, New York" autocomplete="off"></label>
+                <ul id="feeds-place-results" class="feeds-results" hidden></ul>
+              </div>
+              <p id="feeds-place" class="feeds-selected" hidden></p>
+            </section>
+            <section class="feeds-block" aria-labelledby="feeds-quotes-heading">
+              <h4 id="feeds-quotes-heading" tabindex="-1">Quotes</h4>
+              <div class="feeds-row">
+                <label class="field">Quotes provider<select id="feeds-quotes-provider">
+                  <option value="yahoo">Yahoo Finance</option>
+                  <option value="stooq">Stooq</option>
+                  <option value="finnhub">Finnhub</option>
+                </select></label>
+                <label class="field">Quotes API key<input id="feeds-quotes-key" type="password" autocomplete="off"></label>
+              </div>
+              <div class="feeds-search">
+                <label class="field">Search a symbol<input id="feeds-symbol-query" placeholder="Apple, AAPL, MSFT" autocomplete="off"></label>
+                <ul id="feeds-symbol-results" class="feeds-results" hidden></ul>
+              </div>
+              <p id="feeds-provider-hint" class="muted" hidden>Save the quotes provider before searching symbols.</p>
+              <ul id="feeds-symbol-list" class="feeds-chips"></ul>
+              <p id="feeds-symbol-count" class="muted"></p>
+            </section>
+            <section class="feeds-block" aria-labelledby="feeds-currency-heading">
+              <h4 id="feeds-currency-heading" tabindex="-1">Currencies</h4>
+              <div class="feeds-row">
+                <label class="field">Currency pair<input id="feeds-currency-query" placeholder="EURUSD" maxlength="6" autocomplete="off"></label>
+                <button id="feeds-currency-add" type="button">Add pair</button>
+              </div>
+              <ul id="feeds-currency-list" class="feeds-chips"></ul>
+              <p class="muted">Quotes and currency pairs share 8 columns. Currency rates do not need an API key.</p>
+            </section>
+          </fieldset>
+          <div class="settings-form-actions"><button id="feeds-save" type="button" class="primary" disabled>Save feeds</button><p id="feeds-status" class="settings-status" role="status"></p></div>
         </section>
-      </details>
-      <details class="profile" id="deck-shortcut-settings" data-settings-panel>
-        <summary>Deck keys</summary>
-        <p class="muted">Assign a function key or a combination such as Ctrl+Alt+Right. Clear a shortcut and apply to release it.</p>
-        <div id="deck-shortcut-rows"></div>
-        <p id="deck-shortcut-status" role="status"></p>
-      </details>
-      <details class="profile" id="tool-settings" data-settings-panel hidden>
-        <summary>Tools</summary>
+      </section>
+      <section id="deck-shortcut-settings" data-settings-panel aria-labelledby="deck-shortcut-settings-heading" hidden>
+        <div class="settings-page-heading"><h2 id="deck-shortcut-settings-heading" tabindex="-1">Deck keys</h2><p>Set shortcuts that control the deck from the keyboard.</p></div>
+        <section class="deck-settings-card" aria-labelledby="global-shortcuts-heading">
+          <h3 id="global-shortcuts-heading" tabindex="-1">Global keyboard shortcuts</h3>
+          <p class="muted">Assign a function key or a combination such as Ctrl+Alt+Right. Clear a shortcut and apply to release it.</p>
+          <div id="deck-shortcut-rows"></div>
+          <p id="deck-shortcut-status" class="settings-status" role="status"></p>
+        </section>
+      </section>
+      <section id="tool-settings" data-settings-panel aria-labelledby="tool-settings-heading" hidden>
+        <div class="settings-page-heading"><h2 id="tool-settings-heading" tabindex="-1">Tools</h2><p>Customize the choices used by Quick Decision on the deck.</p></div>
         <form id="tool-choices-form" class="deck-settings-card" inert>
           <label class="field">Quick decision pick list
             <textarea name="choices" rows="4" maxlength="600" required></textarea>
           </label>
-          <button type="submit">Save pick list</button>
-          <p id="tool-choices-status" role="status"></p>
+          <p class="muted">Enter one choice per line.</p>
+          <div class="settings-form-actions"><button type="submit" class="primary">Save pick list</button><p id="tool-choices-status" class="settings-status" role="status"></p></div>
         </form>
-      </details>
-      <details class="profile" id="stats-settings" data-settings-panel hidden>
-        <summary>Stats</summary>
+      </section>
+      <section id="stats-settings" data-settings-panel aria-labelledby="stats-settings-heading" hidden>
+        <div class="settings-page-heading"><h2 id="stats-settings-heading" tabindex="-1">Stats</h2><p>Choose what the Stats view shows and how often Lastra collects readings.</p></div>
+        <p id="stats-settings-load" class="settings-status" role="status"></p>
         <form id="stats-settings-form" class="deck-settings-card" inert>
+          <h3 id="stats-overview-heading" tabindex="-1">Stats layout</h3>
           <div class="deck-settings-fields">
             <label class="field">Stats layout<select name="layout"></select></label>
             <label class="field">Chart style<select name="style"></select></label>
@@ -211,20 +259,20 @@
             <button id="stats-settings-refresh" type="button">Refresh readings</button>
             <button type="submit" class="primary">Save Stats settings</button>
           </div>
-          <p id="stats-settings-status" role="status"></p>
+          <p id="stats-settings-status" class="settings-status" role="status"></p>
         </form>
-        <p id="stats-settings-load" class="muted" role="status"></p>
         <div id="stats-maintenance" class="maintenance"></div>
         <form id="grafana-settings-form" class="deck-settings-card" inert>
-          <label class="field">Grafana dashboard URL
-            <input type="url" name="url" maxlength="2048" spellcheck="false" autocomplete="off">
-          </label>
-          <button type="submit">Save Grafana link</button>
-          <p id="grafana-settings-status" class="muted" role="status"></p>
+          <h3 id="grafana-heading" tabindex="-1"><label for="grafana-url">Grafana dashboard URL</label></h3>
+          <div class="deck-settings-fields">
+            <input id="grafana-url" type="url" name="url" maxlength="2048" spellcheck="false" autocomplete="off">
+            <button type="submit" class="primary">Save Grafana link</button>
+          </div>
+          <p id="grafana-settings-status" class="settings-status" role="status"></p>
         </form>
-      </details>
-      <details class="profile" id="production-settings" data-settings-panel hidden>
-        <summary>OBS production</summary>
+      </section>
+      <section id="production-settings" data-settings-panel aria-labelledby="production-settings-heading" hidden>
+        <div class="settings-page-heading"><h2 id="production-settings-heading" tabindex="-1">OBS production</h2><p>Manage the OBS controls and production cues shown on the deck.</p></div>
         <div class="desktop-production">
           <section class="deck-settings-card">
             <label class="check"><input id="settings-obs-enabled" type="checkbox" disabled>Show OBS controls on the deck</label>
@@ -233,9 +281,9 @@
           <section id="desktop-production-timers" class="deck-settings-card"><h3>Countdown and rundown</h3></section>
           <section id="desktop-production-modes" class="deck-settings-card"><h3>Production modes</h3></section>
         </div>
-      </details>
-      <details class="profile" id="system-settings" data-settings-panel hidden>
-        <summary>System</summary>
+      </section>
+      <section id="system-settings" data-settings-panel aria-labelledby="system-settings-heading" hidden>
+        <div class="settings-page-heading"><h2 id="system-settings-heading" tabindex="-1">System</h2><p>Check for updates, connect services, manage agent access, and troubleshoot Lastra.</p></div>
         <section class="deck-settings-card" id="desktop-updates" data-update-controls data-update-settings aria-labelledby="desktop-updates-heading">
           <div class="deck-settings-heading">
             <h3 id="desktop-updates-heading" tabindex="-1">Updates</h3>
@@ -251,21 +299,12 @@
           </div>
         </section>
         <section class="deck-settings-card">
-          <label class="field" for="interface-language">Interface language</label>
-          <select id="interface-language" disabled>
-            <option value="system">System language</option>
-            <option value="it" lang="it">Italiano</option>
-            <option value="en" lang="en">English</option>
-          </select>
-          <p class="muted" id="language-status" role="status"></p>
-        </section>
-        <section class="deck-settings-card">
-          <h3>Integration setup</h3>
+          <h3 id="integrations-heading" tabindex="-1">Integration setup</h3>
           <p class="muted">Connect the services Lastra can read from this PC.</p>
           <div class="deck-settings-fields"><button type="button" id="settings-integrations">Open integration setup</button></div>
         </section>
         <div id="system-maintenance" class="maintenance"></div>
-      </details>
+      </section>
     </div>
   </main>
   <main id="workspace" aria-label="Profile editor" inert hidden>
@@ -292,6 +331,14 @@
       <div class="canvas-heading">
         <div><h2 id="editor-page-name"></h2><p id="editor-page-size" class="muted"></p></div>
         <div id="page-actions"></div>
+      </div>
+      <div class="panel-preview-tools">
+        <div>
+          <button id="copy-xeneon-page" type="button" disabled>Edit current Deck Keys</button>
+          <button id="show-xeneon-preview" class="primary" type="button" aria-pressed="false" disabled>Preview on XENEON</button>
+        </div>
+        <p class="muted">Work on a copy, then save to apply it to the deck.</p>
+        <p id="xeneon-preview-status" class="settings-status" role="status"></p>
       </div>
       <p id="status" role="status"></p>
       <div class="editor-canvas">

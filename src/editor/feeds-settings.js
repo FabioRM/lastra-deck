@@ -8,6 +8,8 @@ window.bindLastraFeeds = function bindLastraFeeds(api) {
   const symbolList = byId('feeds-symbol-list');
   const symbolCount = byId('feeds-symbol-count');
   const currencyList = byId('feeds-currency-list');
+  const editor = byId('feeds-fields');
+  const saveButton = byId('feeds-save');
   const boardLimit = 8;
   if (!byId('feeds-enabled') || !api.getFeeds) return;
 
@@ -25,6 +27,27 @@ window.bindLastraFeeds = function bindLastraFeeds(api) {
   let pairs = [];
   let placeTimer = 0;
   let symbolTimer = 0;
+  let placeRequest = 0;
+  let symbolRequest = 0;
+  let loaded = false;
+  let loading = false;
+  let savedQuotesProvider;
+
+  function report(message, error = false) {
+    status.textContent = t(message);
+    status.classList.toggle('error', error);
+  }
+
+  function updateKeyFields() {
+    fields.weatherKey.disabled = fields.weatherProvider.value !== 'openweather';
+    fields.quotesKey.disabled = fields.quotesProvider.value !== 'finnhub';
+  }
+
+  function updateSymbolField() {
+    const changePending = fields.quotesProvider.value !== savedQuotesProvider;
+    byId('feeds-provider-hint').hidden = !changePending;
+    fields.symbolQuery.disabled = changePending || symbols.length + pairs.length >= boardLimit;
+  }
 
   function chip(text, remove) {
     const item = document.createElement('li');
@@ -52,7 +75,7 @@ window.bindLastraFeeds = function bindLastraFeeds(api) {
       paintLists();
     })));
     const full = symbols.length + pairs.length >= boardLimit;
-    fields.symbolQuery.disabled = full;
+    updateSymbolField();
     byId('feeds-currency-add').disabled = full;
   }
 
@@ -63,9 +86,11 @@ window.bindLastraFeeds = function bindLastraFeeds(api) {
     fields.weatherProvider.value = settings.weather.provider;
     fields.weatherKey.value = '';
     fields.weatherKey.placeholder = settings.weather.hasKey ? t('Saved API key') : t('Only for OpenWeather');
-    fields.quotesProvider.value = settings.quotes.provider || 'yahoo';
+    savedQuotesProvider = settings.quotes.provider || 'yahoo';
+    fields.quotesProvider.value = savedQuotesProvider;
     fields.quotesKey.value = '';
     fields.quotesKey.placeholder = settings.quotes.hasKey ? t('Saved API key') : t('Only for Finnhub');
+    updateKeyFields();
     place = settings.weather.latitude == null ? null : {
       name: settings.weather.place || t('Saved location'),
       latitude: settings.weather.latitude,
@@ -91,7 +116,12 @@ window.bindLastraFeeds = function bindLastraFeeds(api) {
   }
 
   async function save() {
-    status.textContent = '';
+    if (editor.disabled) return;
+    editor.disabled = saveButton.disabled = true;
+    placeRequest++;
+    symbolRequest++;
+    fields.placeResults.hidden = fields.symbolResults.hidden = true;
+    report('Saving Feeds…');
     const weather = {
       provider: fields.weatherProvider.value,
       latitude: place?.latitude ?? '',
@@ -99,8 +129,8 @@ window.bindLastraFeeds = function bindLastraFeeds(api) {
       place: place?.name ?? '',
     };
     const quotes = { provider: fields.quotesProvider.value, symbols, labels };
-    if (fields.weatherKey.value.trim()) weather.apiKey = fields.weatherKey.value;
-    if (fields.quotesKey.value.trim()) quotes.apiKey = fields.quotesKey.value;
+    if (!fields.weatherKey.disabled && fields.weatherKey.value.trim()) weather.apiKey = fields.weatherKey.value;
+    if (!fields.quotesKey.disabled && fields.quotesKey.value.trim()) quotes.apiKey = fields.quotesKey.value;
     try {
       const saved = await api.setFeeds({
         enabled: fields.enabled.checked,
@@ -108,61 +138,106 @@ window.bindLastraFeeds = function bindLastraFeeds(api) {
         weather, quotes, currencies: { pairs },
       });
       show(saved);
-      status.textContent = t('Feeds saved.');
+      report('Feeds saved.');
     } catch (error) {
-      status.textContent = error.message;
+      report(error.message || 'Could not save Feeds.', true);
+    } finally {
+      editor.disabled = saveButton.disabled = false;
+      if (document.activeElement === document.body) saveButton.focus({ preventScroll: true });
     }
   }
 
+  fields.weatherProvider.addEventListener('change', updateKeyFields);
+  fields.quotesProvider.addEventListener('change', () => {
+    symbolRequest++;
+    clearTimeout(symbolTimer);
+    fields.symbolResults.hidden = true;
+    updateKeyFields();
+    updateSymbolField();
+  });
   fields.placeQuery.addEventListener('input', () => {
     clearTimeout(placeTimer);
+    const request = ++placeRequest;
     const query = fields.placeQuery.value.trim();
-    if (query.length < 2) { fields.placeResults.hidden = true; return; }
+    fields.placeResults.hidden = true;
+    report('');
+    if (query.length < 2) return;
     placeTimer = setTimeout(async () => {
-      try { results(fields.placeResults, await api.searchFeedPlaces(query), (item) => {
-        place = item;
-        fields.placeQuery.value = '';
-        fields.placeResults.hidden = true;
-        paintLists();
-      }); }
-      catch (error) { status.textContent = error.message; }
+      try {
+        const items = await api.searchFeedPlaces(query);
+        if (request !== placeRequest) return;
+        results(fields.placeResults, items, (item) => {
+          place = item;
+          fields.placeQuery.value = '';
+          fields.placeResults.hidden = true;
+          paintLists();
+          fields.placeQuery.focus();
+        });
+      } catch (error) { if (request === placeRequest) report(error.message, true); }
     }, 250);
   });
   byId('feeds-locate').addEventListener('click', async () => {
-    status.textContent = t('Finding the current location…');
+    const request = ++placeRequest;
+    clearTimeout(placeTimer);
+    fields.placeResults.hidden = true;
+    report('Finding the current location…');
     try {
-      place = await api.locateFeeds();
-      status.textContent = '';
+      const next = await api.locateFeeds();
+      if (request !== placeRequest) return;
+      place = next;
+      fields.placeQuery.value = '';
+      report('');
       paintLists();
-    } catch (error) { status.textContent = error.message; }
+    } catch (error) { if (request === placeRequest) report(error.message, true); }
   });
   fields.symbolQuery.addEventListener('input', () => {
     clearTimeout(symbolTimer);
+    const request = ++symbolRequest;
     const query = fields.symbolQuery.value.trim();
-    if (!query) { fields.symbolResults.hidden = true; return; }
+    fields.symbolResults.hidden = true;
+    report('');
+    if (!query) return;
     symbolTimer = setTimeout(async () => {
-      try { results(fields.symbolResults, await api.searchFeedSymbols(query), (item) => {
-        if (symbols.length + pairs.length >= boardLimit || symbols.includes(item.symbol)) return;
-        symbols.push(item.symbol);
-        labels[item.symbol] = item.name;
-        fields.symbolQuery.value = '';
-        fields.symbolResults.hidden = true;
-        paintLists();
-      }); }
-      catch (error) { status.textContent = error.message; }
+      try {
+        const items = await api.searchFeedSymbols(query);
+        if (request !== symbolRequest) return;
+        results(fields.symbolResults, items, (item) => {
+          if (symbols.length + pairs.length >= boardLimit || symbols.includes(item.symbol)) return;
+          symbols.push(item.symbol);
+          labels[item.symbol] = item.name;
+          fields.symbolQuery.value = '';
+          fields.symbolResults.hidden = true;
+          paintLists();
+          (fields.symbolQuery.disabled ? saveButton : fields.symbolQuery).focus();
+        });
+      } catch (error) { if (request === symbolRequest) report(error.message, true); }
     }, 250);
   });
   byId('feeds-currency-add').addEventListener('click', () => {
     const pair = fields.currencyQuery.value.trim().toUpperCase();
     if (!/^[A-Z]{6}$/.test(pair) || pairs.includes(pair) || symbols.length + pairs.length >= boardLimit) {
-      status.textContent = t('Enter a currency pair such as EURUSD.');
+      report(pairs.includes(pair) ? 'This currency pair is already on the deck.' : 'Enter a currency pair such as EURUSD.', true);
       return;
     }
     pairs.push(pair);
     fields.currencyQuery.value = '';
-    status.textContent = '';
+    report('');
     paintLists();
   });
-  byId('feeds-save').addEventListener('click', () => { void save(); });
-  api.getFeeds().then(show).catch((error) => { status.textContent = error.message; });
+  saveButton.addEventListener('click', () => void save());
+  byId('feeds-settings-panel').addEventListener('settings:open', async () => {
+    if (loaded || loading) return;
+    loading = true;
+    report('Loading Feeds settings…');
+    try {
+      show(await api.getFeeds());
+      loaded = true;
+      editor.disabled = saveButton.disabled = false;
+      report('');
+    } catch (error) {
+      report(error.message || 'Could not load Feeds settings.', true);
+    } finally {
+      loading = false;
+    }
+  });
 };

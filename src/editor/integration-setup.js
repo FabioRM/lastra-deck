@@ -4,7 +4,7 @@
   const { element, button } = window.LastraDom;
   const api = window.lastraEditor;
   const dialog = document.getElementById('integration-setup');
-  const trigger = document.getElementById('integration-setup-open');
+  const triggers = ['integration-setup-open', 'settings-integrations'].map((id) => document.getElementById(id));
   const refresh = dialog.querySelector('[data-setup-refresh]');
   const close = dialog.querySelector('[data-setup-close]');
   const status = dialog.querySelector('[data-setup-status]');
@@ -81,13 +81,14 @@
     }
   }
 
-  trigger.addEventListener('click', () => {
+  function open() {
     if (dialog.open) return;
     result = undefined;
     render();
     dialog.showModal();
     void load();
-  });
+  }
+  for (const trigger of triggers) trigger.addEventListener('click', open);
   refresh.addEventListener('click', load);
   close.addEventListener('click', () => dialog.close());
   dialog.addEventListener('close', () => { revision++; });

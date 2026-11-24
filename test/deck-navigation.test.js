@@ -7,7 +7,8 @@ const { test } = require('node:test');
 const { DeckNavigation } = require('../src/main/deck-navigation');
 const { tempDir } = require('./helpers/temp-dir');
 
-const defaults = { view: 'dashboard', page: null, locked: false, calendar: 'none', activity: 'main', activityPages: {}, desktopRevealGesture: false, contextReturn: 'manual' };
+const defaults = { view: 'dashboard', page: null, locked: false, calendar: 'none', activity: 'main', activityPages: {},
+  desktopRevealGesture: false, contextReturn: 'manual', preferredDisplay: null };
 
 function fixture(t) {
   const directory = tempDir(t, 'lastra-navigation-');
@@ -67,6 +68,20 @@ test('a Dashboard calendar choice persists and accepts only registered targets',
   assert.throws(() => navigation.setCalendar('https://example.test'), /Unknown calendar/);
   navigation.setCalendar('none');
   assert.equal(new DeckNavigation(file).current.calendar, 'none');
+});
+
+test('the preferred display survives restart and can return to automatic detection', (t) => {
+  const file = fixture(t);
+  let navigation = new DeckNavigation(file);
+  assert.equal(navigation.current.preferredDisplay, null);
+  navigation.setPreferredDisplay('-135789');
+  navigation = new DeckNavigation(file);
+  assert.equal(navigation.current.preferredDisplay, '-135789');
+  assert.throws(() => navigation.setPreferredDisplay('unknown'), /Unknown deck display/);
+  navigation.setPreferredDisplay(null);
+  assert.equal(new DeckNavigation(file).current.preferredDisplay, null);
+  fs.writeFileSync(file, JSON.stringify({ version: 1, preferredDisplay: { id: '1' } }));
+  assert.equal(new DeckNavigation(file).current.preferredDisplay, null);
 });
 
 test('each activity retains its own manual page and page lock, including the legacy Main page', (t) => {

@@ -10,6 +10,7 @@
   } else {
     let state = null;
     let busy = false;
+    let latestRead = 0;
 
     const text = (value) => String(value).replace(/[&<>]/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[char]));
     const attr = (value) => text(value).replace(/"/g, '&quot;');
@@ -25,14 +26,14 @@
         ? `<div class="deck-checks">${state.watchlist.map((item) =>
           `<label class="check"><input type="checkbox" data-command="watch" data-id="${attr(item.id)}"${item.pinned ? ' checked' : ''}>${text(t(item.label))}</label>`).join('')}</div>`
         : `<p class="muted">${text(t('No readings available.'))}</p>`;
-      return `<section class="deck-settings-card"><h3>${text(t('Local Stats history'))}</h3><label class="field">${text(t('Keep local history'))}<select data-command="history">${history}</select></label></section>
+      return `<section class="deck-settings-card"><h3 id="stats-history-heading" tabindex="-1">${text(t('Local Stats history'))}</h3><label class="field">${text(t('Keep local history'))}<select data-command="history">${history}</select></label></section>
         <p id="stats-maintenance-status" class="muted" role="status"></p>
-        <section class="deck-settings-card"><h3>${text(t('Refresh intervals'))}</h3><div class="deck-settings-fields">${intervals || `<p class="muted">${text(t('Refresh intervals are unavailable.'))}</p>`}</div></section>
-        <section class="deck-settings-card"><h3>${text(t('Watchlist readings'))}</h3>${watches}</section>`;
+        <section class="deck-settings-card"><h3 id="stats-refresh-heading" tabindex="-1">${text(t('Refresh intervals'))}</h3><div class="deck-settings-fields">${intervals || `<p class="muted">${text(t('Refresh intervals are unavailable.'))}</p>`}</div></section>
+        <section class="deck-settings-card"><h3 id="stats-watch-heading" tabindex="-1">${text(t('Watchlist readings'))}</h3>${watches}</section>`;
     }
 
     function agentMarkup(agent) {
-      if (!agent) return `<section class="deck-settings-card"><h3>${text(t('Agent access'))}</h3><p class="muted">${text(t('Agent access is unavailable.'))}</p></section>`;
+      if (!agent) return `<section class="deck-settings-card"><h3 id="agent-access-heading" tabindex="-1">${text(t('Agent access'))}</h3><p class="muted">${text(t('Agent access is unavailable.'))}</p></section>`;
       const grants = `<optgroup label="${attr(t('Grant access'))}">${agent.grants.map((item) => option(item.id, item.label, false)).join('')}</optgroup>`
         + `<optgroup label="${attr(t('Grant for 15 minutes'))}">${agent.temporary.map((item) => option(item.id, item.label, false)).join('')}</optgroup>`;
       const projects = agent.projects.map((item) => option(`${item.id}:${item.revision}`, item.name, false)).join('');
@@ -41,7 +42,7 @@
         return `<li><div><strong>${text(t('Agent {id}', { id: client.short }))} · ${text(t(client.online ? 'Connected' : 'Offline'))}</strong><span class="muted">${text(client.summary)}</span>${client.project ? `<span class="muted">${text(client.project)}</span>` : ''}${when}</div><button type="button" data-command="revoke" data-id="${attr(client.id)}">${text(t('Revoke access'))}</button></li>`;
       }).join('')}</ul>` : `<p class="muted">${text(t('No agent clients.'))}</p>`;
       return `<section class="deck-settings-card" aria-labelledby="agent-access-heading">
-        <h3 id="agent-access-heading">${text(t('Agent access'))}</h3>
+        <h3 id="agent-access-heading" tabindex="-1">${text(t('Agent access'))}</h3>
         <p class="muted">${agent.locked ? text(t('Windows session unavailable')) : text(t('{count} connected', { count: agent.connected }))}</p>
         <label class="check"><input type="checkbox" data-command="agent-enabled"${agent.enabled ? ' checked' : ''}>${text(t('Enable local agent access'))}</label>
         <label class="check"><input type="checkbox" data-command="agent-paused"${agent.paused ? ' checked' : ''}${agent.enabled ? '' : ' disabled'}>${text(t('Pause agent access'))}</label>
@@ -68,7 +69,7 @@
             <button type="button" data-command="measure" data-phase="active"${measure}>${text(t('Record active (60 seconds)'))}</button>
           </div>` : '';
       return `${agentMarkup(state.agent)}
-        <section class="deck-settings-card"><h3>${text(t('Diagnostics'))}</h3>
+        <section class="deck-settings-card"><h3 id="diagnostics-heading" tabindex="-1">${text(t('Diagnostics'))}</h3>
           <div class="deck-settings-fields">${touch}
             <button type="button" data-command="export-diagnostics">${text(t('Export diagnostics…'))}</button>
             <button type="button" data-command="reload">${text(t('Reload interface'))}</button>
@@ -76,7 +77,7 @@
           </div>
           ${measurement}
         </section>
-        <section class="deck-settings-card"><h3>${text(t('Profile files'))}</h3>
+        <section class="deck-settings-card"><h3 id="profile-files-heading" tabindex="-1">${text(t('Profile files'))}</h3>
           <div class="deck-settings-fields">
             <button type="button" data-command="open-profile">${text(t('Open profile JSON'))}</button>
             <button type="button" data-command="show-profile">${text(t('Show profile in folder'))}</button>
@@ -86,18 +87,38 @@
     }
 
     function render() {
+      const focus = document.activeElement;
+      const root = [statsRoot, systemRoot].find((container) => container.contains(focus));
+      const keys = ['command', 'id', 'source', 'phase'];
+      const choices = ['[data-command="grant-choice"]', '[data-command="project-choice"]'];
+      const values = choices.map((selector) => systemRoot.querySelector(selector)?.value);
       statsRoot.innerHTML = statsMarkup();
       systemRoot.innerHTML = systemMarkup();
+      choices.forEach((selector, index) => {
+        const select = systemRoot.querySelector(selector);
+        if (select && [...select.options].some(({ value }) => value === values[index])) select.value = values[index];
+      });
+      if (!root) return;
+      const replacement = focus.id ? document.getElementById(focus.id) : [...root.querySelectorAll('[data-command]')]
+        .find((candidate) => keys.every((key) => candidate.dataset[key] === focus.dataset[key]));
+      replacement?.focus({ preventScroll: true });
     }
 
     async function apply(command, statusId) {
       if (busy) return;
       busy = true;
+      latestRead++;
+      statsRoot.setAttribute('aria-busy', 'true');
+      systemRoot.setAttribute('aria-busy', 'true');
       const status = document.getElementById(statusId);
       if (status) status.textContent = '';
       try {
         state = await api.setMaintenance(command);
         render();
+        if (['history', 'interval', 'watch', 'agent-enabled', 'agent-paused'].includes(command.type)) {
+          const next = document.getElementById(statusId);
+          if (next) next.textContent = t('Deck settings saved.');
+        }
       } catch (error) {
         const message = error.message || t('Could not update these settings.');
         render();
@@ -105,11 +126,17 @@
         if (next) next.textContent = message;
       } finally {
         busy = false;
+        statsRoot.removeAttribute('aria-busy');
+        systemRoot.removeAttribute('aria-busy');
       }
     }
 
     function onChange(event) {
       const control = event.target;
+      if (busy) {
+        if (control.type === 'checkbox') control.checked = !control.checked;
+        return;
+      }
       const command = control.dataset?.command;
       if (command === 'history') void apply({ type: 'history', hours: Number(control.value) }, 'stats-maintenance-status');
       else if (command === 'interval') void apply({ type: 'interval', source: control.dataset.source, intervalMs: Number(control.value) }, 'stats-maintenance-status');
@@ -140,14 +167,19 @@
 
     window.LastraMaintenance = {
       refresh() {
+        if (busy) return;
+        const request = ++latestRead;
         return api.maintenance().then((snapshot) => {
+          if (busy || request !== latestRead || JSON.stringify(snapshot) === JSON.stringify(state)) return;
           state = snapshot;
           render();
         }).catch((error) => {
+          if (busy || request !== latestRead || state) return;
           systemRoot.textContent = error.message || t('Could not update these settings.');
         });
       },
     };
+    document.addEventListener('lastra-language', () => { if (state && !busy) render(); });
     void window.LastraMaintenance.refresh();
   }
 }

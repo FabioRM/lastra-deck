@@ -8,7 +8,7 @@
   const { searchSensors } = window.LastraSensorBinding;
   const { CHART_STYLES, STATS_LAYOUTS } = window.LastraStatsChart;
   const byId = (id) => document.getElementById(id);
-  const details = byId('stats-settings');
+  const panel = byId('stats-settings');
   const form = byId('stats-settings-form');
   const list = byId('stats-settings-readings');
   const board = byId('stats-overview-board');
@@ -24,6 +24,7 @@
   const sample = graph(t('Sample of the selected Stats chart style'));
   byId('stats-chart-sample').append(sample.element);
   let settings;
+  let loading = false;
   let selection = new Set();
   let wide = null;
   let series = new Map();
@@ -190,6 +191,8 @@
   }
 
   async function load({ keepDraft = false } = {}) {
+    if (loading) return;
+    loading = true;
     form.inert = true;
     loadStatus.textContent = window.LastraI18n.t('Reading available sensors…');
     try {
@@ -211,11 +214,12 @@
     } catch {
       loadStatus.textContent = window.LastraI18n.t('Could not read Stats settings. Reopen this section to retry.');
     } finally {
+      loading = false;
       form.inert = !settings;
     }
   }
 
-  details.addEventListener('toggle', () => { if (details.open && !settings) void load(); });
+  panel.addEventListener('settings:open', () => { if (!settings) void load(); });
   style.addEventListener('change', updateChart);
   search.addEventListener('input', renderList);
   seriesSearch.addEventListener('input', renderSeries);

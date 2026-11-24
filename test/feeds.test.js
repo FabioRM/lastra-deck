@@ -6,6 +6,7 @@ const os = require('node:os');
 const path = require('node:path');
 const test = require('node:test');
 const { Feeds } = require('../src/main/feeds');
+const { tempDir } = require('./helpers/temp-dir');
 
 function directory() {
   return fs.mkdtempSync(path.join(os.tmpdir(), 'lastra-feeds-'));
@@ -56,4 +57,30 @@ test('feeds chooses a weather provider, keeps the API key out of the deck snapsh
   const capped = feeds.setSettings({ quotes: { provider: 'yahoo', symbols: Array.from({ length: 20 }, (_, index) => `S${index}`), labels: { S0: 'First' } } });
   assert.equal(capped.quotes.symbols.length, 12);
   assert.equal(capped.quotes.labels.S0, 'First');
+});
+
+test('a refresh started before saving Feeds cannot replace readings for the saved configuration', async (t) => {
+  let startOldRequest;
+  let finishOldRequest;
+  const oldStarted = new Promise((resolve) => { startOldRequest = resolve; });
+  const oldResponse = new Promise((resolve) => { finishOldRequest = resolve; });
+  const response = (price) => ({ ok: true, json: async () => ({ chart: { result: [{ meta: { regularMarketPrice: price } }] } }) });
+  const feeds = new Feeds(path.join(tempDir(t, 'lastra-feeds-'), 'feeds.json'), {
+    fetch: async (url) => {
+      if (url.pathname.includes('EURUSD')) {
+        startOldRequest();
+        return oldResponse;
+      }
+      return response(0.84);
+    },
+  });
+  feeds.setSettings({ currencies: { pairs: ['EURUSD'] } });
+  const first = feeds.refresh();
+  await oldStarted;
+  feeds.setSettings({ currencies: { pairs: ['EURGBP'] } });
+  await feeds.refresh();
+  finishOldRequest(response(1.08));
+  await first;
+  assert.equal(feeds.snapshot().currencies.rows[0].pair, 'EURGBP');
+  assert.equal(feeds.snapshot().currencies.rows[0].rate, 0.84);
 });

@@ -28,6 +28,8 @@ const { isRetiredStockPageId } = require('./retired-stock-pages');
 const { profileTemplates } = require('./profile-templates');
 const { declarePreviewScheme, servePreviewAssets } = require('./preview-protocol');
 const { previewAudio, previewSensors, previewStats, previewObs, PreviewMedia } = require('./editor-preview-state');
+const { copyVisiblePage, panelDraftView } = require('./panel-preview-layout');
+const { sensorIds } = require('../shared/sensor-binding');
 const { decodeEditorClipboard, encodeEditorClipboard } = require('./editor-clipboard');
 const { encodeExchange, prepareExchange, suggestedName, readExchangeFile, writeExchangeFile } = require('./profile-exchange');
 const { readStreamDeckProfile } = require('./stream-deck-import');
@@ -167,6 +169,7 @@ const { createUpdater } = require('./updater');
 
 const ROOT = path.join(__dirname, '..', '..');
 const RENDERER = path.join(ROOT, 'src', 'renderer', 'index.html');
+const PANEL_PREVIEW_PRELOAD = path.join(ROOT, 'src', 'preload', 'panel-preview.js');
 const PRELOAD = path.join(ROOT, 'src', 'preload', 'preload.js');
 const EDITOR = path.join(ROOT, 'src', 'editor', 'index.html');
 const EDITOR_PRELOAD = path.join(ROOT, 'src', 'preload', 'editor.js');
@@ -276,6 +279,10 @@ let agentChoices = null;
 let agentActivitySwitch = null;
 let agentRuns = null;
 let editorProfile = null;
+/** @type {BrowserWindow | null} */
+let panelPreviewWindow = null;
+let panelPreviewFrame;
+let panelPreviewRevision = 0;
 const pages = new Pages();
 const keyPresses = new KeyPresses();
 const FLOW_PROGRESS_TYPES = new Set(['sequence', 'repeat', 'if', 'choose', 'random', 'delay', 'wait-for']);
@@ -538,6 +545,77 @@ function deckDisplay() {
   return opts.windowed ? null : findEdgeDisplay(screen.getAllDisplays(), preferredDisplay, process.platform);
 }
 
+function previewReadings(selectedSensors = []) {
+  return {
+    audio: previewAudio(liveAudio),
+    obs: previewObs(obs?.view),
+    sensors: { ...previewSensors(liveSensors, sensors?.history.series),
+      sensorWidgets: sensorWidgets.snapshot(checkedSensorIds(selectedSensors)) },
+    media: previewMedia.snapshot(Date.now(), Math.max(3_500, (monitoring?.intervals.media ?? 1_000) * 2)),
+  };
+}
+
+function notifyPanelPreview(open) {
+  if (editor && !editor.isDestroyed() && !editor.webContents.isCrashed()) editor.webContents.send('editor:panel-preview', open);
+}
+
+function closePanelPreview() {
+  if (panelPreviewWindow && !panelPreviewWindow.isDestroyed()) panelPreviewWindow.destroy();
+}
+
+function updatePanelPreviewBounds() {
+  if (!panelPreviewWindow) return;
+  const display = findEdgeDisplay(screen.getAllDisplays(), null, process.platform);
+  if (!display) closePanelPreview();
+  else panelPreviewWindow.setBounds(display.bounds);
+}
+
+function changePanelPreview(command) {
+  if (command?.type === 'close') {
+    closePanelPreview();
+    return false;
+  }
+  if (command?.type !== 'show' && command?.type !== 'update') throw new Error('Choose a preview action.');
+  if (command.type === 'update' && !panelPreviewWindow) return false;
+  const display = findEdgeDisplay(screen.getAllDisplays(), null, process.platform);
+  if (!display || edgeExit || deckSession.blocked || deckReveal.active) {
+    closePanelPreview();
+    throw new Error('Connect and unlock the XENEON EDGE to show the draft preview.');
+  }
+  const view = panelDraftView(command.profile, command.page, command.sheet, { icon: lucideIcon, image: imageDataUrl });
+  const previous = panelPreviewWindow;
+  panelPreviewFrame = { type: 'lastra:editor-preview', language: interfaceLanguage.language, appearance: appearance.current,
+    view: { ...view, revision: ++panelPreviewRevision }, readings: previewReadings(sensorIds([...view.widgets, ...view.bar.widgets])) };
+  if (previous) {
+    if (!previous.webContents.isLoadingMainFrame()) previous.webContents.send('panel-preview:update', panelPreviewFrame);
+    return true;
+  }
+  const overlay = new BrowserWindow({ ...display.bounds, show: false, frame: false, focusable: false,
+    alwaysOnTop: true, skipTaskbar: true, resizable: false, movable: false, minimizable: false,
+    maximizable: false, fullscreenable: false, hasShadow: false, backgroundColor: BACKGROUND,
+    webPreferences: { ...webPreferences, preload: PANEL_PREVIEW_PRELOAD } });
+  panelPreviewWindow = overlay;
+  overlay.setAlwaysOnTop(true, 'screen-saver');
+  lockDown(overlay.webContents);
+  overlay.once('closed', () => {
+    if (panelPreviewWindow !== overlay) return;
+    panelPreviewWindow = null;
+    panelPreviewFrame = null;
+    notifyPanelPreview(false);
+  });
+  overlay.webContents.on('render-process-gone', () => { if (!overlay.isDestroyed()) overlay.destroy(); });
+  overlay.webContents.once('did-finish-load', () => {
+    if (panelPreviewWindow !== overlay) return;
+    overlay.webContents.send('panel-preview:update', panelPreviewFrame);
+    overlay.showInactive();
+    notifyPanelPreview(true);
+  });
+  overlay.loadFile(RENDERER, { query: { language: interfaceLanguage.language } }).catch(() => {
+    if (!overlay.isDestroyed()) overlay.destroy();
+  });
+  return true;
+}
+
 function backlightWindow() {
   if (process.platform !== 'win32' || deckSession.blocked || deckReveal.active || !win || win.isDestroyed() || !win.isVisible()) return null;
   const display = deckDisplay();
@@ -549,6 +627,7 @@ function backlightWindow() {
 function quitWithoutEdge() {
   if (edgeExit) return;
   edgeExit = true;
+  closePanelPreview();
   log('XENEON EDGE is not connected. Exiting Lastra.');
   if (win && !win.isDestroyed()) win.destroy();
   // Release everything now in case another window delays the quit. With a push-to-talk lease open,
@@ -740,6 +819,7 @@ function syncWebEmbedSuspension() {
 
 function revealDesktop() {
   if (deckSession.blocked || !win || win.isDestroyed() || !deckReveal.begin(revealDisplay())) return false;
+  closePanelPreview();
   agentChoices?.checkPending();
   agentActivitySwitch?.checkPending();
   agentAppAudio?.checkPending();
@@ -811,7 +891,11 @@ function openEditor(section = 'settings') {
   });
   window.once('ready-to-show', () => window.show());
   window.webContents.once('did-finish-load', () => window.webContents.send('editor:section', section));
-  window.once('closed', () => { editor = editorProfile = null; });
+  window.once('closed', () => { editor = editorProfile = null; closePanelPreview(); });
+  window.webContents.on('render-process-gone', closePanelPreview);
+  window.webContents.on('did-start-navigation', ({ isMainFrame, isSameDocument }) => {
+    if (isMainFrame && !isSameDocument) closePanelPreview();
+  });
   window.loadFile(EDITOR, { query: { language: interfaceLanguage.language } });
 }
 
@@ -925,6 +1009,10 @@ function setAppearance(setting, value) {
   const previous = appearance.current;
   const current = appearance.set(setting, value);
   send('deck:appearance', current);
+  if (panelPreviewWindow && panelPreviewFrame) {
+    panelPreviewFrame = { ...panelPreviewFrame, appearance: current };
+    if (!panelPreviewWindow.webContents.isLoadingMainFrame()) panelPreviewWindow.webContents.send('panel-preview:update', panelPreviewFrame);
+  }
   if (current.largeKeys !== previous.largeKeys) repaginatePage();
   if (editor && !editor.isDestroyed() && !editor.webContents.isDestroyed() && !editor.webContents.isCrashed()) {
     editor.webContents.send('editor:appearance', current);
@@ -1129,6 +1217,7 @@ function deckBehavior() {
     calendar: navigation.current.calendar,
     calendars: Object.fromEntries(Object.entries(CALENDARS).map(([id, item]) => [id, item.label])),
     display: preferredDisplay == null ? '' : String(preferredDisplay),
+    displaySaved: !navigation.unsaved,
     displays: screen.getAllDisplays().map((display) => ({ id: String(display.id), label: describeDisplay(display) })),
     revealGesture: navigation.current.desktopRevealGesture,
     revealed: deckReveal.active,
@@ -1139,6 +1228,13 @@ function deckBehavior() {
     followApps: appState.follow,
     mixer: mixer.map(({ id, name, pinned }) => ({ id, name, pinned })),
   };
+}
+
+/** @param {string | null} id */
+function selectDeckDisplay(id) {
+  navigation.setPreferredDisplay(id);
+  preferredDisplay = id;
+  restoreDeck();
 }
 
 function refreshTray() {
@@ -1344,6 +1440,9 @@ function registerIpc() {
     return callback(...args);
   });
   const edit = (channel, callback) => handle(channel, () => editor, EDITOR, callback);
+  ipcMain.on('panel-preview:close', (event) => {
+    if (fromWindow(event, panelPreviewWindow, RENDERER)) closePanelPreview();
+  });
   deck('profile:get', () => {
     send('monitoring', monitoring.intervals);
     return currentView();
@@ -1430,9 +1529,31 @@ function registerIpc() {
     return dashboardAgenda.request(command, () => deck.sameOwner() && navigation.current === selected && selected.view === 'dashboard'
       && !deckSession.blocked && !deck.sessionChanged() && !deck.blocked());
   });
-  const inEditor = (snapshot) => ({ ...snapshot, active: editorProfile.store === store,
-    activity: opts.profile ? null : ACTIVITIES[editorProfile.id] });
+  const inEditor = (snapshot) => {
+    const active = editorProfile.store === store;
+    const page = active ? pages.current(store.current) : null;
+    return { ...snapshot, active, activity: opts.profile ? null : ACTIVITIES[editorProfile.id],
+      deckPage: page && !page.generated ? page.id : null, deckSheet };
+  };
   edit('editor:load', () => inEditor(editorProfile.store.editorSnapshot()));
+  edit('editor:copy-deck-page', (allowSwitch) => {
+    if (deckSession.blocked || deckReveal.active || navigation.current.view !== 'keys') {
+      throw new Error('Open Deck Keys on the XENEON EDGE before copying the current layout.');
+    }
+    if (editorProfile.store !== store && allowSwitch !== true) throw new Error('Save the draft before switching to the active activity.');
+    const page = pages.current(store.current);
+    const display = deckDisplay();
+    const bounds = display?.bounds ?? win?.getContentBounds();
+    const portrait = Boolean(bounds && bounds.height > bounds.width);
+    const source = copyVisiblePage(page, currentView(), { portrait, largeKeys: appearance.current.largeKeys,
+      sheet: deckSheet, appId: pages.binding(page).target?.appId });
+    if (editorProfile.store !== store) {
+      editorProfile = activities.current;
+      editor.setTitle(`Lastra · ${ACTIVITIES[editorProfile.id]}`);
+    }
+    return { source, snapshot: inEditor(store.editorSnapshot()), page: page.generated ? null : page };
+  });
+  edit('editor:panel-preview', changePanelPreview);
   edit('editor:language:get', () => interfaceLanguage.snapshot());
   edit('editor:language:set', (preference) => {
     const next = interfaceLanguage.set(preference);
@@ -1440,16 +1561,25 @@ function registerIpc() {
     refreshTray();
     return next;
   });
+  edit('editor:windows-startup', (enabled) => {
+    if (process.platform !== 'win32') return { available: false, enabled: false };
+    if (enabled !== undefined) {
+      if (typeof enabled !== 'boolean') throw new Error('Invalid Windows startup setting.');
+      try { startup.setEnabled(enabled); } finally { refreshTray(); }
+    }
+    return { available: true, enabled: startup.isEnabled() };
+  });
   edit('editor:integration-setup:read', () => integrationSetup.read());
   edit('editor:integration-setup:open', (choice) => integrationSetup.open(choice));
   edit('editor:profile-templates', (language) => profileTemplates(typeof language === 'string' ? language : undefined));
   edit('editor:appearance:get', () => appearance.current);
   edit('editor:appearance:set', (setting, value) => setAppearance(setting, value));
   edit('editor:feeds:get', () => feeds?.settings() ?? null);
-  edit('editor:feeds:set', async (value) => {
+  edit('editor:feeds:set', (value) => {
     feeds.setSettings(value ?? {});
     if (!feeds.allows(navigation.current.view)) setDeckView('keys');
-    return feeds.refresh();
+    void feeds.refresh().catch(() => log('Could not refresh Feeds.'));
+    return feeds.settings();
   });
   edit('editor:feeds:places', (query) => feeds.searchPlaces(query));
   edit('editor:feeds:locate', () => feeds.locate());
@@ -1481,8 +1611,12 @@ function registerIpc() {
       navigation.setCalendar(command.id);
       sendDashboardCalendar();
     } else if (command.type === 'display') {
-      preferredDisplay = command.id == null || command.id === '' ? null : String(command.id);
-      restoreDeck();
+      if (opts.windowed) throw new Error('Deck display is unavailable in windowed mode.');
+      const id = command.id === '' ? null : command.id;
+      if (id !== null && (typeof id !== 'string' || !screen.getAllDisplays().some((display) => String(display.id) === id))) {
+        throw new Error('The selected display is no longer connected.');
+      }
+      selectDeckDisplay(id);
     } else if (command.type === 'revealGesture') {
       navigation.setDesktopRevealGesture(command.enabled === true);
       refreshPage(true);
@@ -1574,7 +1708,11 @@ function registerIpc() {
   });
   edit('editor:shortcut-webapp', (value) => normalizeWebApp(value));
   edit('editor:action-test', (request) => simulateAction(request));
-  edit('editor:save', (profile, token) => inEditor(editorProfile.store.save(profile, token)));
+  edit('editor:save', (profile, token) => {
+    const snapshot = inEditor(editorProfile.store.save(profile, token));
+    closePanelPreview();
+    return snapshot;
+  });
   edit('editor:backups:list', () => editorProfile.store.editorBackups());
   edit('editor:backups:restore', (id, token) => inEditor(editorProfile.store.restoreBackup(id, token)));
   const imageLibrary = new ImageLibrary({
@@ -1601,13 +1739,7 @@ function registerIpc() {
     if (source !== 'active' && source !== 'draft') throw new Error('Unknown preview source.');
     return {
       view: source === 'active' && revision !== pages.revision ? currentView() : null,
-      readings: {
-        audio: previewAudio(liveAudio),
-        obs: previewObs(obs?.view),
-        sensors: { ...previewSensors(liveSensors, sensors?.history.series),
-          sensorWidgets: sensorWidgets.snapshot(checkedSensorIds(selectedSensors)) },
-        media: previewMedia.snapshot(Date.now(), Math.max(3_500, (monitoring?.intervals.media ?? 1_000) * 2)),
-      },
+      readings: previewReadings(selectedSensors),
     };
   });
   const exchangeFilters = [{ name: 'Lastra JSON', extensions: ['json'] }];
@@ -1827,12 +1959,23 @@ function start() {
   session.defaultSession.setPermissionCheckHandler(() => false);
   // Teardown runs newest first, so the shared PowerShell host registered here is released last.
   disposables.add('shared PowerShell', disposeSharedPowerShell);
+  screen.on('display-added', updatePanelPreviewBounds);
+  screen.on('display-removed', updatePanelPreviewBounds);
+  screen.on('display-metrics-changed', updatePanelPreviewBounds);
+  disposables.add('XENEON preview', () => {
+    screen.off('display-added', updatePanelPreviewBounds);
+    screen.off('display-removed', updatePanelPreviewBounds);
+    screen.off('display-metrics-changed', updatePanelPreviewBounds);
+    closePanelPreview();
+  });
+  const userData = app.getPath('userData');
+  navigation = new DeckNavigation(path.join(userData, 'deck-navigation.json'), log);
+  preferredDisplay = opts.display ?? navigation.current.preferredDisplay;
   const display = deckDisplay();
   if (!opts.windowed && !display) {
     quitWithoutEdge();
     return;
   }
-  const userData = app.getPath('userData');
   interfaceLanguage = new InterfaceLanguage(path.join(userData, 'interface-language.json'), () => app.getPreferredSystemLanguages());
   toolChoices = readJsonSettings(path.join(userData, 'tool-choices.json'), {
     maxBytes: 4_096,
@@ -1849,7 +1992,6 @@ function start() {
   sensorWidgets = new SensorWidgetSamples(() => liveSensors && ({
     sample: liveSensors, details: sensors.detail(liveSensors.hardwareSource),
   }));
-  navigation = new DeckNavigation(path.join(userData, 'deck-navigation.json'), log);
   const power = createPowerEvents(powerMonitor, { log });
   disposables.add('power events', () => power.dispose());
   pomodoro = new Pomodoro(path.join(userData, 'pomodoro.json'), { onChange: (snapshot) => send('pomodoro:changed', snapshot) });
@@ -1951,6 +2093,7 @@ function start() {
   deckShortcuts.sync();
   function blockDeck(transition) {
     transition();
+    closePanelPreview();
     deckShortcuts.sync();
     agentActivitySwitch?.checkPending();
     agentSpotifyActions?.checkPending();
@@ -2492,10 +2635,7 @@ function start() {
           },
         }));
       },
-      selectDisplay(id) {
-        preferredDisplay = id;
-        restoreDeck();
-      },
+      selectDisplay: selectDeckDisplay,
       showDeck: () => showDeck(), revealDesktop: () => revealDesktop(), quit: () => app.quit(),
     },
   });
@@ -2636,6 +2776,7 @@ if (opts.preview) {
   });
   let microphoneQuit = 'idle';
   app.on('before-quit', () => {
+    closePanelPreview();
     keyPresses.cancelPending();
     keyConfirmation.clear();
   });

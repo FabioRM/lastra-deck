@@ -2,7 +2,7 @@
 
 Tap **Apps** in the deck navigation. The catalog lists available views by name and category, with pinned views first. Type in the search field or use **Touch keyboard**. Tap a result to see its commands and the setup required for live data.
 
-Use **Lastra → Settings → Display → Deck organization → Pinned app views** to keep a view at the top of the catalog. Lastra remembers pins and the last view you opened. **Catalog** returns to the list and **Deck keys** returns to your macro grid. The mixer and telemetry stay visible while you use an app view. OBS and Media keep their own dedicated screens.
+Use **Settings → Deck behavior → Deck organization → Pinned app views** to keep a view at the top of the catalog. Lastra remembers pins and the last view you opened. **Catalog** returns to the list and **Deck keys** returns to your macro grid. The mixer and telemetry stay visible while you use an app view. OBS and Media keep their own dedicated screens.
 
 **Follow foreground** is optional. Lastra opens views when the foreground executable matches, except while the contextual pages are locked or another dedicated screen is open. Automatic switching leaves shared browser and terminal processes to the existing contextual pages unless you configure an explicit match.
 

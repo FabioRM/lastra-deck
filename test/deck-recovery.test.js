@@ -149,7 +149,7 @@ test('a restart restores a saved profile and fallback page while dropping the tr
   const recovered = new ProfileStore({ file, defaultFile }).load();
   const { current } = new DeckNavigation(navigationFile);
   assert.deepEqual(current, { view: 'keys', page: 'review', locked: true, calendar: 'none', activity: 'main',
-    activityPages: {}, desktopRevealGesture: false, contextReturn: 'manual' });
+    activityPages: {}, desktopRevealGesture: false, contextReturn: 'manual', preferredDisplay: null });
   const restartedPages = new Pages();
   restartedPages.select(recovered, current.page);
   restartedPages.toggleLock(recovered);

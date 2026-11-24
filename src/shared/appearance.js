@@ -2,7 +2,8 @@
 
 {
   const THEMES = Object.freeze({ system: 'System', light: 'Light', dark: 'Dark',
-    midnight: 'Midnight', forest: 'Forest', ember: 'Ember' });
+    midnight: 'Midnight', forest: 'Forest', ember: 'Ember',
+    graphite: 'Graphite', ocean: 'Ocean', plum: 'Plum', sand: 'Sand' });
   const TEXT_SCALES = Object.freeze([100, 115, 125]);
   const IDLE_SCREEN_TIMES = Object.freeze({ 0: 'Off', 60: '1 minute', 180: '3 minutes', 300: '5 minutes', 600: '10 minutes' });
   const DIM_LEVELS = Object.freeze({ 35: '35%', 55: '55%', 80: '80%', 100: 'Off' });

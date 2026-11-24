@@ -2,9 +2,14 @@
 
 {
   const params = new URLSearchParams(location.search);
-  const isPreview = window.parent !== window && params.get('editor-preview') === '1';
+  const panelPreview = window.lastraPanelPreview;
+  const isPreview = panelPreview || (window.parent !== window && params.get('editor-preview') === '1');
   if (isPreview) {
     document.getElementById('stage').inert = true;
+    if (panelPreview) {
+      document.getElementById('panel-preview-controls').hidden = false;
+      document.getElementById('panel-preview-close').addEventListener('click', () => panelPreview.close());
+    }
     const panel = params.get('panel-preview');
     const fixtures = ['dashboard', 'stats', 'apps'].includes(panel) ? window.LastraPanelFixtures() : null;
     if (!fixtures) {
@@ -36,9 +41,7 @@
         sampledAt: now, hardwareAt: now, hardwareSource: 'preview' };
     }
 
-    window.addEventListener('message', (event) => {
-      if (event.source !== window.parent) return;
-      const data = event.data;
+    function receive(data) {
       if (data?.type === 'lastra:editor-preview' && data.view) {
         window.LastraI18n.set(data.language);
         const previous = view;
@@ -65,6 +68,10 @@
           for (const listener of sensorListeners) listener(sensorSample());
         }
       }
+    }
+    if (panelPreview) panelPreview.onUpdate(receive);
+    else window.addEventListener('message', (event) => {
+      if (event.source === window.parent) receive(event.data);
     });
 
     const panels = fixtures && Object.freeze({

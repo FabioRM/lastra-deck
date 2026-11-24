@@ -14,7 +14,8 @@ const CALENDARS = {
 };
 const DEFAULT_PAGE = Object.freeze({ page: null, locked: false });
 /** @type {NavigationState} */
-const DEFAULT = { view: 'dashboard', ...DEFAULT_PAGE, calendar: 'none', activity: 'main', activityPages: {}, desktopRevealGesture: false, contextReturn: 'manual' };
+const DEFAULT = { view: 'dashboard', ...DEFAULT_PAGE, calendar: 'none', activity: 'main', activityPages: {},
+  desktopRevealGesture: false, contextReturn: 'manual', preferredDisplay: null };
 
 function knownCalendar(calendar) {
   return typeof calendar === 'string' && Object.hasOwn(CALENDARS, calendar);
@@ -28,10 +29,14 @@ function pageId(value) {
   return typeof value === 'string' && /^[a-z0-9_-]{1,40}$/i.test(value) ? value : null;
 }
 
+function displayId(value) {
+  return typeof value === 'string' && /^-?\d{1,20}$/.test(value) ? value : null;
+}
+
 /**
  * @typedef {{ page: string | null, locked: boolean, manualPage?: string | null }} PageSelection
  * @typedef {PageSelection & { view: string, calendar: string, activity: string, desktopRevealGesture: boolean,
- *   contextReturn: string, activityPages: Record<string, PageSelection> }} NavigationState
+ *   contextReturn: string, preferredDisplay: string | null, activityPages: Record<string, PageSelection> }} NavigationState
  */
 
 /**
@@ -66,6 +71,7 @@ function read(file, log) {
         activity: knownActivity(data.activity) ? data.activity : DEFAULT.activity,
         desktopRevealGesture: data.desktopRevealGesture === true,
         contextReturn: knownContextReturn(data.contextReturn) ? data.contextReturn : DEFAULT.contextReturn,
+        preferredDisplay: displayId(data.preferredDisplay),
         activityPages: Object.fromEntries(Object.keys(ACTIVITIES).filter((id) => id !== 'main' && data.activityPages?.[id])
           .map((id) => [id, readPage(data.activityPages[id])])),
       };
@@ -127,6 +133,11 @@ class DeckNavigation {
   setContextReturn(mode) {
     if (!knownContextReturn(mode)) throw new Error('Unknown app page return mode');
     this.save({ contextReturn: mode });
+  }
+
+  setPreferredDisplay(id) {
+    if (id !== null && displayId(id) === null) throw new Error('Unknown deck display');
+    this.save({ preferredDisplay: id });
   }
 
   save(update) {

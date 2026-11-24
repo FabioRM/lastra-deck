@@ -89,6 +89,7 @@ class Feeds {
     this.fetch = fetchImpl;
     this.onChange = onChange;
     this.log = log;
+    this.refreshRequest = 0;
     this.raw = readRaw(file);
     if (!this.raw.weather && legacyWeather) {
       const legacy = readJsonSettings(legacyWeather, {
@@ -181,12 +182,16 @@ class Feeds {
   }
 
   async refresh() {
+    const configuration = this.raw;
+    const request = ++this.refreshRequest;
     const settings = this.settings();
-    this.readings = {
+    const readings = {
       weather: await this.#weather(settings.weather),
       quotes: await this.#quotes(settings.quotes),
       currencies: await this.#currencies(settings.currencies.pairs),
     };
+    if (this.refreshRequest !== request || this.raw !== configuration) return this.snapshot();
+    this.readings = readings;
     this.onChange(this.snapshot());
     return this.snapshot();
   }

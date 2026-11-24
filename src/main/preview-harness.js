@@ -364,6 +364,7 @@ async function startPreview({ opts, ipcMain, BrowserWindow, quit, fail, log, ren
     send('profile', previewView());
   }
   ipcMain.handle('profile:get', previewView);
+  ipcMain.handle('update:status', () => ({ state: 'disabled' }));
   ipcMain.handle('page:lock', () => {
     pages.toggleLock(store.current);
     publishPreview();

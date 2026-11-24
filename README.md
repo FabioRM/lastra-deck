@@ -31,11 +31,11 @@ The loop opens **Emoji** from **Home**, then shows **Dashboard**, **Stats**, and
 
 ## Getting started
 
-Download the installer or browse the reviewed source on the public release page. [Lastra v1.0.2](https://github.com/FabioRM/lastra-deck/releases/tag/v1.0.2) · [Windows x64 installer](https://github.com/FabioRM/lastra-deck/releases/download/v1.0.2/Lastra-Setup-1.0.2.exe) · [SHA‑256 checksum](https://github.com/FabioRM/lastra-deck/releases/download/v1.0.2/Lastra-Setup-1.0.2.exe.sha256) · [Catalog redistribution review](docs/catalog-redistribution.md)
+Download the installer or browse the reviewed source on the public release page. [Lastra v1.1.0](https://github.com/FabioRM/lastra-deck/releases/tag/v1.1.0) · [Windows x64 installer](https://github.com/FabioRM/lastra-deck/releases/download/v1.1.0/Lastra-Setup-1.1.0.exe) · [SHA‑256 checksum](https://github.com/FabioRM/lastra-deck/releases/download/v1.1.0/Lastra-Setup-1.1.0.exe.sha256) · [Catalog redistribution review](docs/catalog-redistribution.md)
 
 Set the XENEON EDGE to **Extend these displays** in Windows Display settings. The panel runs at 2560 × 720 in landscape and 720 × 2560 in portrait.
 
-**Install the app.** Download `Lastra-Setup-1.0.2.exe` and run it on Windows x64. It installs for the current user in `%LOCALAPPDATA%\Programs\Lastra` and adds Start menu and desktop shortcuts. The Windows installer is unsigned. Settings and profiles live in `%APPDATA%\Lastra` and survive updates and uninstalls. [Latest release](https://github.com/FabioRM/lastra-deck/releases/latest) · [Update behavior](https://github.com/FabioRM/lastra-deck/blob/main/docs/releasing.md#update-behavior)
+**Install the app.** Download `Lastra-Setup-1.1.0.exe` and run it on Windows x64. It installs for the current user in `%LOCALAPPDATA%\Programs\Lastra` and adds Start menu and desktop shortcuts. The Windows installer is unsigned. Settings and profiles live in `%APPDATA%\Lastra` and survive updates and uninstalls. [Latest release](https://github.com/FabioRM/lastra-deck/releases/latest) · [Update behavior](https://github.com/FabioRM/lastra-deck/blob/main/docs/releasing.md#update-behavior)
 
 **Run from source.** Install **Node.js 22.12.0 or later**, as required by the Electron installer, then run these commands from the project directory. Source runs never check for updates. To build the installer yourself, see [Releasing](docs/releasing.md).
 
@@ -44,9 +44,9 @@ npm ci
 npm start
 ```
 
-Lastra looks for the XENEON EDGE among the displays detected by Windows. The deck opens in a borderless, always-on-top window with activation disabled. If the Edge is absent at startup or disconnected during use, Lastra closes along with any hardware monitoring it started. While the Edge is connected, use **Lastra → Settings → Display → Deck display** or `npm start -- --display=<id>` to move the deck to another monitor. `npm run dev` opens a diagnostics window even when the Edge is absent.
+Lastra looks for the XENEON EDGE among the displays detected by Windows. The deck opens in a borderless, always-on-top window with activation disabled. If the Edge is absent at startup or disconnected during use, Lastra closes along with any hardware monitoring it started. In **Settings → Display → Deck display**, choose a monitor to remember it across restarts. `npm start -- --display=<id>` overrides the choice at startup. `npm run dev` opens a diagnostics window even when the Edge is absent.
 
-Click the Lastra icon in the Windows notification area to open desktop Settings. From the right-click menu you can check for updates, open **Info**, or choose **Esci**. Enable **Avvio automatico** to launch Lastra when you sign in. The setting is optional and also appears under **Startup apps** in Windows. If the Edge is disconnected when you sign in, Lastra exits. Connect it and start Lastra manually.
+Click the Lastra icon in the Windows notification area to open desktop Settings. Press **Ctrl+F** there to search for an option by name and jump to its section. In **Settings → General** you can set the interface language, export your configuration, and enable **Start with Windows**. If the Edge is disconnected when you sign in, Lastra exits. Connect it and start Lastra manually.
 
 When Windows changes the display layout, rotates the screen, or wakes from sleep, Lastra rechecks the display after a short delay and puts the deck back without taking focus. A brief interruption while Windows detects the Edge can recover in the same window. If Lastra has already exited after a disconnect, reconnect the Edge and start Lastra again.
 
@@ -95,7 +95,7 @@ Start a **Pomodoro break** from Tools or Dashboard to fill the XENEON EDGE with 
 
 ![Lastra Stats overview with sample CPU, GPU, memory, display, frame rate, disk, and temperature readings](docs/preview-stats.png)
 
-Under **Settings → Display → Deck behavior**, **Dashboard calendar** lets you choose what opens when you tap the calendar. Choose Google Calendar, Outlook.com Calendar, or Microsoft 365 Calendar to open it in your default browser. **Do nothing** is the default.
+Under **Settings → Dashboard**, **Dashboard calendar** lets you choose what opens when you tap the calendar. Choose Google Calendar, Outlook.com Calendar, or Microsoft 365 Calendar to open it in your default browser. **Do nothing** is the default.
 
 In **Apps**, open **Service health** to track the HTTP, TCP, DNS, and ping checks you configure. Use **Lastra resources** to see CPU and memory usage for Lastra and its managed helpers, or **Web embeds** to open approved HTTPS pages and official Spotify embeds. [Service health](docs/service-health.md) · [Resource monitoring](docs/resources.md) · [Web embeds](docs/web-embeds.md)
 
@@ -109,11 +109,11 @@ Open **Monitoring watchlist** in **Apps** to keep selected hardware, app, and se
 - Deck opens a configured page for the foreground Windows app when one exists. Otherwise, it uses a matching built-in shortcut pack or a temporary **Auto** page with common shortcuts. Use a page's **Windows app IDs** for an exact Store app or installed web app match. Browser packs cover ordinary browser tabs. [Engineering shortcut packs](docs/engineering-shortcuts.md) · [All shortcut packs](docs/shortcut-packs.md)
 - A page's **Context rules** can match a project or document within an assigned executable or Windows app ID. Lastra takes the highest **Rule priority**, then the most specific match. At equal priority, exact titles beat prefixes and partial titles, and Windows app IDs beat executable names for otherwise equal rules. Page order resolves a tie. Tap the page count or **Auto** to see why the page opened.
 - Use **Home** or either arrow from an **Auto** page to return to a configured page. A manual selection holds until the foreground app changes. **Lock page** keeps the displayed page until you unlock it. If an automatic page is locked when Lastra closes, the configured fallback opens locked next time.
-- In Lastra Settings, open **Display → Deck behavior → After an app page** to choose **Home** or **Last manually selected page**. The deck uses this choice when the foreground stops matching an app page. It keeps the last manual page for each activity. The default is **Last manually selected page**.
+- In Lastra Settings, open **Deck behavior → Navigation and input → After an app page** to choose **Home** or **Last manually selected page**. The deck uses this choice when the foreground stops matching an app page. It keeps the last manual page for each activity. The default is **Last manually selected page**.
 - To see the desktop behind the deck, select **Reveal desktop** in Tools or in **Deck behavior**. **Restore deck** returns to the previous view, page, and lock setting. Display settings also offer an optional swipe up from the bottom edge of Deck Keys.
-- Tap the current page name in Deck Keys to jump to a saved page. Set favorites in **Lastra → Settings → Display → Deck organization**. Each activity keeps its own favorites and six most recently opened pages.
+- Tap the current page name in Deck Keys to jump to a saved page. Set favorites in **Settings → Deck behavior → Deck organization**. Each activity keeps its own favorites and six most recently opened pages.
 - In the editor, set a page’s **Folder path** to group its keys, for example `Work / Editing`. Deck Keys shows the current folder below the page name. **Pages** opens that folder and lets you tap a parent, **All pages**, or **Home**.
-- Switch between **Main**, **Work**, **Meeting**, **Gaming**, and **Streaming** from Deck Keys or **Activity profile** in **Settings → Display → Deck behavior**. Each stores its own pages, backups, and navigation. An open editor continues to save to the activity shown in its title.
+- Switch between **Main**, **Work**, **Meeting**, **Gaming**, and **Streaming** from Deck Keys or **Settings → Deck behavior → Activity profile**. Each stores its own pages, backups, and navigation. An open editor continues to save to the activity shown in its title.
 - A contextual page binds to the foreground window that it represents. Switching windows cancels pending gestures and queued work for the previous deck revision. A locked contextual page stays visible and reads **Target inactive** until its window returns. Lastra rechecks the window before each keyboard step in a contextual macro.
 - The **Apps** catalog opens separately. Its **Follow foreground** setting is optional.
 - A circle marks a **long press** of 550 ms. A dash marks a **double tap**. For double-tap keys, Lastra waits up to 320 ms before running the single-tap action.
@@ -144,9 +144,9 @@ Dashboard shows the **Signal** card alongside the top-right controls. In Deck Ke
 
 Open **Apps → Audio presets** to save the current Windows speaker and default microphone levels for an activity. The preset displays the current and saved values side by side. **Apply shown levels** verifies that the same devices and levels are still present, then checks Windows readback for each change. Use **Refresh levels** after changing a volume or device in Windows. Presets affect volume only.
 
-Open **Lastra → Settings → Display** to preview and choose **System**, **Light**, **Dark**, **Midnight**, **Forest**, or **Ember**. **System** follows Windows appearance as it changes. Choose a custom **Accent color** or use the palette's original accent. High contrast takes precedence over custom colors. The settings apply to the deck, profile editor, and preview.
+Open **Lastra → Settings → Display** to choose from ten themes, including **Graphite**, **Ocean**, **Plum**, and **Sand**. **System** follows the desktop appearance. Choose a custom **Accent color** or use the theme accent. High contrast takes precedence over custom colors. The settings apply to the deck, profile editor, and preview.
 
-In **Settings → PC telemetry** or **Deck settings → Telemetry** in the editor, choose **Number** or **Gauge** independently for CPU, RAM, and GPU in the deck side panel. You can also show or hide percent signs and clock seconds. Percent signs are on by default and clock seconds are off. Readings that reach 100% display **MAX** in red.
+In **Settings → Display → Telemetry**, choose **Number** or **Gauge** independently for CPU, RAM, and GPU in the deck side panel. You can also show or hide percent signs and clock seconds. Percent signs are on by default and clock seconds are off. Readings that reach 100% display **MAX** in red.
 
 Select a muted input and hold the square **Push to talk** button to open that microphone. **Talking** confirms that Windows has unmuted the input. [Push-to-talk guide](docs/push-to-talk.md)
 
@@ -162,9 +162,11 @@ The Deck side panel shows the current CPU, RAM, and GPU readings. Add a **System
 
 ## Interface language
 
-Use **Lastra → Settings → System → Interface language** to choose **System language**, **Italiano**, or **English**. Lastra defaults to the first supported language in Windows preferences and falls back to English. Changing the interface language keeps the current draft and undo history. Key and page names, the Office shortcut language, and the profile's date and time format are stored in the profile. Specialized messages without an Italian translation appear in English.
+Use **Settings → General → Interface language** to choose **System language**, **Italiano**, or **English**. Lastra defaults to the first supported language in Windows preferences and falls back to English. Changing the interface language keeps the current draft and undo history. Key and page names, the Office shortcut language, and the profile's date and time format are stored in the profile. Specialized messages without an Italian translation appear in English.
 
 ## Profile editor
+
+With Deck Keys visible on the XENEON EDGE, choose **Edit current Deck Keys** in the editor to open the active page in your draft. For an automatic shortcut page, Lastra copies the visible screen into a new editable page and keeps the shortcut guards. **Preview on XENEON** shows the draft on the physical display and updates as you edit. Tap **Close preview** on the panel, or close it in the editor. Save the profile to apply the changes to the live deck.
 
 Select **Editor** in the desktop Lastra window or run `npm run edit`. Use **Find a page** to filter pages by name or folder, then select a slot to edit its **Actions**, **Style**, or **Placement**. Use the arrow keys to move around the grid, **F2** or **Edit selection** to move to the slot settings, and drag a key to reposition it. Expand **Page settings** to set the apps that activate the page. The toolbar shows whether the profile has unsaved changes. **Save profile** updates the deck immediately. Find profile import, export, and backups under **More**.
 
@@ -172,7 +174,7 @@ Open **App shortcuts**, select an app, and expand **Configure app shortcut pages
 
 Open **Settings → Display** to set the display theme, text size, contrast, clock, idle screen, and dimming. Enable **Large Deck Keys** for bigger, more widely spaced touch targets. Use the page arrows or swipe to reach additional keys, and find Cut, Copy, Paste, Undo, and Redo at the end of each screen. The page layout shows how many screens each orientation needs. These global settings apply when changed.
 
-Open **Settings → Keyboard shortcuts** to assign Windows-wide combinations for Next, Previous, a saved page in this activity, a view, Back to the last page, or Reveal/Restore. Each row shows whether it registered. If a combination is already assigned or Windows cannot register it, change the shortcut or select **Apply** again after it becomes available. The page lock pauses page shortcuts. View-only mode and Windows lock pause every shortcut.
+Open **Settings → Deck keys → Global keyboard shortcuts** to assign shortcuts for navigating or revealing the deck. Type a combination or select **Record** and press the keys, then select **Apply** to save it. Each row shows the registration status. The page lock pauses page shortcuts. View-only mode and Windows lock pause every shortcut.
 
 On a key, select **Choose icon or image** to search Lucide, browse Start menu apps, or select an image or Windows executable. The crop controls preview the square image before applying it to the draft. Undo and Redo include this change. Save embeds the crop as a PNG in the profile.
 

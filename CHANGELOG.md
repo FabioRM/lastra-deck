@@ -4,6 +4,12 @@ Completed items from the former TODO, grouped by the section that tracked them. 
 
 Entries grouped under **0.2.1** record the completed work through the first reviewed source release.
 
+## 1.1.0
+
+- Open the current Deck Keys layout in the editor as a draft. Copy the visible screen of an automatic shortcut page into an editable page.
+- Preview the draft directly on the XENEON EDGE while editing. Close the preview on the panel or from the editor. Saving applies the draft normally.
+- Add Graphite, Ocean, Plum, and Sand themes. Search Settings in English or Italian, set Windows startup from General, remember the deck monitor, and record global shortcuts from the keyboard.
+
 ## 1.0.2
 
 - Let Windows users download or defer an available update from the deck and from Settings. The Updates page shows download progress and offers a retry after a failed download.

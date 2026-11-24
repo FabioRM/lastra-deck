@@ -6,6 +6,7 @@ if (process.isMainFrame) contextBridge.exposeInMainWorld('lastraEditor', {
   load: () => ipcRenderer.invoke('editor:load'),
   getLanguage: () => ipcRenderer.invoke('editor:language:get'),
   setLanguage: (preference) => ipcRenderer.invoke('editor:language:set', preference),
+  windowsStartup: (enabled) => ipcRenderer.invoke('editor:windows-startup', enabled),
   maintenance: () => ipcRenderer.invoke('editor:maintenance:get'),
   setMaintenance: (command) => ipcRenderer.invoke('editor:maintenance:set', command),
   updateStatus: () => ipcRenderer.invoke('editor:update:status'),
@@ -61,6 +62,9 @@ if (process.isMainFrame) contextBridge.exposeInMainWorld('lastraEditor', {
   soundOutputs: () => ipcRenderer.invoke('editor:sound-outputs'),
   chooseSound: () => ipcRenderer.invoke('editor:choose-sound'),
   previewLive: (source, revision, sensorIds) => ipcRenderer.invoke('editor:preview-live', source, revision, sensorIds),
+  copyDeckPage: (allowSwitch) => ipcRenderer.invoke('editor:copy-deck-page', allowSwitch),
+  panelPreview: (command) => ipcRenderer.invoke('editor:panel-preview', command),
+  onPanelPreview: (callback) => ipcRenderer.on('editor:panel-preview', (_event, open) => callback(open)),
   copy: (kind, item) => ipcRenderer.invoke('editor:copy', kind, item),
   paste: (kind) => ipcRenderer.invoke('editor:paste', kind),
 });

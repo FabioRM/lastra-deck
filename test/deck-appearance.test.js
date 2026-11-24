@@ -41,7 +41,7 @@ test('Deck appearance starts with defaults and saves independent telemetry reado
 test('preset themes and custom accents persist independently and reject CSS input', (t) => {
   const file = tempSettings(t);
   const settings = new DeckAppearance(file);
-  for (const theme of ['midnight', 'forest', 'ember']) assert.equal(settings.set('theme', theme).theme, theme);
+  for (const theme of ['midnight', 'forest', 'graphite', 'ocean', 'plum', 'sand', 'ember']) assert.equal(settings.set('theme', theme).theme, theme);
   settings.set('accent', '#E2814D');
   assert.throws(() => settings.set('accent', 'red; color: black'), /Invalid/);
   assert.equal(new DeckAppearance(file).current.accent, '#E2814D');

@@ -21,6 +21,9 @@ const inspector = document.getElementById('inspector');
 const editSelection = document.getElementById('edit-selection');
 const status = document.getElementById('status');
 const saveState = document.getElementById('save-state');
+const copyXeneon = document.getElementById('copy-xeneon-page');
+const showXeneon = document.getElementById('show-xeneon-preview');
+const xeneonStatus = document.getElementById('xeneon-preview-status');
 const agentDraftOffer = document.getElementById('agent-draft-offer');
 const agentDraftOpen = document.getElementById('agent-draft-open');
 const editorMenu = document.querySelector('.editor-menu');
@@ -119,6 +122,11 @@ let profileActivity;
 let draftText = '';
 let token;
 let pageId;
+let deckSourcePage;
+let deckSourceSheet = 0;
+let xeneonPreviewOpen = false;
+let xeneonPreviewBusy = false;
+let xeneonPreviewTimer;
 let selected = 0;
 let groupSelection = null;
 let dirty = false;
@@ -191,6 +199,8 @@ function updateControls() {
   workspace.inert = busy || !draft;
   reload.disabled = busy;
   save.disabled = busy || (!dirty && !diskWarning);
+  copyXeneon.disabled = busy || !draft;
+  renderXeneonButton();
   backups.disabled = busy || !draft;
   importExchange.disabled = exportExchange.disabled = busy || !draft;
   liveVariables.disabled = busy || !draft;
@@ -202,6 +212,7 @@ function updateControls() {
   agentDraftOpen.disabled = busy;
   if (!busy && !dirty && pendingAgentDraft && !document.querySelector('dialog[open]')) queueMicrotask(() => void acceptAgentDraft());
   livePreview.update(draft, pageId === BAR_PAGE_ID ? draft?.pages[0]?.id : pageId, pageId !== BAR_PAGE_ID);
+  queueXeneonPreview();
   refreshProfileGrid?.();
   refreshPageGrid?.();
 }
@@ -1057,6 +1068,7 @@ function renderPage() {
   pageSettings.hidden = bar;
   refreshPageGrid = undefined;
   livePreview.update(draft, pageId === BAR_PAGE_ID ? draft.pages[0].id : pageId, pageId !== BAR_PAGE_ID);
+  queueXeneonPreview();
   refreshProfileGrid?.();
   renderTabs();
   const barWidgets = button('Widgets', () => showWidgets('bar'));
@@ -2168,6 +2180,8 @@ function makeDraft(profile) {
 }
 
 function readSnapshot(snapshot, savedFrom = null) {
+  if (!draft && snapshot.deckPage) pageId = deckSourcePage = snapshot.deckPage;
+  if (deckSourcePage === snapshot.deckPage) deckSourceSheet = snapshot.deckSheet ?? 0;
   draft = makeDraft(snapshot.profile);
   profileActivity = snapshot.activity;
   gestureOptions = snapshot.gestureOptions ?? {};
@@ -2187,6 +2201,93 @@ function readSnapshot(snapshot, savedFrom = null) {
   updateControls();
   showDraftStatus();
 }
+
+function xeneonFeedback(message, error = false) {
+  xeneonStatus.textContent = t(message);
+  xeneonStatus.classList.toggle('error', error);
+}
+
+function renderXeneonButton() {
+  showXeneon.disabled = busy || !draft || xeneonPreviewBusy;
+  showXeneon.textContent = t(xeneonPreviewOpen ? 'Close XENEON preview' : 'Preview on XENEON');
+  showXeneon.setAttribute('aria-pressed', String(xeneonPreviewOpen));
+}
+
+function xeneonRequest(type) {
+  const page = pageId === BAR_PAGE_ID
+    ? (draft.pages.find(({ id }) => id === deckSourcePage) ?? draft.pages[0]).id : pageId;
+  return api.panelPreview({ type, profile: draft, page, sheet: page === deckSourcePage ? deckSourceSheet : 0 });
+}
+
+function queueXeneonPreview() {
+  clearTimeout(xeneonPreviewTimer);
+  if (!xeneonPreviewOpen || !draft || busy) return;
+  xeneonPreviewTimer = setTimeout(async () => {
+    if (!xeneonPreviewOpen || busy) return;
+    try {
+      if (await xeneonRequest('update')) xeneonFeedback('Draft preview is on the XENEON EDGE.');
+    } catch (error) {
+      xeneonFeedback(error.message, true);
+    }
+  }, 160);
+}
+
+async function toggleXeneonPreview() {
+  if (!draft || xeneonPreviewBusy) return;
+  clearTimeout(xeneonPreviewTimer);
+  const focus = document.activeElement === showXeneon;
+  xeneonPreviewBusy = true;
+  renderXeneonButton();
+  try {
+    xeneonPreviewOpen = xeneonPreviewOpen ? await api.panelPreview({ type: 'close' }) : await xeneonRequest('show');
+    xeneonFeedback(xeneonPreviewOpen ? 'Draft preview is on the XENEON EDGE.' : '');
+  } catch (error) {
+    xeneonFeedback(error.message, true);
+  } finally {
+    xeneonPreviewBusy = false;
+    renderXeneonButton();
+    if (focus && document.activeElement === document.body) showXeneon.focus({ preventScroll: true });
+  }
+}
+
+async function copyXeneonPage() {
+  if (!draft || busy) return;
+  const allowSwitch = !dirty;
+  busy = true;
+  updateControls();
+  let captured;
+  try {
+    captured = await api.copyDeckPage(allowSwitch);
+    if (allowSwitch && (captured.snapshot.token !== token || captured.snapshot.activity !== profileActivity)) readSnapshot(captured.snapshot);
+  } catch (error) {
+    xeneonFeedback(error.message, true);
+  } finally {
+    busy = false;
+    updateControls();
+  }
+  if (!captured) return;
+  const { source, page } = captured;
+  try {
+    if (source.pageId && draft.pages.some(({ id }) => id === source.pageId)) switchPage(source.pageId);
+    else if (source.copy) insertPage(source.copy, { linkAvailable: true });
+    else insertPage(page);
+    deckSourcePage = pageId;
+    deckSourceSheet = source.sheet;
+    queueXeneonPreview();
+    xeneonFeedback('Current Deck Keys are open in the draft.');
+  } catch (error) {
+    xeneonFeedback(error.message, true);
+  }
+}
+
+copyXeneon.addEventListener('click', () => void copyXeneonPage());
+showXeneon.addEventListener('click', () => void toggleXeneonPreview());
+api.onPanelPreview((open) => {
+  xeneonPreviewOpen = open;
+  renderXeneonButton();
+  if (!open) xeneonFeedback('');
+});
+document.addEventListener('lastra-language', renderXeneonButton);
 
 async function load() {
   if (busy) return;
@@ -2410,6 +2511,11 @@ document.addEventListener('lastra-language', () => {
   showDraftStatus();
 });
 window.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape' && xeneonPreviewOpen && !document.querySelector('dialog[open]')) {
+    e.preventDefault();
+    void toggleXeneonPreview();
+    return;
+  }
   if (workspace.hidden || !e.ctrlKey || e.altKey || e.metaKey || e.isComposing || document.querySelector('dialog[open]')) return;
   const key = e.key.toLowerCase();
   if (key === 's') {

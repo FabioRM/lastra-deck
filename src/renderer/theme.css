@@ -99,6 +99,79 @@
   --on-app: #2e1a12;
   --selected-surface: #513327;
 }
+:is(:root, .theme-sample)[data-theme='graphite'] {
+  color-scheme: dark;
+  --background: #151619;
+  --surface: #25272c;
+  --surface-top: #2a2c33;
+  --pressed-surface: #202127;
+  --recessed-surface: #101114;
+  --card-surface: #24262b;
+  --panel-surface: #1b1d21;
+  --track: #737784;
+  --border: #464956;
+  --control-border: #767b8b;
+  --text: #f3f4f7;
+  --muted-text: #b7bac7;
+  --app: #d4e0f6;
+  --on-app: #171b24;
+  --selected-surface: #373d4a;
+}
+:is(:root, .theme-sample)[data-theme='ocean'] {
+  color-scheme: dark;
+  --background: #0c1d25;
+  --surface: #16333f;
+  --surface-top: #1a3b49;
+  --pressed-surface: #132a35;
+  --recessed-surface: #08171e;
+  --card-surface: #132d39;
+  --panel-surface: #10262f;
+  --track: #628492;
+  --border: #385764;
+  --control-border: #688a98;
+  --text: #eaf9fb;
+  --muted-text: #aeccd4;
+  --app: #65e3e6;
+  --system: #97cffa;
+  --on-app: #0b2429;
+  --selected-surface: #1b4550;
+}
+:is(:root, .theme-sample)[data-theme='plum'] {
+  color-scheme: dark;
+  --background: #1c1424;
+  --surface: #332641;
+  --surface-top: #3b2d4a;
+  --pressed-surface: #2b1f36;
+  --recessed-surface: #150e1b;
+  --card-surface: #2d2139;
+  --panel-surface: #261b31;
+  --track: #8c789b;
+  --border: #563f68;
+  --control-border: #927da2;
+  --text: #fbf1fe;
+  --muted-text: #d5c0e1;
+  --app: #dfabfa;
+  --on-app: #24142f;
+  --selected-surface: #4e3262;
+}
+:is(:root, .theme-sample)[data-theme='sand'] {
+  color-scheme: light;
+  --background: #f5eee2;
+  --surface: #fff9ef;
+  --surface-top: #fffcf5;
+  --pressed-surface: #ebdecd;
+  --recessed-surface: #eadecc;
+  --card-surface: #fffaf1;
+  --panel-surface: #efe5d6;
+  --track: #968571;
+  --border: #af9f8a;
+  --control-border: #85725f;
+  --text: #33291f;
+  --muted-text: #625443;
+  --app: #7b412d;
+  --on-app: #fff8ee;
+  --selected-surface: #f0d7c9;
+}
 @media (forced-colors: none) {
   :root[data-accent='custom']:not([data-high-contrast='true']) {
     --app: color-mix(in srgb, light-dark(#122334, #f7f8ff), var(--custom-accent) 38%);
