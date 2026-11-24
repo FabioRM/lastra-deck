@@ -50,16 +50,6 @@ function agentSnapshot(agent) {
   };
 }
 
-function updateSnapshot(updater) {
-  const status = updater?.status?.() ?? { state: 'disabled' };
-  return {
-    state: status.state,
-    version: status.version ?? null,
-    percent: Number.isFinite(status.percent) ? status.percent : null,
-    enabled: ['downloaded', 'up-to-date', 'error', 'idle'].includes(status.state),
-  };
-}
-
 /**
  * @param {object} ctx
  */
@@ -79,7 +69,6 @@ function readMaintenance(ctx) {
       source, label, value: snap.intervals[source], options: snap.options[source],
     })) : [],
     watchlist: [...options, ...missing].map(({ id, label }) => ({ id, label, pinned: ctx.watchlist.pins.includes(id) })),
-    update: updateSnapshot(ctx.updater),
     agent: agentSnapshot(ctx.agent),
   };
 }
@@ -138,12 +127,6 @@ async function runMaintenance(ctx, command) {
     case 'watch':
       ctx.watchlist.change({ action: 'pin', id: command.id, pinned: command.pinned === true });
       break;
-    case 'update': {
-      const state = ctx.updater?.status?.().state;
-      if (state === 'downloaded') ctx.updater.restartToUpdate();
-      else if (state === 'up-to-date' || state === 'error' || state === 'idle') await ctx.updater.checkNow();
-      break;
-    }
     case 'open-profile':
       await ctx.shell.openPath(ctx.store.file);
       break;

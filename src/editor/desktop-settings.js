@@ -145,7 +145,14 @@
       grafana.inert = false;
     }
   });
-  api.onDesktopSection((name) => showTab(name === 'profile' ? 'profile' : 'settings'));
+  api.onDesktopSection((name) => {
+    showTab(name === 'profile' ? 'profile' : 'settings');
+    if (name === 'updates') {
+      showSection('system-settings');
+      byId('desktop-updates-heading').focus({ preventScroll: true });
+      byId('desktop-updates').scrollIntoView({ block: 'nearest' });
+    }
+  });
   showTab('settings');
   showSection('deck-shortcut-settings');
 }

@@ -16,16 +16,6 @@
     const option = (value, label, selected) =>
       `<option value="${attr(value)}"${selected ? ' selected' : ''}>${text(label)}</option>`;
 
-    function updateCopy(update) {
-      if (!update || update.state === 'disabled') return t('Updates are off in this build.');
-      if (update.state === 'checking') return t('Checking for updates…');
-      if (update.state === 'downloading') return t('Downloading update {version}.', { version: update.version ?? '' });
-      if (update.state === 'downloaded') return t('Version {version} is ready.', { version: update.version ?? '' });
-      if (update.state === 'error') return t('The last update check failed.');
-      if (update.state === 'up-to-date') return t('Lastra is up to date.');
-      return t('Check for updates');
-    }
-
     function statsMarkup() {
       const history = state.history.map((item) => option(item.hours, t(item.label), item.hours === state.historyHours)).join('');
       const intervals = state.intervals.map((item) => `<label class="field">${text(t(item.label))}<select data-command="interval" data-source="${attr(item.source)}">${
@@ -85,10 +75,6 @@
             <button type="button" data-command="devtools">${text(t('Developer tools'))}</button>
           </div>
           ${measurement}
-        </section>
-        <section class="deck-settings-card"><h3>${text(t('Updates'))}</h3>
-          <p>${text(updateCopy(state.update))}</p>
-          <div class="deck-settings-fields"><button type="button" data-command="update"${state.update.enabled ? '' : ' disabled'}>${text(state.update.state === 'downloaded' ? t('Restart') : t('Check for updates'))}</button></div>
         </section>
         <section class="deck-settings-card"><h3>${text(t('Profile files'))}</h3>
           <div class="deck-settings-fields">

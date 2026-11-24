@@ -34,7 +34,6 @@ function context() {
       options: () => [{ id: 'cpu', label: 'CPU' }],
       change(command) { calls.push(['watch', command]); this.pins = command.pinned ? [command.id] : []; },
     },
-    updater: { status: () => ({ state: 'disabled', reason: 'not-packaged' }) },
     panelMeasurement: null,
     agent: null,
     setMonitoringInterval(source, intervalMs) { calls.push(['interval', source, intervalMs]); },
@@ -48,7 +47,6 @@ test('settings read the history, intervals and watchlist without a menu', async 
   assert.equal(snapshot.historyHours, 0);
   assert.equal(snapshot.intervals[0].source, 'resources');
   assert.deepEqual(snapshot.watchlist, [{ id: 'cpu', label: 'CPU', pinned: false }]);
-  assert.equal(snapshot.update.state, 'disabled');
   assert.equal(snapshot.agent, null);
   assert.equal(snapshot.measurement, false);
   await runMaintenance(ctx, { type: 'history', hours: 24 });

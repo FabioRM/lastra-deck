@@ -59,9 +59,13 @@
       <time id="corner-time"></time>
       <time id="corner-date"></time>
     </div>
-    <section id="update-offer" hidden>
-      <p id="update-offer-text"></p>
-      <button id="update-offer-restart" type="button">Restart</button>
+    <section id="update-offer" data-update-controls hidden aria-label="Updates">
+      <div><p data-update-message role="status"></p><p data-update-note hidden></p></div>
+      <div class="update-actions">
+        <button type="button" class="quiet" data-update-action="later" hidden>Later</button>
+        <button type="button" data-update-action="download" hidden>Download update</button>
+        <button type="button" data-update-action="restart" hidden>Restart to update</button>
+      </div>
     </section>
     <p id="view-only-status" role="status" hidden><strong>View only</strong> · Switch off from the Lastra tray menu</p>
     <div id="deck-audio-controls" role="group" aria-label="Windows audio">
@@ -685,6 +689,7 @@
   </dialog>
   <script src="../shared/i18n-it.js"></script>
   <script src="../shared/i18n.js"></script>
+  <script src="../shared/update-controls.js"></script>
   <script src="../shared/dom.js"></script>
   <script src="../shared/appearance.js"></script>
   <script src="macro-choice.js"></script>

@@ -341,6 +341,8 @@ test('Windows desktop app identities select executable starters while terminal a
     [{ executable: 'Antigravity.exe', appId: 'com.google.antigravity' }, 'antigravity', 'conversations', 'Ctrl+K'],
     [{ executable: 'Antigravity IDE.exe', appId: 'Google.AntigravityIDE' }, 'antigravity-workbench', 'focus-agent', 'Ctrl+L'],
     [{ executable: 'GitHubDesktop.exe' }, 'github-desktop', 'repositories', 'Ctrl+T'],
+    [{ executable: 'WindowsTerminal.exe' }, 'terminal', 'scroll-page-up', 'Ctrl+Shift+PageUp'],
+    [{ executable: 'WindowsTerminalPreview.exe' }, 'terminal', 'mark-mode', 'Ctrl+Shift+M'],
     [{ executable: 'ONENOTE.EXE' }, 'onenote', 'search-notebooks', 'Ctrl+E'],
     [{ executable: 'devenv.exe' }, 'visual-studio', 'solution-explorer', 'Ctrl+Alt+L'],
     [{ executable: 'vlc.exe' }, 'vlc', 'play-pause', 'Space'],
@@ -426,7 +428,8 @@ test('Photoshop emits workspace shortcuts for its executable and blocks a change
   const readForeground = Object.assign(() => 'photoshop.exe', {
     context: () => ({ ...target, mode: editingMode }), windowId: () => target.windowId,
   });
-  const copiedAction = createActionRunner({ readForeground, input: { sendChord: () => sent++ } });
+  const copiedAction = createActionRunner({ readForeground, readShortcutSettings: () => ({ platform: 'win32' }),
+    input: { sendChord: () => sent++ } });
   assert.equal((await copiedAction.run(copy.keys[0].action)).ok, false);
   editingMode = target.mode;
   assert.equal((await copiedAction.run(copy.keys[0].action)).ok, true);

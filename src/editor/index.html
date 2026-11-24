@@ -38,9 +38,18 @@
           <button id="reload" type="button">Reload from disk</button>
         </div>
       </details>
+      <span id="save-state"></span>
       <button id="save" class="primary" type="button" aria-keyshortcuts="Control+S" title="Save profile (Ctrl+S)" disabled>Save profile</button>
     </div>
   </header>
+  <section id="desktop-update-offer" data-update-controls hidden aria-label="Updates">
+    <div><p data-update-message role="status"></p><p class="muted" data-update-note hidden></p></div>
+    <div class="update-actions">
+      <button type="button" class="quiet" data-update-action="later" hidden>Later</button>
+      <button type="button" class="primary" data-update-action="download" hidden>Download update</button>
+      <button type="button" class="primary" data-update-action="restart" hidden>Restart to update</button>
+    </div>
+  </section>
   <main id="desktop-settings" aria-label="Settings">
     <nav id="desktop-settings-nav" aria-label="Settings categories">
       <p class="settings-nav-label">Views</p>
@@ -227,6 +236,20 @@
       </details>
       <details class="profile" id="system-settings" data-settings-panel hidden>
         <summary>System</summary>
+        <section class="deck-settings-card" id="desktop-updates" data-update-controls data-update-settings aria-labelledby="desktop-updates-heading">
+          <div class="deck-settings-heading">
+            <h3 id="desktop-updates-heading" tabindex="-1">Updates</h3>
+            <p class="muted" data-update-current></p>
+          </div>
+          <p data-update-message role="status"></p>
+          <p class="muted" data-update-note hidden></p>
+          <div class="update-actions">
+            <button type="button" data-update-action="check" disabled>Check for updates</button>
+            <button type="button" class="quiet" data-update-action="later" hidden>Later</button>
+            <button type="button" class="primary" data-update-action="download" hidden>Download update</button>
+            <button type="button" class="primary" data-update-action="restart" hidden>Restart to update</button>
+          </div>
+        </section>
         <section class="deck-settings-card">
           <label class="field" for="interface-language">Interface language</label>
           <select id="interface-language" disabled>
@@ -249,14 +272,18 @@
     <aside class="page-sidebar" aria-label="Page navigation">
       <div class="page-sidebar-heading">
         <h2 id="editor-profile-name">Profile</h2>
-        <p id="status" role="status"></p>
         <div id="agent-draft-offer" hidden>
           <p class="muted">An agent draft is ready to review.</p>
           <button id="agent-draft-open" type="button">Open agent draft</button>
         </div>
       </div>
       <div class="page-sidebar-list">
-        <div class="page-sidebar-title"><h3>Pages</h3><button id="add-page" type="button" title="New page" aria-label="New page">+</button></div>
+        <div class="page-sidebar-title">
+          <h3>Pages</h3>
+          <button id="add-page" type="button"><span aria-hidden="true">+</span><span>New page</span></button>
+        </div>
+        <input id="page-search" type="search" aria-label="Find a page" placeholder="Find a page" autocomplete="off">
+        <p id="page-search-empty" class="muted" role="status" hidden>No matching pages.</p>
         <nav id="pages" aria-label="Pages"></nav>
       </div>
       <button id="profile-templates-open" type="button">Browse templates</button>
@@ -266,11 +293,15 @@
         <div><h2 id="editor-page-name"></h2><p id="editor-page-size" class="muted"></p></div>
         <div id="page-actions"></div>
       </div>
+      <p id="status" role="status"></p>
       <div class="editor-canvas">
-        <div id="slots" role="group" aria-label="Page layout"></div>
-        <div id="key-group-tools" class="clipboard-tools" role="group" aria-label="Key group controls">
-          <button id="select-key-group" type="button" class="quiet" aria-pressed="false">Select keys</button>
-          <button id="paste-key-group" type="button" class="quiet" title="Use the selected slot as the group's upper-left corner">Paste group here</button>
+        <div class="grid-viewport"><div id="slots" role="group" aria-label="Page layout"></div></div>
+        <div class="canvas-tools">
+          <div id="key-group-tools" class="clipboard-tools" role="group" aria-label="Key group controls">
+            <button id="select-key-group" type="button" class="quiet" aria-pressed="false">Select keys</button>
+            <button id="paste-key-group" type="button" class="quiet" title="Use the selected slot as the group's upper-left corner">Paste group here</button>
+          </div>
+          <button id="edit-selection" type="button" aria-controls="inspector" aria-keyshortcuts="F2">Edit selection</button>
         </div>
       </div>
       <details id="live-preview">
@@ -307,7 +338,7 @@
         <div class="profile-fields" id="profile-fields"></div>
       </details>
     </section>
-    <section id="inspector" aria-label="Key settings"></section>
+    <section id="inspector" aria-label="Key settings" tabindex="-1"></section>
   </main>
   <dialog id="integration-setup" aria-labelledby="integration-setup-title">
     <div class="palette-heading">
@@ -535,6 +566,7 @@
   </dialog>
   <script src="../shared/i18n-it.js"></script>
   <script src="../shared/i18n.js"></script>
+  <script src="../shared/update-controls.js"></script>
   <script src="../shared/dom.js"></script>
   <script src="history.js"></script>
   <script src="action-palette.js"></script>

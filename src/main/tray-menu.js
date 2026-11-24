@@ -390,6 +390,7 @@ function createTrayMenu({ tray, electron, log, startup, opts, root, platform = p
     tray.setToolTip(`Lastra: ${where}`);
     tray.setContextMenu(Menu.buildFromTemplate([
       { label: 'Lastra', click: () => actions.openEditor() },
+      ...(current.update ? [current.update] : []),
       platform === 'win32' ? loginMenuItem({ startup, dialog, log, refresh, t }) : { label: t('Start with Windows'), enabled: false },
       { label: t('About'), click: () => actions.showInfo(where) },
       { label: t('Quit'), click: () => actions.quit() },

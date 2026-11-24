@@ -11,7 +11,7 @@ Lastra ships as a per-user NSIS installer for Windows x64, built with electron-b
 | `npm run dist:linux` | `.deb` and AppImage under `out/` | Packages the x86-64 Linux build. Run on Linux. |
 | `sh scripts/release-linux.sh` | Linux packages, GNOME extension ZIP and SHA-256 files under `out/` | Builds the Linux release bundle with `bsdtar` and `sha256sum`. |
 
-Both commands package the directory they run in, including local working-tree files. For a public build, run the commands in the audited source export for the release commit. To check a packaged build without the panel, run `out\win-unpacked\Lastra.exe --preview=preview.png`.
+These commands package the directory they run in, including local working-tree files. For a public build, use an extracted source ZIP from the release page or a clean checkout of its public tag. To check a packaged build without the panel, run `out\win-unpacked\Lastra.exe --preview=preview.png`.
 
 `out/` is ignored by Git. Do not commit build output.
 
@@ -30,16 +30,16 @@ The package contains `src/`, `profiles/`, `extensions/`, `assets/`, the license 
 
 ## Catalog redistribution
 
-`node scripts/package-public-release.js --current` exports committed `HEAD` and applies the public catalog redistribution rules. It prints the audited source directory and writes `dist/lastra-<version>-source.zip` with a SHA-256 checksum file. The Windows installer is built from that same audited directory. [Catalog redistribution](catalog-redistribution.md)
+This public repository mirrors source prepared with the catalog redistribution rules. The release workflow archives the tagged public tree and builds its Windows installer from the extracted files. [Catalog redistribution](catalog-redistribution.md)
 
-For a local release build, run `npm ci`, `npm run check`, and `npm run dist` in the printed `Source tree` directory. The emitted ZIP and checksum stay under `dist/` in the repository, and the installer, blockmap and update metadata appear under `out/` in the audited directory.
+For a local release build, run `npm ci`, `npm run check`, and `npm run dist` in the extracted source directory. The installer, blockmap and update metadata appear under `out/`. Run `sh scripts/release-linux.sh` from the same source on Linux for the `.deb`, AppImage, GNOME extension and their SHA-256 files.
 
 ## Publishing a release
 
 1. Update `version` in `package.json` and `package-lock.json`, for example with `npm version 0.2.2 --no-git-tag-version`. Commit the change.
 2. Tag the commit with the same version and push the tag: `git tag v0.2.2` then `git push origin v0.2.2`.
-3. The workflow checks that the tag matches `package.json`, exports the audited source from the tag, and runs `npm run check` and `npm run dist` there. It retains the installer, its blockmap, `latest.yml`, the source ZIP and its checksum as a workflow artifact, then creates a **draft** release with the same files. Existing releases retain their assets on reruns. [Release workflow](../.github/workflows/release.yml)
-4. Review the draft and add release notes. Optionally, install it on a test PC.
+3. The workflow checks that the tag matches `package.json`, then archives the public source and runs `npm run check` and `npm run dist` there. It retains the installer and its checksum, the blockmap, `latest.yml`, and the source ZIP and its checksum as a workflow artifact. If the release is new, it creates a **draft** with the same files. [Release workflow](../.github/workflows/release.yml)
+4. Build the Linux packages from the same source and attach them to the draft with their checksums. Review all files and add release notes.
 5. Publish the draft. Installed copies find the update at their next check.
 
 electron-updater reads only published releases from `FabioRM/lastra-deck`, and the repository must be public for installed copies to read them. Leave `latest.yml` and the `.blockmap` attached to the release, since they let installed copies verify and download updates. Pre-releases are ignored.
@@ -61,8 +61,8 @@ When a signed build is installed, electron-updater checks that each update is si
 
 ## Update behavior
 
-- Updates run only in an installed copy. Source runs, `--preview` runs, `dist:dir` builds, and runs with `LASTRA_DISABLE_UPDATES=1` never check.
+- The installed Windows app checks the public [GitHub Releases feed](https://github.com/FabioRM/lastra-deck/releases). Source runs, Linux builds, `--preview` runs, `dist:dir` builds, and runs with `LASTRA_DISABLE_UPDATES=1` skip these checks.
 - The first check runs 90 seconds after startup, and later checks run every 4 hours.
-- A new version downloads in the background. When it is ready, the deck offers a restart. Otherwise it installs when Lastra quits. Lastra never opens a system dialog on the deck.
-- **Lastra → Settings → System → Updates** shows the check, download status, and restart options.
+- When a stable version is available, Lastra offers **Download update** and **Later** on the deck and in the desktop window. **Later** hides the offer for that version until the next app session. You can still start the download from **Lastra → Settings → System → Updates**.
+- The download begins after you choose **Download update**. The same page shows progress and lets you retry a failed download. Once the download is ready, choose **Restart to update** or quit Lastra normally to install it.
 - Update activity is written to `lastra.log` in the Lastra logs folder, under `%APPDATA%\Lastra\logs`.

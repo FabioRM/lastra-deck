@@ -31,11 +31,11 @@ The loop opens **Emoji** from **Home**, then shows **Dashboard**, **Stats**, and
 
 ## Getting started
 
-Download the installer or browse the reviewed source on the public release page. [Lastra v1.0.1](https://github.com/FabioRM/lastra-deck/releases/tag/v1.0.1) · [Windows x64 installer](https://github.com/FabioRM/lastra-deck/releases/download/v1.0.1/Lastra-Setup-1.0.1.exe) · [SHA‑256 checksum](https://github.com/FabioRM/lastra-deck/releases/download/v1.0.1/Lastra-Setup-1.0.1.exe.sha256) · [Catalog redistribution review](docs/catalog-redistribution.md)
+Download the installer or browse the reviewed source on the public release page. [Lastra v1.0.2](https://github.com/FabioRM/lastra-deck/releases/tag/v1.0.2) · [Windows x64 installer](https://github.com/FabioRM/lastra-deck/releases/download/v1.0.2/Lastra-Setup-1.0.2.exe) · [SHA‑256 checksum](https://github.com/FabioRM/lastra-deck/releases/download/v1.0.2/Lastra-Setup-1.0.2.exe.sha256) · [Catalog redistribution review](docs/catalog-redistribution.md)
 
 Set the XENEON EDGE to **Extend these displays** in Windows Display settings. The panel runs at 2560 × 720 in landscape and 720 × 2560 in portrait.
 
-**Install the app.** Download `Lastra-Setup-1.0.1.exe` and run it on Windows x64. It installs for the current user in `%LOCALAPPDATA%\Programs\Lastra` and adds Start menu and desktop shortcuts. The Windows installer is unsigned. Settings and profiles live in `%APPDATA%\Lastra` and survive updates and uninstalls. [Latest release](https://github.com/FabioRM/lastra-deck/releases/latest) · [Update behavior](https://github.com/FabioRM/lastra-deck/blob/main/docs/releasing.md#update-behavior)
+**Install the app.** Download `Lastra-Setup-1.0.2.exe` and run it on Windows x64. It installs for the current user in `%LOCALAPPDATA%\Programs\Lastra` and adds Start menu and desktop shortcuts. The Windows installer is unsigned. Settings and profiles live in `%APPDATA%\Lastra` and survive updates and uninstalls. [Latest release](https://github.com/FabioRM/lastra-deck/releases/latest) · [Update behavior](https://github.com/FabioRM/lastra-deck/blob/main/docs/releasing.md#update-behavior)
 
 **Run from source.** Install **Node.js 22.12.0 or later**, as required by the Electron installer, then run these commands from the project directory. Source runs never check for updates. To build the installer yourself, see [Releasing](docs/releasing.md).
 
@@ -46,7 +46,7 @@ npm start
 
 Lastra looks for the XENEON EDGE among the displays detected by Windows. The deck opens in a borderless, always-on-top window with activation disabled. If the Edge is absent at startup or disconnected during use, Lastra closes along with any hardware monitoring it started. While the Edge is connected, use **Lastra → Settings → Display → Deck display** or `npm start -- --display=<id>` to move the deck to another monitor. `npm run dev` opens a diagnostics window even when the Edge is absent.
 
-Click the Lastra icon in the Windows notification area to open desktop Settings. The right-click menu offers **Lastra**, **Avvio automatico**, **Info**, and **Esci**. Enable **Avvio automatico** to launch Lastra when you sign in. The setting is optional and also appears under **Startup apps** in Windows. If the Edge is disconnected when you sign in, Lastra exits. Connect it and start Lastra manually.
+Click the Lastra icon in the Windows notification area to open desktop Settings. From the right-click menu you can check for updates, open **Info**, or choose **Esci**. Enable **Avvio automatico** to launch Lastra when you sign in. The setting is optional and also appears under **Startup apps** in Windows. If the Edge is disconnected when you sign in, Lastra exits. Connect it and start Lastra manually.
 
 When Windows changes the display layout, rotates the screen, or wakes from sleep, Lastra rechecks the display after a short delay and puts the deck back without taking focus. A brief interruption while Windows detects the Edge can recover in the same window. If Lastra has already exited after a disconnect, reconnect the Edge and start Lastra again.
 
@@ -166,7 +166,7 @@ Use **Lastra → Settings → System → Interface language** to choose **System
 
 ## Profile editor
 
-Select **Editor** in the desktop Lastra window or run `npm run edit`. Choose a page on the left, then select a slot in the grid to edit its **Actions**, **Style**, or **Placement**. Use the arrow keys to move around the grid or drag a key to move it. Expand **Page settings** to set the apps that activate the page. **Save profile** updates the deck immediately. Find profile import, export, and backups under **More**.
+Select **Editor** in the desktop Lastra window or run `npm run edit`. Use **Find a page** to filter pages by name or folder, then select a slot to edit its **Actions**, **Style**, or **Placement**. Use the arrow keys to move around the grid, **F2** or **Edit selection** to move to the slot settings, and drag a key to reposition it. Expand **Page settings** to set the apps that activate the page. The toolbar shows whether the profile has unsaved changes. **Save profile** updates the deck immediately. Find profile import, export, and backups under **More**.
 
 Open **App shortcuts**, select an app, and expand **Configure app shortcut pages**. Create, name, and reorder several pages. Select a command in the catalog and choose **Add to shortcut page**. Hide a command to keep it in your configuration for later, or remove it from the page. You can also turn off an app's automatic pages for the current activity. Choose **Save profile** to apply your changes. Use the arrows or swipe on the deck to switch pages while the app is in the foreground. [Configure app shortcut pages](docs/shortcut-packs.md#configure-app-shortcut-pages)
 

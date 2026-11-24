@@ -1591,25 +1591,6 @@
   api?.onStatus((s) => showStatus(s.message, s.ok));
   api?.onDeckNavigation?.(applyDeckNavigation);
   api?.onLanguage?.(setLanguage);
-  const updateOffer = document.getElementById('update-offer');
-  const updateOfferText = document.getElementById('update-offer-text');
-  const updateRestart = document.getElementById('update-offer-restart');
-  function showUpdateOffer(status) {
-    if (!updateOffer || !status || typeof status !== 'object') return;
-    const version = status.version || '';
-    if (status.state === 'downloaded') {
-      updateOffer.hidden = false;
-      updateOfferText.textContent = window.LastraI18n.t('Version {version} is ready.', { version });
-      updateRestart.hidden = false;
-    } else if (status.state === 'downloading') {
-      updateOffer.hidden = false;
-      updateOfferText.textContent = window.LastraI18n.t('Downloading update {version}.', { version });
-      updateRestart.hidden = true;
-    } else updateOffer.hidden = true;
-  }
-  updateRestart?.addEventListener('click', () => { void api?.restartToUpdate?.(); });
-  api?.onUpdateStatus?.(showUpdateOffer);
-  void api?.updateStatus?.().then(showUpdateOffer).catch(() => {});
   document.addEventListener('lastra-language', () => {
     updateViewSwitch();
     if (profile) renderProfile({ ...profile });

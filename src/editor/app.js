@@ -12,11 +12,15 @@ const pageSize = document.getElementById('editor-page-size');
 const pageActions = document.getElementById('page-actions');
 const profileHeading = document.getElementById('editor-profile-name');
 const pages = document.getElementById('pages');
+const pageSearch = document.getElementById('page-search');
+const pageSearchEmpty = document.getElementById('page-search-empty');
 const slots = document.getElementById('slots');
 const selectGroup = document.getElementById('select-key-group');
 const pasteGroup = document.getElementById('paste-key-group');
 const inspector = document.getElementById('inspector');
+const editSelection = document.getElementById('edit-selection');
 const status = document.getElementById('status');
+const saveState = document.getElementById('save-state');
 const agentDraftOffer = document.getElementById('agent-draft-offer');
 const agentDraftOpen = document.getElementById('agent-draft-open');
 const editorMenu = document.querySelector('.editor-menu');
@@ -182,7 +186,8 @@ function notice(message, kind = '') {
 
 function updateControls() {
   dirty = Boolean(draft && editHistory.isDirty(draftText));
-  workspace.toggleAttribute('data-dirty', dirty);
+  saveState.dataset.state = dirty ? 'dirty' : diskWarning ? 'warning' : 'saved';
+  saveState.textContent = !draft ? '' : dirty ? t('Unsaved changes') : diskWarning ? t('Profile file warning') : t('Saved');
   workspace.inert = busy || !draft;
   reload.disabled = busy;
   save.disabled = busy || (!dirty && !diskWarning);
@@ -202,9 +207,8 @@ function updateControls() {
 }
 
 function showDraftStatus() {
-  if (dirty) notice(t('Unsaved changes'));
-  else if (diskWarning) notice(t('{warning}. The editor is showing the last valid profile.', { warning: diskWarning }), 'error');
-  else notice(t('Saved'));
+  if (diskWarning) notice(t('{warning}. The editor is showing the last valid profile.', { warning: diskWarning }), 'error');
+  else notice('');
 }
 
 function editorState() {
@@ -609,12 +613,19 @@ function renderProfileSettings() {
   profileFields.replaceChildren(...controls);
 }
 
+function pageSearchText(value) {
+  return value.normalize('NFD').replace(/\p{M}/gu, '').toLowerCase();
+}
+
 function renderTabs() {
-  pages.replaceChildren(...[...draft.pages, { id: BAR_PAGE_ID, name: t('Persistent bar') }].map((page, index) => {
-    const tab = button('', () => {
-      switchPage(page.id);
-      pages.children[index]?.focus();
-    }, { className: 'page-link', dataset: { surface: page.id === BAR_PAGE_ID ? 'bar' : 'page' } });
+  const focus = pages.contains(document.activeElement) ? document.activeElement.dataset.pageId : undefined;
+  const query = pageSearchText(pageSearch.value.trim());
+  const matches = draft.pages.filter((page) => pageSearchText([...(page.folder ?? []), page.name || page.id].join(' ')).includes(query));
+  pageSearchEmpty.hidden = matches.length > 0;
+  pages.replaceChildren(...[...matches, { id: BAR_PAGE_ID, name: t('Persistent bar') }].map((page) => {
+    const tab = button('', () => switchPage(page.id), {
+      className: 'page-link', dataset: { surface: page.id === BAR_PAGE_ID ? 'bar' : 'page', pageId: page.id },
+    });
     const copy = node('span', 'page-link-copy');
     copy.append(node('span', 'page-link-name', page.name || page.id));
     if (page.folder?.length) copy.append(node('small', '', page.folder.join(' / ')));
@@ -624,6 +635,7 @@ function renderTabs() {
     tab.setAttribute('aria-pressed', String(page.id === pageId));
     return tab;
   }));
+  if (focus) [...pages.children].find((child) => child.dataset.pageId === focus)?.focus({ preventScroll: true });
   addPage.disabled = draft.pages.length >= 16;
 }
 
@@ -1347,8 +1359,14 @@ function activateSlot(index) {
   slots.children[selected].focus();
 }
 
+editSelection.addEventListener('click', () => inspector.focus());
 slots.addEventListener('keydown', (event) => {
   if (!event.target.matches('.slot') || event.altKey || event.ctrlKey || event.metaKey) return;
+  if (event.key === 'F2') {
+    event.preventDefault();
+    inspector.focus();
+    return;
+  }
   const { cols, rows } = currentGrid();
   const current = Array.prototype.indexOf.call(slots.children, event.target);
   const shifts = { ArrowLeft: -1, ArrowRight: 1, ArrowUp: -cols, ArrowDown: cols };
@@ -1967,7 +1985,7 @@ function renderInspector() {
     tabs.append(section.tab);
   }
   const tools = clipboardKeyTools(key);
-  inspector.append(tools, tabs, actions, appearance, layoutPanel);
+  inspector.append(tabs, actions, appearance, layoutPanel, tools);
   showInspectorTab(inspectorTab);
   const behavior = linkedControl(draft, key) ?? key;
   tools.append(button(t('Test key'), () => {
@@ -2378,14 +2396,17 @@ backupsDialog.addEventListener('cancel', (event) => {
 addPage.addEventListener('click', () => edit(() => {
   const id = crypto.randomUUID();
   draft.pages.push({ id, name: t('Page {number}', { number: draft.pages.length + 1 }), apps: [], keys: [] });
+  pageSearch.value = '';
   switchPage(id);
   pageSettings.open = true;
   pageFields.querySelector('input')?.select();
 }));
+pageSearch.addEventListener('input', () => { if (draft) renderTabs(); });
 document.addEventListener('lastra-language', () => {
   if (!draft) return;
   renderProfileSettings();
   renderPage();
+  updateControls();
   showDraftStatus();
 });
 window.addEventListener('keydown', (e) => {

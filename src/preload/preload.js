@@ -76,7 +76,7 @@ contextBridge.exposeInMainWorld('lastra', {
   readFeeds: () => ipcRenderer.invoke('feeds:read'),
   updateStatus: () => ipcRenderer.invoke('update:status'),
   onUpdateStatus: (callback) => subscribe('update:status', callback),
-  restartToUpdate: () => ipcRenderer.invoke('update:restart'),
+  updateCommand: (action, version) => ipcRenderer.invoke('update:command', action, version),
   onProfile: (cb) => subscribe('profile', cb),
   onSensors: (cb) => subscribe('sensors', cb),
   watchSensorWidgets: (ids) => ipcRenderer.invoke('sensors:widgets', ids),

@@ -70,6 +70,14 @@ test('tray and advanced settings follow the chosen interface language', () => {
   assert.equal(tray.menu.at(-1).label, 'Quit');
 });
 
+test('an available update can be opened from the Windows tray', () => {
+  const { menu, state, tray, calls } = fixture({ platform: 'win32' });
+  state.update = { label: 'Update 1.0.2 available', enabled: true, click: () => calls.push(['updates']) };
+  menu.refresh();
+  find(tray.menu, state.update.label).click();
+  assert.deepEqual(calls, [['updates']]);
+});
+
 test('advanced options live under the desktop Settings window', () => {
   const { menu, state, calls } = fixture();
   const displays = find(menu.settingsItems('navigation'), 'Deck display').submenu;

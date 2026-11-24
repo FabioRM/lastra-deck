@@ -2,7 +2,7 @@
 'use strict';
 
 // Background updates for installed (NSIS) builds through electron-updater and GitHub Releases.
-// Checks start on their own. A downloaded update is offered on the deck and also installs when Lastra quits.
+// Check automatically and download only after the user accepts the offered version.
 
 const fs = require('node:fs');
 const path = require('node:path');
@@ -12,9 +12,9 @@ const INTERVAL_MS = 4 * 60 * 60 * 1000;
 const UPDATE_CONFIG = 'app-update.yml';
 
 /**
- * @typedef {'disabled' | 'idle' | 'checking' | 'downloading' | 'downloaded' | 'up-to-date' | 'error'} UpdateState
+ * @typedef {'disabled' | 'idle' | 'checking' | 'available' | 'downloading' | 'downloaded' | 'up-to-date' | 'error'} UpdateState
  * @typedef {{ state: UpdateState, reason?: string, version?: string, percent?: number,
- *   message?: string, checkedAt?: number }} UpdateStatus
+ *   message?: string, checkedAt?: number, deferred?: boolean, downloadFailed?: boolean }} UpdateStatus
  * @typedef {{ label: string, enabled: boolean, click?: () => void }} UpdateMenuItem
  */
 
@@ -84,6 +84,8 @@ function createUpdater({
   /** @type {ReturnType<typeof setInterval> | null} */
   let intervalTimer = null;
   let lastLoggedPercent = -1;
+  /** @type {string | undefined} */
+  let deferredVersion;
 
   /** @param {UpdateStatus} next */
   function set(next) {
@@ -94,7 +96,7 @@ function createUpdater({
   function ensureUpdater() {
     if (updater) return updater;
     const instance = loadAutoUpdater();
-    instance.autoDownload = true;
+    instance.autoDownload = false;
     instance.autoInstallOnAppQuit = true;
     instance.allowPrerelease = false;
     instance.allowDowngrade = false;
@@ -104,14 +106,8 @@ function createUpdater({
       error: (/** @type {unknown} */ message) => log('[updater] error:', messageOf(message)),
       debug: () => {},
     };
-    instance.on('checking-for-update', () => { if (status.state !== 'checking') set({ state: 'checking' }); });
-    instance.on('update-available', (/** @type {unknown} */ info) => {
-      lastLoggedPercent = -1;
-      set({ state: 'downloading', version: versionOf(info), percent: 0, checkedAt: now() });
-    });
-    instance.on('update-not-available', () => set({ state: 'up-to-date', checkedAt: now() }));
     instance.on('download-progress', (/** @type {{ percent?: number }} */ progress) => {
-      if (status.state === 'downloaded') return;
+      if (status.state !== 'downloading') return;
       const percent = Math.max(0, Math.min(100, Math.floor(Number(progress?.percent) || 0)));
       // Rebuild the tray at most every 10% to keep menu churn low on slow connections.
       if (percent - lastLoggedPercent < 10 && percent < 100) return;
@@ -119,14 +115,14 @@ function createUpdater({
       set({ state: 'downloading', version: status.version, percent });
     });
     instance.on('update-downloaded', (/** @type {unknown} */ info) => {
+      if (status.state !== 'downloading') return;
       const version = versionOf(info) ?? status.version;
       log('[updater] update', version ?? '(unknown version)', 'downloaded; it installs when Lastra quits.');
       set({ state: 'downloaded', version });
     });
     instance.on('error', (/** @type {unknown} */ error) => {
-      // A failed check or download leaves an already downloaded update in place.
-      if (status.state === 'downloaded') return;
-      set({ state: 'error', message: messageOf(error), checkedAt: now() });
+      // The request promises handle check and download errors. Installation can emit independently.
+      if (status.state === 'downloaded') log('[updater] install failed:', messageOf(error));
     });
     updater = instance;
     return instance;
@@ -138,29 +134,48 @@ function createUpdater({
       return Promise.resolve({ ...status });
     }
     if (pending) return pending;
-    pending = (async () => {
+    const previous = status;
+    pending = Promise.resolve().then(async () => {
       try {
-        const instance = ensureUpdater();
         set({ state: 'checking' });
-        const result = await instance.checkForUpdates();
-        // Download failures are reported through the 'error' event; never leave the promise unhandled.
-        result?.downloadPromise?.catch?.(() => {});
-        if (status.state === 'checking') {
-          set(result?.isUpdateAvailable
-            ? { state: 'downloading', version: versionOf(result.updateInfo), percent: 0, checkedAt: now() }
-            : { state: 'up-to-date', checkedAt: now() });
+        const result = await ensureUpdater().checkForUpdates();
+        if (result?.isUpdateAvailable) {
+          const version = versionOf(result.updateInfo);
+          if (!version) throw new Error('Missing version in update metadata');
+          set({ state: 'available', version, deferred: deferredVersion === version, checkedAt: now(),
+            downloadFailed: previous.version === version && previous.downloadFailed === true });
+        } else {
+          set({ state: 'up-to-date', checkedAt: now() });
         }
       } catch (error) {
-        if (status.state !== 'downloaded') {
-          log('[updater] check failed:', messageOf(error));
-          set({ state: 'error', message: messageOf(error), checkedAt: now() });
-        }
-      } finally {
-        pending = null;
+        log('[updater] check failed:', messageOf(error));
+        set(previous.state === 'available' ? previous : { state: 'error', message: messageOf(error), checkedAt: now() });
       }
       return { ...status };
-    })();
+    }).finally(() => { pending = null; });
     return pending;
+  }
+
+  /** @param {unknown} version */
+  function download(version) {
+    if (pending || status.state !== 'available' || status.version !== version || typeof version !== 'string') return false;
+    deferredVersion = undefined;
+    lastLoggedPercent = 0;
+    set({ state: 'downloading', version, percent: 0 });
+    void Promise.resolve().then(() => updater.downloadUpdate()).catch((error) => {
+      if (status.state !== 'downloading') return;
+      log('[updater] download failed:', messageOf(error));
+      set({ state: 'available', version, deferred: false, downloadFailed: true });
+    });
+    return true;
+  }
+
+  /** @param {unknown} version */
+  function defer(version) {
+    if (status.state !== 'available' || status.version !== version || typeof version !== 'string') return false;
+    deferredVersion = version;
+    set({ ...status, deferred: true });
+    return true;
   }
 
   function scheduledCheck() {
@@ -201,28 +216,34 @@ function createUpdater({
 
   /**
    * A tray menu item, or null while updates are off because this is a dev, preview, or unpacked build.
+   * @param {(label: string, values?: Record<string, string | number>) => string} [t]
+   * @param {() => void} [openUpdates]
+   * @param {() => void} [restart]
    * @returns {UpdateMenuItem | null}
    */
-  function menuItem() {
+  function menuItem(t = (label, values = {}) => label.replace(/\{(\w+)\}/g, (match, key) => String(values[key] ?? match)),
+    openUpdates = () => {}, restart = restartToUpdate) {
     switch (status.state) {
       case 'disabled':
-        return status.reason === 'LASTRA_DISABLE_UPDATES' ? { label: 'Updates turned off', enabled: false } : null;
+        return status.reason === 'LASTRA_DISABLE_UPDATES' ? { label: t('Updates turned off'), enabled: false } : null;
       case 'checking':
-        return { label: 'Checking for updates…', enabled: false };
+        return { label: t('Checking for updates…'), enabled: false };
+      case 'available':
+        return { label: t('Update {version} available', { version: status.version ?? '' }), enabled: true, click: openUpdates };
       case 'downloading':
-        return { label: `Downloading update${status.version ? ' ' + status.version : ''} (${status.percent ?? 0}%)`, enabled: false };
+        return { label: t('Downloading update {version} ({percent}%)', { version: status.version ?? '', percent: status.percent ?? 0 }), enabled: false };
       case 'downloaded':
-        return { label: `Restart to update${status.version ? ' to ' + status.version : ''}`, enabled: true, click: () => void restartToUpdate() };
+        return { label: t('Restart to update to {version}', { version: status.version ?? '' }), enabled: true, click: restart };
       case 'up-to-date':
-        return { label: 'Check for updates (up to date)', enabled: true, click: () => void checkNow() };
+        return { label: t('Check for updates (up to date)'), enabled: true, click: () => void checkNow() };
       case 'error':
-        return { label: 'Check for updates (last check failed)', enabled: true, click: () => void checkNow() };
+        return { label: t('Check for updates (last check failed)'), enabled: true, click: () => void checkNow() };
       default:
-        return { label: 'Check for updates', enabled: true, click: () => void checkNow() };
+        return { label: t('Check for updates'), enabled: true, click: () => void checkNow() };
     }
   }
 
-  return { start, stop, checkNow, restartToUpdate, menuItem, status: () => ({ ...status }) };
+  return { start, stop, checkNow, download, defer, restartToUpdate, menuItem, status: () => ({ ...status }) };
 }
 
 module.exports = { createUpdater, STARTUP_DELAY_MS, INTERVAL_MS };

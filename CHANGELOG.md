@@ -4,6 +4,12 @@ Completed items from the former TODO, grouped by the section that tracked them. 
 
 Entries grouped under **0.2.1** record the completed work through the first reviewed source release.
 
+## 1.0.2
+
+- Let Windows users download or defer an available update from the deck and from Settings. The Updates page shows download progress and offers a retry after a failed download.
+- Add a page filter and save status to the profile editor. Press F2 to open the selected slot’s settings.
+- Expand Windows Terminal shortcuts with vertical pane resizing, page scrolling, mark mode, and buffer selection.
+
 ## 1.0.1
 
 - Keep the market grid to eight columns. Currency pairs include the day's high, low, and previous close when Yahoo reports them.

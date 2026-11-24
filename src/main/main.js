@@ -807,11 +807,48 @@ function openEditor(section = 'settings') {
       cancelId: 0,
     });
     if (choice === 1) event.preventDefault();
+    else window.removeListener('closed', installAfterClosingEditor);
   });
   window.once('ready-to-show', () => window.show());
   window.webContents.once('did-finish-load', () => window.webContents.send('editor:section', section));
   window.once('closed', () => { editor = editorProfile = null; });
   window.loadFile(EDITOR, { query: { language: interfaceLanguage.language } });
+}
+
+function installAfterClosingEditor() {
+  updater?.restartToUpdate();
+}
+
+function restartToUpdate() {
+  if (updater?.status().state !== 'downloaded') return false;
+  const owner = editor;
+  if (!owner || owner.isDestroyed()) return updater.restartToUpdate();
+  // Electron starts the installer before quitting. Close the editor through its draft guard first.
+  if (!owner.listeners('closed').includes(installAfterClosingEditor)) {
+    owner.once('closed', installAfterClosingEditor);
+    owner.close();
+  }
+  return true;
+}
+
+function updateStatus() {
+  const status = updater?.status();
+  return {
+    state: status?.state ?? 'disabled', version: status?.version ?? null, percent: status?.percent ?? null,
+    deferred: status?.deferred === true, downloadFailed: status?.downloadFailed === true,
+    currentVersion: app.getVersion(),
+  };
+}
+
+/** @param {unknown} action @param {unknown} version */
+function updateCommand(action, version) {
+  switch (action) {
+    case 'download': return updater?.download(version) === true;
+    case 'later': return updater?.defer(version) === true;
+    case 'restart': return restartToUpdate();
+    case 'check': return updater?.checkNow().then(() => true) ?? false;
+    default: return false;
+  }
 }
 
 function offerEditorDraft(approved) {
@@ -1418,11 +1455,10 @@ function registerIpc() {
   edit('editor:feeds:locate', () => feeds.locate());
   edit('editor:feeds:symbols', (query) => feeds.searchSymbols(query));
   deck('feeds:read', () => feeds?.snapshot() ?? null);
-  deck('update:status', () => {
-    const current = updater?.status() ?? { state: 'disabled' };
-    return { state: current.state, version: current.version ?? null, percent: current.percent ?? null };
-  });
-  handle('update:restart', () => win, RENDERER, () => updater?.restartToUpdate() === true);
+  deck('update:status', updateStatus);
+  deck('update:command', (action, version) => action !== 'check' && updateCommand(action, version));
+  edit('editor:update:status', updateStatus);
+  edit('editor:update:command', updateCommand);
   edit('editor:configuration:export', async () => {
     const owner = editor;
     const bundle = readSettings(app.getPath('userData'));
@@ -2434,7 +2470,9 @@ function start() {
     tray, electron: { Menu, dialog, clipboard, screen, shell }, log, startup, opts, root: ROOT,
     language: () => interfaceLanguage.language,
     state: () => ({ edge, store, activities, viewOnly, navigation, pages, monitoring, retainedTelemetry, deckReveal,
-      panelMeasurement, preferredDisplay, win, update: updater?.menuItem() ?? null, agent: agentAccess ? { access: agentAccess, service: agentService, drafts: agentDrafts,
+      panelMeasurement, preferredDisplay, win, update: updater?.menuItem(
+        (label, values) => translate(interfaceLanguage.language, label, values),
+        () => openEditor('updates'), restartToUpdate) ?? null, agent: agentAccess ? { access: agentAccess, service: agentService, drafts: agentDrafts,
         gestureFixtures: agentGestureFixtures, runs: agentRuns, apply: agentApply, projects: agentProjects } : null }),
     actions: {
       openEditor, switchActivity, setViewOnly, sendDashboardCalendar, exportDiagnostics, refreshPage,
@@ -2461,16 +2499,17 @@ function start() {
       showDeck: () => showDeck(), revealDesktop: () => revealDesktop(), quit: () => app.quit(),
     },
   });
-  // Installed builds check GitHub Releases quietly and install when Lastra quits; dev and preview runs skip it.
-  updater = createUpdater({ app, log, preview: Boolean(opts.preview), supported: process.platform === 'win32', onChange: (status) => {
+  updater = createUpdater({ app, log, preview: Boolean(opts.preview), supported: process.platform === 'win32', onChange: () => {
     trayMenu?.refresh();
-    send('update:status', { state: status.state, version: status.version ?? null, percent: status.percent ?? null });
+    const status = updateStatus();
+    send('update:status', status);
+    if (editor && !editor.isDestroyed() && !editor.webContents.isCrashed()) editor.webContents.send('update:status', status);
   } });
   disposables.add('updates', () => updater.stop());
   updater.start();
   const maintenanceContext = () => ({
     platform: process.platform, root: ROOT, dialog, clipboard, shell, screen, window: editor,
-    store, monitoring, retainedTelemetry, watchlist, serviceHealth, updater, panelMeasurement, win,
+    store, monitoring, retainedTelemetry, watchlist, serviceHealth, panelMeasurement, win,
     activity: () => activities.current.id,
     setMonitoringInterval: (source, intervalMs) => resources.change({ action: 'refresh', source, intervalMs }),
     exportDiagnostics,

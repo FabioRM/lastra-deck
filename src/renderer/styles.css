@@ -82,6 +82,8 @@ html, body {
   translate: -50% 0;
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
+  justify-content: space-between;
   gap: 16px;
   max-width: calc(100% - 80px);
   padding: 14px 16px 14px 22px;
@@ -92,6 +94,10 @@ html, body {
   box-shadow: 0 16px 40px rgb(0 0 0 / 28%);
 }
 #update-offer p { margin: 0; font-size: calc(24px * var(--text-scale)); }
+#update-offer [data-update-note] { margin-top: 4px; color: var(--muted-text); font-size: calc(19px * var(--text-scale)); }
+#update-offer .update-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+#update-offer .update-actions:has(button:not([hidden])) { margin-inline-start: auto; }
+#update-offer .update-actions:not(:has(button:not([hidden]))) { display: none; }
 #update-offer button {
   min-height: 48px;
   padding: 8px 18px;
@@ -102,6 +108,8 @@ html, body {
   font: inherit;
   font-size: calc(22px * var(--text-scale));
 }
+#update-offer .quiet { border: 1px solid var(--control-border); background: transparent; color: var(--text); }
+#stage[data-view-only] #update-offer { display: none; }
 
 #stage {
   position: absolute;

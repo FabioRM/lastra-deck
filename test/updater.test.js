@@ -10,7 +10,9 @@ class FakeAutoUpdater extends EventEmitter {
     super();
     this.behaviour = behaviour;
     this.checks = 0;
+    this.downloads = 0;
     this.installs = [];
+    this.version = '0.3.0';
   }
 
   async checkForUpdates() {
@@ -18,12 +20,22 @@ class FakeAutoUpdater extends EventEmitter {
     this.emit('checking-for-update');
     if (this.behaviour === 'throw') throw new Error('net::ERR_INTERNET_DISCONNECTED\nlong body');
     if (this.behaviour === 'update') {
-      const info = { version: '0.3.0' };
+      const info = { version: this.version };
       this.emit('update-available', info);
-      return { isUpdateAvailable: true, updateInfo: info, downloadPromise: Promise.reject(new Error('reported via event')) };
+      return { isUpdateAvailable: true, updateInfo: info, downloadPromise: this.autoDownload ? this.downloadUpdate() : null };
     }
     this.emit('update-not-available', { version: '0.2.1' });
     return { isUpdateAvailable: false, updateInfo: { version: '0.2.1' } };
+  }
+
+  async downloadUpdate() {
+    this.downloads += 1;
+    if (this.failDownload) {
+      const error = new Error('Download failed');
+      this.emit('error', error);
+      throw error;
+    }
+    return ['installer.exe'];
   }
 
   quitAndInstall(isSilent, forceRunAfter) {
@@ -93,11 +105,11 @@ test('start schedules one delayed check and periodic checks, and stop clears the
   assert.equal(timers.intervals.length, 0);
 });
 
-test('a check configures background download and install on quit, and reports up to date', async () => {
+test('a check disables automatic downloads and reports up to date', async () => {
   const { updater, fake, changes } = setup();
   const status = await updater.checkNow();
   assert.deepEqual(status, { state: 'up-to-date', checkedAt: 1000 });
-  assert.equal(fake.autoDownload, true);
+  assert.equal(fake.autoDownload, false);
   assert.equal(fake.autoInstallOnAppQuit, true);
   assert.equal(fake.allowPrerelease, false);
   assert.equal(typeof fake.logger.info, 'function');
@@ -112,11 +124,17 @@ test('concurrent checks share one request', async () => {
   assert.deepEqual(first, second);
 });
 
-test('an available update downloads in the background and offers a restart from the tray', async () => {
+test('an available update stays pending until the user accepts that version', async () => {
   const { updater, fake, lines } = setup({ behaviour: 'update' });
   const status = await updater.checkNow();
-  assert.equal(status.state, 'downloading');
+  assert.equal(status.state, 'available');
   assert.equal(status.version, '0.3.0');
+  assert.equal(fake.downloads, 0);
+  assert.equal(updater.download('0.2.9'), false);
+  assert.equal(updater.download('0.3.0'), true);
+  assert.equal(updater.download('0.3.0'), false);
+  await new Promise(setImmediate);
+  assert.equal(fake.downloads, 1);
   assert.match(updater.menuItem().label, /^Downloading update 0\.3\.0 \(0%\)$/);
   assert.equal(updater.menuItem().enabled, false);
 
@@ -140,6 +158,40 @@ test('an available update downloads in the background and offers a restart from 
   assert.equal(item.label, 'Restart to update to 0.3.0');
   item.click();
   assert.deepEqual(fake.installs, [[true, true]]);
+});
+
+test('a postponed version stays available in settings and a newer version offers a fresh prompt', async () => {
+  const { updater, fake, timers } = setup({ behaviour: 'update' });
+  updater.start();
+  await updater.checkNow();
+  assert.equal(updater.defer('0.2.9'), false);
+  assert.equal(updater.defer('0.3.0'), true);
+  timers.intervals[0].fn();
+  await new Promise(setImmediate);
+  assert.equal(updater.status().state, 'available');
+  assert.equal(updater.status().deferred, true);
+  assert.equal(fake.downloads, 0);
+  fake.version = '0.3.1';
+  assert.equal((await updater.checkNow()).deferred, false);
+  assert.equal(updater.download('0.3.0'), false);
+  assert.equal(updater.download('0.3.1'), true);
+});
+
+test('a failed download can be retried only with explicit consent', async () => {
+  const { updater, fake } = setup({ behaviour: 'update' });
+  await updater.checkNow();
+  fake.failDownload = true;
+  assert.equal(updater.download('0.3.0'), true);
+  await new Promise(setImmediate);
+  assert.equal(updater.status().state, 'available');
+  assert.equal(updater.status().downloadFailed, true);
+  assert.equal((await updater.checkNow()).downloadFailed, true);
+  assert.equal(fake.downloads, 1);
+  fake.failDownload = false;
+  assert.equal(updater.download('0.3.0'), true);
+  await new Promise(setImmediate);
+  assert.equal(fake.downloads, 2);
+  assert.equal(updater.status().state, 'downloading');
 });
 
 test('a failed check is logged once, shown in the tray, and can be retried', async () => {

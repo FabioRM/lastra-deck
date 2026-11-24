@@ -2,7 +2,7 @@
 'use strict';
 
 const SESSION_BLOCKED = Object.freeze({ ok: false, unavailable: true, message: 'The Windows session is locked or suspended.' });
-const PASSIVE = new Set(['profile:get', 'stats:stop', 'key:confirmation:cancel']);
+const PASSIVE = new Set(['profile:get', 'stats:stop', 'key:confirmation:cancel', 'update:status']);
 
 class DeckSession {
   constructor(locked = false) {
