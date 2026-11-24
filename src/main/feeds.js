@@ -3,7 +3,6 @@
 const { readJsonSettings, writeJsonSettings } = require('./json-settings-file');
 const { openSecret, sealSecrets } = require('./sealed-secret');
 const { normalizeLocation, readForecast, readSun } = require('./weather');
-const { readCurrencyCirculation } = require('./feeds-circulation');
 
 const WEATHER = ['open-meteo', 'openweather'];
 const QUOTES = ['yahoo', 'stooq', 'finnhub'];
@@ -100,7 +99,6 @@ class Feeds {
     this.onChange = onChange;
     this.log = log;
     this.refreshRequest = 0;
-    this.cash = { observations: new Map(), refreshAt: 0, pending: null };
     this.marketCaps = new Map();
     this.raw = readRaw(file);
     if (!this.raw.weather && legacyWeather) {
@@ -480,25 +478,7 @@ class Feeds {
     return { pair, rate: await this.#rate(pair) };
   }
 
-  async #cashInCirculation() {
-    if (this.cash.pending) return this.cash.pending;
-    if (this.cash.refreshAt > Date.now()) return this.cash.observations;
-    this.cash.pending = (async () => {
-      try {
-        this.cash.observations = await readCurrencyCirculation(this.fetch);
-        this.cash.refreshAt = Date.now() + DAY_MS;
-      } catch {
-        this.cash.refreshAt = Date.now() + 900_000;
-        this.log('Could not read BIS currency circulation.');
-      } finally {
-        this.cash.pending = null;
-      }
-      return this.cash.observations;
-    })();
-    return this.cash.pending;
-  }
-
-  async #currencyRates(pairs) {
+  async #currencies(pairs) {
     const rows = [];
     for (const pair of pairs) {
       try { rows.push(await this.#fx(pair)); }
@@ -508,14 +488,6 @@ class Feeds {
       }
     }
     return rows;
-  }
-
-  async #currencies(pairs) {
-    if (!pairs.length) return [];
-    const [rates, circulation] = await Promise.all([this.#currencyRates(pairs), this.#cashInCirculation()]);
-    return rates.map((row) => ({ ...row, circulation: [row.pair.slice(0, 3), row.pair.slice(3)].map((code) => ({
-      code, ...circulation.get(code),
-    })) }));
   }
 }
 

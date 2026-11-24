@@ -124,7 +124,8 @@
   }
 
   const metrics = [
-    ['Day open', 'open'], ['Day high', 'high'], ['Day low', 'low'], ['Prev close', 'close'],
+    ['Open', 'Day open', 'open'], ['High', 'Day high', 'high'],
+    ['Low', 'Day low', 'low'], ['Prev.', 'Prev close', 'close'],
   ];
 
   function figure(value) {
@@ -132,29 +133,26 @@
     return Math.abs(value) >= 20 ? formatQuote(value) : digits(value, 4);
   }
 
+  function rowLabel(short, full) {
+    const label = el('th', 'feeds-label', t(short));
+    label.scope = 'row';
+    label.title = full;
+    label.setAttribute('aria-label', full);
+    return label;
+  }
+
+  function appendRow(section, ...cells) {
+    section.insertRow().append(...cells);
+  }
+
   function marketCapCell(item) {
-    const cell = el('span', 'feeds-value feeds-cap', item.marketCap > 0 ? compactCap(item.marketCap) : item.symbol ? '—' : '');
-    if (item.marketCap > 0 && item.marketCapCurrency) cell.append(el('small', 'feeds-unit', item.marketCapCurrency));
+    const cell = el('td', 'feeds-value', item.marketCap > 0 ? compactCap(item.marketCap) : item.symbol ? '—' : '');
+    if (item.marketCap > 0 && item.marketCapCurrency) cell.append(' ', el('small', 'feeds-unit', item.marketCapCurrency));
     if (item.marketCapDate) cell.title = t('Market cap reported on {date}', { date: item.marketCapDate });
     return cell;
   }
 
-  function cashCell(item) {
-    const cell = el('div', 'feeds-value feeds-cash');
-    if (!item.pair) return cell;
-    const sides = item.circulation ?? [{ code: item.pair.slice(0, 3) }, { code: item.pair.slice(3) }];
-    for (const { code, amount, year } of sides) {
-      const line = el('span', 'feeds-cash-amount', `${code} ${amount > 0 ? compactCap(amount) : '—'}`);
-      if (year) {
-        line.append(el('small', 'feeds-unit', year));
-        line.title = t('Banknotes and coins in circulation · BIS · {year}', { year });
-      }
-      cell.append(line);
-    }
-    return cell;
-  }
-
-  function paintCapTotal(items) {
+  function paintCapTotal(table, items) {
     const quotes = new Map();
     for (const item of items) {
       if (!item.symbol) continue;
@@ -172,50 +170,59 @@
     if (!count) return;
     const label = count === quotes.size ? t('Ticker market cap total')
       : t('Available ticker market cap total ({count}/{total})', { count, total: quotes.size });
-    const footer = el('div', 'feeds-cap-total');
-    footer.append(el('span', 'feeds-label', label), el('strong', '', [...totals]
-      .map(([currency, amount]) => `${compactCap(amount)} ${currency}`).join(' · ')));
-    board.append(footer);
+    const header = rowLabel('Cap total', label);
+    if (count < quotes.size) header.append(' ', el('small', 'feeds-unit', `${count}/${quotes.size}`));
+    const cells = [...totals].map(([currency, amount]) => {
+      const cell = el('td', 'feeds-cap-total', compactCap(amount));
+      cell.append(' ', el('small', 'feeds-unit', currency));
+      return cell;
+    });
+    while (cells.length < items.length) cells.push(el('td'));
+    appendRow(table.createTFoot(), header, ...cells);
   }
 
   function paintBoard(items) {
-    const visible = metrics.filter(([, key]) => items.some((item) => item[key] != null));
-    board.style.setProperty('--cols', String(Math.max(items.length, 1)));
-    board.replaceChildren();
-    if (!items.length) return;
-    board.append(el('span', 'feeds-label'));
-    for (const item of items) {
-      const head = el('span', 'feeds-head');
-      head.append(el('span', 'feeds-symbol', item.title));
-      if (item.name) head.append(el('span', 'feeds-name', item.name));
-      board.append(head);
+    if (!items.length) {
+      board.replaceChildren();
+      return;
     }
-    board.append(el('span', 'feeds-label'));
-    for (const item of items) {
-      const price = el('span', 'feeds-price', item.error ? '' : figure(item.price ?? item.rate));
+    const table = el('table', 'feeds-table');
+    table.setAttribute('aria-label', t('Market data'));
+    table.style.setProperty('--cols', String(items.length));
+    const columns = el('colgroup');
+    columns.append(el('col', 'feeds-label-column'));
+    table.append(columns);
+    appendRow(table.createTHead(), el('td', 'feeds-stub'), ...items.map(({ title, name }) => {
+      const head = el('th', 'feeds-head');
+      head.scope = 'col';
+      head.title = name ? `${title} · ${name}` : title;
+      head.append(el('span', 'feeds-symbol', title));
+      if (name) head.append(el('span', 'feeds-name', name));
+      return head;
+    }));
+    const body = table.createTBody();
+    appendRow(body, rowLabel('', t('Price / rate')), ...items.map((item) => {
+      const value = item.error ? '' : figure(item.price ?? item.rate);
+      const price = el('td', 'feeds-price', value);
+      price.title = value;
       const direction = item.change > 0.05 ? 'up' : item.change < -0.05 ? 'down' : 'flat';
       price.dataset.direction = item.error ? 'bad' : direction;
-      board.append(price);
-    }
-    board.append(el('span', 'feeds-label'));
-    for (const item of items) {
-      const change = el('span', 'feeds-change', item.error ? t(item.error) : item.change == null ? '—' : formatChange(item.change));
+      return price;
+    }));
+    appendRow(body, rowLabel('', t('Price change')), ...items.map((item) => {
+      const change = el('td', 'feeds-change', item.error ? t(item.error) : item.change == null ? '—' : formatChange(item.change));
       change.dataset.direction = item.error ? 'bad' : item.change > 0.05 ? 'up' : item.change < -0.05 ? 'down' : 'flat';
-      board.append(change);
-    }
-    for (const [label, key] of visible) {
-      board.append(el('span', 'feeds-label', t(label)));
-      for (const item of items) board.append(el('span', 'feeds-value', figure(item[key])));
+      return change;
+    }));
+    for (const [short, full, key] of metrics) {
+      if (!items.some((item) => item[key] != null)) continue;
+      appendRow(body, rowLabel(short, t(full)), ...items.map((item) => el('td', 'feeds-value', figure(item[key]))));
     }
     if (items.some((item) => item.symbol && item.marketCap > 0)) {
-      board.append(el('span', 'feeds-label', t('Total market cap')), ...items.map(marketCapCell));
+      appendRow(body, rowLabel('Mkt cap', t('Total market cap')), ...items.map(marketCapCell));
     }
-    if (items.some((item) => item.circulation?.some(({ amount }) => amount > 0))) {
-      const label = el('span', 'feeds-label', t('Cash in circulation'));
-      label.title = t('Banknotes and coins in circulation · BIS');
-      board.append(label, ...items.map(cashCell));
-    }
-    paintCapTotal(items);
+    paintCapTotal(table, items);
+    board.replaceChildren(table);
   }
 
   function show(snapshot) {
@@ -253,7 +260,7 @@
     if (quoteError) status.textContent = t(quoteError.error);
     const items = [
       ...quotes.filter(({ symbol }) => symbol).map((item) => ({ ...item, title: item.symbol, name: labels[item.symbol] })),
-      ...currencies.filter(({ pair }) => pair).map((item) => ({ ...item, title: `${item.pair.slice(0, 3)} → ${item.pair.slice(3)}` })),
+      ...currencies.filter(({ pair }) => pair).map((item) => ({ ...item, title: `${item.pair.slice(0, 3)}/${item.pair.slice(3)}` })),
     ].slice(0, 8);
     paintBoard(items);
   }

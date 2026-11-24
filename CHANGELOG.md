@@ -4,6 +4,11 @@ Completed items from the former TODO, grouped by the section that tracked them. 
 
 Entries grouped under **0.2.1** record the completed work through the first reviewed source release.
 
+## 1.1.2
+
+- Shorten Feeds labels and align headings, figures and totals in the same columns. Keep row labels visible while scrolling in portrait view.
+- Remove the cash-in-circulation row and its data requests.
+
 ## 1.1.1
 
 - Show reported market capitalisation per ticker and totals by currency. Show annual cash in circulation for both sides of a currency pair when BIS publishes the data.

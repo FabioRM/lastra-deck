@@ -445,9 +445,7 @@ async function startPreview({ opts, ipcMain, BrowserWindow, quit, fail, log, ren
           { symbol: 'MSFT', price: 421.15, change: -0.4, marketCap: 3.13e12, marketCapCurrency: 'USD' },
         ],
       },
-      currencies: { rows: [{ pair: 'EURUSD', rate: 1.0864, circulation: [
-        { code: 'EUR', amount: 1.63e12, year: '2024' }, { code: 'USD', amount: 2.37e12, year: '2024' },
-      ] }] },
+      currencies: { rows: [{ pair: 'EURUSD', rate: 1.0864 }] },
     }));
   }
   if (opts.previewToolView) {

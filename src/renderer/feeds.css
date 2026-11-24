@@ -277,40 +277,59 @@
   flex: 1;
   min-height: 0;
   min-width: 0;
-  display: grid;
-  grid-template-columns: auto repeat(var(--cols, 1), minmax(0, 1fr));
-  grid-auto-rows: minmax(0, 1fr);
-  align-items: center;
-  column-gap: 18px;
   overflow: auto;
+  overscroll-behavior: contain;
+  touch-action: pan-x pan-y;
 }
-.feeds-board > * { min-width: 0; padding-block: 6px; border-bottom: 1px solid color-mix(in srgb, var(--border) 65%, transparent); }
-.feeds-label { color: var(--muted-text); font-size: calc(20px * var(--text-scale)); white-space: nowrap; }
-.feeds-head { display: grid; align-content: end; }
-.feeds-board .feeds-symbol { font-size: calc(26px * var(--text-scale)); letter-spacing: .03em; }
-.feeds-board .feeds-name { color: var(--muted-text); font-size: calc(16px * var(--text-scale)); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.feeds-table {
+  --label-width: calc(104px * var(--text-scale));
+  inline-size: 100%;
+  min-inline-size: calc(var(--label-width) + 118px * var(--text-scale) * var(--cols));
+  block-size: 100%;
+  table-layout: fixed;
+  border-spacing: 0;
+  line-height: 1.1;
+}
+.feeds-label-column { inline-size: var(--label-width); }
+.feeds-table :is(th, td) {
+  padding: 4px 10px;
+  border-block-end: 1px solid color-mix(in srgb, var(--border) 65%, transparent);
+  text-align: end;
+  vertical-align: middle;
+}
+.feeds-table :is(.feeds-stub, .feeds-label) {
+  position: sticky;
+  inset-inline-start: 0;
+  z-index: 1;
+  padding-inline-start: 0;
+  background: var(--background);
+  text-align: start;
+}
+.feeds-table .feeds-label { color: var(--muted-text); font-size: calc(20px * var(--text-scale)); font-weight: 500; white-space: nowrap; }
+.feeds-table .feeds-head { vertical-align: top; }
+.feeds-head > span { display: block; }
+.feeds-head .feeds-symbol { font-size: calc(26px * var(--text-scale)); letter-spacing: .03em; }
+.feeds-head .feeds-name { font-size: calc(16px * var(--text-scale)); font-weight: 400; }
 .feeds-board .feeds-price {
-  font: 400 clamp(40px, 7vh, 72px) / .9 'Barlow Condensed', 'Segoe UI', sans-serif;
+  font: 400 clamp(40px, 7vmin, 72px) / .9 'Barlow Condensed', 'Segoe UI', sans-serif;
   font-variant-numeric: tabular-nums;
   letter-spacing: -.03em;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .feeds-board .feeds-change { font-size: calc(28px * var(--text-scale)); font-weight: 650; font-variant-numeric: tabular-nums; }
 .feeds-board .feeds-value { font-size: calc(28px * var(--text-scale)); font-variant-numeric: tabular-nums; }
-.feeds-board .feeds-cap { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 5px; }
+.feeds-board :is(.feeds-price, .feeds-change, .feeds-value) { white-space: nowrap; }
 .feeds-board .feeds-unit { color: var(--muted-text); font-size: calc(14px * var(--text-scale)); }
-.feeds-board .feeds-cash { display: grid; gap: 2px; font-size: calc(20px * var(--text-scale)); line-height: 1.05; }
-.feeds-cash-amount { display: flex; flex-wrap: wrap; align-items: baseline; gap: 1px 6px; }
 .feeds-cap-total {
-  grid-column: 1 / -1;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: 4px 14px;
-  font-size: calc(22px * var(--text-scale));
+  font-size: calc(24px * var(--text-scale));
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
 }
 .feeds-board [data-direction='up'] { color: var(--ok); }
 .feeds-board [data-direction='down'] { color: var(--err); }
-.feeds-board [data-direction='bad'] { color: var(--err); font-size: calc(18px * var(--text-scale)); white-space: normal; }
+.feeds-board [data-direction='bad'] { color: var(--err); font-size: calc(18px * var(--text-scale)); white-space: normal; overflow-wrap: anywhere; }
 
 #feeds-panel-status { color: var(--muted-text); font-size: calc(24px * var(--text-scale)); }
 
@@ -375,6 +394,7 @@
   grid-template-rows: minmax(420px, 36%) minmax(0, 1fr);
 }
 #stage.portrait #feeds-temp { font-size: clamp(96px, 12vh, 150px); }
+#stage.portrait .feeds-price { font-size: 42px; }
 
 @keyframes feeds-breathe { 50% { transform: scale(1.08); } }
 @keyframes feeds-haze { 50% { opacity: .45; } }

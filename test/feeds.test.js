@@ -85,23 +85,13 @@ test('a refresh started before saving Feeds cannot replace readings for the save
   assert.equal(feeds.snapshot().currencies.rows[0].rate, 0.84);
 });
 
-test('Feeds keeps ticker market caps and the reported cash for both currencies, then removes empty groups immediately', async (t) => {
-  let circulationRequests = 0;
+test('Feeds keeps ticker market caps and currency rates, then removes empty groups immediately', async (t) => {
   let capitalisationRequests = 0;
+  let rateRequests = 0;
   const json = (data) => ({ ok: true, json: async () => data });
   const feeds = new Feeds(path.join(tempDir(t, 'lastra-feeds-'), 'feeds.json'), {
     fetch: async (url) => {
       const address = new URL(url);
-      if (address.hostname === 'stats.bis.org') {
-        circulationRequests++;
-        return { ok: true, text: async () => [
-          'BIS_UNIT,REP_CTY,UNIT_MULT,TIME_PERIOD,OBS_VALUE,COMMENT_TS',
-          'USD,US,9,2024,2367.55,"Notes and coins, total"',
-          'EUR,XM,9,2024,1625.7,',
-          'USD,US,9,2023,2284,',
-          'GBP,GB,9,2024,,',
-        ].join('\r\n') };
-      }
       if (address.pathname.includes('finance/quote')) return json({ quoteResponse: { result: [{ regularMarketPrice: 155, marketCap: null }] } });
       if (address.pathname.includes('fundamentals-timeseries')) {
         capitalisationRequests++;
@@ -110,7 +100,10 @@ test('Feeds keeps ticker market caps and the reported cash for both currencies, 
           { asOfDate: '2026-11-01', currencyCode: 'USD', reportedValue: { raw: 3.2e12 } },
         ] }] } });
       }
-      if (address.pathname.includes('finance/chart')) return json({ chart: { result: [{ meta: { regularMarketPrice: 1.1 } }] } });
+      if (address.pathname.includes('finance/chart')) {
+        rateRequests++;
+        return json({ chart: { result: [{ meta: { regularMarketPrice: 1.1 } }] } });
+      }
       throw new Error('Unexpected request in fixture');
     },
   });
@@ -119,12 +112,9 @@ test('Feeds keeps ticker market caps and the reported cash for both currencies, 
   assert.equal(result.quotes.rows[0].marketCap, 3.2e12);
   assert.equal(result.quotes.rows[0].marketCapCurrency, 'USD');
   assert.equal(result.quotes.rows[0].marketCapDate, '2026-11-01');
-  assert.deepEqual(result.currencies.rows[0].circulation, [
-    { code: 'EUR', amount: 1625.7e9, year: '2024' }, { code: 'USD', amount: 2367.55e9, year: '2024' },
-  ]);
-  assert.deepEqual(result.currencies.rows[1].circulation[0], { code: 'GBP' });
+  assert.deepEqual(result.currencies.rows.map(({ pair, rate }) => [pair, rate]), [['EURUSD', 1.1], ['GBPUSD', 1.1]]);
+  assert.equal(rateRequests, 2);
   await feeds.refresh();
-  assert.equal(circulationRequests, 1);
   assert.equal(capitalisationRequests, 1);
   const withoutQuotes = feeds.setSettings({ quotes: { symbols: [] } });
   assert.deepEqual(withoutQuotes.quotes.rows, []);
@@ -132,6 +122,6 @@ test('Feeds keeps ticker market caps and the reported cash for both currencies, 
   const withoutMarkets = feeds.setSettings({ currencies: { pairs: [] } });
   assert.deepEqual(withoutMarkets.currencies.rows, []);
   await feeds.refresh();
-  assert.equal(circulationRequests, 1);
+  assert.equal(rateRequests, 4);
   assert.equal(capitalisationRequests, 1);
 });
