@@ -2,7 +2,7 @@
   "name": "lastra",
   "productName": "Lastra",
   "desktopName": "lastra.deck.desktop",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Touch macro deck for CORSAIR XENEON EDGE (2560x720), built on Electron",
   "license": "MIT",
   "author": "Fabio Angeletti",

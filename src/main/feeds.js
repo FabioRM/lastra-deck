@@ -3,6 +3,7 @@
 const { readJsonSettings, writeJsonSettings } = require('./json-settings-file');
 const { openSecret, sealSecrets } = require('./sealed-secret');
 const { normalizeLocation, readForecast, readSun } = require('./weather');
+const { readCurrencyCirculation } = require('./feeds-circulation');
 
 const WEATHER = ['open-meteo', 'openweather'];
 const QUOTES = ['yahoo', 'stooq', 'finnhub'];
@@ -11,6 +12,8 @@ const MAX_SYMBOLS = 12;
 const MAX_PAIRS = 6;
 const SYMBOL = /^[A-Za-z0-9.]{1,16}$/;
 const PAIR = /^[A-Z]{6}$/;
+const DAY_MS = 86_400_000;
+const CAP_TYPES = ['trailingMarketCap', 'quarterlyMarketCap', 'annualMarketCap'];
 const US_EXCHANGES = new Set(['NASDAQ', 'NYSE', 'NYSEARCA', 'NYSEMKT', 'BATS', 'NMS', 'NYQ', 'NGM', 'PCX']);
 
 function list(value, pattern, limit) {
@@ -36,8 +39,15 @@ function quoteLabels(value, symbols) {
 }
 
 function finite(value) {
+  if (typeof value !== 'number' && (typeof value !== 'string' || !value.trim())) return null;
   const number = Number(value);
   return Number.isFinite(number) ? number : null;
+}
+
+function marketCap(value, currency, date) {
+  const amount = finite(value);
+  return amount > 0 ? { marketCap: amount, marketCapCurrency: /^[A-Z]{3}$/.test(currency) ? currency : null,
+    ...(date ? { marketCapDate: date } : {}) } : {};
 }
 
 function sessionStats(quote) {
@@ -52,7 +62,7 @@ function sessionStats(quote) {
     high: finite(quote?.regularMarketDayHigh),
     low: finite(quote?.regularMarketDayLow),
     close: previous,
-    marketCap: finite(quote?.marketCap),
+    ...marketCap(quote?.marketCap, quote?.currency),
   };
 }
 function yahooSymbol(symbol) {
@@ -90,6 +100,8 @@ class Feeds {
     this.onChange = onChange;
     this.log = log;
     this.refreshRequest = 0;
+    this.cash = { observations: new Map(), refreshAt: 0, pending: null };
+    this.marketCaps = new Map();
     this.raw = readRaw(file);
     if (!this.raw.weather && legacyWeather) {
       const legacy = readJsonSettings(legacyWeather, {
@@ -137,9 +149,11 @@ class Feeds {
 
   snapshot() {
     const settings = this.settings();
+    const quotes = this.readings.quotes.filter(({ symbol }) => symbol ? settings.quotes.symbols.includes(symbol) : settings.quotes.symbols.length);
+    const currencies = this.readings.currencies.filter(({ pair }) => settings.currencies.pairs.includes(pair));
     return { ...settings, cycle: this.cycle(), weather: { ...settings.weather, ...this.readings.weather },
-      quotes: { ...settings.quotes, rows: this.readings.quotes },
-      currencies: { ...settings.currencies, rows: this.readings.currencies } };
+      quotes: { ...settings.quotes, rows: quotes },
+      currencies: { ...settings.currencies, rows: currencies } };
   }
 
   setSettings(value = {}) {
@@ -185,13 +199,12 @@ class Feeds {
     const configuration = this.raw;
     const request = ++this.refreshRequest;
     const settings = this.settings();
-    const readings = {
-      weather: await this.#weather(settings.weather),
-      quotes: await this.#quotes(settings.quotes),
-      currencies: await this.#currencies(settings.currencies.pairs),
-    };
+    const [weather, quotes, currencies] = await Promise.all([
+      this.#weather(settings.weather), this.#quotes(settings.quotes).then((rows) => this.#withMarketCaps(settings.quotes.provider, rows)),
+      this.#currencies(settings.currencies.pairs),
+    ]);
     if (this.refreshRequest !== request || this.raw !== configuration) return this.snapshot();
-    this.readings = readings;
+    this.readings = { weather, quotes, currencies };
     this.onChange(this.snapshot());
     return this.snapshot();
   }
@@ -332,15 +345,64 @@ class Feeds {
       url.searchParams.set('e', 'csv');
       const response = await this.fetch(url, { signal: AbortSignal.timeout(8_000) });
       if (!response.ok) throw new Error('Stooq is unavailable.');
-      return String(await response.text()).trim().split(/\r?\n/).slice(1).flatMap((row) => {
+      const prices = new Map(String(await response.text()).trim().split(/\r?\n/).slice(1).flatMap((row) => {
         const [symbol, price] = row.split(',');
-        const value = Number(price);
-        return symbol && Number.isFinite(value) ? [{ symbol, price: value, change: null }] : [];
+        const value = finite(price);
+        return symbol && value != null ? [[symbol.toUpperCase(), value]] : [];
+      }));
+      return quotes.symbols.flatMap((symbol) => {
+        const listed = prices.has(symbol) ? symbol : `${symbol}.US`;
+        return prices.has(listed) ? [{ symbol, listed, price: prices.get(listed), change: null }] : [];
       });
     } catch (error) {
       this.log('Could not read the quote feed.');
       return [{ error: error.message }];
     }
+  }
+
+  async #withMarketCaps(provider, rows) {
+    return Promise.all(rows.map(async ({ listed, ...row }) => {
+      if (!row.symbol || (row.marketCap && row.marketCapCurrency)) return row;
+      // Only look up Stooq and Finnhub tickers that can be matched without guessing the exchange.
+      const symbol = provider === 'stooq' ? /^([A-Z0-9]+)\.US$/.exec(listed)?.[1]
+        : provider === 'finnhub' && !/^[A-Z0-9]+$/.test(row.symbol) ? null : yahooSymbol(row.symbol);
+      if (!symbol) return row;
+      return { ...row, ...await this.#reportedMarketCap(symbol) };
+    }));
+  }
+
+  async #reportedMarketCap(symbol) {
+    const now = Date.now();
+    const cached = this.marketCaps.get(symbol);
+    if (cached && cached.refreshAt > now) return cached.result;
+    // Bound the cache as users replace their lists. Keep successful reports through short outages.
+    if (this.marketCaps.size >= 100) this.marketCaps.delete(this.marketCaps.keys().next().value);
+    const entry = { refreshAt: now + 600_000, result: null };
+    entry.result = this.#readMarketCap(symbol).then((report) => {
+      if (!report.marketCap) return cached?.result ?? {};
+      entry.refreshAt = now + 3_600_000;
+      return report;
+    }, () => cached?.result ?? {});
+    this.marketCaps.set(symbol, entry);
+    return entry.result;
+  }
+
+  async #readMarketCap(symbol) {
+    const url = new URL(`https://query1.finance.yahoo.com/ws/fundamentals-timeseries/v1/finance/timeseries/${encodeURIComponent(symbol)}`);
+    const now = Math.floor(Date.now() / 1_000);
+    url.searchParams.set('symbol', symbol);
+    url.searchParams.set('type', CAP_TYPES.join(','));
+    url.searchParams.set('period1', String(now - 366 * DAY_MS / 1_000));
+    url.searchParams.set('period2', String(now));
+    const response = await this.fetch(url, { headers: { 'User-Agent': 'Mozilla/5.0', Accept: 'application/json' }, signal: AbortSignal.timeout(5_000) });
+    if (!response.ok) return {};
+    const series = (await response.json())?.timeseries?.result;
+    if (!Array.isArray(series)) return {};
+    const reports = series.filter((row) => row?.meta?.symbol?.includes(symbol))
+      .flatMap((row) => CAP_TYPES.flatMap((type) => Array.isArray(row[type]) ? row[type] : []))
+      .filter((row) => /^\d{4}-\d{2}-\d{2}$/.test(row?.asOfDate) && /^[A-Z]{3}$/.test(row?.currencyCode))
+      .map((row) => marketCap(row.reportedValue?.raw, row.currencyCode, row.asOfDate));
+    return reports.filter((row) => row.marketCap).sort((a, b) => b.marketCapDate.localeCompare(a.marketCapDate))[0] ?? {};
   }
 
   async #yahooQuote(symbol) {
@@ -418,8 +480,25 @@ class Feeds {
     return { pair, rate: await this.#rate(pair) };
   }
 
-  async #currencies(pairs) {
-    if (!pairs.length) return [];
+  async #cashInCirculation() {
+    if (this.cash.pending) return this.cash.pending;
+    if (this.cash.refreshAt > Date.now()) return this.cash.observations;
+    this.cash.pending = (async () => {
+      try {
+        this.cash.observations = await readCurrencyCirculation(this.fetch);
+        this.cash.refreshAt = Date.now() + DAY_MS;
+      } catch {
+        this.cash.refreshAt = Date.now() + 900_000;
+        this.log('Could not read BIS currency circulation.');
+      } finally {
+        this.cash.pending = null;
+      }
+      return this.cash.observations;
+    })();
+    return this.cash.pending;
+  }
+
+  async #currencyRates(pairs) {
     const rows = [];
     for (const pair of pairs) {
       try { rows.push(await this.#fx(pair)); }
@@ -429,6 +508,14 @@ class Feeds {
       }
     }
     return rows;
+  }
+
+  async #currencies(pairs) {
+    if (!pairs.length) return [];
+    const [rates, circulation] = await Promise.all([this.#currencyRates(pairs), this.#cashInCirculation()]);
+    return rates.map((row) => ({ ...row, circulation: [row.pair.slice(0, 3), row.pair.slice(3)].map((code) => ({
+      code, ...circulation.get(code),
+    })) }));
   }
 }
 

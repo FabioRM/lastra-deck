@@ -4,6 +4,11 @@ Completed items from the former TODO, grouped by the section that tracked them. 
 
 Entries grouped under **0.2.1** record the completed work through the first reviewed source release.
 
+## 1.1.1
+
+- Show reported market capitalisation per ticker and totals by currency. Show annual cash in circulation for both sides of a currency pair when BIS publishes the data.
+- Hide ticker and currency rows when their group is empty.
+
 ## 1.1.0
 
 - Open the current Deck Keys layout in the editor as a draft. Copy the visible screen of an automatic shortcut page into an editable page.

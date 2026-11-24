@@ -124,13 +124,58 @@
   }
 
   const metrics = [
-    ['Day open', 'open'], ['Day high', 'high'], ['Day low', 'low'], ['Prev close', 'close'], ['Mkt cap', 'marketCap'],
+    ['Day open', 'open'], ['Day high', 'high'], ['Day low', 'low'], ['Prev close', 'close'],
   ];
 
-  function figure(value, cap) {
+  function figure(value) {
     if (value == null) return '—';
-    if (cap) return compactCap(value);
     return Math.abs(value) >= 20 ? formatQuote(value) : digits(value, 4);
+  }
+
+  function marketCapCell(item) {
+    const cell = el('span', 'feeds-value feeds-cap', item.marketCap > 0 ? compactCap(item.marketCap) : item.symbol ? '—' : '');
+    if (item.marketCap > 0 && item.marketCapCurrency) cell.append(el('small', 'feeds-unit', item.marketCapCurrency));
+    if (item.marketCapDate) cell.title = t('Market cap reported on {date}', { date: item.marketCapDate });
+    return cell;
+  }
+
+  function cashCell(item) {
+    const cell = el('div', 'feeds-value feeds-cash');
+    if (!item.pair) return cell;
+    const sides = item.circulation ?? [{ code: item.pair.slice(0, 3) }, { code: item.pair.slice(3) }];
+    for (const { code, amount, year } of sides) {
+      const line = el('span', 'feeds-cash-amount', `${code} ${amount > 0 ? compactCap(amount) : '—'}`);
+      if (year) {
+        line.append(el('small', 'feeds-unit', year));
+        line.title = t('Banknotes and coins in circulation · BIS · {year}', { year });
+      }
+      cell.append(line);
+    }
+    return cell;
+  }
+
+  function paintCapTotal(items) {
+    const quotes = new Map();
+    for (const item of items) {
+      if (!item.symbol) continue;
+      const symbol = item.symbol.replace(/\.US$/, '');
+      if (!quotes.get(symbol)?.marketCapCurrency) quotes.set(symbol, item);
+    }
+    if (quotes.size < 2) return;
+    const totals = new Map();
+    let count = 0;
+    for (const { marketCap, marketCapCurrency } of quotes.values()) {
+      if (!(marketCap > 0) || !marketCapCurrency) continue;
+      totals.set(marketCapCurrency, (totals.get(marketCapCurrency) ?? 0) + marketCap);
+      count++;
+    }
+    if (!count) return;
+    const label = count === quotes.size ? t('Ticker market cap total')
+      : t('Available ticker market cap total ({count}/{total})', { count, total: quotes.size });
+    const footer = el('div', 'feeds-cap-total');
+    footer.append(el('span', 'feeds-label', label), el('strong', '', [...totals]
+      .map(([currency, amount]) => `${compactCap(amount)} ${currency}`).join(' · ')));
+    board.append(footer);
   }
 
   function paintBoard(items) {
@@ -160,8 +205,17 @@
     }
     for (const [label, key] of visible) {
       board.append(el('span', 'feeds-label', t(label)));
-      for (const item of items) board.append(el('span', 'feeds-value', item[key] == null ? '—' : figure(item[key], key === 'marketCap')));
+      for (const item of items) board.append(el('span', 'feeds-value', figure(item[key])));
     }
+    if (items.some((item) => item.symbol && item.marketCap > 0)) {
+      board.append(el('span', 'feeds-label', t('Total market cap')), ...items.map(marketCapCell));
+    }
+    if (items.some((item) => item.circulation?.some(({ amount }) => amount > 0))) {
+      const label = el('span', 'feeds-label', t('Cash in circulation'));
+      label.title = t('Banknotes and coins in circulation · BIS');
+      board.append(label, ...items.map(cashCell));
+    }
+    paintCapTotal(items);
   }
 
   function show(snapshot) {
@@ -193,9 +247,13 @@
       range.textContent = '';
     }
     const labels = snapshot.quotes?.labels ?? {};
+    const quotes = snapshot.quotes?.rows ?? [];
+    const currencies = snapshot.currencies?.rows ?? [];
+    const quoteError = quotes.find(({ symbol, error }) => !symbol && error);
+    if (quoteError) status.textContent = t(quoteError.error);
     const items = [
-      ...(snapshot.quotes?.rows ?? []).map((item) => ({ ...item, title: item.symbol || '', name: item.symbol ? labels[item.symbol] : '' })),
-      ...(snapshot.currencies?.rows ?? []).map((item) => ({ ...item, title: item.pair ? `${item.pair.slice(0, 3)} → ${item.pair.slice(3)}` : '' })),
+      ...quotes.filter(({ symbol }) => symbol).map((item) => ({ ...item, title: item.symbol, name: labels[item.symbol] })),
+      ...currencies.filter(({ pair }) => pair).map((item) => ({ ...item, title: `${item.pair.slice(0, 3)} → ${item.pair.slice(3)}` })),
     ].slice(0, 8);
     paintBoard(items);
   }

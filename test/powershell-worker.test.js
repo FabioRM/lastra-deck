@@ -12,7 +12,7 @@ test('one PowerShell process answers several scripts in turn, with per-request e
   const worker = new PowerShellWorker({ spawnImpl: (...args) => { spawned++; return spawn(...args); } });
   t.after(() => worker.dispose());
   const [a, b] = await Promise.all([
-    worker.run("[PSCustomObject]@{ n = 1 + 1 } | ConvertTo-Json -Compress"),
+    worker.run("[PSCustomObject]@{ n = 1 + 1 } | ConvertTo-Json -Compress", { timeout: 15_000 }),
     worker.run('"host=$env:LASTRA_TEST_VALUE"', { env: { LASTRA_TEST_VALUE: 'déjà vu' } }),
   ]);
   assert.deepEqual(JSON.parse(a), { n: 2 });

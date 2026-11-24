@@ -440,9 +440,14 @@ async function startPreview({ opts, ipcMain, BrowserWindow, quit, fail, log, ren
       },
       quotes: {
         labels: { AAPL: 'Apple', MSFT: 'Microsoft' },
-        rows: [{ symbol: 'AAPL', price: 189.4, change: 1.2 }, { symbol: 'MSFT', price: 421.15, change: -0.4 }],
+        rows: [
+          { symbol: 'AAPL', price: 189.4, change: 1.2, marketCap: 2.86e12, marketCapCurrency: 'USD' },
+          { symbol: 'MSFT', price: 421.15, change: -0.4, marketCap: 3.13e12, marketCapCurrency: 'USD' },
+        ],
       },
-      currencies: { rows: [{ pair: 'EURUSD', rate: 1.0864 }] },
+      currencies: { rows: [{ pair: 'EURUSD', rate: 1.0864, circulation: [
+        { code: 'EUR', amount: 1.63e12, year: '2024' }, { code: 'USD', amount: 2.37e12, year: '2024' },
+      ] }] },
     }));
   }
   if (opts.previewToolView) {
