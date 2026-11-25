@@ -127,6 +127,11 @@ html, body {
 
 [hidden] { display: none !important; }
 
+#stage:is([data-desktop-revealed], :has(> #quick-tools:not([hidden]))) :is(.feeds-sky, .audio-peak),
+body:has(> #deck-idle-screen:not([hidden]), > #windows-session-cover[open]) #stage :is(.feeds-sky, .audio-peak) {
+  display: none;
+}
+
 #deck {
   display: grid;
   grid-template-columns: minmax(0, 1fr);

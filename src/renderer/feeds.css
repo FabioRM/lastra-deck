@@ -208,6 +208,21 @@
 .feeds-flash { inset: 0; background: rgb(255 255 255 / 70%); }
 #feeds-weather[data-scene='storm'] .feeds-flash { animation: feeds-flash 5.5s ease-in-out infinite; }
 
+/* Render only the weather layers visible in the current scene. */
+#feeds-weather[data-phase='day'] .feeds-stars,
+#feeds-weather:not(:is([data-scene='cloud'], [data-scene='fog'])) .feeds-mist,
+#feeds-weather:not(:is([data-scene='rain'], [data-scene='storm'])) .feeds-rain,
+#feeds-weather:not([data-scene='snow']) .feeds-snow,
+#feeds-weather[data-scene='snow'] .feeds-bank {
+  display: none;
+}
+
+#feeds-weather[data-phase='night']:not(:is([data-scene='rain'], [data-scene='storm'])) .feeds-sun > * {
+  animation-play-state: paused;
+}
+
+#feeds-weather:not([data-motion]) .feeds-sky { display: none; }
+
 .feeds-clock {
   position: absolute;
   z-index: 2;
@@ -422,7 +437,8 @@
   93% { opacity: .22; }
 }
 @media (prefers-reduced-motion: reduce) {
-  #feeds-panel :is(.feeds-atmosphere, .feeds-sun b, .feeds-sun span, .feeds-moon, .feeds-stars i, .feeds-bank, .feeds-bank i, .feeds-mist, .feeds-rain i, .feeds-snow i, .feeds-flash, .feeds-meteor) {
+  #feeds-panel #feeds-weather .feeds-sky * {
     animation: none;
+    transition: none;
   }
 }

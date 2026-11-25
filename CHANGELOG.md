@@ -4,6 +4,11 @@ Completed items from the former TODO, grouped by the section that tracked them. 
 
 Entries grouped under **0.2.1** record the completed work through the first reviewed source release.
 
+## 1.1.3
+
+- Keep weather effects running while Feeds is visible. Stop animations for hidden weather layers and when another view covers Feeds.
+- Keep audio meters animated while visible and stop polling when they are hidden.
+
 ## 1.1.2
 
 - Shorten Feeds labels and align headings, figures and totals in the same columns. Keep row labels visible while scrolling in portrait view.

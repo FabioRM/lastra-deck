@@ -1284,6 +1284,7 @@
       || profile?.editorActive !== view.editorActive) quickSheet = 0;
     if (!api && view.editorActive) quickSheet = view.deckSheet ?? 0;
     profile = view;
+    stage.toggleAttribute('data-desktop-revealed', view.desktopRevealed === true);
     const sessionBlocked = view.sessionBlocked === true;
     if (sessionBlocked !== sessionCover.open) {
       if (sessionBlocked) {

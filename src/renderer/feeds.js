@@ -226,7 +226,7 @@
   }
 
   function show(snapshot) {
-    if (!snapshot) return;
+    if (!snapshot || panel.hidden || document.hidden) return;
     solar = snapshot.weather ?? null;
     const reading = snapshot.weather;
     applySky();
@@ -267,21 +267,28 @@
 
   async function refresh() {
     try { show(await api.readFeeds()); }
-    catch (error) { status.textContent = error.message; }
+    catch (error) { if (!panel.hidden && !document.hidden) status.textContent = error.message; }
+  }
+
+  function updateVisibility() {
+    clearInterval(timer);
+    timer = null;
+    const visible = !panel.hidden && !document.hidden;
+    weather.toggleAttribute('data-motion', visible);
+    if (visible) {
+      applySky();
+      void refresh();
+      timer = setInterval(refresh, 60_000);
+    }
   }
 
   function setOpen(open) {
     if (panel.hidden === !open) return;
     window.LastraDeckViews.setPanel(panel, open);
-    clearInterval(timer);
-    timer = null;
-    if (open) {
-      applySky();
-      void refresh();
-      timer = setInterval(() => { applySky(); void refresh(); }, 60_000);
-    }
+    updateVisibility();
   }
 
+  document.addEventListener('visibilitychange', updateVisibility);
   panel.addEventListener('lastra:close-view', () => setOpen(false));
   api.onFeeds?.(show);
   window.LastraFeeds = { setOpen };

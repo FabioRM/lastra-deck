@@ -31,11 +31,11 @@ The loop opens **Emoji** from **Home**, then shows **Dashboard**, **Stats**, and
 
 ## Getting started
 
-Download the installer or browse the reviewed source on the public release page. [Lastra v1.1.2](https://github.com/FabioRM/lastra-deck/releases/tag/v1.1.2) · [Windows x64 installer](https://github.com/FabioRM/lastra-deck/releases/download/v1.1.2/Lastra-Setup-1.1.2.exe) · [SHA‑256 checksum](https://github.com/FabioRM/lastra-deck/releases/download/v1.1.2/Lastra-Setup-1.1.2.exe.sha256) · [Catalog redistribution review](docs/catalog-redistribution.md)
+Download the installer or browse the reviewed source on the public release page. [Lastra v1.1.3](https://github.com/FabioRM/lastra-deck/releases/tag/v1.1.3) · [Windows x64 installer](https://github.com/FabioRM/lastra-deck/releases/download/v1.1.3/Lastra-Setup-1.1.3.exe) · [SHA‑256 checksum](https://github.com/FabioRM/lastra-deck/releases/download/v1.1.3/Lastra-Setup-1.1.3.exe.sha256) · [Catalog redistribution review](docs/catalog-redistribution.md)
 
 Set the XENEON EDGE to **Extend these displays** in Windows Display settings. The panel runs at 2560 × 720 in landscape and 720 × 2560 in portrait.
 
-**Install the app.** Download `Lastra-Setup-1.1.2.exe` and run it on Windows x64. It installs for the current user in `%LOCALAPPDATA%\Programs\Lastra` and adds Start menu and desktop shortcuts. The Windows installer is unsigned. Settings and profiles live in `%APPDATA%\Lastra` and survive updates and uninstalls. [Latest release](https://github.com/FabioRM/lastra-deck/releases/latest) · [Update behavior](https://github.com/FabioRM/lastra-deck/blob/main/docs/releasing.md#update-behavior)
+**Install the app.** Download `Lastra-Setup-1.1.3.exe` and run it on Windows x64. It installs for the current user in `%LOCALAPPDATA%\Programs\Lastra` and adds Start menu and desktop shortcuts. The Windows installer is unsigned. Settings and profiles live in `%APPDATA%\Lastra` and survive updates and uninstalls. [Latest release](https://github.com/FabioRM/lastra-deck/releases/latest) · [Update behavior](https://github.com/FabioRM/lastra-deck/blob/main/docs/releasing.md#update-behavior)
 
 **Run from source.** Install **Node.js 22.12.0 or later**, as required by the Electron installer, then run these commands from the project directory. Source runs never check for updates. To build the installer yourself, see [Releasing](docs/releasing.md).
 
