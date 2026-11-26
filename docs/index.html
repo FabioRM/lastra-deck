@@ -3,10 +3,10 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Lastra is a touchscreen macro deck for the CORSAIR XENEON EDGE. It automatically switches shortcuts with the active app on Windows or Linux and includes Windows audio controls and live PC stats.">
+  <meta name="description" content="Lastra is a touchscreen macro deck for the CORSAIR XENEON EDGE. It automatically switches shortcuts with the active app on Windows or Linux, comes with 14 themes and five quick looks, and includes Windows audio controls and live PC stats.">
   <meta name="theme-color" content="#151b20">
   <title>Lastra · A touchscreen macro deck for XENEON EDGE</title>
-  <link rel="stylesheet" href="site.css?v=3">
+  <link rel="stylesheet" href="site.css?v=4">
   <link rel="icon" href="data:,">
 </head>
 <body>
@@ -15,6 +15,7 @@
     <a class="wordmark" href="./">Lastra<span>.</span></a>
     <nav aria-label="Main navigation">
       <a href="#features">Features</a>
+      <a href="#themes">Themes</a>
       <a href="#tools">Tools and Pomodoro</a>
       <a href="#setup">Setup</a>
       <a href="https://github.com/FabioRM/lastra-deck">GitHub</a>
@@ -30,11 +31,11 @@
           <a class="button" href="https://github.com/FabioRM/lastra-deck/releases/latest">Download for Windows or Linux</a>
           <a class="text-link" href="https://github.com/FabioRM/lastra-deck#readme">Read the documentation</a>
         </div>
-        <p class="requirements">Windows 10 or 11 · Linux x86-64 · Open source under MIT · <a href="https://github.com/FabioRM/lastra-deck/releases/tag/v1.1.3">What’s new in v1.1.3</a></p>
+        <p class="requirements">Windows 10 or 11 · Linux x86-64 · Open source under MIT · <a href="https://github.com/FabioRM/lastra-deck/releases/tag/v1.2.0">What’s new in v1.2.0</a></p>
       </div>
       <figure class="deck">
         <a href="preview-home.png"><img src="preview-home.png" width="2560" height="720" alt="Lastra Home showing touchscreen shortcut keys, Windows audio controls, and CPU, RAM, and GPU readings."></a>
-        <figcaption>Deck Keys with an example Home layout and sample telemetry</figcaption>
+        <figcaption>Deck Keys with an example Home layout in the Soft glow look, with sample telemetry</figcaption>
       </figure>
       <figure class="toolbar-detail">
         <a href="preview-toolbar.png"><img src="preview-toolbar.png" width="277" height="96" loading="lazy" alt="The Tools, Emoji, and page lock icons in the Deck Keys toolbar."></a>
@@ -48,7 +49,7 @@
           <div class="feature-copy">
             <h3>Shortcuts for the active app</h3>
             <div>
-              <p>The deck follows 451 Windows and installed web apps, including Visual Studio Code, Claude Desktop, SOLIDWORKS, KiCad, and Altium Designer. Windows Terminal shortcuts cover pane resizing, page scrolling, and text selection. Use the page filter in the editor to find a saved page by name or folder.</p>
+              <p>The deck follows 451 Windows and installed web apps, including Visual Studio Code, Claude Desktop, SOLIDWORKS, KiCad, and Altium Designer. Windows Terminal shortcuts cover pane resizing, page scrolling, and text selection. Swipe to move between the pages of an app. The count beside the app name shows where you are.</p>
               <a href="https://github.com/FabioRM/lastra-deck/blob/main/docs/shortcut-packs.md#configure-app-shortcut-pages">Configure app shortcut pages</a> · <a href="preview-shortcuts.gif">Watch custom shortcut pages</a>
             </div>
           </div>
@@ -58,17 +59,19 @@
           <div class="feature-copy">
             <h3>Edit a copy and preview it on XENEON</h3>
             <div>
-              <p>Open the visible Deck Keys page in the editor. Preview the draft on the XENEON EDGE as you edit, then save it when the layout is ready. Choose from ten themes, including Graphite, Ocean, Plum, and Sand.</p>
+              <p>Open the visible Deck Keys page in the editor. The editor draws the page as the deck does, with the same look, beside an outline of the side panel. Give a key its own color in the <strong>Style</strong> tab, and use the page filter to find a saved page by name or folder.</p>
+              <p>Preview the draft on the XENEON EDGE as you edit, then save it when the layout is ready.</p>
               <a href="https://github.com/FabioRM/lastra-deck#profile-editor">Use the profile editor</a>
             </div>
           </div>
+          <a class="feature-image" href="preview-editor.png"><img src="preview-editor.png" width="1920" height="800" loading="lazy" alt="The profile editor with the Home page drawn as on the deck, and the Style tab showing a key preview and color swatches."></a>
         </article>
         <article class="feature">
           <div class="feature-copy">
             <h3>Dashboard and media</h3>
             <div>
               <p>Control playback, check the calendar, and run a Pomodoro timer from Dashboard. Feeds shows weather, ticker market caps and currency rates.</p>
-              <a href="https://github.com/FabioRM/lastra-deck#deck-views">Explore the deck views</a>
+              <a href="https://github.com/FabioRM/lastra-deck#deck-views">Explore the deck views</a> · <a href="preview-demo.gif">Watch Emoji, Dashboard, Stats, and Feeds</a>
             </div>
           </div>
           <a class="feature-image" href="preview-dashboard.png"><img src="preview-dashboard.png" width="2560" height="720" loading="lazy" alt="Dashboard showing the calendar, Pomodoro controls, and playback controls for a sample track."></a>
@@ -97,6 +100,60 @@
         </article>
       </div>
     </section>
+    <section class="themes" id="themes" aria-labelledby="themes-title">
+      <div class="shell">
+        <div class="section-intro">
+          <h2 id="themes-title">Themes and looks</h2>
+          <div>
+            <p>Choose one of 14 themes, then decide how the keys are drawn. A quick look sets the key style, backdrop, key shape, and icon weight together, and you can change each of them separately. Every look works with every color theme.</p>
+            <a href="https://github.com/FabioRM/lastra-deck/blob/main/docs/deck-look.md">Read the deck look guide</a>
+          </div>
+        </div>
+        <a class="feature-image" href="preview-themes.gif"><img src="preview-themes.gif" width="1280" height="360" loading="lazy" alt="Deck Keys changes through ten combinations of theme and quick look, from Dark with Soft glow to Contrast dark."></a>
+        <h3 id="looks-title">Five quick looks</h3>
+        <p>Shown on the Dark theme. Pick one under <strong>Settings → Display → Deck look</strong> and the deck changes at once.</p>
+        <ul class="gallery" aria-labelledby="looks-title">
+          <li><figure><a href="preview-look-classic.webp"><img src="preview-look-classic.webp" width="1280" height="360" loading="lazy" alt="Deck Keys in the Classic quick look."></a><figcaption><strong>Classic</strong> Outline keys on a plain background, as in earlier versions.</figcaption></figure></li>
+          <li><figure><a href="preview-look-glow.webp"><img src="preview-look-glow.webp" width="1280" height="360" loading="lazy" alt="Deck Keys in the Soft glow quick look."></a><figcaption><strong>Soft glow</strong> Tinted keys over a soft glow. A new installation starts here.</figcaption></figure></li>
+          <li><figure><a href="preview-look-glass.webp"><img src="preview-look-glass.webp" width="1280" height="360" loading="lazy" alt="Deck Keys in the Glass quick look."></a><figcaption><strong>Glass</strong> Translucent keys with soft corners over an aurora backdrop.</figcaption></figure></li>
+          <li><figure><a href="preview-look-bold.webp"><img src="preview-look-bold.webp" width="1280" height="360" loading="lazy" alt="Deck Keys in the Bold tiles quick look."></a><figcaption><strong>Bold tiles</strong> Keys filled with their color, with bold icons.</figcaption></figure></li>
+          <li><figure><a href="preview-look-blueprint.webp"><img src="preview-look-blueprint.webp" width="1280" height="360" loading="lazy" alt="Deck Keys in the Blueprint quick look."></a><figcaption><strong>Blueprint</strong> Square outline keys with thin icons on a dot grid.</figcaption></figure></li>
+        </ul>
+        <h3 id="color-themes-title">Color themes</h3>
+        <p>Shown with Soft glow. <strong>System</strong> follows the light or dark appearance of the desktop.</p>
+        <ul class="gallery" aria-labelledby="color-themes-title">
+          <li><figure><a href="preview-theme-light.webp"><img src="preview-theme-light.webp" width="1280" height="360" loading="lazy" alt="Deck Keys in the Light theme."></a><figcaption><strong>Light</strong></figcaption></figure></li>
+          <li><figure><a href="preview-theme-dark.webp"><img src="preview-theme-dark.webp" width="1280" height="360" loading="lazy" alt="Deck Keys in the Dark theme."></a><figcaption><strong>Dark</strong></figcaption></figure></li>
+          <li><figure><a href="preview-theme-midnight.webp"><img src="preview-theme-midnight.webp" width="1280" height="360" loading="lazy" alt="Deck Keys in the Midnight theme."></a><figcaption><strong>Midnight</strong></figcaption></figure></li>
+          <li><figure><a href="preview-theme-forest.webp"><img src="preview-theme-forest.webp" width="1280" height="360" loading="lazy" alt="Deck Keys in the Forest theme."></a><figcaption><strong>Forest</strong></figcaption></figure></li>
+          <li><figure><a href="preview-theme-ember.webp"><img src="preview-theme-ember.webp" width="1280" height="360" loading="lazy" alt="Deck Keys in the Ember theme."></a><figcaption><strong>Ember</strong></figcaption></figure></li>
+          <li><figure><a href="preview-theme-graphite.webp"><img src="preview-theme-graphite.webp" width="1280" height="360" loading="lazy" alt="Deck Keys in the Graphite theme."></a><figcaption><strong>Graphite</strong></figcaption></figure></li>
+          <li><figure><a href="preview-theme-ocean.webp"><img src="preview-theme-ocean.webp" width="1280" height="360" loading="lazy" alt="Deck Keys in the Ocean theme."></a><figcaption><strong>Ocean</strong></figcaption></figure></li>
+          <li><figure><a href="preview-theme-plum.webp"><img src="preview-theme-plum.webp" width="1280" height="360" loading="lazy" alt="Deck Keys in the Plum theme."></a><figcaption><strong>Plum</strong></figcaption></figure></li>
+          <li><figure><a href="preview-theme-sand.webp"><img src="preview-theme-sand.webp" width="1280" height="360" loading="lazy" alt="Deck Keys in the Sand theme."></a><figcaption><strong>Sand</strong></figcaption></figure></li>
+        </ul>
+        <h3 id="plain-themes-title">Plain themes</h3>
+        <p>Four themes keep the deck plain on purpose. They always draw outline keys on a flat background.</p>
+        <ul class="gallery" aria-labelledby="plain-themes-title">
+          <li><figure><a href="preview-theme-minimal-dark.webp"><img src="preview-theme-minimal-dark.webp" width="1280" height="360" loading="lazy" alt="Deck Keys in the Minimal dark theme."></a><figcaption><strong>Minimal dark</strong> One ink color on a flat background with hairline borders.</figcaption></figure></li>
+          <li><figure><a href="preview-theme-minimal-light.webp"><img src="preview-theme-minimal-light.webp" width="1280" height="360" loading="lazy" alt="Deck Keys in the Minimal light theme."></a><figcaption><strong>Minimal light</strong> The same plain deck on a light background.</figcaption></figure></li>
+          <li><figure><a href="preview-theme-contrast-dark.webp"><img src="preview-theme-contrast-dark.webp" width="1280" height="360" loading="lazy" alt="Deck Keys in the Contrast dark theme."></a><figcaption><strong>Contrast dark</strong> High-contrast colors, fixed to dark.</figcaption></figure></li>
+          <li><figure><a href="preview-theme-contrast-light.webp"><img src="preview-theme-contrast-light.webp" width="1280" height="360" loading="lazy" alt="Deck Keys in the Contrast light theme."></a><figcaption><strong>Contrast light</strong> High-contrast colors, fixed to light.</figcaption></figure></li>
+        </ul>
+        <h3>Make it yours</h3>
+        <div class="look-detail">
+          <ul>
+            <li><strong>Key style.</strong> Outline, Tinted, Solid, or Glass.</li>
+            <li><strong>Backdrop.</strong> Plain, Glow, Aurora, or Dot grid, drawn from the colors of the theme.</li>
+            <li><strong>Key shape and icon weight.</strong> Square, Rounded, or Soft corners, with Thin, Regular, or Bold icons.</li>
+            <li><strong>Accent color.</strong> Pick one of eight presets or any color.</li>
+            <li><strong>Key colors.</strong> A key takes the color of its category. Give any key a color of its own in the editor.</li>
+            <li><strong>Icons only.</strong> Hide the labels and enlarge the icons.</li>
+          </ul>
+          <a class="feature-image" href="preview-settings-look.png"><img src="preview-settings-look.png" width="1362" height="1175" loading="lazy" alt="The Appearance and Deck look cards in Settings, with theme swatches, accent presets, quick looks, key styles, backdrops, key shapes, and icon weights."></a>
+        </div>
+      </div>
+    </section>
     <section class="setup shell" id="setup" aria-labelledby="setup-title">
       <div>
         <h2 id="setup-title">Set up your XENEON EDGE</h2>
@@ -112,7 +169,7 @@
     <section class="setup shell" id="linux" aria-labelledby="linux-title">
       <div>
         <h2 id="linux-title">Set up Lastra on Linux</h2>
-        <p>Install the x86-64 Debian package with <code>sudo apt install ./Lastra-1.1.3-linux-amd64.deb</code> or run the AppImage. The Deck follows the active application on X11 and supported Wayland desktops.</p>
+        <p>Install the x86-64 Debian package with <code>sudo apt install ./Lastra-1.2.0-linux-amd64.deb</code> or run the AppImage. The Deck follows the active application on X11 and supported Wayland desktops.</p>
       </div>
       <ol>
         <li><strong>GNOME.</strong> Install the Lastra GNOME extension ZIP from the release, enable it, and install the GNOME Remote Desktop portal.</li>

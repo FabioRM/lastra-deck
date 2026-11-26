@@ -273,7 +273,6 @@
   });
   tab.addEventListener('click', () => { if (panel.hidden) void open(); else close(true); });
   panel.addEventListener('lastra:close-view', () => close());
-  byId('return').addEventListener('click', () => close(true));
   categories.addEventListener('click', (event) => {
     const button = event.target.closest('[data-group]');
     if (!button) return;
@@ -379,6 +378,9 @@
       event.preventDefault();
       event.stopPropagation();
       closeTones(true);
+    } else if (event.key === 'Escape' && keyboard.hidden) {
+      event.preventDefault();
+      close(true);
     } else if (event.altKey && event.key === 'ArrowDown' && openTones(event.target.closest('.emoji-key'), true)) {
       event.preventDefault();
     }

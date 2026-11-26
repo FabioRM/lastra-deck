@@ -23,6 +23,7 @@ const path = require('node:path');
  * @property {boolean} [verifyFaders] Check horizontal and vertical audio faders.
  * @property {boolean} [verifyHomeNotification] Check the Home notification and clock geometry.
  * @property {boolean} [previewLargeKeys] Render with the large Deck Keys layout.
+ * @property {Record<string, string>} [previewLook] Appearance settings for the preview, such as theme or keyStyle.
  * @property {boolean} [measureDeck] Enable the panel measurement recorder.
  * @property {boolean} [enableWaylandKeyboard] Ask the desktop portal for keyboard permission.
  * @property {boolean} [reload] Ask the running Lastra to reload the deck and editor.
@@ -53,6 +54,11 @@ function parseArgs(argv, { cwd } = {}) {
     else if (arg === '--preview-portrait') opts.portrait = true;
     else if (arg === '--preview-stats') opts.stats = true;
     else if (arg === '--preview-large-keys') opts.previewLargeKeys = true;
+    else if (arg.startsWith('--preview-look=')) {
+      // --preview-look=theme=midnight,keyStyle=tinted,backdrop=aurora
+      opts.previewLook = Object.fromEntries(arg.slice('--preview-look='.length).split(',')
+        .map((pair) => pair.split('=')).filter(([name, value]) => name && value));
+    }
     else if (arg.startsWith('--preview-pack=')) opts.previewPack = arg.slice('--preview-pack='.length);
     else if (arg === '--verify-stats-layout') opts.stats = opts.verifyStats = true;
     else if (arg === '--verify-deck-swipe') opts.verifySwipe = true;

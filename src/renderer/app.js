@@ -18,6 +18,8 @@
     'app-views-panel': 'apps', 'emoji-panel': 'emoji',
   };
   const VIEW_BUTTONS = { obs: 'obs-tab', apps: 'app-views-tab', emoji: 'emoji-tab' };
+  // Views that replace Deck Keys and leave the navigation row in place.
+  const SIDE_VIEWS = ['emoji-panel', 'obs-panel', 'app-views-panel'];
   const VIEW_LABELS = { keys: 'Deck keys', dashboard: 'Dashboard', stats: 'Stats', feeds: 'Feeds' };
 
   const api = window.lastra;
@@ -100,6 +102,13 @@
   const quickTools = window.LastraQuickTools.mount({
     api,
     beforeOpen() {
+      // Apps opens from Tools, so while Apps is open the Tools button is the way back to Deck Keys.
+      if (activeView?.id === 'app-views-panel') {
+        closeActiveView();
+        return false;
+      }
+      // Tools open over Deck Keys, so leave the Emoji or OBS view first.
+      if (activeView) closeActiveView();
       swipe = null;
       for (const key of stage.querySelectorAll('.key')) key.dispatchEvent(new Event('lastra:swipe-cancel'));
       showPageMatch(false);
@@ -124,7 +133,8 @@
 
   function renderQuickTools() {
     quickTools.render({
-      visible: Boolean(api && profile && !activeView),
+      // Emoji, OBS and Apps keep the Tools button, so the row of buttons does not move.
+      visible: Boolean(api && profile && (!activeView || SIDE_VIEWS.includes(activeView.id))),
       readOnly: profile?.viewOnly === true,
       revision: profile?.revision,
       runningFlows: [...keyFeedback].filter(([, entry]) => entry.pending && entry.progress && !entry.unavailable)
@@ -218,6 +228,9 @@
       keysEl.hidden = Boolean(activeView);
       updateViewSwitch();
       renderQuickTools();
+      const toolsButton = document.getElementById('quick-tools-open');
+      if (activeView?.id === 'app-views-panel') toolsButton.setAttribute('aria-pressed', 'true');
+      else toolsButton.removeAttribute('aria-pressed');
       updateWidgetVisibility();
       if (wasFullPanel !== isFullPanel) {
         updateTelemetryVisibility();
@@ -878,6 +891,10 @@
     if (slot.confirm === 'hold' && slot.confirmMs !== undefined) el.style.setProperty('--confirm-ms', `${slot.confirmMs}ms`);
     if (slot.hasDouble) el.classList.add('has-double');
     el.dataset.cat = slot.category;
+    if (slot.color) {
+      el.dataset.keyColor = '';
+      el.style.setProperty('--key-color', slot.color);
+    }
     el.dataset.id = slot.id;
     const unavailable = keyUnavailable(slot, targetBound && profile?.targetUnavailable);
     // The revision lives here rather than in the listeners so refreshKeys can move a mounted key on.
@@ -1257,7 +1274,7 @@
     const useProfilePages = !profile.shortcutPack;
     const count = quickLayout?.sheets.length ?? 1;
     const group = quickLayout?.sheets[quickSheet]?.group;
-    const part = count > 1 ? [group, t('Keys {index} / {count}', { index: quickSheet + 1, count })].filter(Boolean).join(' · ')
+    const part = count > 1 ? [group, `${quickSheet + 1} / ${count}`].filter(Boolean).join(' · ')
       : profile.shortcutPages ? group || '' : '';
     pageCount.textContent = profile.targetUnavailable ? [t('Target inactive'), part].filter(Boolean).join(' · ')
       : part || (automatic ? t('Auto') : profile.pages.length > 1 ? `${index + 1} / ${profile.pages.length}`
@@ -1266,7 +1283,6 @@
     pageCount.title = pageCount.textContent;
     previous.disabled = !api || !(quickSheet > 0 || (useProfilePages && (automatic || index > 0)));
     next.disabled = !api || !(quickSheet + 1 < count || (useProfilePages && (automatic || index < profile.pages.length - 1)));
-    previous.hidden = next.hidden = count === 1 && (!useProfilePages || (profile.pages.length === 1 && !automatic));
   }
 
   function renderProfile(view) {

@@ -714,7 +714,7 @@ label.field input[type='checkbox'] { width: 17px; min-height: 17px; padding: 0; 
   text-overflow: ellipsis;
 }
 .slot-icon {
-  width: calc(clamp(12px, 1.3vw, 18px) * var(--text-scale));
+  width: calc(clamp(16px, 1.9vw, 26px) * var(--text-scale));
   aspect-ratio: 1;
   background: var(--category);
   mask: var(--slot-icon) center / contain no-repeat;
@@ -1123,3 +1123,170 @@ legend { padding: 0 5px; color: var(--ink); font-weight: 600; }
 @media (max-width: 540px) {
   .widget-editor-body { grid-template-columns: minmax(0, 1fr); }
 }
+
+/* Deck look choices */
+.accent-presets { display: flex; flex-wrap: wrap; gap: 6px; }
+.accent-preset, .key-color {
+  flex: none;
+  width: 28px;
+  height: 28px;
+  min-height: 0;
+  min-block-size: 0;
+  padding: 0;
+  border: 2px solid transparent;
+  border-radius: 50%;
+  background: var(--swatch, var(--surface));
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, #000 28%, transparent);
+  cursor: pointer;
+}
+:is(.accent-preset, .key-color)[aria-pressed='true'] { border-color: var(--ink); box-shadow: 0 0 0 2px var(--accent); }
+.look-palette { min-width: 0; padding: 0; border: 0; }
+.look-palette legend { padding: 0; margin-block-end: 7px; color: var(--muted); }
+.look-palette[inert] { opacity: .42; }
+.look-options { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 92px), 1fr)); gap: 8px; }
+.look-pair { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 230px), 1fr)); gap: 12px; }
+.look-option {
+  position: relative;
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+  padding: 8px 6px 6px;
+  border: 1px solid var(--editor-border);
+  border-radius: 10px;
+  background: var(--surface);
+  text-align: center;
+  font-size: .86rem;
+  cursor: pointer;
+  transition: border-color 120ms ease-out, background 120ms ease-out;
+}
+.look-option input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: pointer; }
+.look-option:hover { border-color: var(--control-border); }
+.look-option:has(:checked) { border-color: var(--accent); background: var(--selected-surface); box-shadow: inset 0 0 0 1px var(--accent); }
+.look-option:has(:focus-visible) { outline: 2px solid var(--accent); outline-offset: 2px; }
+.look-sample { display: flex; justify-content: center; gap: 5px; min-height: 40px; align-items: center; }
+.look-sample .look-key { width: 26px; --look-scale: .28; }
+.look-option[data-look-setting='iconWeight'] .look-glyph svg { width: 72%; height: 72%; }
+.look-option[data-look-setting='keyShape'] .look-key, .look-option[data-look-setting='iconWeight'] .look-key { width: 42px; --look-scale: .5; }
+.look-scene {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  width: 100%;
+  height: 44px;
+  border-radius: 7px;
+  border: 1px solid var(--border);
+  background: var(--background);
+}
+.look-scene .look-key { width: 26px; --look-scale: .28; }
+.look-preview {
+  display: grid;
+  grid-template-columns: repeat(8, minmax(0, 1fr));
+  gap: clamp(5px, 1.2vw, 12px);
+  padding: clamp(10px, 2vw, 18px);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--background);
+}
+.look-preview .look-key { --look-scale: .6; }
+
+/* Key style preview and colors in the inspector */
+.key-style-preview { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 12px; align-items: center; }
+.key-style-sample {
+  --category: var(--cat);
+  --look-scale: 1;
+  width: 104px;
+  grid-template-rows: minmax(0, 1fr) auto;
+  gap: 4px;
+  padding: 12px 6px 9px;
+  font: 600 .82rem/1.1 'Segoe UI', sans-serif;
+  text-align: center;
+  overflow: hidden;
+}
+.key-style-sample .slot-icon { width: 40px; }
+.key-style-sample .key-style-image { width: 48px; height: 48px; object-fit: contain; border-radius: 8px; }
+.key-style-label { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.key-style-hint { color: var(--muted); font-size: .86rem; line-height: 1.35; }
+.key-style-side { display: grid; gap: 8px; min-width: 0; }
+.key-style-side .clipboard-tools { margin: 0; }
+.key-colors { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-block-start: 5px; }
+.look-heading { margin-block-end: 7px; color: var(--muted); }
+.look-preset { color: var(--ink); font: inherit; font-size: .86rem; }
+#look-presets { grid-template-columns: repeat(auto-fit, minmax(min(100%, 70px), 1fr)); }
+.look-preset[aria-pressed='true'] { border-color: var(--accent); background: var(--selected-surface); box-shadow: inset 0 0 0 1px var(--accent); }
+.look-preset .look-scene { height: 48px; pointer-events: none; }
+.look-preset .look-key { width: 26px; --look-scale: .3; }
+.key-color-auto {
+  width: auto;
+  height: 28px;
+  padding: 0 10px;
+  border-radius: 14px;
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  font-size: .82rem;
+  box-shadow: inset 0 0 0 1px var(--editor-border);
+}
+.key-color-custom { width: 34px; height: 28px; padding: 0; border: 1px solid var(--editor-border); border-radius: 6px; background: none; }
+
+/* The deck stage: the page grid drawn on the deck's own backdrop, with an outline of the side panel on wide windows. */
+.layout { max-width: 1480px; }
+.editor-canvas.deck-stage { padding: 0; overflow: hidden; background: var(--panel); }
+.stage-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 12px;
+  margin: 0;
+  padding: 8px 10px 8px 14px;
+  border-block-end: 1px solid var(--editor-border);
+}
+.stage-bar > div { margin-inline-start: auto; }
+.stage-device { font-size: .86rem; }
+.deck-stage > #xeneon-preview-status { padding-inline: 14px; }
+.deck-stage > #xeneon-preview-status:empty { display: none; }
+.stage-surface {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: center;
+  gap: clamp(14px, 2vw, 36px);
+  padding: clamp(10px, 1.5vw, 24px);
+  background: var(--background);
+}
+.stage-surface .grid-viewport { padding: 2px; }
+#slots { max-width: calc(var(--cols, 8) * 132px); margin-inline: auto; }
+#slots .slot { aspect-ratio: 1; border-radius: calc(var(--key-radius) * .62); }
+.stage-panel { display: none; }
+.deck-stage .canvas-tools { margin: 0; padding: 8px 10px; }
+
+@media (min-width: 1500px) {
+  #workspace[data-surface='page'] .stage-surface { grid-template-columns: minmax(0, 63fr) minmax(0, 37fr); }
+  #workspace[data-surface='page'] .stage-panel {
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr) auto auto;
+    gap: clamp(8px, 1vw, 16px);
+    align-self: stretch;
+    min-width: 0;
+    color: var(--muted);
+    opacity: .78;
+    pointer-events: none;
+    user-select: none;
+  }
+  .stage-panel-nav { display: flex; justify-content: flex-end; gap: 8px; }
+  .stage-panel-nav i { width: clamp(22px, 2.1vw, 34px); aspect-ratio: 1; border: 1px solid var(--control-border); border-radius: 30%; }
+  .stage-clock { align-self: center; color: var(--text); font: 300 clamp(3rem, 6.4vw, 6.6rem)/.9 'Barlow Condensed', 'Segoe UI', sans-serif; font-variant-numeric: tabular-nums; }
+  .stage-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); padding-block: 8px; border-block: 1px solid var(--border); text-align: center; font-size: .9rem; }
+  .stage-stats span + span { border-inline-start: 1px solid var(--border); }
+  .stage-sliders { display: grid; gap: 9px; }
+  .stage-sliders i { height: 5px; border-radius: 3px; background: linear-gradient(90deg, var(--app) 62%, var(--track) 62%); }
+  .stage-sliders i + i { background: linear-gradient(90deg, var(--media) 78%, var(--track) 78%); }
+}
+
+/* Page, profile and preview settings share one accordion: opening one closes the others. */
+.canvas-details > summary, #live-preview > summary { font-size: .95rem; }
+
+/* The inspector keeps the key's name and its tabs in view while the form scrolls. */
+#inspector { padding-block-start: 0; }
+#inspector > .inspector-heading { position: sticky; top: 0; z-index: 2; margin-inline: -16px; padding: 20px 16px 8px; background: var(--panel-surface); }
+#inspector > .inspector-tabs { position: sticky; top: var(--inspector-heading, 74px); z-index: 2; box-shadow: 0 0 0 7px var(--panel-surface); }

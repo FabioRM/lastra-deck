@@ -237,6 +237,9 @@ function validateKeys(keys, grid, prefix, controlIds, resolver, page) {
     seen.add(k.id);
     if (k.label !== undefined && typeof k.label !== 'string') fail(`${where}: "label" must be a string`);
     if (k.icon !== undefined && !/^[a-z0-9-]{1,60}$/.test(k.icon)) fail(`${where}: invalid icon name`);
+    if (k.color !== undefined && (typeof k.color !== 'string' || !/^#[0-9a-f]{6}$/i.test(k.color))) {
+      fail(`${where}: "color" must be a hex color such as #5b9df9`);
+    }
     if (typeof k.image === 'string' && k.image.startsWith('data:') && !embeddedImageDataUrl(k.image)) {
       fail(`${where}: invalid embedded PNG image`);
     }

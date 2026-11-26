@@ -190,7 +190,7 @@ window.LastraQuickTools = {
 
     opener.addEventListener('click', () => {
       if (opener.hidden || !panel.hidden || document.hidden || document.querySelector('dialog[open]')) return;
-      beforeOpen();
+      if (beforeOpen() === false) return;
       panel.hidden = false;
       opener.setAttribute('aria-expanded', 'true');
       setVisible(true);

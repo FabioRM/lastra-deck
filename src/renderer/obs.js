@@ -307,7 +307,6 @@
     modesOpen = false;
     render();
   });
-  byId('obs-return').addEventListener('click', () => setOpen(false));
   timersToggle.addEventListener('click', () => {
     modesOpen = false;
     timersOpen = !timersOpen;

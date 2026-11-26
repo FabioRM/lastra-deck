@@ -11,6 +11,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { ProfileStore, validateProfile } = require('./profile');
 const { DEFAULT_APPEARANCE } = require('./deck-appearance');
+const { normalizeAppearance } = require('../shared/appearance');
 const { packs } = require('./shortcut-packs');
 const { webPacks, chromiumWebAppId } = require('./shortcut-packs-web');
 const { StatsMonitor } = require('./stats');
@@ -158,15 +159,12 @@ async function captureDemo({ devtools, send, directory, width, height, shortcutP
   }
   if (shortcutPack) {
     const label = await evaluate(`document.getElementById('page-count').textContent`);
-    await capture(1.6);
-    await evaluate(`document.getElementById('next').focus({ preventScroll: true })`);
-    await capture(0.28);
+    // Pages change by swipe on the panel. The hidden paging buttons stand in for the swipe here.
+    await capture(1.9);
     await evaluate(`document.getElementById('next').click()`);
     const before = JSON.stringify(label);
     await waitFor(`document.getElementById('page-count').textContent !== ${before}`, 'This shortcut preview needs at least two generated pages.');
-    await capture(1.84);
-    await evaluate(`document.getElementById('previous').focus({ preventScroll: true })`);
-    await capture(0.28);
+    await capture(2.1);
     await evaluate(`document.getElementById('previous').click()`);
     await waitFor(`document.getElementById('page-count').textContent === ${before}`, 'The shortcut preview could not return to the first page.');
     await capture(0.84);
@@ -484,7 +482,9 @@ async function startPreview({ opts, ipcMain, BrowserWindow, quit, fail, log, ren
 
   ipcMain.once('renderer:ready', async () => {
     try {
-      send('deck:appearance', { ...DEFAULT_APPEARANCE, largeKeys: opts.previewLargeKeys === true });
+      const look = Object.fromEntries(Object.entries(opts.previewLook ?? {}).map(([name, value]) =>
+        [name, value === 'true' ? true : value === 'false' ? false : /^\d+$/.test(value) ? Number(value) : value]));
+      send('deck:appearance', normalizeAppearance({ ...DEFAULT_APPEARANCE, ...look, largeKeys: opts.previewLargeKeys === true }));
       win.setContentSize(width + 1, height + 1);
       devtools.attach();
       await devtools.sendCommand('Emulation.setDeviceMetricsOverride', { width, height, deviceScaleFactor: 1, mobile: false });

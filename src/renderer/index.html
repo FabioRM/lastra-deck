@@ -13,6 +13,7 @@
   <link rel="stylesheet" href="idle-screen.css">
   <link rel="stylesheet" href="navigation-badges.css">
   <link rel="stylesheet" href="key-live-state.css">
+  <link rel="stylesheet" href="look.css">
   <link rel="stylesheet" href="dashboard.css">
   <link rel="stylesheet" href="feeds.css">
   <link rel="stylesheet" href="dashboard-pomodoro.css">
@@ -136,15 +137,18 @@
     </button>
     <div id="deck">
       <nav id="page-nav" aria-label="Pages">
-        <button id="previous" type="button" aria-label="Previous page">‹</button>
-        <button id="next" type="button" aria-label="Next page">›</button>
+        <!-- Pages change by swipe, wheel or shortcut. These two keep the paging state and stay hidden. -->
+        <button id="previous" type="button" aria-label="Previous page" hidden>‹</button>
+        <button id="next" type="button" aria-label="Next page" hidden>›</button>
         <div class="page-current">
           <img id="page-app-icon" alt="" hidden>
-          <button id="page-directory-open" class="page-label" type="button" title="Pages" aria-haspopup="dialog" aria-controls="page-directory" disabled>
-            <span id="page-name"></span>
-            <span id="page-folder" hidden></span>
-          </button>
-          <button id="page-count" type="button" aria-label="Why this page?" aria-controls="page-match" aria-expanded="false" hidden></button>
+          <div class="page-title">
+            <button id="page-directory-open" class="page-label" type="button" title="Pages" aria-haspopup="dialog" aria-controls="page-directory" disabled>
+              <span id="page-name"></span>
+              <span id="page-folder" hidden></span>
+            </button>
+            <button id="page-count" type="button" aria-label="Why this page?" aria-controls="page-match" aria-expanded="false" hidden></button>
+          </div>
           <p id="page-match" hidden></p>
         </div>
         <div id="activity-profile" hidden>
@@ -188,7 +192,6 @@
           <p id="obs-status" role="status"></p>
           <button id="obs-timers-toggle" type="button" aria-controls="obs-production" aria-expanded="false">Timers</button>
           <button id="obs-modes-toggle" type="button" aria-controls="obs-modes" aria-expanded="false" hidden>Modes</button>
-          <button id="obs-return" type="button">Deck keys</button>
         </div>
         <div id="obs-recovery" hidden>
           <p id="obs-unavailable" role="status"></p>
@@ -246,7 +249,6 @@
           <h2 id="app-views-heading">App views</h2>
           <div class="app-views-toolbar">
             <button id="app-views-catalog-button" type="button" hidden>Catalog</button>
-            <button id="app-views-return" type="button">Deck keys</button>
           </div>
         </header>
         <div id="app-views-feedback">
@@ -283,7 +285,6 @@
             <input id="emoji-search" type="search" inputmode="none" maxlength="60" placeholder="Search all emoji" aria-label="Search all emoji">
             <button id="emoji-type" type="button" aria-controls="emoji-keyboard" aria-expanded="false">Touch keyboard</button>
           </div>
-          <button id="emoji-return" type="button">Deck keys</button>
         </header>
         <div id="emoji-keyboard" aria-label="Touch keyboard" hidden></div>
         <div id="emoji-browser">

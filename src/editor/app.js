@@ -105,8 +105,19 @@ const livePreview = window.createLastraEditorPreview(document.getElementById('li
 });
 let largeKeys = false;
 window.bindLastraFeeds?.(api);
+const stageSurface = document.getElementById('deck-stage-surface');
+const stageClock = document.getElementById('deck-stage-clock');
+function paintStageClock() {
+  const format = { hour: '2-digit', minute: '2-digit' };
+  // The draft loads after this script starts, and a profile may carry a locale this PC does not know.
+  try { stageClock.textContent = new Date().toLocaleTimeString(draft?.locale || [], format); }
+  catch { stageClock.textContent = new Date().toLocaleTimeString([], format); }
+}
+paintStageClock();
+setInterval(paintStageClock, 20_000);
 window.bindLastraAppearance(api, (settings) => {
   livePreview.setAppearance(settings);
+  stageSurface.dataset.lookBackdrop = window.LastraAppearance.plainLook(settings) ? 'plain' : settings.backdrop;
   if (largeKeys === settings.largeKeys) return;
   largeKeys = settings.largeKeys;
   refreshProfileGrid?.();
@@ -1283,10 +1294,17 @@ function renderGroupInspector() {
   const appliedStyle = node('p', 'muted', t('Keep current icons and images'));
   appliedStyle.setAttribute('role', 'status');
   let asset;
+  // undefined keeps each key's color, null returns to the category color, and a hex value sets one color.
+  let groupColor;
+  const pendingStyle = () => Boolean(category.value || asset || groupColor !== undefined);
   const apply = button(t('Apply to selected keys'), () => {
-    if ((!category.value && !asset) || !stillSelected()) return;
+    if (!pendingStyle() || !stillSelected()) return;
     edit(() => {
-      for (const { key } of entries) applyKeyAppearance(key, { category: category.value, asset });
+      for (const { key } of entries) {
+        applyKeyAppearance(key, { category: category.value, asset });
+        if (groupColor) key.color = groupColor;
+        else if (groupColor === null) delete key.color;
+      }
       renderSlots();
       renderInspector();
       inspector.querySelector('#key-group-category').focus();
@@ -1298,7 +1316,7 @@ function renderGroupInspector() {
     asset = value;
     appliedStyle.textContent = value?.kind === 'icon' ? `Icon · ${value.value}` : value?.kind === 'image' ? t('Embedded image')
       : value?.kind === 'clear' ? t('Remove icons and images') : t('Keep current icons and images');
-    apply.disabled = !category.value && !asset;
+    apply.disabled = !pendingStyle();
     resetAsset.disabled = !asset;
   }
   const choose = button(t('Choose icon or image'), () => {
@@ -1312,9 +1330,27 @@ function renderGroupInspector() {
   const clear = button(t('Remove icons and images'), () => stageAsset({ kind: 'clear' }), { className: 'quiet' });
   const styleTools = node('div', 'clipboard-tools');
   styleTools.append(choose, clear, resetAsset);
-  category.addEventListener('change', () => { apply.disabled = !category.value && !asset; });
+  category.addEventListener('change', () => { apply.disabled = !pendingStyle(); });
+  const groupColors = node('div', 'key-colors');
+  groupColors.setAttribute('role', 'group');
+  groupColors.setAttribute('aria-label', t('Key color'));
+  const stageColor = (value, control) => {
+    groupColor = value;
+    for (const option of groupColors.querySelectorAll('.key-color')) option.setAttribute('aria-pressed', String(option === control));
+    apply.disabled = !pendingStyle();
+  };
+  const keepColor = button(t('Keep current colors'), () => stageColor(undefined, keepColor), { className: 'key-color key-color-auto', pressed: true });
+  const categoryColor = button(t('Category color'), () => stageColor(null, categoryColor), { className: 'key-color key-color-auto', pressed: false });
+  groupColors.append(keepColor, categoryColor);
+  for (const color of window.LastraAppearance.ACCENT_PRESETS) {
+    const swatch = button('', () => stageColor(color, swatch), { className: 'key-color', pressed: false, label: color, title: color });
+    swatch.style.setProperty('--swatch', color);
+    groupColors.append(swatch);
+  }
+  const groupColorField = node('div', 'field');
+  groupColorField.append(node('span', '', t('Key color')), groupColors);
   stageAsset(undefined);
-  style.append(field(t('Category'), category), appliedStyle, styleTools, apply);
+  style.append(field(t('Category'), category), groupColorField, appliedStyle, styleTools, apply);
   inspector.append(moving, style);
 }
 
@@ -1413,6 +1449,8 @@ function addSlotIcon(control, name) {
 function renderSlots() {
   const { cols, rows } = currentGrid();
   const page = currentPage();
+  workspace.dataset.surface = pageId === BAR_PAGE_ID ? 'bar' : 'page';
+  paintStageClock();
   const resolver = createProfileKeys(draft);
   const keyLabel = (key) => {
     if (key?.labelExpression) {
@@ -1456,6 +1494,10 @@ function renderSlots() {
     el.append(node('span', 'slot-label', label ?? '+'));
     if (key?.icon) addSlotIcon(el, key.icon);
     el.dataset.category = key?.category ?? '';
+    if (key?.color) {
+      el.dataset.keyColor = '';
+      el.style.setProperty('--key-color', key.color);
+    }
     el.disabled = Boolean(groupSelection && !key);
     el.draggable = Boolean(key && !groupSelection);
     el.setAttribute('aria-label', t(label ? 'Slot {number}, {label}' : 'Slot {number}, empty', { number: index + 1, label }));
@@ -1998,6 +2040,8 @@ function renderInspector() {
   }
   const tools = clipboardKeyTools(key);
   inspector.append(tabs, actions, appearance, layoutPanel, tools);
+  // The tabs stick just below the heading, whose height depends on the key's name.
+  inspector.style.setProperty('--inspector-heading', `${heading.offsetHeight}px`);
   showInspectorTab(inspectorTab);
   const behavior = linkedControl(draft, key) ?? key;
   tools.append(button(t('Test key'), () => {
@@ -2036,7 +2080,7 @@ function renderInspector() {
       });
       return true;
     });
-  }, { className: 'quiet' });
+  });
   chooseImage.id = 'choose-key-image';
   assets.append(chooseImage);
   const embedded = typeof key.image === 'string' && key.image.startsWith('data:image/png;base64,');
@@ -2045,15 +2089,63 @@ function renderInspector() {
     renderSlots();
     renderInspector();
   }), { className: 'quiet' }));
-  appearance.append(
-    visualField('label', 'Label', { maxLength: 40 }),
-    field(t('Category'), select(localizedOptions(categories), key.category, (value) => { key.category = value; renderSlots(); })),
+  const stylePreview = node('div', 'key-style-preview');
+  const styleSample = node('div', 'look-key key-style-sample');
+  styleSample.dataset.cat = key.category ?? 'app';
+  if (key.color) {
+    styleSample.dataset.keyColor = '';
+    styleSample.style.setProperty('--key-color', key.color);
+  }
+  styleSample.setAttribute('aria-hidden', 'true');
+  styleSample.append(node('span', 'key-style-label', key.label || key.id));
+  if (embedded) {
+    const picture = node('img', 'key-style-image');
+    picture.src = key.image;
+    picture.alt = '';
+    styleSample.prepend(picture);
+  } else addSlotIcon(styleSample, key.icon);
+  const styleSide = node('div', 'key-style-side');
+  styleSide.append(assets, node('p', 'key-style-hint', t('This is how the key looks on the deck. Change the deck look under Settings → Display.')));
+  stylePreview.append(styleSample, styleSide);
+  const assetFields = node('details', 'inspector-advanced');
+  assetFields.open = Boolean(key.iconExpression || (key.image && !embedded));
+  assetFields.append(node('summary', '', t('Icon name and image path')),
     visualField('icon', t('Lucide icon name'), { maxLength: 60, placeholder: 'folder' }),
-    ...(embedded ? [] : [textField('image', t('Custom image path'))]), assets,
+    ...(embedded ? [] : [textField('image', t('Custom image path'))]));
+  const setColor = (value) => edit(() => {
+    if (value) key.color = value;
+    else delete key.color;
+    renderSlots();
+    renderInspector();
+  });
+  const colors = node('div', 'key-colors');
+  colors.setAttribute('role', 'group');
+  colors.setAttribute('aria-label', t('Key color'));
+  colors.append(button(t('Category color'), () => setColor(null), { className: 'key-color key-color-auto', pressed: !key.color }));
+  for (const color of window.LastraAppearance.ACCENT_PRESETS) {
+    const swatch = button('', () => setColor(color), { className: 'key-color', pressed: key.color?.toLowerCase() === color, label: color, title: color });
+    swatch.style.setProperty('--swatch', color);
+    colors.append(swatch);
+  }
+  const customColor = node('input', 'key-color-custom');
+  customColor.type = 'color';
+  customColor.value = key.color ?? '#5b9df9';
+  customColor.title = t('Custom color');
+  customColor.setAttribute('aria-label', t('Custom color'));
+  customColor.addEventListener('change', () => setColor(customColor.value));
+  colors.append(customColor);
+  const colorField = node('div', 'field');
+  colorField.append(node('span', '', t('Key color')), colors);
+  appearance.append(
+    stylePreview,
+    visualField('label', 'Label', { maxLength: 40 }),
+    field(t('Category'), select(localizedOptions(categories), key.category, (value) => { key.category = value; renderSlots(); renderInspector(); })),
+    colorField,
     field(t('Key value'), select(localizedOptions(window.LastraKeyReadouts.READOUTS), key.readout ?? 'auto', (value) => {
       if (value === 'auto') delete key.readout;
       else key.readout = value;
     })),
+    assetFields,
   );
   const advanced = node('details', 'inspector-advanced');
   advanced.open = Boolean(showAdvanced);

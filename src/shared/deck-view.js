@@ -58,6 +58,7 @@
         id: prefix + key.id,
         label: key.label ?? key.id,
         category: key.category ?? 'app',
+        ...(key.color ? { color: key.color } : {}),
         icon: key.image ? null : icon(key.icon),
         image: key.image ? image(key.image) : null,
         hasHold: Boolean(key.hold),

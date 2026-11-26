@@ -4,6 +4,23 @@ Completed items from the former TODO, grouped by the section that tracked them. 
 
 Entries grouped under **0.2.1** record the completed work through the first reviewed source release.
 
+## 1.2.0
+
+- Add a deck look under **Settings → Display** with four key styles, four backdrops, three key shapes, three icon weights, and an icons-only option. Five quick looks set them together, and a new installation starts with **Soft glow**. [Deck look](docs/deck-look.md)
+- Add accent presets beside the accent color.
+- Add a color for each key. The editor's **Style** tab shows the key as the deck draws it, offers color swatches, and keeps the icon name and image path in a collapsed group. A color can be applied to several selected keys.
+- Draw the editor's key grid with the deck look and larger icons.
+- Add `--preview-look` to render a preview with chosen appearance settings.
+- Add **Minimal dark**, **Minimal light**, **Contrast dark**, and **Contrast light** themes. They keep outline keys on a plain background whatever the deck look says.
+- Rework the editor's page area into a deck stage: the grid sits on the deck's backdrop with square keys, the XENEON actions share one bar above it, and wide windows show an outline of the side panel. Page settings, profile settings, and the live preview open one at a time.
+- Keep the key name and the Actions, Style, and Placement tabs in view while the key settings scroll.
+- Keep the Deck Keys navigation buttons in place when Emoji, OBS, or Apps opens. The button of the open view shows as selected and closes it: Emoji and OBS use their own button, and Apps uses the Tools button it opens from. The views no longer have a **Deck keys** button. Escape also closes Emoji.
+- Remove the previous and next page arrows from Deck Keys. Pages change by swipe, trackpad scroll, mouse wheel, or a global shortcut.
+- Show the screen count beside the page name as **1 / 2**, on the same baseline as the name and without the word Keys.
+- Enlarge the page name in Deck Keys, with its app icon and screen count in proportion.
+- Refresh the preview images and animations for the new look. `scripts/refresh-previews.js` also renders Home, Dashboard, a gallery of every quick look and theme, and a themes animation.
+- Add a **Themes and looks** section and a picture of the editor to the website.
+
 ## 1.1.3
 
 - Keep weather effects running while Feeds is visible. Stop animations for hidden weather layers and when another view covers Feeds.

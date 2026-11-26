@@ -25,17 +25,21 @@ The loop opens **Emoji** from **Home**, then shows **Dashboard**, **Stats**, and
 
 [Watch the deck switch between custom shortcut pages](docs/preview-shortcuts.gif).
 
+![Deck Keys changes through ten combinations of theme and quick look](docs/preview-themes.gif)
+
+The deck comes with 14 themes and five quick looks. [Deck look](docs/deck-look.md)
+
 <a href="docs/preview-portrait.png"><img src="docs/preview-portrait.png" alt="Deck Keys in portrait with the mixer above the macro grid" width="225"></a>
 
 </details>
 
 ## Getting started
 
-Download the installer or browse the reviewed source on the public release page. [Lastra v1.1.3](https://github.com/FabioRM/lastra-deck/releases/tag/v1.1.3) · [Windows x64 installer](https://github.com/FabioRM/lastra-deck/releases/download/v1.1.3/Lastra-Setup-1.1.3.exe) · [SHA‑256 checksum](https://github.com/FabioRM/lastra-deck/releases/download/v1.1.3/Lastra-Setup-1.1.3.exe.sha256) · [Catalog redistribution review](docs/catalog-redistribution.md)
+Download the installer or browse the reviewed source on the public release page. [Lastra v1.2.0](https://github.com/FabioRM/lastra-deck/releases/tag/v1.2.0) · [Windows x64 installer](https://github.com/FabioRM/lastra-deck/releases/download/v1.2.0/Lastra-Setup-1.2.0.exe) · [SHA‑256 checksum](https://github.com/FabioRM/lastra-deck/releases/download/v1.2.0/Lastra-Setup-1.2.0.exe.sha256) · [Catalog redistribution review](docs/catalog-redistribution.md)
 
 Set the XENEON EDGE to **Extend these displays** in Windows Display settings. The panel runs at 2560 × 720 in landscape and 720 × 2560 in portrait.
 
-**Install the app.** Download `Lastra-Setup-1.1.3.exe` and run it on Windows x64. It installs for the current user in `%LOCALAPPDATA%\Programs\Lastra` and adds Start menu and desktop shortcuts. The Windows installer is unsigned. Settings and profiles live in `%APPDATA%\Lastra` and survive updates and uninstalls. [Latest release](https://github.com/FabioRM/lastra-deck/releases/latest) · [Update behavior](https://github.com/FabioRM/lastra-deck/blob/main/docs/releasing.md#update-behavior)
+**Install the app.** Download `Lastra-Setup-1.2.0.exe` and run it on Windows x64. It installs for the current user in `%LOCALAPPDATA%\Programs\Lastra` and adds Start menu and desktop shortcuts. The Windows installer is unsigned. Settings and profiles live in `%APPDATA%\Lastra` and survive updates and uninstalls. [Latest release](https://github.com/FabioRM/lastra-deck/releases/latest) · [Update behavior](https://github.com/FabioRM/lastra-deck/blob/main/docs/releasing.md#update-behavior)
 
 **Run from source.** Install **Node.js 22.12.0 or later**, as required by the Electron installer, then run these commands from the project directory. Source runs never check for updates. To build the installer yourself, see [Releasing](docs/releasing.md).
 
@@ -91,7 +95,7 @@ Start a **Pomodoro break** from Tools or Dashboard to fill the XENEON EDGE with 
 - **Stats** shows current readings and charts for the processor, graphics, memory, displays, app frame performance, storage, and cooling. Configure Overview card order and width, and place up to four readings on one graph with separate scales by unit. [Telemetry guide](docs/telemetry.md)
 - **OBS** shows live recording and streaming status and provides controls for scenes and sources. [OBS setup](docs/obs.md)
 - **Apps** offers searchable, pinnable views for Spotify, Docker and Compose, Kubernetes, GitHub Checks, WSL, Windows Terminal, and custom apps. **Action history** shows up to 100 completed command attempts from the current session. [App views](docs/app-views.md) · [Kubernetes](docs/kubernetes.md) · [GitHub Checks](docs/github-checks.md)
-- **Emoji** puts frequently used emoji at the top of one vertically scrollable grid. Swipe up or down, use the mouse wheel, or search with the touch keyboard. Tap an emoji to insert it into the active text field.
+- **Emoji** puts frequently used emoji at the top of one vertically scrollable grid. Swipe up or down, use the mouse wheel, or search with the touch keyboard. Tap an emoji to insert it into the active text field. The Emoji button stays selected while the view is open. Tap it again, or press Escape, to return to Deck Keys. **OBS** works the same way with its button, and **Apps** with the Tools button it opens from.
 
 ![Lastra Stats overview with sample CPU, GPU, memory, display, frame rate, disk, and temperature readings](docs/preview-stats.png)
 
@@ -105,7 +109,7 @@ Open **Monitoring watchlist** in **Apps** to keep selected hardware, app, and se
 
 ## Pages and keys
 
-- Use the arrows, swipe horizontally, scroll sideways on a trackpad, or turn the mouse wheel over Deck Keys to change pages. A swipe cancels the key where it started. **Home** returns to the first page. The default profile starts on **Home**. VS Code and each browser open their own automatic shortcut pack when they take focus.
+- Swipe horizontally, scroll sideways on a trackpad, or turn the mouse wheel over Deck Keys to change pages. With more than one screen, the count beside the page name reads **1 / 2**. A swipe cancels the key where it started. **Home** returns to the first page. The default profile starts on **Home**. VS Code and each browser open their own automatic shortcut pack when they take focus.
 - Deck opens a configured page for the foreground Windows app when one exists. Otherwise, it uses a matching built-in shortcut pack or a temporary **Auto** page with common shortcuts. Use a page's **Windows app IDs** for an exact Store app or installed web app match. Browser packs cover ordinary browser tabs. [Engineering shortcut packs](docs/engineering-shortcuts.md) · [All shortcut packs](docs/shortcut-packs.md)
 - A page's **Context rules** can match a project or document within an assigned executable or Windows app ID. Lastra takes the highest **Rule priority**, then the most specific match. At equal priority, exact titles beat prefixes and partial titles, and Windows app IDs beat executable names for otherwise equal rules. Page order resolves a tie. Tap the page count or **Auto** to see why the page opened.
 - Use **Home** or either arrow from an **Auto** page to return to a configured page. A manual selection holds until the foreground app changes. **Lock page** keeps the displayed page until you unlock it. If an automatic page is locked when Lastra closes, the configured fallback opens locked next time.
@@ -144,7 +148,7 @@ Dashboard shows the **Signal** card alongside the top-right controls. In Deck Ke
 
 Open **Apps → Audio presets** to save the current Windows speaker and default microphone levels for an activity. The preset displays the current and saved values side by side. **Apply shown levels** verifies that the same devices and levels are still present, then checks Windows readback for each change. Use **Refresh levels** after changing a volume or device in Windows. Presets affect volume only.
 
-Open **Lastra → Settings → Display** to choose from ten themes, including **Graphite**, **Ocean**, **Plum**, and **Sand**. **System** follows the desktop appearance. Choose a custom **Accent color** or use the theme accent. High contrast takes precedence over custom colors. The settings apply to the deck, profile editor, and preview.
+Open **Lastra → Settings → Display** to choose from 14 themes, including **Graphite**, **Ocean**, **Plum**, and **Sand**, and four plain ones, **Minimal** and **Contrast** in dark and light. **System** follows the desktop appearance. Choose a custom **Accent color** or use the theme accent. High contrast takes precedence over custom colors. The settings apply to the deck, profile editor, and preview.
 
 In **Settings → Display → Telemetry**, choose **Number** or **Gauge** independently for CPU, RAM, and GPU in the deck side panel. You can also show or hide percent signs and clock seconds. Percent signs are on by default and clock seconds are off. Readings that reach 100% display **MAX** in red.
 
@@ -168,11 +172,11 @@ Use **Settings → General → Interface language** to choose **System language*
 
 With Deck Keys visible on the XENEON EDGE, choose **Edit current Deck Keys** in the editor to open the active page in your draft. For an automatic shortcut page, Lastra copies the visible screen into a new editable page and keeps the shortcut guards. **Preview on XENEON** shows the draft on the physical display and updates as you edit. Tap **Close preview** on the panel, or close it in the editor. Save the profile to apply the changes to the live deck.
 
-Select **Editor** in the desktop Lastra window or run `npm run edit`. Use **Find a page** to filter pages by name or folder, then select a slot to edit its **Actions**, **Style**, or **Placement**. Use the arrow keys to move around the grid, **F2** or **Edit selection** to move to the slot settings, and drag a key to reposition it. Expand **Page settings** to set the apps that activate the page. The toolbar shows whether the profile has unsaved changes. **Save profile** updates the deck immediately. Find profile import, export, and backups under **More**.
+Select **Editor** in the desktop Lastra window or run `npm run edit`. Use **Find a page** to filter pages by name or folder, then select a slot to edit its **Actions**, **Style**, or **Placement**. The grid is drawn on the deck's own backdrop, and a window at least 1,500 pixels wide also shows an outline of the deck's side panel. The key name and the three tabs stay in view while you scroll its settings. Use the arrow keys to move around the grid, **F2** or **Edit selection** to move to the slot settings, and drag a key to reposition it. Expand **Page settings** to set the apps that activate the page. The toolbar shows whether the profile has unsaved changes. **Save profile** updates the deck immediately. Find profile import, export, and backups under **More**.
 
-Open **App shortcuts**, select an app, and expand **Configure app shortcut pages**. Create, name, and reorder several pages. Select a command in the catalog and choose **Add to shortcut page**. Hide a command to keep it in your configuration for later, or remove it from the page. You can also turn off an app's automatic pages for the current activity. Choose **Save profile** to apply your changes. Use the arrows or swipe on the deck to switch pages while the app is in the foreground. [Configure app shortcut pages](docs/shortcut-packs.md#configure-app-shortcut-pages)
+Open **App shortcuts**, select an app, and expand **Configure app shortcut pages**. Create, name, and reorder several pages. Select a command in the catalog and choose **Add to shortcut page**. Hide a command to keep it in your configuration for later, or remove it from the page. You can also turn off an app's automatic pages for the current activity. Choose **Save profile** to apply your changes. Swipe on the deck to switch pages while the app is in the foreground. [Configure app shortcut pages](docs/shortcut-packs.md#configure-app-shortcut-pages)
 
-Open **Settings → Display** to set the display theme, text size, contrast, clock, idle screen, and dimming. Enable **Large Deck Keys** for bigger, more widely spaced touch targets. Use the page arrows or swipe to reach additional keys, and find Cut, Copy, Paste, Undo, and Redo at the end of each screen. The page layout shows how many screens each orientation needs. These global settings apply when changed.
+Open **Settings → Display** to set the display theme, text size, contrast, clock, idle screen, and dimming. Under **Deck look**, choose a quick look or set the key style, backdrop, key shape, and icon weight yourself. **Classic** keeps the look of earlier versions, and the **Minimal** and **Contrast** themes, each dark or light, keep the deck plain. [Deck look](docs/deck-look.md) Enable **Large Deck Keys** for bigger, more widely spaced touch targets. Swipe to reach additional keys, and find Cut, Copy, Paste, Undo, and Redo at the end of each screen. The page layout shows how many screens each orientation needs. These global settings apply when changed.
 
 Open **Settings → Deck keys → Global keyboard shortcuts** to assign shortcuts for navigating or revealing the deck. Type a combination or select **Record** and press the keys, then select **Apply** to save it. Each row shows the registration status. The page lock pauses page shortcuts. View-only mode and Windows lock pause every shortcut.
 
@@ -247,7 +251,7 @@ Activity profiles with the old system volume buttons in **Home** use the audio s
 
 Pages inherit the profile grid. Set a page's own `"grid": { "cols": 5, "rows": 2 }` to override it. The editor provides these controls under **Page grid**. A key can cover several cells from its anchor, for example with `"span": { "cols": 2, "rows": 1 }`. Leave the covered array entries as `null`. Widgets fit in the remaining cells. Use **Width in cells** and **Height in cells** to set a key's size in the editor.
 
-`hold` and `double` are optional actions. Set `"confirm": { "mode": "prompt" }` for a confirmation dialog or `"confirm": { "mode": "hold", "holdMs": 850 }` for a key-specific hold of 250 to 3000 ms. Omit `holdMs` to use the profile duration. Existing `"confirm": true` keys also use the profile duration. A confirmed key cannot have `hold` or `double` actions. The optional `onBusy` field accepts `ignore` or `queue-one`. Use `icon` for a Lucide icon name or `image` for the path to a PNG, JPG, SVG, or WebP up to 2 MB. Available categories are `app`, `media`, `system`, and `meeting`. [Lucide icon catalog](https://lucide.dev/icons)
+`hold` and `double` are optional actions. Set `"confirm": { "mode": "prompt" }` for a confirmation dialog or `"confirm": { "mode": "hold", "holdMs": 850 }` for a key-specific hold of 250 to 3000 ms. Omit `holdMs` to use the profile duration. Existing `"confirm": true` keys also use the profile duration. A confirmed key cannot have `hold` or `double` actions. The optional `onBusy` field accepts `ignore` or `queue-one`. Use `icon` for a Lucide icon name or `image` for the path to a PNG, JPG, SVG, or WebP up to 2 MB. Available categories are `app`, `media`, `system`, and `meeting`. Add `"color": "#5b9df9"` to give a key its own color. [Lucide icon catalog](https://lucide.dev/icons)
 
 ### Action fields
 

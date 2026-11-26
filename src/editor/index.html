@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="../renderer/theme.css">
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="integration-setup.css">
+  <link rel="stylesheet" href="../renderer/look.css">
   <link rel="stylesheet" href="../renderer/widgets.css">
   <link rel="stylesheet" href="../renderer/virtual-dial.css">
   <link rel="stylesheet" href="../renderer/obs.css">
@@ -118,8 +119,37 @@
               <label class="field">Accent color<input name="accent" type="color" value="#619fd8"></label>
               <button id="reset-accent" type="button" class="quiet" disabled>Use theme accent</button>
             </div>
+            <div id="accent-presets" class="accent-presets" role="group" aria-label="Accent presets"></div>
             <label class="check"><input type="checkbox" name="highContrast">High contrast</label>
             <label class="check"><input type="checkbox" name="largeKeys">Large Deck Keys</label>
+          </section>
+          <section class="deck-settings-card look-settings" aria-labelledby="look-settings-heading">
+            <h3 id="look-settings-heading" tabindex="-1">Deck look</h3>
+            <div id="look-preview" class="look-preview" aria-hidden="true"></div>
+            <p id="look-plain-note" class="muted" role="status" hidden>This theme keeps keys plain. Quick looks, key style, and backdrop apply to the other themes.</p>
+            <div class="look-palette" role="group" aria-labelledby="look-presets-heading">
+              <p id="look-presets-heading" class="look-heading">Quick looks</p>
+              <div id="look-presets" class="look-options"></div>
+            </div>
+            <fieldset class="look-palette">
+              <legend>Key style</legend>
+              <div id="key-style-options" class="look-options"></div>
+            </fieldset>
+            <fieldset class="look-palette">
+              <legend>Backdrop</legend>
+              <div id="backdrop-options" class="look-options"></div>
+            </fieldset>
+            <div class="look-pair">
+              <fieldset class="look-palette">
+                <legend>Key shape</legend>
+                <div id="key-shape-options" class="look-options"></div>
+              </fieldset>
+              <fieldset class="look-palette">
+                <legend>Icon weight</legend>
+                <div id="icon-weight-options" class="look-options"></div>
+              </fieldset>
+            </div>
+            <label class="check"><input type="checkbox" name="hideKeyLabels">Show icons only on Deck Keys</label>
           </section>
           <section class="deck-settings-card" aria-labelledby="clock-settings-heading">
             <h3 id="clock-settings-heading" tabindex="-1">Clock and idle</h3>
@@ -332,17 +362,25 @@
         <div><h2 id="editor-page-name"></h2><p id="editor-page-size" class="muted"></p></div>
         <div id="page-actions"></div>
       </div>
-      <div class="panel-preview-tools">
-        <div>
-          <button id="copy-xeneon-page" type="button" disabled>Edit current Deck Keys</button>
-          <button id="show-xeneon-preview" class="primary" type="button" aria-pressed="false" disabled>Preview on XENEON</button>
-        </div>
-        <p class="muted">Work on a copy, then save to apply it to the deck.</p>
-        <p id="xeneon-preview-status" class="settings-status" role="status"></p>
-      </div>
       <p id="status" role="status"></p>
-      <div class="editor-canvas">
-        <div class="grid-viewport"><div id="slots" role="group" aria-label="Page layout"></div></div>
+      <div class="editor-canvas deck-stage">
+        <div class="stage-bar panel-preview-tools">
+          <p class="stage-device muted">Work on a copy, then save to apply it to the deck.</p>
+          <div>
+            <button id="copy-xeneon-page" type="button" disabled>Edit current Deck Keys</button>
+            <button id="show-xeneon-preview" class="primary" type="button" aria-pressed="false" disabled>Preview on XENEON</button>
+          </div>
+        </div>
+        <p id="xeneon-preview-status" class="settings-status" role="status"></p>
+        <div id="deck-stage-surface" class="stage-surface" data-look-backdrop="plain">
+          <div class="grid-viewport"><div id="slots" role="group" aria-label="Page layout"></div></div>
+          <div class="stage-panel" aria-hidden="true">
+            <div class="stage-panel-nav"><i></i><i></i><i></i><i></i></div>
+            <div id="deck-stage-clock" class="stage-clock"></div>
+            <div class="stage-stats"><span>CPU</span><span>RAM</span><span>GPU</span></div>
+            <div class="stage-sliders"><i></i><i></i></div>
+          </div>
+        </div>
         <div class="canvas-tools">
           <div id="key-group-tools" class="clipboard-tools" role="group" aria-label="Key group controls">
             <button id="select-key-group" type="button" class="quiet" aria-pressed="false">Select keys</button>
@@ -351,7 +389,7 @@
           <button id="edit-selection" type="button" aria-controls="inspector" aria-keyshortcuts="F2">Edit selection</button>
         </div>
       </div>
-      <details id="live-preview">
+      <details id="live-preview" name="editor-context">
         <summary>Live preview</summary>
         <div class="preview-controls">
           <label class="field">Layout
@@ -376,11 +414,11 @@
           <div id="preview-layout-overlay" role="group" aria-label="Draft layout controls" hidden></div>
         </div>
       </details>
-      <details id="page-settings" class="canvas-details">
+      <details id="page-settings" class="canvas-details" name="editor-context">
         <summary>Page settings</summary>
         <div id="page-fields"></div>
       </details>
-      <details class="canvas-details">
+      <details class="canvas-details" name="editor-context">
         <summary>Profile settings</summary>
         <div class="profile-fields" id="profile-fields"></div>
       </details>

@@ -277,10 +277,6 @@
   });
   panel.addEventListener('lastra:close-view', () => close());
   document.addEventListener('lastra-language', render);
-  byId('app-views-return').addEventListener('click', () => {
-    close();
-    byId('quick-tools-open').focus({ preventScroll: true });
-  });
   byId('app-views-catalog-button').addEventListener('click', async () => {
     if (await change({ type: 'select', viewId: null }) && !panel.hidden) {
       automatic = false;

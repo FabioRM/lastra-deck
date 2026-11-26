@@ -1,0 +1,125 @@
+/*
+ * The deck look chosen under Settings → Display: key style, key shape, icon weight, backdrop and
+ * per-key colors. The same rules style a deck key (.key), an editor slot (.slot) and the samples in
+ * Settings (.look-key), so the editor shows what the deck will show.
+ * High contrast, the Minimal and Contrast themes, and Windows forced colors keep the plain outline look.
+ */
+
+:root {
+  --key-radius: 18px;
+  --icon-stroke: 1.6;
+}
+:root[data-key-shape='square'], [data-look-shape='square'] { --key-radius: 6px; }
+:root[data-key-shape='soft'], [data-look-shape='soft'] { --key-radius: 32px; }
+[data-look-shape='rounded'] { --key-radius: 18px; }
+:root[data-icon-weight='thin'], [data-look-weight='thin'] { --icon-stroke: 1.1; }
+:root[data-icon-weight='bold'], [data-look-weight='bold'] { --icon-stroke: 2.3; }
+[data-look-weight='regular'] { --icon-stroke: 1.6; }
+
+.slot { --cat: var(--category); }
+.look-key { --cat: var(--app); }
+.look-key[data-cat='media'] { --cat: var(--media); }
+.look-key[data-cat='system'] { --cat: var(--system); }
+.look-key[data-cat='meeting'] { --cat: var(--meeting); }
+
+/* Samples used by Settings and the editor. */
+.look-key {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1;
+  border: 1px solid var(--control-border);
+  border-radius: calc(var(--key-radius) * var(--look-scale, .34));
+  background: linear-gradient(180deg, var(--surface-top), var(--surface));
+  color: var(--text);
+}
+.look-glyph { display: grid; place-items: center; color: var(--cat); }
+.look-glyph svg { width: 56%; height: 56%; stroke-width: var(--icon-stroke); }
+
+/* A key with its own color. The color leans toward the text color, so it stays readable on light and dark themes. */
+.key[data-key-color]:not([aria-pressed='true']), .look-key[data-key-color] { --cat: color-mix(in srgb, var(--key-color) 74%, var(--text)); }
+.slot[data-key-color] { --category: color-mix(in srgb, var(--key-color) 74%, var(--text)); }
+
+@media not (forced-colors: active) {
+  /* Tinted: a soft wash of the key's color with a matching glow underneath. */
+  :root:not([data-plain-look='true'])[data-key-style='tinted'] :is(.key, .slot:not(.empty, .slot-widget), .look-key):not([data-look]),
+  [data-look='tinted'] {
+    border-color: color-mix(in srgb, var(--cat) 36%, var(--border));
+    background:
+      radial-gradient(130% 88% at 50% 0%, color-mix(in srgb, var(--cat) 26%, transparent), transparent 72%),
+      linear-gradient(180deg, color-mix(in srgb, var(--cat) 10%, var(--surface-top)), var(--surface));
+    box-shadow:
+      inset 0 1px 0 color-mix(in srgb, #fff 9%, transparent),
+      0 12px 22px -16px color-mix(in srgb, var(--cat) 75%, transparent);
+  }
+
+  /* Solid: the key is its color, like the caps of a hardware deck. */
+  :root:not([data-plain-look='true'])[data-key-style='solid'] :is(.key, .slot:not(.empty, .slot-widget), .look-key):not([data-look]),
+  [data-look='solid'] {
+    border-color: color-mix(in srgb, var(--cat) 72%, #000);
+    background: linear-gradient(165deg, color-mix(in srgb, var(--cat) 86%, #fff), color-mix(in srgb, var(--cat) 80%, #000));
+    color: var(--on-app);
+    box-shadow:
+      inset 0 1px 0 color-mix(in srgb, #fff 30%, transparent),
+      0 10px 18px -12px color-mix(in srgb, var(--cat) 70%, #000);
+  }
+  :root:not([data-plain-look='true'])[data-key-style='solid'] .key:not([data-look]) :is(.glyph, .key-live-state),
+  [data-look='solid'] :is(.glyph, .look-glyph) { color: inherit; }
+  :root:not([data-plain-look='true'])[data-key-style='solid'] :is(.slot:not(.empty, .slot-widget), .key-style-sample) .slot-icon { background: currentColor; }
+  :root:not([data-plain-look='true'])[data-key-style='solid'] .key:is(.has-hold, .has-double)::before { border-color: currentColor; }
+  :root:not([data-plain-look='true'])[data-key-style='solid'] .key.needs-confirm::before,
+  :root:not([data-plain-look='true'])[data-key-style='solid'] .key .hold-bar { background: currentColor; }
+
+  /* Glass: a translucent pane that lets the backdrop through. */
+  :root:not([data-plain-look='true'])[data-key-style='glass'] :is(.key, .slot:not(.empty, .slot-widget), .look-key):not([data-look]),
+  [data-look='glass'] {
+    border-color: color-mix(in srgb, var(--text) 20%, transparent);
+    background: linear-gradient(155deg, color-mix(in srgb, var(--text) 14%, transparent), color-mix(in srgb, var(--text) 4%, transparent) 56%,
+      color-mix(in srgb, var(--cat) 16%, transparent));
+    box-shadow:
+      inset 0 1px 0 color-mix(in srgb, #fff 18%, transparent),
+      inset 0 -1px 0 color-mix(in srgb, #000 24%, transparent);
+  }
+
+  :root:not([data-plain-look='true'], [data-key-style='outline']) .key.pressed { filter: brightness(.84); }
+  :root:not([data-plain-look='true'], [data-backdrop='plain']) .slot-empty { background: color-mix(in srgb, var(--recessed-surface) 55%, transparent); }
+
+  /* Backdrops. Each one is a still image built from the theme's own colors. */
+  :root:not([data-plain-look='true'])[data-backdrop='glow'] body:has(#stage), [data-look-backdrop='glow'] {
+    background:
+      radial-gradient(44% 96% at 6% -12%, color-mix(in srgb, var(--app) 28%, transparent), transparent 70%),
+      radial-gradient(42% 92% at 97% 114%, color-mix(in srgb, var(--system) 26%, transparent), transparent 70%),
+      var(--background);
+  }
+  :root:not([data-plain-look='true'])[data-backdrop='aurora'] body:has(#stage), [data-look-backdrop='aurora'] {
+    background:
+      radial-gradient(34% 82% at 10% 6%, color-mix(in srgb, var(--app) 32%, transparent), transparent 72%),
+      radial-gradient(30% 76% at 44% 110%, color-mix(in srgb, var(--meeting) 28%, transparent), transparent 72%),
+      radial-gradient(32% 86% at 76% -8%, color-mix(in srgb, var(--system) 30%, transparent), transparent 72%),
+      radial-gradient(26% 72% at 101% 100%, color-mix(in srgb, var(--media) 22%, transparent), transparent 72%),
+      var(--background);
+  }
+  :root:not([data-plain-look='true'])[data-backdrop='grid'] body:has(#stage), [data-look-backdrop='grid'] {
+    background:
+      radial-gradient(circle at 1.5px 1.5px, color-mix(in srgb, var(--text) 15%, transparent) 1.5px, transparent 2.2px) 0 0 / 30px 30px,
+      linear-gradient(180deg, color-mix(in srgb, var(--app) 8%, var(--background)), var(--background));
+  }
+  [data-look-backdrop='plain'] { background: var(--background); }
+}
+
+/* Icon-only keys. The label stays in the page for screen readers and for keys without an icon. */
+:root[data-key-labels='hidden'] #keys .key:not(:has(.glyph:empty)) { grid-template-rows: minmax(0, 1fr); padding: calc(var(--key) * 0.1); }
+:root[data-key-labels='hidden'] #keys .key:not(:has(.glyph:empty)) .label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+:root[data-key-labels='hidden'] #keys .key .glyph svg {
+  width: min(108px, calc(var(--key) * 0.54));
+  height: min(108px, calc(var(--key) * 0.54));
+}
+:root[data-key-labels='hidden'] #keys .key .glyph img {
+  width: min(128px, calc(var(--key) * 0.64));
+  height: min(128px, calc(var(--key) * 0.64));
+}

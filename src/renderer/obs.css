@@ -56,14 +56,13 @@
 }
 
 #obs-heading h2 { font-size: 38px; line-height: 1; }
-#obs-return { margin-inline-start: auto; }
+#obs-timers-toggle { margin-inline-start: auto; }
 #obs-status, #obs-unavailable, #obs-current-scenes, #obs-source-scene, #obs-select-item {
   color: var(--muted-text);
 }
 
 #obs-status.obs-error { color: var(--err); }
 #obs-status { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-#obs-return { flex: 0 0 auto; }
 #obs-timers-toggle { flex: 0 0 auto; }
 #obs-replay-state {
   padding: 5px 9px;

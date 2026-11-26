@@ -8,7 +8,22 @@ const { spawnSync } = require('node:child_process');
 
 const root = path.resolve(__dirname, '..');
 const electron = require('electron');
+const { LOOK_PRESETS, THEMES } = require('../src/shared/appearance');
 const ffmpeg = process.env.LASTRA_FFMPEG || 'ffmpeg';
+
+// Deck Keys in each quick look on one theme, then in each theme with the default look. The site's gallery shows them.
+const GALLERY = [
+  ...Object.entries(LOOK_PRESETS).map(([id, preset]) => ({ name: 'look-' + id, settings: { theme: 'dark', ...preset } })),
+  ...Object.keys(THEMES).filter((id) => id !== 'system').map((id) => ({ name: 'theme-' + id, settings: { theme: id } })),
+];
+// The themes animation pairs themes with quick looks. The plain themes keep their own look.
+const TOUR = [
+  { theme: 'dark', ...LOOK_PRESETS.glow }, { theme: 'midnight', ...LOOK_PRESETS.glass },
+  { theme: 'ocean', ...LOOK_PRESETS.bold }, { theme: 'graphite', ...LOOK_PRESETS.blueprint },
+  { theme: 'ember', ...LOOK_PRESETS.glow }, { theme: 'plum', ...LOOK_PRESETS.glass },
+  { theme: 'forest', ...LOOK_PRESETS.classic }, { theme: 'sand', ...LOOK_PRESETS.glow },
+  { theme: 'minimal-light' }, { theme: 'contrast-dark' },
+];
 
 function run(program, args) {
   const result = spawnSync(program, args, { cwd: root, stdio: 'inherit', windowsHide: true });
@@ -34,6 +49,37 @@ function animation(file, ...args) {
     '-loop', '0', '-t', duration.toFixed(2), file]);
 }
 
+/**
+ * Appearance settings as a `--preview-look` argument. A preset's display name is not a setting.
+ * @param {Record<string, string>} settings
+ */
+function look(settings) {
+  return '--preview-look=' + Object.entries(settings).filter(([setting]) => setting !== 'name')
+    .map(([setting, value]) => `${setting}=${value}`).join(',');
+}
+
+/** Renders the gallery at half size as WebP, which keeps eighteen pictures light, and returns the names of the files it wrote. */
+function lookGallery(directory) {
+  return GALLERY.map(({ name, settings }) => {
+    const full = path.join(directory, name + '-full.png');
+    preview(full, look(settings));
+    const file = `preview-${name}.webp`;
+    run(ffmpeg, ['-hide_banner', '-loglevel', 'error', '-y', '-i', full, '-vf', 'scale=1280:360:flags=lanczos',
+      '-c:v', 'libwebp', '-quality', '88', path.join(directory, file)]);
+    return file;
+  });
+}
+
+function themesAnimation(file) {
+  const directory = path.dirname(file);
+  for (const [index, settings] of TOUR.entries()) preview(path.join(directory, `tour-${index}.png`), look(settings));
+  // Every theme has its own colors, so each frame gets its own palette.
+  run(ffmpeg, ['-hide_banner', '-loglevel', 'error', '-framerate', '2/3', '-start_number', '0',
+    '-i', path.join(directory, 'tour-%d.png'),
+    '-filter_complex', 'scale=1280:360:flags=lanczos,split[a][b];[a]palettegen=stats_mode=single[p];[b][p]paletteuse=new=1:dither=bayer:bayer_scale=4',
+    '-loop', '0', file]);
+}
+
 function appFocusAnimation(file) {
   const directory = path.dirname(file);
   const packs = ['claude', 'chatgpt-codex', 'chrome', 'explorer', 'photoshop'];
@@ -50,6 +96,8 @@ function refresh() {
   const temporaryRoot = fs.realpathSync(os.tmpdir());
   const staging = fs.mkdtempSync(path.join(temporaryRoot, 'lastra-previews-'));
   try {
+    preview(path.join(staging, 'preview-home.png'));
+    preview(path.join(staging, 'preview-vscode.png'), '--preview-pack=vscode');
     preview(path.join(staging, 'preview-states.png'), '--preview-states', `--preview-toolbar=${path.join(staging, 'preview-toolbar.png')}`);
     preview(path.join(staging, 'preview-portrait.png'), '--preview-states', '--preview-portrait',
       `--preview-toolbar=${path.join(staging, 'preview-toolbar-portrait.png')}`);
@@ -76,11 +124,15 @@ function refresh() {
     const shortcuts = ['--preview-pack=chrome', `--profile=${example}`];
     preview(path.join(staging, 'preview-shortcuts.png'), ...shortcuts);
     animation(path.join(staging, 'preview-demo.gif'), '--preview-states');
+    // The demo's Dashboard frame doubles as the Dashboard picture.
+    fs.copyFileSync(path.join(staging, 'preview-demo', 'dashboard.png'), path.join(staging, 'preview-dashboard.png'));
     animation(path.join(staging, 'preview-shortcuts.gif'), ...shortcuts);
     animation(path.join(staging, 'preview-tools.gif'), '--preview-states', '--preview-break');
     appFocusAnimation(path.join(staging, 'preview-app-focus.gif'));
+    themesAnimation(path.join(staging, 'preview-themes.gif'));
+    const gallery = lookGallery(staging);
 
-    for (const file of ['preview-states.png', 'preview-portrait.png', 'preview-stats.png', 'preview-shortcuts.png',
+    for (const file of [...gallery, 'preview-home.png', 'preview-dashboard.png', 'preview-vscode.png', 'preview-themes.gif', 'preview-states.png', 'preview-portrait.png', 'preview-stats.png', 'preview-shortcuts.png',
       'preview-toolbar.png', 'preview-tools.png', 'preview-pomodoro-break.png',
       'preview-demo.gif', 'preview-shortcuts.gif', 'preview-tools.gif', 'preview-app-focus.gif']) {
       fs.copyFileSync(path.join(staging, file), path.join(root, 'docs', file));

@@ -172,6 +172,60 @@
   --on-app: #fff8ee;
   --selected-surface: #f0d7c9;
 }
+/* Minimal: one ink color on a flat background, hairline borders, no category colors. */
+:is(:root, .theme-sample)[data-theme='minimal-dark'] {
+  color-scheme: dark;
+  --background: #0a0a0b;
+  --surface: #0a0a0b;
+  --surface-top: #0a0a0b;
+  --pressed-surface: #19191b;
+  --recessed-surface: #0a0a0b;
+  --card-surface: #0f0f10;
+  --panel-surface: #0d0d0e;
+  --track: #55555b;
+  --border: #232326;
+  --control-border: #343438;
+  --text: #f1f1f1;
+  --muted-text: #9b9ba1;
+  --app: #f1f1f1;
+  --media: #f1f1f1;
+  --system: #f1f1f1;
+  --meeting: #f1f1f1;
+  --on-app: #0a0a0b;
+  --fill-media: #f1f1f1;
+  --on-media: #0a0a0b;
+  --selected-surface: #1c1c1f;
+  --media-surface: #0f0f10;
+  --media-border: #343438;
+}
+:is(:root, .theme-sample)[data-theme='minimal-light'] {
+  color-scheme: light;
+  --background: #fbfbfb;
+  --surface: #fbfbfb;
+  --surface-top: #fbfbfb;
+  --pressed-surface: #ebebec;
+  --recessed-surface: #fbfbfb;
+  --card-surface: #ffffff;
+  --panel-surface: #f5f5f5;
+  --track: #9c9ca1;
+  --border: #e2e2e4;
+  --control-border: #cdcdd1;
+  --text: #111113;
+  --muted-text: #5d5d63;
+  --app: #111113;
+  --media: #111113;
+  --system: #111113;
+  --meeting: #111113;
+  --on-app: #ffffff;
+  --fill-media: #111113;
+  --on-media: #ffffff;
+  --selected-surface: #ededee;
+  --media-surface: #ffffff;
+  --media-border: #cdcdd1;
+}
+/* Contrast: the high-contrast colors as a theme, fixed to dark or light. */
+:is(:root, .theme-sample)[data-theme='contrast-dark'] { color-scheme: dark; }
+:is(:root, .theme-sample)[data-theme='contrast-light'] { color-scheme: light; }
 @media (forced-colors: none) {
   :root[data-accent='custom']:not([data-high-contrast='true']) {
     --app: color-mix(in srgb, light-dark(#122334, #f7f8ff), var(--custom-accent) 38%);
@@ -199,7 +253,7 @@
 
 .telemetry-arc > span { position: relative; }
 
-:root[data-high-contrast='true'] {
+:root[data-high-contrast='true'], .theme-sample[data-theme^='contrast-'] {
   --background: light-dark(#ffffff, #000000);
   --surface: var(--background);
   --surface-top: var(--background);
