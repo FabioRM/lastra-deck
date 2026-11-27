@@ -19,6 +19,8 @@ contextBridge.exposeInMainWorld('lastra', {
   insertEmoji: (id) => ipcRenderer.invoke('emoji:insert', id),
   onDeckNavigation: (callback) => subscribe('deck:navigation', callback),
   onDeckAppearance: (callback) => subscribe('deck:appearance', callback),
+  onDeckPet: (callback) => subscribe('deck:pet', callback),
+  interactWithPet: (action) => ipcRenderer.invoke('pet:interact', action),
   onDeckPageIcon: (callback) => subscribe('deck:page-icon', callback),
   openDashboardCalendar: () => ipcRenderer.invoke('dashboard:calendar:open'),
   readDashboardPomodoro: () => ipcRenderer.invoke('dashboard:pomodoro:read'),

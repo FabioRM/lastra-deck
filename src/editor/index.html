@@ -62,10 +62,12 @@
         <button type="button" data-settings-section="appearance-settings" aria-controls="appearance-settings">Display</button>
         <button type="button" data-settings-section="behavior-settings" aria-controls="behavior-settings">Deck behavior</button>
         <button type="button" data-settings-section="system-settings" aria-controls="system-settings">System</button>
+        <button type="button" data-settings-section="about-settings" aria-controls="about-settings">About Lastra</button>
       </div>
       <div class="settings-nav-group">
         <p class="settings-nav-label">Views</p>
         <button type="button" data-settings-section="deck-shortcut-settings" aria-controls="deck-shortcut-settings">Deck keys</button>
+        <button type="button" data-settings-section="pet-settings" aria-controls="pet-settings">Deck pet</button>
         <button type="button" data-settings-section="dashboard-settings" aria-controls="dashboard-settings">Dashboard</button>
         <button type="button" data-settings-section="stats-settings" aria-controls="stats-settings">Stats</button>
         <button type="button" data-settings-section="feeds-settings-panel" aria-controls="feeds-settings-panel">Feeds</button>
@@ -102,6 +104,42 @@
           <button type="button" id="settings-export-configuration">Export configuration…</button>
           <p class="settings-status" id="settings-export-status" role="status"></p>
         </section>
+      </section>
+      <section id="about-settings" data-settings-panel aria-labelledby="about-settings-heading" hidden>
+        <div class="settings-page-heading"><h2 id="about-settings-heading" tabindex="-1">About Lastra</h2></div>
+        <div class="deck-settings-card about-card">
+          <div class="about-brand">
+            <span class="desktop-mark" aria-hidden="true"></span>
+            <div><h3>Lastra</h3><p id="about-version" class="muted"></p></div>
+          </div>
+          <dl class="about-details">
+            <div><dt>Created by</dt><dd id="about-author"></dd></div>
+            <div><dt>License</dt><dd id="about-license"></dd></div>
+          </dl>
+          <div class="about-links">
+            <a data-about-link="source">GitHub source code</a>
+            <a data-about-link="releases">Releases</a>
+            <a data-about-link="issues">Report an issue</a>
+            <a data-about-link="license">Read the license</a>
+            <a data-about-link="notices">Third-party notices</a>
+          </div>
+          <p id="about-status" class="settings-status" role="status"></p>
+        </div>
+      </section>
+      <section id="pet-settings" data-settings-panel aria-labelledby="pet-settings-heading" hidden>
+        <div class="settings-page-heading">
+          <h2 id="pet-settings-heading" tabindex="-1">Deck pet</h2>
+          <p>Tap the paw button above the shortcuts to visit your pet.</p>
+        </div>
+        <form id="pet-preferences" class="deck-settings-card" inert>
+          <div class="deck-settings-fields">
+            <label class="field">Animal<select name="species"></select></label>
+            <label class="field">Habitat<select name="habitat"></select></label>
+          </div>
+          <label class="field">Pet name<input name="petName" type="text" autocomplete="off"></label>
+          <label class="check"><input type="checkbox" name="motion">Animate the habitat</label>
+          <p id="pet-settings-status" class="settings-status" role="status"></p>
+        </form>
       </section>
       <section id="appearance-settings" data-settings-panel aria-labelledby="appearance-settings-heading" hidden>
         <div class="settings-page-heading"><h2 id="appearance-settings-heading" tabindex="-1">Display</h2><p>Choose the screen and tune the look of the deck. Appearance changes apply immediately.</p></div>
@@ -686,6 +724,8 @@
   <script src="action-test.js"></script>
   <script src="key-groups.js"></script>
   <script src="../shared/appearance.js"></script>
+  <script src="../shared/deck-pet.js"></script>
+  <script src="deck-pet-settings.js"></script>
   <script src="appearance.js"></script>
   <script src="feeds-settings.js"></script>
   <script src="deck-behavior.js"></script>

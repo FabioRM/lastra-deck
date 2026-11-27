@@ -10,6 +10,7 @@ The [MIT License](LICENSE) grants rights in the original Lastra material. The co
 | Noto Color Emoji shipped as WOFF2 in `src/renderer/fonts/` | SIL Open Font License 1.1. Lastra compressed the upstream COLRv1 font in WOFF2 format. [Font license and copyright](licenses/Noto-Emoji-OFL.txt) · [Upstream font](https://github.com/googlefonts/noto-emoji/blob/99701e07d3d1fe1bdbcdb14964547f0fd592966f/2D/fonts/Noto-COLRv1.ttf) |
 | Unicode Emoji 18.0 test data used for the emoji picker | Unicode License v3. [License and copyright](licenses/Unicode-Data.txt) · [Data source](https://www.unicode.org/Public/18.0.0/emoji/emoji-test.txt) |
 | Lucide icons used in the app and shown in the README previews | ISC, with Feather-derived icons under MIT. The upstream notice is reproduced below. |
+| Three.js used for the deck pet habitat | MIT, copyright Three.js Authors. [Upstream license](https://github.com/mrdoob/three.js/blob/r187/LICENSE) |
 | PowerToys Shortcut Guide manifest data | MIT, copyright Microsoft Corporation. [Manifest data notice](profiles/shortcut-packs.NOTICE) |
 | IntelliJ Platform keymaps and English action labels | Apache 2.0. Lastra converted the upstream XML descriptors and action resources to JSON and added coverage metadata. [License](licenses/Apache-2.0.txt) · [JetBrains NOTICE](licenses/IntelliJ-Platform-NOTICE.txt) |
 | Codex CLI TUI defaults and slash commands | Apache 2.0. Lastra converted the entries from `rust-v0.150.1` to JSON and added labels. [License](licenses/Apache-2.0.txt) · [Codex NOTICE](licenses/Codex-CLI-NOTICE.txt) |

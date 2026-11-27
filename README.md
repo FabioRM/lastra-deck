@@ -4,7 +4,7 @@ Lastra turns the **CORSAIR XENEON EDGE** into a touchscreen macro deck for Windo
 
 The Deck and automatic shortcut profiles also have an experimental Linux mode for X11, GNOME, KDE Plasma, and Hyprland. Linux x86-64 builds ship as a `.deb` and AppImage. [Linux setup](docs/linux-deck.md)
 
-![Deck Keys toolbar with Tools, Emoji, and page lock icons](docs/preview-toolbar.png)
+![Deck Keys toolbar with Tools, Emoji, Deck pet, and page lock icons](docs/preview-toolbar.png)
 
 ![Landscape Deck Keys with the icon toolbar aligned to the key grid](docs/preview-states.png)
 
@@ -12,7 +12,7 @@ The Deck and automatic shortcut profiles also have an experimental Linux mode fo
 
 ![Deck Keys switches from Claude Desktop to Codex, Chrome, File Explorer, and Photoshop, then loops back to Claude Desktop.](docs/preview-app-focus.gif)
 
-[Getting started](#getting-started) · [Tools and Pomodoro](#tools-and-pomodoro) · [Deck views](#deck-views) · [Profile editor](#profile-editor) · [Local MCP integration](#local-mcp-integration) · [License](#license)
+[Project website](https://fabiorm.github.io/lastra-deck/) · [Getting started](#getting-started) · [Deck pet](#deck-pet) · [Tools and Pomodoro](#tools-and-pomodoro) · [Deck views](#deck-views) · [Profile editor](#profile-editor) · [Local MCP integration](#local-mcp-integration) · [License](#license)
 
 <details>
 <summary>Animated demo and more deck previews</summary>
@@ -69,6 +69,18 @@ In **Lastra → Settings → System → Diagnostics**, **Touch diagnostics** sho
 
 Use **Export diagnostics…** under **Settings → System → Diagnostics** to save a JSON report for troubleshooting. It includes display geometry and touch mapping, audio mute and volume status, sensor availability, and integration status. Service health appears as totals. The report omits device names and IDs, file paths, URLs, credentials, media titles, and profile contents. Export reads the current state without starting providers or sending the report anywhere.
 
+## Deck pet
+
+From **Deck Keys**, tap the paw immediately before the page lock. The pet's 3D habitat opens in the shortcut area. Tap the paw again to return to your keys.
+
+Tap your pet to cuddle or wake it, tap the ground to move it, and tap a habitat object to explore it. Each habitat has an interactive object the pet also visits on its own. Use the care buttons to feed, play, cuddle, wash, and nap, and watch the five indicators for hunger, happiness, playfulness, sleepiness, and hygiene.
+
+Under **Settings → Deck pet**, choose an animal, a habitat, a name, and whether the scene animates. The eight pets include K-9 the robot dog and Bip the companion drone. Habitats include Lantern Grove, Aurora Peak, Neon Alley, and the Cybergreenhouse. Progress stays on your computer and time spent napping counts while Lastra is closed.
+
+Deck pet is available on `main`. Use the **Run from source** steps above with the current source to try it. The latest published installer is v1.2.0. [Watch the deck pet demo](https://fabiorm.github.io/lastra-deck/#deck-pet)
+
+![K-9 in the neon alley habitat with five care indicators](docs/preview-pet-neon.webp)
+
 ## Tools and Pomodoro
 
 Tap the wrench icon in **Deck Keys** to open **Tools** full screen. The gears open dialogs for a custom countdown, the Pomodoro durations, and the Quick decision pick list. Tap the red **×** in the mode switch position to return to Deck Keys.
@@ -88,7 +100,7 @@ Start a **Pomodoro break** from Tools or Dashboard to fill the XENEON EDGE with 
 
 ## Deck views
 
-- **Deck Keys** combines configurable app shortcut pages, a persistent widget bar, and Windows audio controls. The navigation row has large Tools, Emoji, and Lock buttons. The default **Home** fits 15 shortcuts and five editing keys on one screen in either orientation. [Shortcut packs](docs/shortcut-packs.md) · [Macros](docs/macros.md) · [Widgets](docs/widgets.md)
+- **Deck Keys** combines configurable app shortcut pages, a persistent widget bar, and Windows audio controls. The navigation row has large Tools, Emoji, Deck pet, and Lock buttons. The default **Home** fits 15 shortcuts and five editing keys on one screen in either orientation. [Shortcut packs](docs/shortcut-packs.md) · [Macros](docs/macros.md) · [Widgets](docs/widgets.md)
 - **Tools** also opens **Apps** from Deck Keys. [Tools and Pomodoro](#tools-and-pomodoro)
 - **Dashboard** shows a clock, calendar, Pomodoro timer, and Now Playing for the default Windows media session. Use **Previous**, **Play or Pause**, and **Next**, or drag the progress bar to seek when supported. [Now Playing](docs/now-playing.md) · [Pomodoro](docs/pomodoro.md)
 - **Feeds** shows the weather for a saved place, stock quotes, and currency rates. The sky follows local sunrise and sunset, and the card includes the moon phase plus today's low and high. Where reported, Feeds shows the market cap for each ticker and totals the displayed tickers by denomination. [Yahoo Finance market data](https://finance.yahoo.com/)
@@ -112,7 +124,7 @@ Open **Monitoring watchlist** in **Apps** to keep selected hardware, app, and se
 - Swipe horizontally, scroll sideways on a trackpad, or turn the mouse wheel over Deck Keys to change pages. With more than one screen, the count beside the page name reads **1 / 2**. A swipe cancels the key where it started. **Home** returns to the first page. The default profile starts on **Home**. VS Code and each browser open their own automatic shortcut pack when they take focus.
 - Deck opens a configured page for the foreground Windows app when one exists. Otherwise, it uses a matching built-in shortcut pack or a temporary **Auto** page with common shortcuts. Use a page's **Windows app IDs** for an exact Store app or installed web app match. Browser packs cover ordinary browser tabs. [Engineering shortcut packs](docs/engineering-shortcuts.md) · [All shortcut packs](docs/shortcut-packs.md)
 - A page's **Context rules** can match a project or document within an assigned executable or Windows app ID. Lastra takes the highest **Rule priority**, then the most specific match. At equal priority, exact titles beat prefixes and partial titles, and Windows app IDs beat executable names for otherwise equal rules. Page order resolves a tie. Tap the page count or **Auto** to see why the page opened.
-- Use **Home** or either arrow from an **Auto** page to return to a configured page. A manual selection holds until the foreground app changes. **Lock page** keeps the displayed page until you unlock it. If an automatic page is locked when Lastra closes, the configured fallback opens locked next time.
+- Use **Home** from an **Auto** page to return to a configured page. A manual selection holds until the foreground app changes. **Lock page** keeps the displayed page until you unlock it. If an automatic page is locked when Lastra closes, the configured fallback opens locked next time.
 - In Lastra Settings, open **Deck behavior → Navigation and input → After an app page** to choose **Home** or **Last manually selected page**. The deck uses this choice when the foreground stops matching an app page. It keeps the last manual page for each activity. The default is **Last manually selected page**.
 - To see the desktop behind the deck, select **Reveal desktop** in Tools or in **Deck behavior**. **Restore deck** returns to the previous view, page, and lock setting. Display settings also offer an optional swipe up from the bottom edge of Deck Keys.
 - Tap the current page name in Deck Keys to jump to a saved page. Set favorites in **Settings → Deck behavior → Deck organization**. Each activity keeps its own favorites and six most recently opened pages.

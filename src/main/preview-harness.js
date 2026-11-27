@@ -12,6 +12,7 @@ const path = require('node:path');
 const { ProfileStore, validateProfile } = require('./profile');
 const { DEFAULT_APPEARANCE } = require('./deck-appearance');
 const { normalizeAppearance } = require('../shared/appearance');
+const { DEFAULTS: DEFAULT_PET, initialPetCare } = require('../shared/deck-pet');
 const { packs } = require('./shortcut-packs');
 const { webPacks, chromiumWebAppId } = require('./shortcut-packs-web');
 const { StatsMonitor } = require('./stats');
@@ -35,12 +36,23 @@ function inspectToolbar() {
   const inset = (grid.offsetWidth - gridWidth) / 2 * (gridBounds.width / grid.offsetWidth);
   const nav = document.getElementById('page-nav').getBoundingClientRect();
   const home = document.getElementById('home-page').getBoundingClientRect();
-  const buttons = ['quick-tools-open', 'emoji-tab', 'page-lock'].map((id) => document.getElementById(id));
+  const buttons = ['quick-tools-open', 'emoji-tab', 'pet-tab', 'page-lock'].map((id) => document.getElementById(id));
   if (buttons.some((button) => {
     const { width, height } = button.getBoundingClientRect();
     return !width || Math.abs(width - home.width) > 1 || Math.abs(height - home.height) > 1
       || ![...button.querySelectorAll('svg')].some((icon) => icon.getBoundingClientRect().width > 0);
-  })) throw new Error('Tools, Emoji and Lock must have visible icons and match the Home button size.');
+  })) throw new Error('Tools, Emoji, Pet and Lock must have visible icons and match the Home button size.');
+  const [, , pet, lock] = buttons;
+  if (pet.nextElementSibling !== lock) throw new Error('The Pet button must come immediately before Lock.');
+  const geometry = () => JSON.stringify(['deck', 'page-nav', 'panel', 'widget-bar'].map((id) =>
+    document.getElementById(id).getBoundingClientRect().toJSON()));
+  const before = geometry();
+  pet.click();
+  if (!grid.hidden || document.getElementById('pet-habitat').hidden || geometry() !== before) {
+    throw new Error('The pet habitat must replace the keys without moving the deck layout.');
+  }
+  pet.click();
+  if (grid.hidden || geometry() !== before) throw new Error('Closing the pet habitat must restore the keys in place.');
   const actions = buttons[0].parentElement.getBoundingClientRect();
   const aligned = Number.isFinite(inset) && Math.abs(nav.left - (gridBounds.left + inset)) < 2
     && Math.abs(nav.right - (gridBounds.right - inset)) < 2 && Math.abs(actions.right - nav.right) < 2;
@@ -485,6 +497,7 @@ async function startPreview({ opts, ipcMain, BrowserWindow, quit, fail, log, ren
       const look = Object.fromEntries(Object.entries(opts.previewLook ?? {}).map(([name, value]) =>
         [name, value === 'true' ? true : value === 'false' ? false : /^\d+$/.test(value) ? Number(value) : value]));
       send('deck:appearance', normalizeAppearance({ ...DEFAULT_APPEARANCE, ...look, largeKeys: opts.previewLargeKeys === true }));
+      send('deck:pet', { settings: DEFAULT_PET, care: initialPetCare() });
       win.setContentSize(width + 1, height + 1);
       devtools.attach();
       await devtools.sendCommand('Emulation.setDeviceMetricsOverride', { width, height, deviceScaleFactor: 1, mobile: false });

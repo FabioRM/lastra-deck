@@ -18,6 +18,7 @@ const { DisplayBacklight } = require('./display-backlight');
 const { DisplayBacklightWidgets } = require('./display-backlight-widgets');
 const { restoreDeckWindow, watchDeckDisplay } = require('./display-lifecycle');
 const { DeckAppearance } = require('./deck-appearance');
+const { DeckPet } = require('./deck-pet');
 const { createWindowsStartup } = require('./windows-startup');
 const { readTouchDevices } = require('./touch-win32');
 const { buildDiagnostics, saveDiagnostics } = require('./diagnostics');
@@ -178,6 +179,15 @@ const SOUND_PRELOAD = path.join(ROOT, 'src', 'preload', 'sound-host.js');
 const DEFAULT_PROFILE = path.join(ROOT, 'profiles', 'default.json');
 const BACKGROUND = '#171c21';
 const APP_ID = 'lastra.deck';
+const packageInfo = require('../../package.json');
+const PUBLIC_PROJECT = 'https://github.com/FabioRM/lastra-deck';
+const ABOUT_LINKS = Object.freeze({
+  source: PUBLIC_PROJECT,
+  releases: `${PUBLIC_PROJECT}/releases`,
+  issues: `${PUBLIC_PROJECT}/issues`,
+  license: `${PUBLIC_PROJECT}/blob/main/LICENSE`,
+  notices: `${PUBLIC_PROJECT}/blob/main/THIRD_PARTY_NOTICES.md`,
+});
 
 const opts = parseArgs(process.argv.slice(1));
 const log = createLogger({ directory: () => app.getPath('logs') });
@@ -251,6 +261,7 @@ let viewOnly = null;
 let deckReveal = null;
 let emojiUsage = null;
 let appearance = null;
+let deckPet = null;
 let feeds = null;
 let interfaceLanguage = null;
 let activities = null;
@@ -1447,6 +1458,11 @@ function registerIpc() {
     send('monitoring', monitoring.intervals);
     return currentView();
   });
+  deck('pet:interact', (action) => {
+    const current = deckPet.care(action);
+    send('deck:pet', current);
+    return { ok: true, sleeping: current.care.sleepUntil > current.care.at };
+  });
   const requireCurrentActivity = (activity) => {
     if (activity !== (opts.profile ? null : activities.current.id)) throw new Error('The activity profile changed.');
   };
@@ -1574,6 +1590,19 @@ function registerIpc() {
   edit('editor:profile-templates', (language) => profileTemplates(typeof language === 'string' ? language : undefined));
   edit('editor:appearance:get', () => appearance.current);
   edit('editor:appearance:set', (setting, value) => setAppearance(setting, value));
+  edit('editor:pet:get', () => deckPet.current.settings);
+  edit('editor:pet:set', (settings) => {
+    const current = deckPet.configure(settings);
+    send('deck:pet', current);
+    return current.settings;
+  });
+  edit('editor:about:get', () => ({
+    version: packageInfo.version, author: packageInfo.author, license: packageInfo.license, links: ABOUT_LINKS,
+  }));
+  edit('editor:about:open', (id) => {
+    if (typeof id !== 'string' || !Object.hasOwn(ABOUT_LINKS, id)) throw new Error('Invalid Lastra link.');
+    return shell.openExternal(ABOUT_LINKS[id]);
+  });
   edit('editor:feeds:get', () => feeds?.settings() ?? null);
   edit('editor:feeds:set', (value) => {
     feeds.setSettings(value ?? {});
@@ -1927,6 +1956,7 @@ function registerIpc() {
   ipcMain.on('renderer:ready', (event) => {
     if (!fromWindow(event, win, RENDERER)) return;
     send('deck:appearance', appearance.current);
+    send('deck:pet', deckPet.current);
     if (feeds) {
       send('feeds', feeds.snapshot());
       send('weather', feeds.snapshot().weather ?? { line: '' });
@@ -2012,6 +2042,7 @@ function start() {
   viewOnly = new DeckViewOnly(path.join(userData, 'deck-view-only.json'), log);
   emojiUsage = new EmojiUsage(path.join(userData, 'emoji-usage.json'), log);
   appearance = new DeckAppearance(path.join(userData, 'deck-appearance.json'), log);
+  deckPet = new DeckPet(path.join(userData, 'deck-pet.json'), log);
   feeds = new Feeds(path.join(userData, 'feeds.json'), {
     legacyWeather: path.join(userData, 'weather.json'),
     onChange(snapshot) {

@@ -37,6 +37,9 @@ files:
   - "!**/node_modules/lucide-static/{dist,font}/**"
   - "!**/node_modules/lucide-static/{icon-nodes.json,sprite.svg,tags.json,rollup.config.mjs,tsconfig.json}"
   - "!**/node_modules/koffi/{doc,vendor}/**"
+  # The habitat uses only the WebGL ES module and its core dependency.
+  - "!**/node_modules/three/{examples,src}/**"
+  - "!**/node_modules/three/build/{three.cjs,three.tsl.js,three.webgpu.js,three.webgpu.nodes.js}"
   - "!**/*.{map,md.orig}"
 
 win:

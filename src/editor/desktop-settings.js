@@ -56,6 +56,8 @@
       ['Deck organization', 'deck-organization-heading', 'favorite pinned pages apps mixer preferiti pagine app fissate'],
     ],
     'deck-shortcut-settings': [['Global keyboard shortcuts', 'global-shortcuts-heading', 'hotkeys keybind ctrl tasti rapidi scorciatoie combinazioni']],
+    'pet-settings': [['Deck pet', 'pet-settings-heading', 'tamagotchi animal habitat name motion animale ambiente nome animazioni']],
+    'about-settings': [['About Lastra', 'about-settings-heading', 'creator author mit license github autore creatore licenza versione']],
     'dashboard-settings': [
       ['Dashboard calendar', 'deck-calendar-heading', 'google outlook microsoft calendar calendario tap'],
       ['Dashboard calendar file', 'calendar-file-heading', 'ics ical calendario file'],

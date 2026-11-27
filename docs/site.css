@@ -51,6 +51,37 @@ h1 { margin-block: .65rem 1.25rem; font-size: clamp(2.65rem, 7vw, 5.5rem); lette
 .toolbar-detail img { border: 1px solid var(--border); border-radius: .5rem; }
 .feature-image + .feature-image { margin-top: 1.15rem; }
 
+.pet-showcase {
+  background: radial-gradient(ellipse at 79% 17%, #30243c, transparent 67%), #1b1924;
+  border-block-start: 1px solid var(--border);
+  padding-block: clamp(2.75rem, 5vw, 4.5rem);
+}
+.pet-showcase .platform { margin-bottom: .45rem; }
+.pet-showcase .pet-source { margin-block: .65rem; font-size: .94rem; }
+.pet-demo video {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1200 / 428;
+  background: #171323;
+  border: 1px solid #6a556e;
+  border-radius: .75rem;
+  box-shadow: 0 18px 50px #110d1db0;
+}
+.pet-demo figcaption, .pet-gallery figcaption { margin-top: .65rem; color: var(--muted); font-size: .875rem; }
+.pet-guide {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: .9rem 1.45rem;
+  margin: 1.9rem 0;
+  padding: 0;
+  list-style: none;
+}
+.pet-guide li { padding-top: .75rem; border-top: 1px solid #594962; }
+.pet-guide h3 { font-size: 1.18rem; letter-spacing: -.015em; }
+.pet-guide p { margin-top: .45rem; color: var(--muted); font-size: .94rem; }
+.pet-gallery { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.25rem; }
+
 .features { background: var(--surface); border-block: 1px solid var(--border); padding-block: clamp(2.75rem, 5vw, 5rem); }
 h2 { font-size: clamp(1.85rem, 4.5vw, 3rem); letter-spacing: -.055em; }
 .feature { margin-top: clamp(2rem, 4.5vw, 4rem); padding-top: 1.5rem; border-top: 1px solid #53636d; }
@@ -86,4 +117,6 @@ h3 { font-size: clamp(1.35rem, 3vw, 2rem); letter-spacing: -.035em; }
   .shell { width: calc(100% - 2rem); }
   .feature-copy, .setup, .section-intro, .look-detail { grid-template-columns: 1fr; }
   .setup { gap: 1.2rem; }
+  .pet-guide, .pet-gallery { grid-template-columns: 1fr; }
+  .pet-guide { gap: .85rem; }
 }

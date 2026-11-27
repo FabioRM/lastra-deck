@@ -19,7 +19,7 @@
   };
   const VIEW_BUTTONS = { obs: 'obs-tab', apps: 'app-views-tab', emoji: 'emoji-tab' };
   // Views that replace Deck Keys and leave the navigation row in place.
-  const SIDE_VIEWS = ['emoji-panel', 'obs-panel', 'app-views-panel'];
+  const SIDE_VIEWS = ['emoji-panel', 'obs-panel', 'app-views-panel', 'pet-habitat'];
   const VIEW_LABELS = { keys: 'Deck keys', dashboard: 'Dashboard', stats: 'Stats', feeds: 'Feeds' };
 
   const api = window.lastra;

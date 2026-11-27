@@ -41,6 +41,10 @@ module.exports = [
     languageOptions: { sourceType: 'script', globals: { ...globals.browser, ...globals.node } },
   },
   {
+    files: ['src/renderer/**/*.mjs'],
+    languageOptions: { sourceType: 'module', globals: globals.browser },
+  },
+  {
     files: ['src/preload/**/*.js'],
     languageOptions: { sourceType: 'commonjs', globals: { ...globals.browser, ...globals.node } },
   },

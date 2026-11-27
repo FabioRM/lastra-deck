@@ -4,6 +4,13 @@ Completed items from the former TODO, grouped by the section that tracked them. 
 
 Entries grouped under **0.2.1** record the completed work through the first reviewed source release.
 
+## Unreleased
+
+- Add an interactive 3D Deck pet with eight animals and eight habitats, including two robots and two cyberpunk environments. The paw button opens it in the Deck Keys area.
+- Add five pet needs, care actions, touch interactions, and local progress. Choose the animal, habitat, name, and motion preference in **Settings → Deck pet**.
+- Add **Settings → About Lastra** with the creator, version, MIT license, and project links.
+- Add the Deck pet walkthrough and demo to the project website.
+
 ## 1.2.0
 
 - Add a deck look under **Settings → Display** with four key styles, four backdrops, three key shapes, three icon weights, and an icons-only option. Five quick looks set them together, and a new installation starts with **Soft glow**. [Deck look](docs/deck-look.md)
