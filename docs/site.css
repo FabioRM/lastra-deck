@@ -83,6 +83,16 @@ h1 { margin-block: .65rem 1.25rem; font-size: clamp(2.65rem, 7vw, 5.5rem); lette
 .pet-guide p { margin-top: .45rem; color: var(--muted); font-size: .94rem; }
 .pet-gallery { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.25rem; }
 
+.aquarium-showcase {
+  background: radial-gradient(ellipse at 48% 0%, #163b48, transparent 56%), #111e28;
+  border-block-start: 1px solid #355663;
+  padding-block: clamp(2.75rem, 5vw, 4.5rem);
+}
+.aquarium-showcase .platform { color: #a5e0e7; margin-bottom: .45rem; }
+.aquarium-showcase .pet-guide li { border-color: #355663; }
+.aquarium-demo video { background: #11212b; border-color: #426877; box-shadow: 0 18px 48px #07141bb3; }
+.aquarium-feeding { margin-top: 1.8rem; }
+
 .features { background: var(--surface); border-block: 1px solid var(--border); padding-block: clamp(2.75rem, 5vw, 5rem); }
 h2 { font-size: clamp(1.85rem, 4.5vw, 3rem); letter-spacing: -.055em; }
 .feature { margin-top: clamp(2rem, 4.5vw, 4rem); padding-top: 1.5rem; border-top: 1px solid #53636d; }

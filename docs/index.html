@@ -3,14 +3,14 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Lastra is a touchscreen macro deck for the CORSAIR XENEON EDGE with app-aware shortcuts, Windows audio and PC stats, and a touch-controlled 3D virtual pet. Available for Windows and Linux.">
+  <meta name="description" content="Lastra is a touchscreen macro deck for the CORSAIR XENEON EDGE with app-aware shortcuts, Windows audio and PC stats, a touch-controlled 3D virtual pet, and a customizable aquarium. Available for Windows and Linux.">
   <meta property="og:title" content="Lastra · A touchscreen macro deck for XENEON EDGE">
-  <meta property="og:description" content="App-aware shortcuts, live PC stats, and a 3D virtual pet you can care for on your deck.">
-  <meta property="og:image" content="https://fabiorm.github.io/lastra-deck/preview-pet-full.webp?v=1.4.0">
-  <meta property="og:image:alt" content="Mochi in full-screen Lantern Grove with a large clock and weather panel.">
+  <meta property="og:description" content="App-aware shortcuts, live PC stats, a 3D virtual pet, and a customizable aquarium with 53 animal species.">
+  <meta property="og:image" content="https://fabiorm.github.io/lastra-deck/preview-aquarium-reef.webp">
+  <meta property="og:image:alt" content="A green sea turtle crosses the coral reef on the CORSAIR XENEON EDGE.">
   <meta name="theme-color" content="#151b20">
   <title>Lastra · A touchscreen macro deck for XENEON EDGE</title>
-  <link rel="stylesheet" href="site.css?v=7">
+  <link rel="stylesheet" href="site.css?v=8">
   <link rel="icon" href="data:,">
 </head>
 <body>
@@ -18,6 +18,7 @@
   <header class="site-header shell">
     <a class="wordmark" href="./">Lastra<span>.</span></a>
     <nav aria-label="Main navigation">
+      <a href="#aquarium">Aquarium</a>
       <a href="#deck-pet">Deck pet</a>
       <a href="#features">Features</a>
       <a href="#themes">Themes</a>
@@ -32,12 +33,12 @@
         <p class="platform">CORSAIR XENEON EDGE <span aria-hidden="true">/</span> Windows and Linux</p>
         <h1 id="hero-title">Switch apps.<br>Your shortcuts follow.</h1>
         <p>When you switch to another app, Lastra automatically loads its shortcuts on your XENEON EDGE. Build your own macro pages and keep the Windows mixer and live PC stats within reach.</p>
-        <div class="hero-links" aria-label="Lastra 1.4.0 downloads">
-          <a class="button" href="https://github.com/FabioRM/lastra-deck/releases/download/v1.4.0/Lastra-Setup-1.4.0.exe">Windows installer</a>
-          <a class="button button-secondary" href="https://github.com/FabioRM/lastra-deck/releases/download/v1.4.0/Lastra-1.4.0-linux-amd64.deb">Linux .deb</a>
-          <a class="button button-secondary" href="https://github.com/FabioRM/lastra-deck/releases/download/v1.4.0/Lastra-1.4.0-linux-x86_64.AppImage">Linux AppImage</a>
+        <div class="hero-links" aria-label="Lastra 1.5.0 downloads">
+          <a class="button" href="https://github.com/FabioRM/lastra-deck/releases/download/v1.5.0/Lastra-Setup-1.5.0.exe">Windows installer</a>
+          <a class="button button-secondary" href="https://github.com/FabioRM/lastra-deck/releases/download/v1.5.0/Lastra-1.5.0-linux-amd64.deb">Linux .deb</a>
+          <a class="button button-secondary" href="https://github.com/FabioRM/lastra-deck/releases/download/v1.5.0/Lastra-1.5.0-linux-x86_64.AppImage">Linux AppImage</a>
         </div>
-        <p class="requirements">Windows 10 or 11 · Linux x86-64 · MIT · <a href="https://github.com/FabioRM/lastra-deck/releases/tag/v1.4.0">Release notes and checksums for v1.4.0</a></p>
+        <p class="requirements">Windows 10 or 11 · Linux x86-64 · MIT · <a href="https://github.com/FabioRM/lastra-deck/releases/tag/v1.5.0">Release notes and checksums for v1.5.0</a></p>
       </div>
       <figure class="deck">
         <a href="preview-home.png"><img src="preview-home.png" width="2560" height="720" alt="Lastra Home showing touchscreen shortcut keys, Windows audio controls, and CPU, RAM, and GPU readings."></a>
@@ -47,6 +48,58 @@
         <a href="preview-toolbar.png"><img src="preview-toolbar.png" width="365" height="96" loading="lazy" alt="The Tools, Emoji, Deck pet, and page lock icons. The paw sits immediately before the lock."></a>
         <figcaption>Tap the paw beside the lock to open the habitat.</figcaption>
       </figure>
+    </section>
+    <section class="aquarium-showcase" id="aquarium" aria-labelledby="aquarium-title">
+      <div class="shell">
+        <div class="section-intro">
+          <div>
+            <p class="platform">Aquarium</p>
+            <h2 id="aquarium-title">A living aquarium across your deck</h2>
+          </div>
+          <div>
+            <p>Choose Aquarium in the view switcher to fill the XENEON EDGE with a 3D habitat. The time, date, and four corner controls stay visible while the light follows your local day and night.</p>
+            <p>Start with one of seven habitats and make it your own. Choose among 53 animal species, from schooling fish and reef crustaceans to mussels, oysters, and two sea turtles.</p>
+            <a class="text-link" href="https://github.com/FabioRM/lastra-deck#aquarium">Read the aquarium guide</a>
+          </div>
+        </div>
+        <figure class="pet-demo aquarium-demo">
+          <video controls playsinline preload="none" width="1920" height="540" poster="preview-aquarium-reef.webp" aria-label="A green sea turtle swims over the animated coral reef">
+            <source src="preview-aquarium-reef.mp4" type="video/mp4">
+            <a href="preview-aquarium-reef.mp4">Watch the coral reef video</a>
+          </video>
+          <figcaption>A green sea turtle glides past swaying seaweed and coral. Recorded from Lastra’s aquarium view in the XENEON EDGE’s 32:9 format.</figcaption>
+        </figure>
+        <ul class="pet-guide">
+          <li><h3>Shape the habitat</h3><p>Change the water, depth, substrate, and rock formations. Place coral thickets, mussel beds, or a bubble vent on the tank map.</p></li>
+          <li><h3>Make it come alive</h3><p>Adjust algae, coral, sponges, and bubbles independently. Choose how often green or hawksbill sea turtles pass through.</p></li>
+          <li><h3>Feed by touch</h3><p>Tap the water to drop flakes, pellets, or bottom wafers. Fish turn toward the food and follow it as it drifts.</p></li>
+        </ul>
+        <div class="pet-gallery">
+          <figure>
+            <a class="feature-image" href="preview-aquarium-atoll.webp"><img src="preview-aquarium-atoll.webp" width="2560" height="720" loading="lazy" alt="Reef fish swim among coral colonies and a limestone arch in shallow turquoise water."></a>
+            <figcaption><strong>Turquoise atoll</strong> · Limestone arch and layered coral colonies</figcaption>
+          </figure>
+          <figure>
+            <a class="feature-image" href="preview-aquarium-kelp.webp"><img src="preview-aquarium-kelp.webp" width="2560" height="720" loading="lazy" alt="Tall kelp ribbons frame a green underwater canyon."></a>
+            <figcaption><strong>Kelp forest</strong> · Tall kelp and coastal rock formations</figcaption>
+          </figure>
+          <figure>
+            <a class="feature-image" href="preview-aquarium-wreck.webp"><img src="preview-aquarium-wreck.webp" width="2560" height="720" loading="lazy" alt="A sunken boat rests amid rocks, sponges, and seaweed in deep blue water."></a>
+            <figcaption><strong>Sunken wreck</strong> · Deep water and a bubble vent</figcaption>
+          </figure>
+          <figure>
+            <a class="feature-image" href="preview-aquarium-pond.webp"><img src="preview-aquarium-pond.webp" width="2560" height="720" loading="lazy" alt="Koi and goldfish swim over a planted bed in shallow water."></a>
+            <figcaption><strong>Koi garden</strong> · Freshwater fish above a planted bed</figcaption>
+          </figure>
+        </div>
+        <figure class="pet-demo aquarium-demo aquarium-feeding">
+          <video controls playsinline preload="none" width="1920" height="540" poster="preview-aquarium-atoll.webp" aria-label="Fish swim toward food dropped by tapping the aquarium atoll">
+            <source src="preview-aquarium-feeding.mp4" type="video/mp4">
+            <a href="preview-aquarium-feeding.mp4">Watch the tap-to-feed video</a>
+          </video>
+          <figcaption>Two taps release pellets into the current and draw the fish toward the middle of the atoll.</figcaption>
+        </figure>
+      </div>
     </section>
     <section class="pet-showcase" id="deck-pet" aria-labelledby="deck-pet-title">
       <div class="shell">
@@ -220,7 +273,7 @@
     <section class="setup shell" id="linux" aria-labelledby="linux-title">
       <div>
         <h2 id="linux-title">Set up Lastra on Linux</h2>
-        <p>Install the x86-64 Debian package with <code>sudo apt install ./Lastra-1.4.0-linux-amd64.deb</code> or run the AppImage. The Deck follows the active application on X11 and supported Wayland desktops.</p>
+        <p>Install the x86-64 Debian package with <code>sudo apt install ./Lastra-1.5.0-linux-amd64.deb</code> or run the AppImage. The Deck follows the active application on X11 and supported Wayland desktops.</p>
       </div>
       <ol>
         <li><strong>GNOME.</strong> Install the Lastra GNOME extension ZIP from the release, enable it, and install the GNOME Remote Desktop portal.</li>

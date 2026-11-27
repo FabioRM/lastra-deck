@@ -5,7 +5,7 @@ const path = require('node:path');
 const { pathToFileURL } = require('node:url');
 
 const SCHEME = 'lastra-preview';
-const ASSET = /^\/src\/(?:renderer\/(?:index\.html|[a-z0-9-]+\.(?:css|js)|fonts\/[a-z0-9-]+\.woff2)|shared\/(?:appearance|deck-pet|decisions|dom|editing-keys|i18n(?:-it)?|key-readouts|linked-controls|sensor-binding|snippets|sounds|stats-chart|timers|widget-composition|widget-layout)\.js)$/;
+const ASSET = /^\/src\/(?:renderer\/(?:index\.html|[a-z0-9-]+\.(?:css|js)|fonts\/[a-z0-9-]+\.woff2)|shared\/(?:appearance|aquarium|deck-pet|decisions|dom|editing-keys|i18n(?:-it)?|key-readouts|linked-controls|sensor-binding|snippets|sounds|stats-chart|timers|widget-composition|widget-layout)\.js)$/;
 
 function previewAssetPath(url, root) {
   const request = new URL(url);

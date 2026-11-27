@@ -68,6 +68,7 @@
         <p class="settings-nav-label">Views</p>
         <button type="button" data-settings-section="deck-shortcut-settings" aria-controls="deck-shortcut-settings">Deck keys</button>
         <button type="button" data-settings-section="pet-settings" aria-controls="pet-settings">Deck pet</button>
+        <button type="button" data-settings-section="aquarium-settings" aria-controls="aquarium-settings">Aquarium</button>
         <button type="button" data-settings-section="dashboard-settings" aria-controls="dashboard-settings">Dashboard</button>
         <button type="button" data-settings-section="stats-settings" aria-controls="stats-settings">Stats</button>
         <button type="button" data-settings-section="feeds-settings-panel" aria-controls="feeds-settings-panel">Feeds</button>
@@ -139,6 +140,124 @@
           <label class="field">Pet name<input name="petName" type="text" autocomplete="off"></label>
           <label class="check"><input type="checkbox" name="motion">Animate the habitat</label>
           <p id="pet-settings-status" class="settings-status" role="status"></p>
+        </form>
+      </section>
+      <section id="aquarium-settings" data-settings-panel aria-labelledby="aquarium-settings-heading" hidden>
+        <div class="settings-page-heading">
+          <h2 id="aquarium-settings-heading" tabindex="-1">Aquarium</h2>
+          <p>Build an underwater habitat for the deck. Changes apply as you make them.</p>
+        </div>
+        <form id="aquarium-preferences" class="deck-settings" inert>
+          <section class="deck-settings-card" aria-labelledby="aquarium-layout-heading">
+            <h3 id="aquarium-layout-heading" tabindex="-1">Aquascape</h3>
+            <label class="check"><input name="enabled" type="checkbox">Show Aquarium in the view switcher</label>
+            <div class="deck-settings-fields aquarium-preset">
+              <label class="field">Habitat preset<select name="preset" aria-describedby="aquarium-preset-help"></select></label>
+              <button id="aquarium-apply-preset" type="button">Apply preset</button>
+            </div>
+            <p id="aquarium-preset-help" class="muted">A preset replaces the scenery, decorations, and animals.</p>
+            <div class="aquarium-options">
+              <label class="field">Layout<select name="layout"></select></label>
+              <label class="field">Substrate<select name="substrate"></select></label>
+              <label class="field">Plants and corals<select name="growth"></select></label>
+              <label class="field">Water colour<select name="water"></select></label>
+              <label class="field">Tank frame<select name="tank"></select></label>
+              <label class="field">Tank depth<select name="depth"></select></label>
+              <label class="field">Water current<select name="current"></select></label>
+              <label class="field">Rock formations<select name="rockStyle"></select></label>
+            </div>
+            <div class="aquarium-options">
+              <label class="field"><span>Rock coverage <output data-aquarium-range="rocks"></output></span>
+                <input name="rocks" type="range" min="0" max="100"></label>
+              <label class="field"><span>Plant density <output data-aquarium-range="plants"></output></span>
+                <input name="plants" type="range" min="0" max="100"></label>
+            </div>
+            <button id="aquarium-reshape" type="button" class="quiet">Reshape aquascape</button>
+          </section>
+          <section class="deck-settings-card" aria-labelledby="aquarium-growth-heading">
+            <h3 id="aquarium-growth-heading" tabindex="-1">Reef growth</h3>
+            <div class="aquarium-options">
+              <label class="field">Seaweed and algae<select name="algae"></select></label>
+              <label class="field"><span>Algae coverage <output data-aquarium-range="algaeDensity"></output></span>
+                <input name="algaeDensity" type="range" min="0" max="100"></label>
+              <label class="field">Coral colonies<select name="coralStyle"></select></label>
+              <label class="field"><span>Coral coverage <output data-aquarium-range="coralDensity"></output></span>
+                <input name="coralDensity" type="range" min="0" max="100"></label>
+              <label class="field">Sponge colonies<select name="spongeStyle"></select></label>
+              <label class="field"><span>Sponge coverage <output data-aquarium-range="spongeDensity"></output></span>
+                <input name="spongeDensity" type="range" min="0" max="100"></label>
+            </div>
+          </section>
+          <section class="deck-settings-card" aria-labelledby="aquarium-decor-heading">
+            <h3 id="aquarium-decor-heading" tabindex="-1">Decorations</h3>
+            <div class="deck-settings-fields aquarium-preset">
+              <label class="field">Choose a decoration<select id="aquarium-decor-kind"></select></label>
+              <button id="aquarium-decor-add" type="button">Add decoration</button>
+            </div>
+            <p class="muted">Select a marker or use the sliders to move an object. The top of the map is the back of the tank.</p>
+            <div id="aquarium-decor-map" role="group" aria-label="Tank layout map"></div>
+            <div id="aquarium-decor-controls" hidden>
+              <div class="aquarium-options">
+                <label class="field"><span>Left to right <output data-decor-range="x"></output></span>
+                  <input type="range" data-decor-field="x" min="-100" max="100"></label>
+                <label class="field"><span>Front to back <output data-decor-range="depth"></output></span>
+                  <input type="range" data-decor-field="depth" min="0" max="100"></label>
+                <label class="field"><span>Decoration size <output data-decor-range="size"></output></span>
+                  <input type="range" data-decor-field="size" min="45" max="200"></label>
+                <label class="field"><span>Rotation <output data-decor-range="rotation"></output></span>
+                  <input type="range" data-decor-field="rotation" min="-180" max="180"></label>
+              </div>
+              <button id="aquarium-decor-remove" type="button" class="quiet">Remove decoration</button>
+            </div>
+          </section>
+          <section class="deck-settings-card" aria-labelledby="aquarium-stock-heading">
+            <h3 id="aquarium-stock-heading" tabindex="-1">Inhabitants</h3>
+            <p class="muted">Set a quantity for each species. Set it to zero to leave that species out.</p>
+            <label class="field">Turtle visits<select name="turtleVisits"></select></label>
+            <div class="aquarium-options">
+              <label class="field">Animal group<select id="aquarium-stock-group"></select></label>
+              <label class="field">Find a species<input id="aquarium-stock-search" type="search" autocomplete="off"></label>
+            </div>
+            <div id="aquarium-stock"></div>
+            <output id="aquarium-stock-total" class="muted"></output>
+          </section>
+          <section class="deck-settings-card" aria-labelledby="aquarium-light-heading">
+            <h3 id="aquarium-light-heading" tabindex="-1">Circadian lighting</h3>
+            <label class="field">Light cycle<select name="lighting" aria-describedby="aquarium-light-help"></select></label>
+            <p id="aquarium-light-help" class="muted">The solar cycle uses the location in Feeds → Weather. When no location is set, the aquarium uses the local times below.</p>
+            <div class="aquarium-options">
+              <label class="field">Light colour<select name="lightTone"></select></label>
+              <label class="field"><span>Light intensity <output data-aquarium-range="brightness"></output></span>
+                <input name="brightness" type="range" min="35" max="145"></label>
+            </div>
+            <div class="deck-settings-fields">
+              <label class="field">Sunrise<input name="dawn" type="time" required></label>
+              <label class="field">Sunset<input name="dusk" type="time" required></label>
+            </div>
+          </section>
+          <section class="deck-settings-card" aria-labelledby="aquarium-motion-heading">
+            <h3 id="aquarium-motion-heading" tabindex="-1">Movement and detail</h3>
+            <div class="deck-settings-fields">
+              <label class="field">Movement<select name="motion"></select></label>
+              <label class="field">Render quality<select name="quality"></select></label>
+            </div>
+            <label class="check"><input name="bubbles" type="checkbox">Show rising bubbles</label>
+            <div class="aquarium-options">
+              <label class="field">Bubble pattern<select name="bubblePattern"></select></label>
+              <label class="field"><span>Bubble density <output data-aquarium-range="bubbleDensity"></output></span>
+                <input name="bubbleDensity" type="range" min="0" max="100"></label>
+            </div>
+          </section>
+          <section class="deck-settings-card" aria-labelledby="aquarium-feeding-heading">
+            <h3 id="aquarium-feeding-heading" tabindex="-1">Feeding</h3>
+            <label class="check"><input name="touch" type="checkbox">Feed the aquarium on touch</label>
+            <div class="aquarium-options">
+              <label class="field">Food type<select name="feedType"></select></label>
+              <label class="field"><span>Portion per touch <output data-aquarium-range="portion"></output></span>
+                <input name="portion" type="range" min="1" max="3"></label>
+            </div>
+          </section>
+          <p id="aquarium-settings-status" class="settings-status" role="status"></p>
         </form>
       </section>
       <section id="appearance-settings" data-settings-panel aria-labelledby="appearance-settings-heading" hidden>
@@ -726,6 +845,8 @@
   <script src="../shared/appearance.js"></script>
   <script src="../shared/deck-pet.js"></script>
   <script src="deck-pet-settings.js"></script>
+  <script src="../shared/aquarium.js"></script>
+  <script src="aquarium-settings.js"></script>
   <script src="appearance.js"></script>
   <script src="feeds-settings.js"></script>
   <script src="deck-behavior.js"></script>

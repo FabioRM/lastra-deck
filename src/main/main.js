@@ -19,6 +19,7 @@ const { DisplayBacklightWidgets } = require('./display-backlight-widgets');
 const { restoreDeckWindow, watchDeckDisplay } = require('./display-lifecycle');
 const { DeckAppearance } = require('./deck-appearance');
 const { DeckPet } = require('./deck-pet');
+const { AquariumSettings } = require('./aquarium-settings');
 const { createWindowsStartup } = require('./windows-startup');
 const { readTouchDevices } = require('./touch-win32');
 const { buildDiagnostics, saveDiagnostics } = require('./diagnostics');
@@ -263,6 +264,7 @@ let deckReveal = null;
 let emojiUsage = null;
 let appearance = null;
 let deckPet = null;
+let aquarium = null;
 let feeds = null;
 let interfaceLanguage = null;
 let activities = null;
@@ -369,6 +371,7 @@ function currentView() {
     activity: activities?.snapshot(),
     deckView: opts.preview && opts.stats ? 'stats'
       : navigation?.current.view === 'obs' && !obs?.enabled ? 'keys' : navigation?.current.view,
+    deckViewCycle: deckViewCycle(),
     deckStatsTab,
     viewOnly: viewOnly?.enabled === true,
     sessionBlocked: deckSession.blocked,
@@ -1111,9 +1114,22 @@ function setDeckPageLock(enabled = !pages.locked) {
   refreshPage(true);
 }
 
+function deckViewAllowed(view) {
+  return view === 'aquarium' ? aquarium?.current.enabled !== false : !feeds || feeds.allows(view);
+}
+
+function deckViewCycle() {
+  const cycle = feeds?.cycle() ?? ['keys', 'dashboard', 'stats', 'feeds'];
+  return deckViewAllowed('aquarium') ? [...cycle, 'aquarium'] : cycle;
+}
+
+function sendDeckNavigation() {
+  send('deck:navigation', { view: navigation.current.view, statsTab: deckStatsTab, sheet: deckSheet, views: deckViewCycle() });
+}
+
 function setDeckView(view) {
   if (view === 'obs' && !obs.enabled) throw new Error('Enable OBS in Lastra Settings.');
-  if (feeds && !feeds.allows(view)) throw new Error('That deck view is turned off.');
+  if (!deckViewAllowed(view)) throw new Error('That deck view is turned off.');
   const before = navigation.current.view;
   navigation.setView(view);
   if (before === 'stats' && navigation.current.view !== 'stats') processTelemetry?.stop();
@@ -1169,8 +1185,7 @@ function navigateDeck({ command, view, page: requestedPage, tab, enabled, settin
     case 'appearance': setAppearance(setting, value); break;
   }
   if (['surface', 'view', 'page', 'home', 'stats'].includes(command)) {
-    send('deck:navigation', { view: navigation.current.view, statsTab: deckStatsTab, sheet: deckSheet,
-      views: feeds?.cycle() ?? ['keys', 'dashboard', 'stats', 'feeds'] });
+    sendDeckNavigation();
   }
 }
 
@@ -1180,6 +1195,7 @@ function shortcutUnavailableOnDeck(command, binding) {
   if (pages.locked && ['next', 'previous', 'page', 'back'].includes(command)) return 'Paused while the page is locked';
   if (command === 'page' && (binding.activity !== activities.current.id
       || !store.current.pages.some(({ id }) => id === binding.target))) return 'Page unavailable in this activity';
+  if (command === 'view' && binding.target === 'aquarium' && !deckViewAllowed('aquarium')) return 'That deck view is turned off.';
 }
 
 function runDeckShortcut(command, binding) {
@@ -1623,6 +1639,18 @@ function registerIpc() {
     send('deck:pet', current);
     return current.settings;
   });
+  edit('editor:aquarium:get', () => aquarium.current);
+  edit('editor:aquarium:set', (settings) => {
+    const wasEnabled = aquarium.current.enabled;
+    const current = aquarium.configure(settings);
+    send('deck:aquarium', current);
+    if (current.enabled !== wasEnabled) {
+      if (!current.enabled && navigation.current.view === 'aquarium') setDeckView('keys');
+      deckShortcuts?.sync();
+      sendDeckNavigation();
+    }
+    return current;
+  });
   edit('editor:about:get', () => ({
     version: packageInfo.version, author: packageInfo.author, license: packageInfo.license, links: ABOUT_LINKS,
   }));
@@ -1633,7 +1661,10 @@ function registerIpc() {
   edit('editor:feeds:get', () => feeds?.settings() ?? null);
   edit('editor:feeds:set', (value) => {
     feeds.setSettings(value ?? {});
-    if (!feeds.allows(navigation.current.view)) setDeckView('keys');
+    if (!deckViewAllowed(navigation.current.view)) {
+      setDeckView('keys');
+      sendDeckNavigation();
+    }
     void feeds.refresh().catch(() => log('Could not refresh Feeds.'));
     return feeds.settings();
   });
@@ -1985,6 +2016,7 @@ function registerIpc() {
     send('deck:window-visibility', win.isVisible() && !win.isMinimized());
     send('deck:appearance', appearance.current);
     send('deck:pet', deckPet.current);
+    send('deck:aquarium', aquarium.current);
     if (feeds) {
       send('feeds', feeds.snapshot());
       send('weather', feeds.snapshot().weather ?? { line: '' });
@@ -2071,12 +2103,13 @@ function start() {
   emojiUsage = new EmojiUsage(path.join(userData, 'emoji-usage.json'), log);
   appearance = new DeckAppearance(path.join(userData, 'deck-appearance.json'), log);
   deckPet = new DeckPet(path.join(userData, 'deck-pet.json'), log);
+  aquarium = new AquariumSettings(path.join(userData, 'aquarium.json'), log);
   feeds = new Feeds(path.join(userData, 'feeds.json'), {
     legacyWeather: path.join(userData, 'weather.json'),
     onChange(snapshot) {
       send('feeds', snapshot);
       send('weather', snapshot.weather ?? { line: '' });
-      send('deck:navigation', { view: navigation.current.view, statsTab: deckStatsTab, sheet: deckSheet, views: snapshot.cycle });
+      sendDeckNavigation();
     },
     log,
   });

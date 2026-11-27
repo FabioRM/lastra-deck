@@ -6,8 +6,8 @@ Linux support is experimental. Automatic profiles use the foreground window's ap
 
 Download the x86-64 packages and SHA-256 checksums from the [latest Lastra Deck release](https://github.com/FabioRM/lastra-deck/releases/latest).
 
-- **Debian, Ubuntu or Mint.** Run `sudo apt install ./Lastra-1.4.0-linux-amd64.deb`, then open **Lastra** from the app menu or run `lastra`.
-- **AppImage.** Run `chmod +x Lastra-1.4.0-linux-x86_64.AppImage`, then launch it directly. On systems without FUSE, try `--appimage-extract-and-run`.
+- **Debian, Ubuntu or Mint.** Run `sudo apt install ./Lastra-1.5.0-linux-amd64.deb`, then open **Lastra** from the app menu or run `lastra`.
+- **AppImage.** Run `chmod +x Lastra-1.5.0-linux-x86_64.AppImage`, then launch it directly. On systems without FUSE, try `--appimage-extract-and-run`.
 - **Source.** Run `npm ci` with Node.js 22.12 or later, then `npm start`. `npm run dev` opens a focusable development window for inspecting profiles.
 
 Update Linux builds by downloading a new package. Lastra selects the XENEON EDGE by name or by physical resolution if exactly one display matches. Pass `--display=<id>` to select an Electron display explicitly. Switch to **Deck Keys** to see the active app's shortcuts.

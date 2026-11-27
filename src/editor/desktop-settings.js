@@ -57,6 +57,15 @@
     ],
     'deck-shortcut-settings': [['Global keyboard shortcuts', 'global-shortcuts-heading', 'hotkeys keybind ctrl tasti rapidi scorciatoie combinazioni']],
     'pet-settings': [['Deck pet', 'pet-settings-heading', 'tamagotchi animal habitat name motion animale ambiente nome animazioni']],
+    'aquarium-settings': [
+      ['Aquascape', 'aquarium-layout-heading', 'aquarium reef kelp plants sand acqua acquario coralli piante sabbia'],
+      ['Reef growth', 'aquarium-growth-heading', 'seaweed macroalgae coral sponges alghe coralli spugne densità'],
+      ['Decorations', 'aquarium-decor-heading', 'tank props placement arch wreck arredi mappa relitto arco'],
+      ['Inhabitants', 'aquarium-stock-heading', 'fish shrimp crab jellyfish turtles mussels pesci granchi meduse tartarughe mitili'],
+      ['Circadian lighting', 'aquarium-light-heading', 'sunrise sunset solar day night alba tramonto circadiano luce'],
+      ['Movement and detail', 'aquarium-motion-heading', 'quality bubbles performance touch qualità bolle prestazioni'],
+      ['Feeding', 'aquarium-feeding-heading', 'food feed tap flakes pellets wafers cibo mangime fiocchi granuli'],
+    ],
     'about-settings': [['About Lastra', 'about-settings-heading', 'creator author mit license github autore creatore licenza versione']],
     'dashboard-settings': [
       ['Dashboard calendar', 'deck-calendar-heading', 'google outlook microsoft calendar calendario tap'],

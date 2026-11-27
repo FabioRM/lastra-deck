@@ -8,7 +8,7 @@ const { knownActivity } = require('./activity-profiles');
 const COMMANDS = Object.freeze({ next: 'Next page', previous: 'Previous page', page: 'Open a page',
   view: 'Open a view', back: 'Back to the last page', reveal: 'Reveal or restore the deck' });
 const VIEW_LABELS = Object.freeze({ keys: 'Deck Keys', dashboard: 'Dashboard', stats: 'Stats', feeds: 'Feeds',
-  obs: 'OBS', apps: 'Apps', emoji: 'Emoji' });
+  aquarium: 'Aquarium', obs: 'OBS', apps: 'Apps', emoji: 'Emoji' });
 const MODIFIERS = { ctrl: 'Ctrl', control: 'Ctrl', alt: 'Alt', shift: 'Shift', super: 'Super', win: 'Super' };
 const ORDER = ['Ctrl', 'Alt', 'Shift', 'Super'];
 const NAMED_KEYS = ['Up', 'Down', 'Left', 'Right', 'PageUp', 'PageDown', 'Home', 'End', 'Insert', 'Delete', 'Space'];

@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="activity-profile.css">
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="deck-pet.css">
+  <link rel="stylesheet" href="aquarium.css">
   <link rel="stylesheet" href="obs.css">
   <link rel="stylesheet" href="obs-modes.css">
   <link rel="stylesheet" href="idle-screen.css">
@@ -61,6 +62,10 @@
     <button id="panel-preview-close" type="button">Close preview</button>
   </aside>
   <main id="stage">
+    <section id="aquarium-panel" aria-label="Aquarium" hidden>
+      <canvas id="aquarium-canvas" role="button" aria-label="Feed the aquarium" tabindex="-1"></canvas>
+      <p id="aquarium-status" role="status" hidden>Could not start the 3D aquarium.</p>
+    </section>
     <div id="corner-clock">
       <time id="corner-time"></time>
       <time id="corner-date"></time>
@@ -107,7 +112,7 @@
         <div id="speaker-output-devices" role="group" aria-label="Output devices"></div>
       </section>
     </div>
-    <button id="dashboard-switch" class="dashboard-icon-button" type="button" aria-controls="deck dashboard-panel stats-panel feeds-panel"
+    <button id="dashboard-switch" class="dashboard-icon-button" type="button" aria-controls="deck dashboard-panel stats-panel feeds-panel aquarium-panel"
       data-next="dashboard" aria-label="Show Dashboard" title="Show Dashboard">
       <svg class="dashboard-icon dashboard-switch-dashboard" viewBox="0 0 24 24" aria-hidden="true">
         <rect x="3" y="3" width="7" height="10" rx="1"/>
@@ -129,6 +134,10 @@
       <svg class="dashboard-icon dashboard-switch-feeds" viewBox="0 0 24 24" aria-hidden="true">
         <path d="M12 3v3M6 8a6 6 0 0 1 12 0c0 4-3 5-3 9H9c0-4-3-5-3-9M9 21h6"/>
         <path d="M4 14h4M16 14h4"/>
+      </svg>
+      <svg class="dashboard-icon dashboard-switch-aquarium" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M3 12c3.4-5.5 9.7-6.1 14-1l4-3v8l-4-3c-4.3 5.1-10.6 4.5-14-1Z"/>
+        <path d="M8.2 11.8h.1m3.4-4.1 1.1-3 2.6 4.5"/>
       </svg>
     </button>
     <button id="home-page" class="dashboard-icon-button" type="button" aria-label="Home" title="Home" disabled>
@@ -786,6 +795,7 @@
   <script src="../shared/i18n-it.js"></script>
   <script src="../shared/i18n.js"></script>
   <script src="../shared/deck-pet.js"></script>
+  <script src="../shared/aquarium.js"></script>
   <script src="../shared/weather-scene.js"></script>
   <script src="../shared/update-controls.js"></script>
   <script src="../shared/dom.js"></script>
@@ -827,6 +837,7 @@
   <script src="display-backlight.js"></script>
   <script src="app.js"></script>
   <script src="deck-pet.js"></script>
+  <script src="aquarium.js"></script>
   <script src="push-to-talk.js"></script>
   <script src="microphone-mixer.js"></script>
   <script src="obs-production.js"></script>

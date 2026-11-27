@@ -12,7 +12,7 @@ The Deck and automatic shortcut profiles also have an experimental Linux mode fo
 
 ![Deck Keys switches from Claude Desktop to Codex, Chrome, File Explorer, and Photoshop, then loops back to Claude Desktop.](docs/preview-app-focus.gif)
 
-[Project website](https://fabiorm.github.io/lastra-deck/) · [Getting started](#getting-started) · [Deck pet](#deck-pet) · [Tools and Pomodoro](#tools-and-pomodoro) · [Deck views](#deck-views) · [Profile editor](#profile-editor) · [Local MCP integration](#local-mcp-integration) · [License](#license)
+[Project website](https://fabiorm.github.io/lastra-deck/) · [Getting started](#getting-started) · [Deck pet](#deck-pet) · [Aquarium](#aquarium) · [Tools and Pomodoro](#tools-and-pomodoro) · [Deck views](#deck-views) · [Profile editor](#profile-editor) · [Local MCP integration](#local-mcp-integration) · [License](#license)
 
 <details>
 <summary>Animated demo and more deck previews</summary>
@@ -35,11 +35,11 @@ The deck comes with 14 themes and five quick looks. [Deck look](docs/deck-look.m
 
 ## Getting started
 
-Download Lastra 1.4.0 for your system. [Windows x64 installer](https://github.com/FabioRM/lastra-deck/releases/download/v1.4.0/Lastra-Setup-1.4.0.exe) · [Linux .deb](https://github.com/FabioRM/lastra-deck/releases/download/v1.4.0/Lastra-1.4.0-linux-amd64.deb) · [Linux AppImage](https://github.com/FabioRM/lastra-deck/releases/download/v1.4.0/Lastra-1.4.0-linux-x86_64.AppImage) · [Checksums and reviewed source](https://github.com/FabioRM/lastra-deck/releases/tag/v1.4.0)
+Download Lastra 1.5.0 for your system. [Windows x64 installer](https://github.com/FabioRM/lastra-deck/releases/download/v1.5.0/Lastra-Setup-1.5.0.exe) · [Linux .deb](https://github.com/FabioRM/lastra-deck/releases/download/v1.5.0/Lastra-1.5.0-linux-amd64.deb) · [Linux AppImage](https://github.com/FabioRM/lastra-deck/releases/download/v1.5.0/Lastra-1.5.0-linux-x86_64.AppImage) · [Checksums and reviewed source](https://github.com/FabioRM/lastra-deck/releases/tag/v1.5.0)
 
 Set the XENEON EDGE to **Extend these displays** in Windows Display settings. The panel runs at 2560 × 720 in landscape and 720 × 2560 in portrait.
 
-**Install the app.** Run `Lastra-Setup-1.4.0.exe` on Windows x64. It installs for the current user in `%LOCALAPPDATA%\Programs\Lastra` and adds Start menu and desktop shortcuts. The Windows installer is unsigned. Settings and profiles live in `%APPDATA%\Lastra` and survive updates and uninstalls. [Linux setup](docs/linux-deck.md) · [Windows update behavior](docs/releasing.md#update-behavior)
+**Install the app.** Run `Lastra-Setup-1.5.0.exe` on Windows x64. It installs for the current user in `%LOCALAPPDATA%\Programs\Lastra` and adds Start menu and desktop shortcuts. The Windows installer is unsigned. Settings and profiles live in `%APPDATA%\Lastra` and survive updates and uninstalls. [Linux setup](docs/linux-deck.md) · [Windows update behavior](docs/releasing.md#update-behavior)
 
 **Run from source.** Install **Node.js 22.12.0 or later**, as required by the Electron installer, then run these commands from the project directory. Source runs never check for updates. To build the installer yourself, see [Releasing](docs/releasing.md).
 
@@ -82,6 +82,16 @@ Under **Settings → Deck pet**, choose an animal, a habitat, a name, and whethe
 See the compact and full-screen views and watch the new play and care animations, captured on a 2560 × 720 XENEON EDGE with sample weather. [Watch the deck pet demo](https://fabiorm.github.io/lastra-deck/#deck-pet)
 
 ![Mochi in full-screen Lantern Grove with six care indicators, a large clock, and a weather panel](docs/preview-pet-full.webp)
+
+## Aquarium
+
+Choose **Aquarium** in the deck’s view switcher for a full-screen 3D tank with the time, date, and the four corner controls. Tap the water to drop food and watch the fish swim toward it.
+
+In **Settings → Aquarium**, start with a reef, kelp forest, sunken wreck, or one of four other habitats. Set the tank depth, water, current, lighting, and the number of each of the 53 animal species. Choose the types and densities of swaying algae, corals, and sponges, place decorations on the tank map, and adjust bubble intensity and turtle visits.
+
+The tank can follow local daylight or your own dawn and dusk schedule. Animation pauses when you switch views or the idle cover appears. [Watch the aquarium and feeding demos](https://fabiorm.github.io/lastra-deck/#aquarium)
+
+![A green sea turtle crosses the coral reef on a CORSAIR XENEON EDGE](docs/preview-aquarium-reef.webp)
 
 ## Tools and Pomodoro
 

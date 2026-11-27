@@ -81,7 +81,8 @@
 #dashboard-switch[data-next='keys'] .dashboard-switch-keys,
 #dashboard-switch[data-next='dashboard'] .dashboard-switch-dashboard,
 #dashboard-switch[data-next='stats'] .dashboard-switch-stats,
-#dashboard-switch[data-next='feeds'] .dashboard-switch-feeds { display: block; }
+#dashboard-switch[data-next='feeds'] .dashboard-switch-feeds,
+#dashboard-switch[data-next='aquarium'] .dashboard-switch-aquarium { display: block; }
 
 .dashboard-sr-only {
   position: absolute;

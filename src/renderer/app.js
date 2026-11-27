@@ -15,12 +15,12 @@
   const PROMPT_ARM_MS = 350;
   const VIEWS = {
     'dashboard-panel': 'dashboard', 'stats-panel': 'stats', 'feeds-panel': 'feeds', 'obs-panel': 'obs',
-    'app-views-panel': 'apps', 'emoji-panel': 'emoji',
+    'app-views-panel': 'apps', 'emoji-panel': 'emoji', 'aquarium-panel': 'aquarium',
   };
   const VIEW_BUTTONS = { obs: 'obs-tab', apps: 'app-views-tab', emoji: 'emoji-tab' };
   // Views that replace Deck Keys and leave the navigation row in place.
   const SIDE_VIEWS = ['emoji-panel', 'obs-panel', 'app-views-panel', 'pet-habitat'];
-  const VIEW_LABELS = { keys: 'Deck keys', dashboard: 'Dashboard', stats: 'Stats', feeds: 'Feeds' };
+  const VIEW_LABELS = { keys: 'Deck keys', dashboard: 'Dashboard', stats: 'Stats', feeds: 'Feeds', aquarium: 'Aquarium' };
 
   const api = window.lastra;
   const { t, set: setLanguage } = window.LastraI18n;
@@ -39,6 +39,7 @@
   const dashboard = document.getElementById('dashboard-panel');
   const stats = document.getElementById('stats-panel');
   const feedsPanel = document.getElementById('feeds-panel');
+  const aquariumPanel = document.getElementById('aquarium-panel');
   let viewCycle = ['keys', 'dashboard', 'stats', 'feeds'];
   const viewSwitch = document.getElementById('dashboard-switch');
   const statusEl = document.getElementById('status');
@@ -172,6 +173,7 @@
     if (view === 'dashboard') window.LastraDashboard?.setOpen(true);
     else if (view === 'stats') window.LastraStats?.setOpen(true);
     else if (view === 'feeds') window.LastraFeeds?.setOpen(true);
+    else if (view === 'aquarium') window.LastraDeckViews.setPanel(aquariumPanel, true);
     else closeActiveView();
   }
 
@@ -180,8 +182,11 @@
       pendingNavigation = next;
       return;
     }
-    if (Array.isArray(next.views) && next.views.length) viewCycle = next.views;
-    savedView = ['dashboard', 'stats', 'feeds'].includes(next.view) && !viewCycle.includes(next.view) ? 'keys' : next.view;
+    if (Array.isArray(next.views) && next.views.length) {
+      viewCycle = next.views;
+      updateViewSwitch();
+    }
+    savedView = Object.hasOwn(VIEW_LABELS, next.view) && !viewCycle.includes(next.view) ? 'keys' : next.view;
     if (next.statsTab) window.LastraStats?.selectTab(next.statsTab);
     if (Number.isSafeInteger(next.sheet) && quickSheet !== next.sheet) {
       quickTools.close();
@@ -223,11 +228,14 @@
       }
       if (open && activeView !== panel) closeActiveView();
       if (open) showPageMatch(false);
-      const fullPanel = (item) => item === dashboard || item === stats || item === feedsPanel;
+      const fullPanel = (item) => item === dashboard || item === stats || item === feedsPanel || item === aquariumPanel;
       const wasFullPanel = fullPanel(activeView);
+      const wasAquarium = activeView === aquariumPanel;
       panel.hidden = !open;
       if (open) activeView = panel;
       else if (activeView === panel) activeView = null;
+      const inAquarium = activeView === aquariumPanel;
+      stage.toggleAttribute('data-aquarium', inAquarium);
       const isFullPanel = fullPanel(activeView);
       if (isFullPanel) stage.dataset.cornerClock = 'on';
       else delete stage.dataset.cornerClock;
@@ -246,12 +254,14 @@
       updateWidgetVisibility();
       if (wasFullPanel !== isFullPanel) {
         updateTelemetryVisibility();
-        if (!isFullPanel) fitStage();
       }
+      if (wasAquarium !== inAquarium || (wasFullPanel && !isFullPanel)) fitStage();
+      window.LastraAquarium?.setVisible(inAquarium && deckIsVisible());
       updateClock();
       if (remember) rememberView();
     },
   };
+  aquariumPanel.addEventListener('lastra:close-view', () => window.LastraDeckViews.setPanel(aquariumPanel, false));
 
   function deckIsVisible() {
     return deckWindowVisible && !document.hidden && !stage.inert && !sessionCover.open
@@ -468,6 +478,12 @@
     const height = portrait ? STAGE_W : STAGE_H;
     const scale = Math.min(viewWidth / width, viewHeight / height) || 1;
     stageScale = scale;
+    if (stage.hasAttribute('data-aquarium')) {
+      stage.style.setProperty('--aquarium-screen-width', `${viewWidth / scale}px`);
+      stage.style.setProperty('--aquarium-screen-height', `${viewHeight / scale}px`);
+      stage.style.transform = `scale(${scale})`;
+      return;
+    }
     if (stage.hasAttribute('data-pet-expanded')) {
       stage.style.setProperty('--pet-screen-width', `${viewWidth / scale}px`);
       stage.style.setProperty('--pet-screen-height', `${viewHeight / scale}px`);
@@ -1531,10 +1547,9 @@
     const inStats = activeView === stats;
     const inDashboard = activeView === dashboard;
     const inFeeds = activeView === feedsPanel;
-    if (inStats || inDashboard || inFeeds) {
+    if (inStats || inDashboard || inFeeds || activeView === aquariumPanel) {
       renderClockTime(document.getElementById('corner-time'), parts, showClockSeconds);
-      const spacer = document.getElementById(inStats ? 'stats-time' : inDashboard ? 'dashboard-time' : 'feeds-time');
-      if (inStats || inDashboard) renderClockTime(spacer, parts, showClockSeconds);
+      if (inStats || inDashboard) renderClockTime(document.getElementById(inStats ? 'stats-time' : 'dashboard-time'), parts, showClockSeconds);
       const day = now.toLocaleDateString(locale, { weekday: 'short', month: 'short', day: 'numeric' });
       const cornerDate = document.getElementById('corner-date');
       if (cornerDate.textContent !== day) cornerDate.textContent = day;
@@ -1574,6 +1589,7 @@
   }
 
   function updateDeckVisibility() {
+    window.LastraAquarium?.setVisible(activeView === aquariumPanel && deckIsVisible());
     updateWidgetVisibility();
     updateTelemetryVisibility();
     tickClock();
@@ -1679,7 +1695,8 @@
       if (document.readyState === 'loading') {
         await new Promise((resolve) => document.addEventListener('DOMContentLoaded', resolve, { once: true }));
       }
-      applyDeckNavigation(pendingNavigation ?? { view: initial.deckView, statsTab: initial.deckStatsTab, sheet: initial.deckSheet });
+      applyDeckNavigation(pendingNavigation ?? { view: initial.deckView, statsTab: initial.deckStatsTab,
+        sheet: initial.deckSheet, views: initial.deckViewCycle });
       pendingNavigation = undefined;
     }
     tickClock();

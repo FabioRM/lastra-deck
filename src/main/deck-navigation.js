@@ -4,7 +4,7 @@
 const { readJsonSettings, writeJsonSettings } = require('./json-settings-file');
 const { ACTIVITIES, knownActivity } = require('./activity-profiles');
 
-const VIEWS = new Set(['dashboard', 'keys', 'stats', 'feeds', 'obs', 'apps', 'emoji']);
+const VIEWS = new Set(['dashboard', 'keys', 'stats', 'feeds', 'aquarium', 'obs', 'apps', 'emoji']);
 const CONTEXT_RETURN_CHOICES = Object.freeze({ manual: 'Last manually selected page', home: 'Home' });
 const CALENDARS = {
   none: { label: 'Do nothing', url: null },

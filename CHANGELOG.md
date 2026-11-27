@@ -4,6 +4,14 @@ Completed items from the former TODO, grouped by the section that tracked them. 
 
 Entries grouped under **0.2.1** record the completed work through the first reviewed source release.
 
+## 1.5.0
+
+- Add a full-screen 3D Aquarium to the deck view switcher, with a clock, date, and the four corner controls. The scene follows local daylight or a custom dawn and dusk schedule.
+- Add seven habitats and 53 animal species, including green and hawksbill sea turtles, mussels, oysters, fish, crustaceans, and other invertebrates. Tap the water to feed the inhabitants and see how they respond.
+- Add a tank layout map and settings for depth, water, lighting, current, plants, and stocking. Choose rock formations, set algae, coral, and sponge density independently, and adjust bubble patterns and turtle visits.
+- Use perspective, foreground and background scenery, animated caustics, and swaying vegetation across the full panel. Pause aquarium rendering while another view or the idle cover is visible.
+- Publish new XENEON EDGE screenshots and aquarium videos, plus Windows x64 and Linux x86-64 installers.
+
 ## 1.4.0
 
 - Give Deck pet a full-screen view with a red exit button, a larger clock, the date, and a shaded weather panel. Keep the active app’s name and icon visible in the compact view.

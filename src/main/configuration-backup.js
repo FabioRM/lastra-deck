@@ -4,7 +4,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 
 const SETTINGS = ['deck-appearance.json', 'deck-navigation.json', 'interface-language.json', 'pomodoro.json',
-  'timers.json', 'tool-choices.json', 'weather.json', 'feeds.json', 'deck-shortcuts.json', 'deck-view-only.json', 'deck-pet.json'];
+  'timers.json', 'tool-choices.json', 'weather.json', 'feeds.json', 'deck-shortcuts.json', 'deck-view-only.json', 'deck-pet.json', 'aquarium.json'];
 const EXTRA = /^(?:profile(?:-[a-z]+)?|deck-shortcuts-[a-z]+)\.json$/;
 
 function readSettings(directory, names = SETTINGS) {
