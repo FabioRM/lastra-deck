@@ -22,6 +22,8 @@ contextBridge.exposeInMainWorld('lastra', {
   onDeckWindowVisibility: (callback) => subscribe('deck:window-visibility', callback),
   onDeckPet: (callback) => subscribe('deck:pet', callback),
   onAquarium: (callback) => subscribe('deck:aquarium', callback),
+  onAquariumLightingPreview: (callback) => subscribe('deck:aquarium-lighting-preview', callback),
+  closeAquariumLightingPreview: () => ipcRenderer.send('deck:aquarium-lighting-preview:close'),
   interactWithPet: (action, automatic) => ipcRenderer.invoke('pet:interact', action, automatic),
   onDeckPageIcon: (callback) => subscribe('deck:page-icon', callback),
   openDashboardCalendar: () => ipcRenderer.invoke('dashboard:calendar:open'),

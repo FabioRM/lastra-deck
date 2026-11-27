@@ -35,11 +35,11 @@ The deck comes with 14 themes and five quick looks. [Deck look](docs/deck-look.m
 
 ## Getting started
 
-Download Lastra 1.5.0 for your system. [Windows x64 installer](https://github.com/FabioRM/lastra-deck/releases/download/v1.5.0/Lastra-Setup-1.5.0.exe) · [Linux .deb](https://github.com/FabioRM/lastra-deck/releases/download/v1.5.0/Lastra-1.5.0-linux-amd64.deb) · [Linux AppImage](https://github.com/FabioRM/lastra-deck/releases/download/v1.5.0/Lastra-1.5.0-linux-x86_64.AppImage) · [Checksums and reviewed source](https://github.com/FabioRM/lastra-deck/releases/tag/v1.5.0)
+Download Lastra 1.5.1 for your system. [Windows x64 installer](https://github.com/FabioRM/lastra-deck/releases/download/v1.5.1/Lastra-Setup-1.5.1.exe) · [Linux .deb](https://github.com/FabioRM/lastra-deck/releases/download/v1.5.1/Lastra-1.5.1-linux-amd64.deb) · [Linux AppImage](https://github.com/FabioRM/lastra-deck/releases/download/v1.5.1/Lastra-1.5.1-linux-x86_64.AppImage) · [Checksums and reviewed source](https://github.com/FabioRM/lastra-deck/releases/tag/v1.5.1)
 
 Set the XENEON EDGE to **Extend these displays** in Windows Display settings. The panel runs at 2560 × 720 in landscape and 720 × 2560 in portrait.
 
-**Install the app.** Run `Lastra-Setup-1.5.0.exe` on Windows x64. It installs for the current user in `%LOCALAPPDATA%\Programs\Lastra` and adds Start menu and desktop shortcuts. The Windows installer is unsigned. Settings and profiles live in `%APPDATA%\Lastra` and survive updates and uninstalls. [Linux setup](docs/linux-deck.md) · [Windows update behavior](docs/releasing.md#update-behavior)
+**Install the app.** Run `Lastra-Setup-1.5.1.exe` on Windows x64. It installs for the current user in `%LOCALAPPDATA%\Programs\Lastra` and adds Start menu and desktop shortcuts. The Windows installer is unsigned. Settings and profiles live in `%APPDATA%\Lastra` and survive updates and uninstalls. [Linux setup](docs/linux-deck.md) · [Windows update behavior](docs/releasing.md#update-behavior)
 
 **Run from source.** Install **Node.js 22.12.0 or later**, as required by the Electron installer, then run these commands from the project directory. Source runs never check for updates. To build the installer yourself, see [Releasing](docs/releasing.md).
 
@@ -90,6 +90,12 @@ Choose **Aquarium** in the deck’s view switcher for a full-screen 3D tank with
 In **Settings → Aquarium**, start with a reef, kelp forest, sunken wreck, or one of four other habitats. Set the tank depth, water, current, lighting, and the number of each of the 53 animal species. Choose the types and densities of swaying algae, corals, and sponges, place decorations on the tank map, and adjust bubble intensity and turtle visits.
 
 The tank can follow local daylight or your own dawn and dusk schedule. Animation pauses when you switch views or the idle cover appears. [Watch the aquarium and feeding demos](https://fabiorm.github.io/lastra-deck/#aquarium)
+
+Open **Settings → Aquarium** to try your changes on the desktop. The 3D preview stays visible while you scroll the controls. Start with `npm run dev -- --settings` when the XENEON EDGE is disconnected. Use **Feed the aquarium** to try feeding, then choose **Save aquarium** to apply the setup to the deck.
+
+The Aquarium settings include snapshots of the habitats and visual examples beside the sliders. Drag a decoration on the overhead map or in the 3D preview. Both views update as you move it. Drag the water to orbit the tank, scroll or use **−** and **+** to zoom, and choose **Reset view** to return to the front.
+
+Adjust **Night brightness** and **Glow intensity** independently. **Day** and **Night** change the desktop preview and the XENEON EDGE together. Moving either night slider switches both previews to **Night**. Choose **Live cycle** or leave the Aquarium settings to restore the panel’s previous view and saved light schedule. **Save aquarium** keeps the values.
 
 ![A green sea turtle crosses the coral reef on a CORSAIR XENEON EDGE](docs/preview-aquarium-reef.webp)
 
@@ -191,6 +197,8 @@ The Deck side panel shows the current CPU, RAM, and GPU readings. Add a **System
 ## Interface language
 
 Use **Settings → General → Interface language** to choose **System language**, **Italiano**, or **English**. Lastra defaults to the first supported language in Windows preferences and falls back to English. Changing the interface language keeps the current draft and undo history. Key and page names, the Office shortcut language, and the profile's date and time format are stored in the profile. Specialized messages without an Italian translation appear in English.
+
+Use **Ctrl+,** to open Settings and focus search. Search by section and setting name, or use **Jump to…** in the sidebar to go straight to a control. The **About** tab includes the installed version, project links, and shortcuts to diagnostics and configuration backup.
 
 ## Profile editor
 
@@ -333,6 +341,6 @@ See the [roadmap](ROADMAP.md) for planned features and hardware checks and the [
 
 ## License
 
-The original Lastra code, documentation, and assets are released under the MIT License. Third-party components and material in shortcut reference catalogs remain subject to their upstream terms. Check the redistribution status of catalog data before using it in a release. [MIT License](LICENSE) · [Third-party notices and catalog sources](THIRD_PARTY_NOTICES.md)
+The original Lastra code, documentation, and assets are released under the MIT License. Third-party components and material in shortcut reference catalogs remain subject to their upstream terms. Check the redistribution status of catalog data before using it in a release. [MIT License](LICENSE) · [Usage and warranty notice](https://fabiorm.github.io/lastra-deck/usage-notice.html) · [Third-party notices and catalog sources](THIRD_PARTY_NOTICES.md)
 
 Lastra was inspired by Tessera Deck.

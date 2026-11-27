@@ -2,6 +2,7 @@ import * as THREE from '../../node_modules/three/build/three.module.js';
 import { floorAt } from './aquarium-habitat.mjs';
 import { placeInstances, placeMesh, waterLit } from './aquarium-materials.mjs';
 import { makeMollusc } from './aquarium-molluscs.mjs';
+import { aquariumInvertebrateMotion } from './aquarium-invertebrate-motion.mjs';
 
 const CRUSTACEANS = {
   cleaner: { body:'#dd704e', edge:'#ffeae5', shrimp:true },
@@ -18,8 +19,7 @@ const CRUSTACEANS = {
 };
 const BOTTOM_DWELLERS = ['star','urchin','nerite','turbo','conch','cowrie','nudibranch','clam','scallop',
   'octopus','cuttlefish','cucumber','featherStar','mussel','oyster'];
-const STATIC = new Set(['clam','scallop','featherStar','mussel','oyster']);
-const FILTER = new Set([...STATIC,'porcelain']);
+const NIGHT_COLORS = { star:'#63e1e0', cleaner:'#b6f0ff', cherry:'#ff9478', blueShrimp:'#83c8ff' };
 const UP = new THREE.Vector3(0,1,0);
 const curve = (points) => new THREE.CatmullRomCurve3(points.map((p) => new THREE.Vector3(...p)));
 
@@ -70,8 +70,10 @@ function smallParts(resources, uniforms, random) {
     bevelSize:.033, bevelThickness:.037, bevelSegments:3, steps:1 }));
   starGeometry.rotateX(-Math.PI/2);
   function pigment(color, options = {}) {
-    if (!styles.has(color)) styles.set(color,waterLit(resources,uniforms,{ color,roughness:.64,...options },{ grain:'organic' }));
-    return styles.get(color);
+    const key=options.emissive ? `${color}/${options.emissive}` : color;
+    if (!styles.has(key)) styles.set(key,waterLit(resources,uniforms,{ color,roughness:.64,...options },
+      { grain:'organic',nightGlow:Boolean(options.emissive) }));
+    return styles.get(key);
   }
   const eyes=pigment('#141d21',{ roughness:.22 });
   const sandShadow=resources.keep(new THREE.MeshBasicMaterial({ color:'#202e32', opacity:.35, transparent:true, depthWrite:false }));
@@ -95,8 +97,8 @@ function bottomAnimal(parent, parts, resources, uniforms, id) {
           color:j%2 ? '#e7a572' : '#e3b374' });
       }
     }
-    placeInstances(parent,pebble,pigment('#ffffff'),markings);
-    return (t) => { parent.rotation.y += .0006*Math.sin(t*.6); };
+    placeInstances(parent,pebble,pigment('#ffffff',{emissive:NIGHT_COLORS.star,emissiveIntensity:.92}),markings);
+    return (t,_day,feeding) => { parent.rotation.x=.025*Math.sin(t*.8)+(feeding ? .045 : 0); };
   }
   if (id==='urchin') {
     placeMesh(parent,hull,pigment('#4e304b'),0,.19,0,.22,.18,.22);
@@ -124,9 +126,14 @@ function bottomAnimal(parent, parts, resources, uniforms, id) {
     placeMesh(group,hull,eyes,.13,.11,.055*side,.022);
     return group;
   });
-  return (t) => {
-    body.scale.x=.305+.036*Math.sin(t*1.92);
-    for (const [i,antenna] of feelers.entries()) antenna.rotation.z=.26*Math.sin(t*.82+i);
+  return (t,_day,biting,mode,speed=0) => {
+    body.scale.x=.305+(.012+.034*speed)*Math.sin(t*2.6)+(biting?.028:0);
+    const inspecting=mode==='inspect';
+    for (const [i,antenna] of feelers.entries()) {
+      antenna.rotation.z=.19*Math.sin(t*1.54+i)+(inspecting?.20:0);
+      const reach=inspecting ? 1.07+.1*Math.sin(t*1.9+i) : mode==='rest' ? .62 : .93;
+      antenna.scale.setScalar(antenna.scale.x+(reach-antenna.scale.x)*.14);
+    }
   };
 }
 
@@ -135,9 +142,10 @@ function crustacean(parent, parts, resources, uniforms, id) {
   const { body:bodyColor, edge:edgeColor, shrimp, claws, large } = CRUSTACEANS[id];
   const hermit=id==='hermit';
   const back=pigment(bodyColor);
-  const edge=pigment(edgeColor);
+  const edge=NIGHT_COLORS[id] ? pigment(edgeColor,{emissive:NIGHT_COLORS[id],emissiveIntensity:.49}) : pigment(edgeColor);
   const scale=shrimp?.78:1;
   const body=placeMesh(parent,hull,back,0,.228,0,large?.36:shrimp?.255:.31,shrimp?.122:.146,large?.20:shrimp?.135:.244);
+  let tailFan;
   if (shrimp) {
     placeMesh(parent,thinTail,back,0,.172,0);
     for (let i=0;i<5;i++) {
@@ -147,6 +155,7 @@ function crustacean(parent, parts, resources, uniforms, id) {
       joint.rotation.z=.19;
     }
     const fan=placeMesh(parent,hull,edge,-.57,.104,0,.131,.022,.110);
+    tailFan=fan;
     fan.rotation.z=.39;
     if (id==='cleaner') placeMesh(parent,hull,edge,-.027,.324,0,.218,.017,.049);
     if (large) for (const side of [-1,1]) {
@@ -219,32 +228,39 @@ function crustacean(parent, parts, resources, uniforms, id) {
     dummy.updateMatrix();
     limbs.setMatrixAt(index,dummy.matrix);
   }
-  return (t,day,biting) => {
+  return (t,day,biting,mode,speed=0) => {
+    const retreat=mode==='retreat' || mode==='shelter';
+    const display=mode==='display';
+    const tending=mode==='clean' || mode==='approach' || mode==='inspect';
+    const stride=.14+speed*.86;
     body.rotation.y=.055*Math.sin(t*1.8);
+    body.rotation.z=retreat ? .12+.13*Math.sin(t*6.2) : .025*Math.sin(t*2.1);
+    if (tailFan) tailFan.rotation.z=.39+(retreat ? .53*Math.sin(t*11) : .10*speed*Math.sin(t*5.5));
     const gait=t*(3.1+(1-day)*2.0)+(biting ? .67:0);
     for (let i=0;i<legCount*2;i++) {
       const leg=i%legCount, side=i<legCount ? -1 : 1;
       const step=gait+leg*1.24+(side===1 ? Math.PI : 0);
       joint.set(.145-leg*.098,.165,side*(shrimp?.093:.152));
-      knee.set(joint.x-.058+Math.sin(step)*.09,.182+Math.cos(step)*.034,side*(.33+(.046-leg*.012))*scale);
-      toe.set(knee.x-.125+Math.sin(step)*.125,.033+Math.max(0,Math.cos(step))*.093,side*(.325+(.12-leg*.025))*scale);
+      knee.set(joint.x-.058+Math.sin(step)*.09*stride,.182+Math.cos(step)*.034*stride,side*(.33+(.046-leg*.012))*scale);
+      toe.set(knee.x-.125+Math.sin(step)*.125*stride,.033+Math.max(0,Math.cos(step))*.093*stride,side*(.325+(.12-leg*.025))*scale);
       write(i*2,joint,knee,(shrimp?.018:.032)*(1-leg*.075));
       write(i*2+1,knee,toe,(shrimp?.013:.025)*(1-leg*.085));
     }
     limbs.instanceMatrix.needsUpdate=true;
     for (const [i,group] of clawGroups.entries()) {
-      group.rotation.y=.34*Math.sin(t*1.75+i);
-      group.rotation.z=biting ? .25+.27*Math.sin(t*8.7+i) : .08*Math.sin(t*2.9+i);
+      group.rotation.y=.25*Math.sin(t*1.75+i)+(display ? .28*(i ? -1 : 1) : 0);
+      group.rotation.z=display ? .83+.19*Math.sin(t*5+i) : biting ? .25+.27*Math.sin(t*8.7+i)
+        : retreat ? .31+.16*Math.sin(t*5+i) : .08*Math.sin(t*2.9+i);
     }
     for (const [i,group] of whiskers.entries()) {
-      group.rotation.y=.23*Math.sin(t*2.13+i*2.5);
-      group.rotation.z=.16*Math.cos(t*1.7+i);
+      group.rotation.y=(tending ? .38 : .23)*Math.sin(t*2.13+i*2.5);
+      group.rotation.z=.16*Math.cos(t*1.7+i)+(tending ? .24 : retreat ? -.15 : 0);
     }
   };
 }
 
-function makeJellies(scene, resources, random, count, width) {
-  if (!count) return [];
+function makeJellies(scene, resources, uniforms, random, count, width, movement) {
+  if (!count) return;
   const bell=resources.keep(new THREE.SphereGeometry(1,26,16,0,Math.PI*2,0,Math.PI*.57));
   const ring=resources.keep(new THREE.TorusGeometry(1,.014,6,40).rotateX(Math.PI/2));
   const blob=resources.keep(new THREE.TorusGeometry(.19,.035,8,24,Math.PI*1.65).rotateX(Math.PI/2));
@@ -252,7 +268,6 @@ function makeJellies(scene, resources, random, count, width) {
     roughness:.42, metalness:0, clearcoat:.6, transparent:true, opacity:.56, side:THREE.DoubleSide, depthWrite:false }));
   const rim=resources.keep(new THREE.MeshBasicMaterial({ color:'#d1f6ff', transparent:true, opacity:.49, depthWrite:false }));
   const organs=resources.keep(new THREE.MeshBasicMaterial({ color:'#ccaad9', transparent:true, opacity:.52, depthWrite:false }));
-  const jellies=[];
   for (let i=0;i<count;i++) {
     const object=new THREE.Group();
     const scale=.48+random()*.38;
@@ -283,25 +298,23 @@ function makeJellies(scene, resources, random, count, width) {
       tentacles.push(pendulum);
     }
     const offset=random()*Math.PI*2, x=(i/Math.max(1,count-1)*1.12-.56)*width;
-    jellies.push((t,day)=>{
-      const pulse=.5+.5*Math.sin(t*2.24+offset);
-      object.position.set(x+2.04*Math.sin(t*.133+offset),2.2+i%3*.62+.61*Math.sin(t*.35+offset+.22*pulse),
-        -3.22-i%4*1.2+Math.sin(t*.24+offset)*1.12);
-      object.rotation.set(.25*Math.sin(t*.39+offset), t*.09+offset,.18*Math.cos(t*.34+offset));
+    const pose=(t,_day,feeding,_mode,speed)=>{
+      const pulse=.5+.5*Math.sin(t*(1.95+speed*.53)+offset);
+      object.rotation.x=.17*Math.sin(t*.63+offset);
       dome.scale.set(1.02-.18*pulse,.38+.24*pulse,1.02-.18*pulse);
       edge.scale.setScalar(1.010-.174*pulse);
       edge.position.y=-.04-.046*pulse;
       for (const [j,arm] of tentacles.entries()) {
-        arm.rotation.z= .12*Math.sin(t*1.36+j*.33+offset) + .23*pulse*Math.cos(j*2.13);
+        arm.rotation.z=.12*Math.sin(t*1.36+j*.33+offset)+.23*pulse*Math.cos(j*2.13)+(feeding?.12:0);
         arm.rotation.x= .12*Math.cos(t*1.52+j*.39+offset);
       }
-      membrane.emissiveIntensity=.36-.18*day;
-    });
+    };
+    movement.add('jelly',object,pose,null,x,-3.22-i%4*1.2);
   }
-  return jellies;
+  return () => { membrane.emissiveIntensity=.18+.64*(uniforms.tankNight?.value ?? 0); };
 }
 
-function makeRays(scene, resources, uniforms, random, count, width, food) {
+export function makeRays(scene, resources, uniforms, random, count) {
   if (!count) return [];
   const vertices=[], indices=[];
   const columns=30, rows=16;
@@ -355,37 +368,68 @@ function makeRays(scene, resources, uniforms, random, count, width, food) {
     placeMesh(node,dotBody,bodyMat,.18,0,0,.61,.141,.36);
     for (const side of [-1,1]) placeMesh(node,dotBody,eyeMat,.36,.101,side*.16,.073,.064,.078);
     const whip=placeMesh(node,tail,bodyMat,-.54,-.025,0);
-    const offset=i*1.9+random();
-    const goal=new THREE.Vector3();
-    let seek=0, piece, started=false;
-    return (t,light,delta)=>{
-      const a=t*.155*(.7+.3*light)+offset;
-      const x=Math.sin(a)*width*.71, z=-2.2-Math.cos(a)*5.0;
-      goal.set(x,floorAt(x,z)+.82+.31*Math.sin(a*1.8),z);
-      seek-=delta;
-      if (food.active() && seek <= 0 && started) {
-        seek=.28;
-        piece=food.find(node.position,'bed',6.6,i);
-      }
-      if (piece && !piece.eaten && piece.age<=21) {
-        goal.set(piece.x,piece.y+.34,piece.z);
-        const yaw=-Math.atan2(goal.z-node.position.z,goal.x-node.position.x);
-        const turn=Math.atan2(Math.sin(yaw-node.rotation.y),Math.cos(yaw-node.rotation.y));
-        node.rotation.y+=turn*(1-Math.exp(-delta*3.3));
-        food.consume(piece,node.position,.49);
-      } else node.rotation.y=-Math.atan2(Math.sin(a)*5,Math.cos(a)*width*.71);
-      if (started) node.position.lerp(goal,1-Math.exp(-delta*1.26));
-      else { node.position.copy(goal); started=true; }
-      node.rotation.x=.09*Math.sin(t*.76+offset);
-      whip.rotation.y=.26*Math.sin(t*2.74+offset);
-    };
+    return {node,whip,phase:i*1.9+random()};
   });
 }
 
-export function makeInhabitants(scene, resources, uniforms, settings, random, width, rocks, food) {
+function nightHalos(resources, uniforms) {
+  const halos=[], materials=new Map();
+  const geometry=resources.keep(new THREE.PlaneGeometry(1,1));
+  return {
+    add(node,id) {
+      const color=NIGHT_COLORS[id];
+      if (!color) return;
+      if (!materials.has(color)) materials.set(color,resources.keep(new THREE.ShaderMaterial({
+        uniforms:{ tint:{value:new THREE.Color(color)}, tankNight:uniforms.tankNight, tankTime:uniforms.tankTime },
+        transparent:true, depthWrite:false, blending:THREE.AdditiveBlending,
+        vertexShader:/* glsl */`
+          varying vec2 haloUv;
+          varying float glowDistance;
+          varying float phase;
+          void main() {
+            vec4 point=modelViewMatrix*vec4(0.,0.,0.,1.);
+            haloUv=uv*2.-1.;
+            glowDistance=-point.z;
+            phase=modelMatrix[3].x*.81+modelMatrix[3].z*.52;
+            point.xy+=position.xy*vec2(length(modelMatrix[0].xyz),length(modelMatrix[1].xyz));
+            gl_Position=projectionMatrix*point;
+          }
+        `,
+        fragmentShader:/* glsl */`
+          uniform vec3 tint;
+          uniform float tankNight;
+          uniform float tankTime;
+          varying vec2 haloUv;
+          varying float glowDistance;
+          varying float phase;
+          void main() {
+            float radius=dot(haloUv,haloUv);
+            float halo=exp(-radius*4.5)*(1.-smoothstep(.36,1.,radius));
+            float pulse=.86+.14*sin(tankTime*1.21+phase);
+            gl_FragColor=vec4(tint,halo*tankNight*pulse*.21*exp(-glowDistance*.018));
+            #include <colorspace_fragment>
+          }
+        `,
+      })));
+      const star=id==='star';
+      const halo=placeMesh(node,geometry,materials.get(color),star ? 0 : -.23,star ? .13 : .24,0,star ? 1.72 : 1.42,star ? .91 : .77,1);
+      halo.visible=false;
+      halos.push(halo);
+    },
+    refresh() {
+      const visible=(uniforms.tankNight?.value ?? 0)>.01;
+      for (const halo of halos) halo.visible=visible;
+    },
+  };
+}
+
+export function makeInhabitants(scene, resources, uniforms, settings, random, width, rocks, food, options) {
   const parts=smallParts(resources,uniforms,random);
-  const walkers=[];
-  for (const [kind, list] of [['crustacean',Object.keys(CRUSTACEANS)],['bottom',BOTTOM_DWELLERS]]) for (const id of list) {
+  const movement=aquariumInvertebrateMotion(random,width,rocks,food,options);
+  const glow=nightHalos(resources,uniforms);
+  const anchored=[];
+  let population=0;
+  for (const [kind,list] of [['crustacean',Object.keys(CRUSTACEANS)],['bottom',BOTTOM_DWELLERS]]) for (const id of list) {
     for (let i=0;i<settings.stock[id];i++) {
       const node=new THREE.Group();
       const scale=(CRUSTACEANS[id]?.large || id==='octopus' ? 1.12 : kind==='crustacean'?.75: .79)+random()*.375;
@@ -394,59 +438,40 @@ export function makeInhabitants(scene, resources, uniforms, settings, random, wi
       const pose=kind==='crustacean' ? crustacean(node,parts,resources,uniforms,id)
         : ['star','urchin','nerite'].includes(id) ? bottomAnimal(node,parts,resources,uniforms,id)
           : makeMollusc(node,parts,resources,uniforms,id);
-      placeMesh(node,parts.shadowDisc,parts.sandShadow,0,-.016,0,id==='star'?.35:.28,1,.22);
-      const bank=rocks[(i*2+walkers.length)%rocks.length], phase=random()*Math.PI*2;
-      const sign=walkers.length%2?1:-1;
-      const x=(i===0) ? width*sign*(.12+random()*.40) : bank.x+.42*sign;
+      glow.add(node,id);
+      const shadow=placeMesh(node,parts.shadowDisc,parts.sandShadow,0,-.016,0,id==='star'?.35:.28,1,.22);
+      const bank=rocks[(i*2+population)%rocks.length] ?? {x:0,z:-4,size:0};
+      const sign=population++%2 ? 1 : -1;
+      const x=i===0 ? width*sign*(.12+random()*.40) : bank.x+.42*sign;
       const z=i===0 ? 2.65-random()*1.8 : bank.z+bank.size*1.31+.54;
-      walkers.push({ id,node,pose,phase,x,z,crab:kind==='crustacean', fixed:STATIC.has(id), filtering:FILTER.has(id),
-        clock:0, pace:.23+random()*.35, seek:random()*.34, bite:0, paused:0, piece:null, started:false });
+      const phase=random()*Math.PI*2;
+      if (movement.add(id,node,pose,shadow,x,z)) continue;
+      node.position.set(x,floorAt(x,z)+.034,z);
+      node.rotation.y=phase;
+      anchored.push({node,pose,phase,seek:random()*.34,bite:0,piece:null});
     }
   }
 
-  const jellies=makeJellies(scene,resources,random,settings.stock.jelly,width);
-  const rays=makeRays(scene,resources,uniforms,random,settings.stock.ray,width,food);
-  const destination=new THREE.Vector3();
+  const lightJellies=makeJellies(scene,resources,uniforms,random,settings.stock.jelly,width,movement);
   return (time,delta,day) => {
-    for (const creature of walkers) {
-      const { id,node,pose,phase,x,z,crab,pace,fixed,filtering }=creature;
-      creature.clock+=delta*pace*(crab ? 1.32-day*.45 : .25);
-      creature.seek-=delta;
-      creature.paused=Math.max(0,creature.paused-delta);
-      creature.bite=Math.max(0,creature.bite-delta);
-      const step=creature.clock+phase;
-      const swimming=id==='cuttlefish';
-      const xf=x+(fixed ? 0 : Math.sin(step)*(swimming ? 3.5 : crab?1.41:.46));
-      const zf=z+(fixed ? 0 : Math.cos(step)*(swimming ? 2.1 : crab?.81:.31));
-      destination.set(xf,floorAt(xf,zf)+(swimming ? 1.05+.25*Math.sin(time+phase) : .034),zf);
-      if (!food.active() || creature.piece?.eaten || creature.piece?.age>21) creature.piece=null;
-      if (creature.started && food.active() && creature.seek <= 0 && !creature.paused) {
-        creature.seek=.26+pace*.31;
-        creature.piece=food.find(node.position,filtering ? 'sifter' : swimming ? 'swimmer' : 'bed',fixed ? .88 : crab ? 4.5 : 3.15,
-          Math.floor(phase*4));
+    glow.refresh();
+    lightJellies?.();
+    const feeding=food.active();
+    for (const animal of anchored) {
+      const {node,pose,phase}=animal;
+      animal.seek-=delta;
+      animal.bite=Math.max(0,animal.bite-delta);
+      if (!feeding || animal.piece?.eaten || animal.piece?.age>21) animal.piece=null;
+      if (feeding && animal.seek<=0 && !animal.bite) {
+        animal.seek=.32;
+        animal.piece=food.find(node.position,'sifter',.88,Math.floor(phase*4));
       }
-      let yaw=crab || swimming ? -Math.atan2(-Math.sin(step),Math.cos(step)*1.8)+Math.PI*.38 : phase;
-      if (creature.piece) {
-        const piece=creature.piece;
-        if (!fixed) {
-          destination.set(piece.x,swimming ? piece.y : floorAt(piece.x,piece.z)+.034,piece.z);
-          yaw=-Math.atan2(destination.z-node.position.z,destination.x-node.position.x);
-        }
-        if (food.consume(piece,node.position,fixed ? .68 : .43)) {
-          creature.bite=.53;
-          creature.paused=.59+pace*.51;
-          creature.piece=null;
-        }
+      if (animal.piece && food.consume(animal.piece,node.position,.68)) {
+        animal.bite=.69;
+        animal.piece=null;
       }
-      if (creature.started) {
-        node.position.lerp(destination,1-Math.exp(-delta*(creature.piece ? (crab||swimming?1.52:.43):.81)));
-        const turn=Math.atan2(Math.sin(yaw-node.rotation.y),Math.cos(yaw-node.rotation.y));
-        node.rotation.y+=turn*(1-Math.exp(-delta*2.7));
-      } else { node.position.copy(destination); node.rotation.y=yaw; creature.started=true; }
-      const movement=swimming || fixed ? time*.82+phase : id==='octopus' ? time*.64+phase : creature.clock*(crab?3.2:1);
-      pose(movement,day,Boolean(creature.bite || (filtering&&creature.piece)));
+      pose(time*.82+phase,day,Boolean(animal.bite || animal.piece));
     }
-    for (const pose of jellies) pose(time,day);
-    for (const pose of rays) pose(time,day,delta);
+    movement.animate(delta,day,anchored);
   };
 }

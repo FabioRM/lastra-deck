@@ -39,6 +39,7 @@ if (process.isMainFrame) contextBridge.exposeInMainWorld('lastraEditor', {
   setDeckPet: (settings) => ipcRenderer.invoke('editor:pet:set', settings),
   getAquarium: () => ipcRenderer.invoke('editor:aquarium:get'),
   setAquarium: (settings) => ipcRenderer.invoke('editor:aquarium:set', settings),
+  previewAquariumLighting: (lighting) => ipcRenderer.invoke('editor:aquarium:lighting-preview', lighting),
   getAbout: () => ipcRenderer.invoke('editor:about:get'),
   openAboutLink: (id) => ipcRenderer.invoke('editor:about:open', id),
   setAppearance: (setting, value) => ipcRenderer.invoke('editor:appearance:set', setting, value),

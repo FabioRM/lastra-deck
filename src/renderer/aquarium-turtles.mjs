@@ -1,5 +1,6 @@
 import * as THREE from '../../node_modules/three/build/three.module.js';
 import { placeMesh, waterLit } from './aquarium-materials.mjs';
+import { fishContact, fishContactsOverlap, poseFishContact } from './aquarium-fish-contact.mjs';
 
 export function turtlePass(time, mode, index) {
   const elapsed = time - 1.8 - index*8.3;
@@ -65,7 +66,8 @@ function flipperShape(side, rear) {
   return geometry;
 }
 
-export function makeTurtles(scene, resources, uniforms, settings, random, visibleWidth) {
+export function makeTurtles(scene, resources, uniforms, settings, random, visibleWidth, options = {}) {
+  const { visitors, swimmingContacts } = options;
   if (!settings.stock.greenTurtle && !settings.stock.hawksbill) return () => {};
   const dome=resources.keep(new THREE.SphereGeometry(1,35,20,0,Math.PI*2,0,Math.PI*.55));
   const body=resources.keep(new THREE.SphereGeometry(1,21,14));
@@ -107,11 +109,19 @@ export function makeTurtles(scene, resources, uniforms, settings, random, visibl
         placeMesh(pivot,shape,skin,0,0,0);
         return {pivot,side,rear};
       });
-      turtles.push({node,head,fins,phase:random()*6.28});
+      // Include the front flippers throughout their stroke.
+      const shape={center:.045,half:[1.43,.82,1.76]};
+      const turtle={node,head,fins,phase:random()*6.28,clock:0,velocity:new THREE.Vector3(),
+        contact:fishContact(shape,node.scale.x),trial:fishContact(shape,node.scale.x)};
+      turtles.push(turtle);
+      visitors?.push(turtle);
+      swimmingContacts?.set(node,turtle);
+      node.visible=false;
     }
   }
 
-  const point=new THREE.Vector3(), ahead=new THREE.Vector3();
+  const point=new THREE.Vector3(), ahead=new THREE.Vector3(), rotation=new THREE.Euler();
+  let lastTime=0;
   function route(out, progress, direction, index, resident) {
     const arc=progress*Math.PI*2;
     const z=resident ? -4.7+Math.cos(arc)*6.8-(index%2)*3.1
@@ -120,19 +130,37 @@ export function makeTurtles(scene, resources, uniforms, settings, random, visibl
     out.set(visibleWidth(z)*x,2.7 + .63*Math.sin(arc+.79+index) + (index%2)*.53,z);
   }
   return (time,day) => {
-    for (const [i,{node,head,fins,phase}] of turtles.entries()) {
+    const delta=Math.max(0,time-lastTime);
+    lastTime=time;
+    for (const [i,turtle] of turtles.entries()) {
+      const {node,head,fins,phase}=turtle;
       const resident=settings.turtleVisits==='resident';
-      const pass=resident ? { progress:time/(37+i*3)+i*.36,direction:1 } :
-        turtlePass(time*(.84+day*.16),settings.turtleVisits,i);
-      node.visible=Boolean(pass);
-      if (!pass) continue;
+      const clock=turtle.clock+delta*(resident ? 1 : .84+day*.16);
+      const pass=resident ? { progress:clock/(37+i*3)+i*.36,direction:1 } :
+        turtlePass(clock,settings.turtleVisits,i);
+      turtle.velocity.set(0,0,0);
+      if (!pass) {
+        turtle.clock=clock;
+        node.visible=false;
+        continue;
+      }
       route(point,pass.progress,pass.direction,i,resident);
       route(ahead,pass.progress+.002,pass.direction,i,resident);
       ahead.sub(point);
       const stroke=time*(1.9+day*.43)+phase;
-      node.position.copy(point);
-      node.position.y+=.094*Math.sin(stroke*2.);
-      node.rotation.set(.07*Math.sin(stroke),-Math.atan2(ahead.z,ahead.x),.11*Math.sin(stroke*.49));
+      point.y+=.094*Math.sin(stroke*2.);
+      rotation.set(.07*Math.sin(stroke),-Math.atan2(ahead.z,ahead.x),.11*Math.sin(stroke*.49));
+      poseFishContact(turtle.trial,point,rotation);
+      if (turtleRoom(turtle)) {
+        if (node.visible && delta>0) turtle.velocity.subVectors(point,node.position).multiplyScalar(1/delta);
+        turtle.clock=clock;
+        node.visible=true;
+        node.position.copy(point);
+        node.rotation.copy(rotation);
+        const previous=turtle.contact;
+        turtle.contact=turtle.trial;
+        turtle.trial=previous;
+      }
       head.rotation.z=.12*Math.sin(stroke*.54);
       head.rotation.y=.14*Math.sin(stroke*.38);
       for (const {pivot,side,rear} of fins) {
@@ -143,4 +171,15 @@ export function makeTurtles(scene, resources, uniforms, settings, random, visibl
       }
     }
   };
+
+  function turtleRoom(turtle) {
+    if (swimmingContacts) for (const [node,other] of swimmingContacts) {
+      if (node!==turtle.node && node.visible && fishContactsOverlap(turtle.trial,other.contact)) return false;
+    }
+    if (visitors) for (const other of visitors) {
+      if (!swimmingContacts?.has(other.node) && other!==turtle && other.node.visible
+        && fishContactsOverlap(turtle.trial,other.contact)) return false;
+    }
+    return true;
+  }
 }

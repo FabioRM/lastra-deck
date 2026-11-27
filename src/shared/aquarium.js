@@ -133,6 +133,13 @@
     });
   }
 
+  function normalizeNightLighting(value, brightness = 100) {
+    return {
+      nightBrightness: bounded(value.nightBrightness, 20, 200, brightness),
+      glowIntensity: bounded(value.glowIntensity, 0, 200, Math.round(Math.sqrt(brightness / 100) * 100)),
+    };
+  }
+
   function normalizeAquarium(input) {
     const value = input && typeof input === 'object' && !Array.isArray(input) ? input : {};
     const preset = choose(PRESETS, value.preset, 'reef');
@@ -154,6 +161,7 @@
     const dusk = validTime(value.dusk) ? value.dusk : '19:00';
     const growth = choose(CHOICES.growth, value.growth, source.growth);
     const coralDefault = growth===source.growth ? source.coralDensity : growth==='corals' ? 83 : growth==='coralGarden' ? 94 : 0;
+    const brightness = bounded(value.brightness, 35, 145, 100);
     return {
       enabled: value.enabled !== false, preset, stock,
       layout: choose(CHOICES.layout, value.layout, source.layout),
@@ -177,7 +185,8 @@
       coralDensity: bounded(value.coralDensity, 0, 100, coralDefault),
       spongeDensity: bounded(value.spongeDensity, 0, 100, source.spongeDensity),
       bubbleDensity: bounded(value.bubbleDensity, 0, 100, 41),
-      brightness: bounded(value.brightness, 35, 145, 100),
+      brightness,
+      ...normalizeNightLighting(value, brightness),
       portion: bounded(value.portion, 1, 3, 2),
       decorations: normalizeDecorations(value.decorations ?? source.decorations),
       lighting: choose(CHOICES.lighting, value.lighting, 'solar'),
@@ -237,7 +246,7 @@
   }
 
   const aquarium = { SPECIES, PRESETS, CHOICES, DECORATIONS, DECORATION_LIMIT, STOCK_LIMIT,
-    normalizeAquarium, applyAquariumPreset, aquariumLight, solarElevation };
+    normalizeAquarium, normalizeNightLighting, applyAquariumPreset, aquariumLight, solarElevation };
   if (typeof module === 'object') module.exports = aquarium;
   else window.LastraAquariumSettings = aquarium;
 }

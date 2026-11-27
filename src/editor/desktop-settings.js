@@ -5,16 +5,24 @@
   const { t, set: setLanguage } = window.LastraI18n;
   const byId = (id) => document.getElementById(id);
   const settings = byId('desktop-settings');
+  const about = byId('about-settings');
   const content = byId('desktop-settings-content');
   const tabs = [...document.querySelectorAll('[data-desktop-tab]')];
   const sections = [...settings.querySelectorAll('[data-settings-section]')];
   const panels = [...settings.querySelectorAll('[data-settings-panel]')];
   const searchForm = byId('settings-search-form');
   const search = byId('settings-search');
+  const jump = byId('settings-jump');
   const results = byId('settings-search-results');
   const matches = byId('settings-matches');
   const searchStatus = byId('settings-search-status');
+  const categoryKey = 'lastra.settings.category';
+  const scrollPositions = new Map();
   let selected = 'general-settings';
+  try {
+    const remembered = localStorage.getItem(categoryKey);
+    if (panels.some((panel) => panel.id === remembered)) selected = remembered;
+  } catch { /* The settings window can still navigate when storage is unavailable. */ }
   let waitingForHeading;
   const grafana = byId('grafana-settings-form');
   const calendarPick = byId('settings-calendar-pick');
@@ -58,6 +66,8 @@
     'deck-shortcut-settings': [['Global keyboard shortcuts', 'global-shortcuts-heading', 'hotkeys keybind ctrl tasti rapidi scorciatoie combinazioni']],
     'pet-settings': [['Deck pet', 'pet-settings-heading', 'tamagotchi animal habitat name motion animale ambiente nome animazioni']],
     'aquarium-settings': [
+      ['Aquarium preview', 'aquarium-preview-heading', 'preview desktop simulate feeding xeneon anteprima simulazione mangime'],
+      ['Habitat preset', 'aquarium-preset-heading', 'gallery images preset defaults galleria immagini predefiniti'],
       ['Aquascape', 'aquarium-layout-heading', 'aquarium reef kelp plants sand acqua acquario coralli piante sabbia'],
       ['Reef growth', 'aquarium-growth-heading', 'seaweed macroalgae coral sponges alghe coralli spugne densità'],
       ['Decorations', 'aquarium-decor-heading', 'tank props placement arch wreck arredi mappa relitto arco'],
@@ -66,7 +76,10 @@
       ['Movement and detail', 'aquarium-motion-heading', 'quality bubbles performance touch qualità bolle prestazioni'],
       ['Feeding', 'aquarium-feeding-heading', 'food feed tap flakes pellets wafers cibo mangime fiocchi granuli'],
     ],
-    'about-settings': [['About Lastra', 'about-settings-heading', 'creator author mit license github autore creatore licenza versione']],
+    'about-settings': [
+      ['Project resources', 'about-resources-heading', 'website site documentation guide releases download changelog github sito guida aggiornamenti scaricare'],
+      ['Support and licenses', 'about-support-heading', 'report issue creator author mit license support licenza assistenza segnalazione autore versione'],
+    ],
     'dashboard-settings': [
       ['Dashboard calendar', 'deck-calendar-heading', 'google outlook microsoft calendar calendario tap'],
       ['Dashboard calendar file', 'calendar-file-heading', 'ics ical calendario file'],
@@ -237,6 +250,29 @@
       else control.removeAttribute('aria-current');
     }
     for (const panel of panels) panel.hidden = searching || panel.id !== selected;
+    updateJump();
+  }
+
+  function panelEntries(panel) {
+    const curated = (options[panel.id] ?? []).filter(([, target]) => !byId(target) || panel.contains(byId(target)));
+    const targets = new Set(curated.map(([, target]) => target));
+    const headings = [...panel.querySelectorAll('h3[id], h4[id]')].filter((heading) => !targets.has(heading.id)
+      && heading.tabIndex === -1 && heading.hasAttribute('tabindex'));
+    return [...curated, ...headings.map((heading) => [heading.textContent.trim(), heading.id, ''])];
+  }
+
+  function updateJump() {
+    const entries = panelEntries(byId(selected)).filter(([, target]) => target !== byId(selected).getAttribute('aria-labelledby'));
+    jump.replaceChildren(new Option(t('Jump to…'), ''), ...entries.map(([label, id]) => new Option(t(label), id)));
+    jump.hidden = !results.hidden || entries.length < 2;
+  }
+
+  function scroller() {
+    return byId(selected).querySelector('[data-settings-scroll]') ?? content;
+  }
+
+  function rememberPosition() {
+    if (!settings.hidden && results.hidden) scrollPositions.set(selected, scroller().scrollTop);
   }
 
   function activateSection() {
@@ -250,28 +286,47 @@
   }
 
   function showSection(id, target, focus = true, activate = true) {
+    if (id === about.id) {
+      showTab('about');
+      search.value = '';
+      updateVisibility();
+      focusHeading(about, target);
+      return;
+    }
+    rememberPosition();
     selected = id;
+    try { localStorage.setItem(categoryKey, selected); } catch { /* Navigation is still available in this window. */ }
     search.value = '';
     updateVisibility();
-    content.scrollTop = 0;
+    const previous = target ? 0 : scrollPositions.get(id) ?? 0;
+    scroller().scrollTop = previous;
     if (activate) activateSection();
+    updateJump();
     if (!focus) return;
-    const panel = byId(id);
-    const found = byId(target);
+    if (!target && previous > 0) sections.find((control) => control.dataset.settingsSection === id)?.focus();
+    else focusHeading(byId(id), target);
+  }
+
+  function focusHeading(panel, target) {
+    waitingForHeading?.disconnect();
+    const found = panel.contains(byId(target)) ? byId(target) : null;
     const fallback = byId(panel.getAttribute('aria-labelledby'));
-    const focusHeading = (heading) => {
+    const focus = (heading) => {
+      for (let details = heading.closest('details:not([open])'); details; details = details.parentElement.closest('details:not([open])')) {
+        details.open = true;
+      }
       heading.focus({ preventScroll: true });
       heading.scrollIntoView({ block: 'nearest' });
     };
-    focusHeading(found ?? fallback);
+    focus(found ?? fallback);
     if (!target || found) return;
     // A search result can lead to a card populated asynchronously when its section opens.
     waitingForHeading = new MutationObserver(() => {
       if (document.activeElement !== fallback) { waitingForHeading.disconnect(); return; }
       const heading = byId(target);
-      if (!heading) return;
+      if (!heading || !panel.contains(heading)) return;
       waitingForHeading.disconnect();
-      focusHeading(heading);
+      focus(heading);
     });
     waitingForHeading.observe(panel, { childList: true, subtree: true });
   }
@@ -280,19 +335,26 @@
   function showSearch() {
     const query = normalize(search.value.trim());
     const words = query.split(/\s+/);
+    if (query) rememberPosition();
     updateVisibility();
-    if (!query) return;
+    if (!query) {
+      scroller().scrollTop = scrollPositions.get(selected) ?? 0;
+      return;
+    }
     void showProduction(false);
-    const hits = sections.flatMap((control) => {
-      const id = control.dataset.settingsSection;
-      const section = control.textContent.trim();
-      const heading = byId(id).getAttribute('aria-labelledby');
-      const entries = [[section, heading, ''], ...(options[id] ?? [])];
+    const topics = sections.map((control) => [control.dataset.settingsSection, control.textContent.trim()]);
+    topics.push([about.id, t('About Lastra')]);
+    const hits = topics.flatMap(([id, section]) => {
+      const panel = byId(id);
+      const heading = panel.getAttribute('aria-labelledby');
+      const entries = [[section, heading, ''], ...panelEntries(panel).filter(([, target]) => target !== heading)];
       return entries.flatMap(([source, target, keywords]) => {
         const title = t(source);
-        const searchText = normalize(`${title} ${source} ${keywords}`);
+        const searchText = normalize(`${title} ${source} ${keywords} ${section}`);
         if (!words.every((word) => searchText.includes(word))) return [];
-        const rank = normalize(title) === query ? 0 : normalize(title).startsWith(query) ? 1 : 2;
+        const normalizedTitle = normalize(title);
+        const rank = normalizedTitle === query ? 0 : normalizedTitle.startsWith(query) ? 1
+          : words.every((word) => normalizedTitle.includes(word)) ? 2 : 3;
         return [{ id, section, target, title, rank }];
       });
     }).sort((a, b) => a.rank - b.rank);
@@ -317,20 +379,42 @@
     content.scrollTop = 0;
   }
 
-  function showTab(name) {
+  function showTab(name, activate = true) {
+    const wasSettings = !settings.hidden;
+    if (name !== 'settings') rememberPosition();
     const profile = name === 'profile';
     byId('workspace').hidden = byId('profile-toolbar').hidden = byId('status').hidden = !profile;
-    settings.hidden = profile;
-    if (profile) {
+    settings.hidden = name !== 'settings';
+    about.hidden = name !== 'about';
+    if (settings.hidden) {
       waitingForHeading?.disconnect();
       void showProduction(false);
+    } else if (results.hidden) {
+      if (!wasSettings) scroller().scrollTop = scrollPositions.get(selected) ?? 0;
+      if (activate) {
+        activateSection();
+        updateJump();
+      }
     }
-    else if (results.hidden) activateSection();
+    if (name === 'about') about.dispatchEvent(new Event('about:open'));
     for (const tab of tabs) tab.setAttribute('aria-pressed', String(tab.dataset.desktopTab === name));
   }
 
-  for (const tab of tabs) tab.addEventListener('click', () => showTab(tab.dataset.desktopTab));
+  for (const tab of tabs) tab.addEventListener('click', () => {
+    const name = tab.dataset.desktopTab;
+    showTab(name);
+    if (name === 'about') focusHeading(about);
+  });
   for (const control of sections) control.addEventListener('click', () => showSection(control.dataset.settingsSection));
+  for (const button of about.querySelectorAll('[data-settings-destination]')) button.addEventListener('click', () => {
+    showTab('settings', false);
+    showSection(button.dataset.settingsDestination, button.dataset.settingsTarget);
+  });
+  jump.addEventListener('change', () => {
+    const target = jump.value;
+    jump.value = '';
+    if (target) focusHeading(byId(selected), target);
+  });
   search.addEventListener('input', () => {
     showSearch();
     if (results.hidden) activateSection();
@@ -338,20 +422,35 @@
   search.addEventListener('keydown', (event) => {
     if (event.key !== 'Escape' || !search.value) return;
     event.preventDefault();
-    showSection(selected, undefined, false);
+    search.value = '';
+    showSearch();
+    activateSection();
   });
   searchForm.addEventListener('submit', (event) => {
     event.preventDefault();
     if (!results.hidden) matches.querySelector('button')?.click();
   });
   document.addEventListener('keydown', (event) => {
-    if (settings.hidden || event.defaultPrevented || !event.ctrlKey || event.altKey || event.shiftKey || event.metaKey
-      || event.key.toLowerCase() !== 'f' || document.querySelector('dialog[open]')) return;
+    if (event.defaultPrevented || !event.ctrlKey || event.altKey || event.shiftKey || event.metaKey || event.isComposing
+      || document.querySelector('dialog[open]')) return;
+    if (event.key.toLowerCase() === 's' && !settings.hidden && results.hidden) {
+      const save = byId(selected).querySelector('[data-settings-save]');
+      if (save) {
+        event.preventDefault();
+        if (!save.disabled) save.click();
+      }
+      return;
+    }
+    if (event.key === ',') showTab('settings');
+    else if (settings.hidden || event.key.toLowerCase() !== 'f') return;
     event.preventDefault();
     search.focus();
     search.select();
   });
-  document.addEventListener('lastra-language', () => { if (!results.hidden) showSearch(); });
+  document.addEventListener('lastra-language', () => {
+    if (!results.hidden) showSearch();
+    else updateJump();
+  });
   calendarPick.addEventListener('click', () => void calendar('pick'));
   calendarClear.addEventListener('click', () => void calendar('clear'));
   grafana.addEventListener('submit', async (event) => {
@@ -374,7 +473,8 @@
   });
   api.onDesktopSection((name) => {
     if (name === 'updates') showSection('system-settings', undefined, false, false);
-    showTab(name === 'profile' ? 'profile' : 'settings');
+    showTab(name === 'profile' || name === 'about' ? name : 'settings');
+    if (name === 'about') focusHeading(about);
     if (name === 'updates') {
       byId('desktop-updates-heading').focus({ preventScroll: true });
       byId('desktop-updates').scrollIntoView({ block: 'nearest' });

@@ -36,11 +36,11 @@ const causticShader = /* glsl */`
   }
 `;
 
-export function waterLit(resources, uniforms, options, { grain = 'none', sway = 0 } = {}) {
+export function waterLit(resources, uniforms, options, { grain = 'none', sway = 0, nightGlow = false } = {}) {
   const material = resources.keep(new THREE.MeshStandardMaterial({ ...options, fog: grain !== 'sand' }));
   const rockMap=grain==='rock' && Boolean(uniforms.tankRockMap?.value);
   const sandMap=grain==='sand' && Boolean(uniforms.tankSandMap?.value);
-  material.customProgramCacheKey = () => `aquarium-surface-${grain}-${sway}-${rockMap || sandMap}`;
+  material.customProgramCacheKey = () => `aquarium-surface-${grain}-${sway}-${rockMap || sandMap}-${nightGlow}`;
   material.onBeforeCompile = (shader) => {
     Object.assign(shader.uniforms, uniforms);
     shader.vertexShader = /* glsl */`
@@ -132,12 +132,16 @@ export function waterLit(resources, uniforms, options, { grain = 'none', sway = 
       vec3 gradient=sign(det)*(dFdx(rockRelief)*r1+dFdy(rockRelief)*r2);
       normal=normalize(max(.000001,abs(det))*normal-gradient*.083);
     `) : litSurface;
+    const litFragment = nightGlow ? 'uniform float tankNight;\n' + rockBump.replace('#include <emissivemap_fragment>', /* glsl */`
+      #include <emissivemap_fragment>
+      totalEmissiveRadiance*=tankNight*(.87+.13*sin(tankTime*1.21+tankWorld.x*.73+tankWorld.z*.40));
+    `) : rockBump;
     shader.fragmentShader = causticShader + texSampling + (grain === 'sand' ? waterColourShader
-      + litSurface.replace('#include <tonemapping_fragment>', /* glsl */`
+      + litFragment.replace('#include <tonemapping_fragment>', /* glsl */`
         float haze=smoothstep(3.,43.,-tankWorld.z);
         if (haze > .001) gl_FragColor.rgb=mix(gl_FragColor.rgb,waterColour(gl_FragCoord.xy/tankViewport),haze);
         #include <tonemapping_fragment>
-      `) : rockBump);
+      `) : litFragment);
   };
   return material;
 }

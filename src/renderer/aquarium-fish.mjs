@@ -1,31 +1,32 @@
 import * as THREE from '../../node_modules/three/build/three.module.js';
-import { floorAt } from './aquarium-habitat.mjs';
+import { makeFishMotion } from './aquarium-fish-motion.mjs';
+import { makeRays } from './aquarium-inhabitants.mjs';
 import { placeMesh } from './aquarium-materials.mjs';
 
 const FISH = {
-  clown: { shape:[.33,.205,.45,.27,.31], palette:['#ef7925','#ffeac2','#1d1820'], size:.72, speed:1.32, pattern:0, route:'reef' },
-  tang: { shape:[.48,.155,.42,.38,.43], palette:['#2875dc','#f6d743','#142648'], size:1.08, speed:.82, pattern:1, route:'roam' },
-  anthias: { shape:[.26,.11,.44,.19,.34], palette:['#df792a','#ffcb7f','#a6456b'], size:.49, speed:1.05, pattern:2, route:'school' },
-  cardinal: { shape:[.35,.125,.42,.35,.40], palette:['#b2a48a','#e1dac2','#272234'], size:.59, speed:.79, pattern:3, route:'reef' },
-  sardine: { shape:[.20,.11,.4,.14,.30], palette:['#75958d','#deebe6','#213e46'], size:.58, speed:1.24, pattern:4, route:'school' },
-  rockfish: { shape:[.34,.175,.49,.33,.29], palette:['#a65c36','#de9d62','#312525'], size:1.07, speed:.64, pattern:5, route:'reef' },
-  tetra: { shape:[.22,.104,.35,.15,.27], palette:['#183e53','#5ce7ff','#d74753'], size:.50, speed:1.17, pattern:6, route:'school' },
-  discus: { shape:[.59,.145,.28,.42,.42], palette:['#ce5634','#e99f58','#4f292d'], size:1.11, speed:.66, pattern:7, route:'roam' },
-  cory: { shape:[.27,.154,.42,.23,.29], palette:['#aa8f56','#ddd5aa','#364b42'], size:.57, speed:.62, pattern:8, route:'bottom' },
-  blackClown: { shape:[.36,.21,.42,.28,.34], palette:['#251d21','#fff4da','#08070e'], size:.72, speed:1.22, pattern:0, route:'reef' },
-  yellowTang: { shape:[.49,.12,.32,.44,.36], palette:['#f7cd29','#fff197','#b6861a'], size:1.01, speed:.91, pattern:9, route:'roam' },
-  regal: { shape:[.37,.14,.31,.39,.32], palette:['#daa236','#b8dded','#353b79'], size:1.08, speed:.83, pattern:10, route:'roam' },
-  mandarin: { shape:[.26,.18,.35,.37,.35], palette:['#1b9a9c','#dfa636','#343b91'], size:.62, speed:.63, pattern:11, route:'bottom' },
-  gramma: { shape:[.26,.128,.40,.27,.26], palette:['#aa379a','#f6be33','#3d195e'], size:.60, speed:.96, pattern:12, route:'reef' },
-  flame: { shape:[.41,.132,.33,.30,.31], palette:['#eb5b20','#f49b35','#302340'], size:.78, speed:.86, pattern:13, route:'reef' },
-  butterfly: { shape:[.45,.106,.29,.34,.29], palette:['#efeee1','#dc8d41','#292432'], size:.91, speed:.81, pattern:14, route:'reef', fins:'beak' },
-  moorish: { shape:[.43,.109,.31,.46,.35], palette:['#eceadc','#efcf59','#242631'], size:1.00, speed:.80, pattern:15, route:'roam', fins:'streamer' },
-  guppy: { shape:[.23,.11,.52,.20,.54], palette:['#437fba','#f9a247','#37316c'], size:.46, speed:.93, pattern:16, route:'school', fins:'fan' },
-  betta: { shape:[.28,.13,.55,.35,.72], palette:['#4252c7','#d96093','#29306a'], size:.71, speed:.52, pattern:17, route:'reef', fins:'veil' },
-  rummy: { shape:[.19,.099,.39,.17,.25], palette:['#9bbab0','#db4b4a','#39454b'], size:.48, speed:1.21, pattern:18, route:'school' },
-  goldfish: { shape:[.37,.20,.54,.33,.63], palette:['#ea6a29','#ffd3a2','#ae3828'], size:.91, speed:.72, pattern:19, route:'roam', fins:'veil' },
-  angel: { shape:[.58,.101,.33,.53,.40], palette:['#c9c9b1','#f2e0a6','#3b4140'], size:.86, speed:.64, pattern:20, route:'reef', fins:'filaments' },
-  koi: { shape:[.28,.19,.46,.215,.34], palette:['#eee1cd','#e95335','#5e5456'], size:1.27, speed:.71, pattern:21, route:'roam' },
+  clown: { shape:[.33,.205,.45,.27,.31], palette:['#ef7925','#ffeac2','#1d1820'], size:.72, speed:1.32, pattern:0 },
+  tang: { shape:[.48,.155,.42,.38,.43], palette:['#2875dc','#f6d743','#142648'], size:1.08, speed:.82, pattern:1 },
+  anthias: { shape:[.26,.11,.44,.19,.34], palette:['#df792a','#ffcb7f','#a6456b'], size:.49, speed:1.05, pattern:2 },
+  cardinal: { shape:[.35,.125,.42,.35,.40], palette:['#b2a48a','#e1dac2','#272234'], size:.59, speed:.79, pattern:3 },
+  sardine: { shape:[.20,.11,.4,.14,.30], palette:['#75958d','#deebe6','#213e46'], size:.58, speed:1.24, pattern:4 },
+  rockfish: { shape:[.34,.175,.49,.33,.29], palette:['#a65c36','#de9d62','#312525'], size:1.07, speed:.64, pattern:5 },
+  tetra: { shape:[.22,.104,.35,.15,.27], palette:['#183e53','#5ce7ff','#d74753'], size:.50, speed:1.17, pattern:6 },
+  discus: { shape:[.59,.145,.28,.42,.42], palette:['#ce5634','#e99f58','#4f292d'], size:1.11, speed:.66, pattern:7 },
+  cory: { shape:[.27,.154,.42,.23,.29], palette:['#aa8f56','#ddd5aa','#364b42'], size:.57, speed:.62, pattern:8 },
+  blackClown: { shape:[.36,.21,.42,.28,.34], palette:['#251d21','#fff4da','#08070e'], size:.72, speed:1.22, pattern:0 },
+  yellowTang: { shape:[.49,.12,.32,.44,.36], palette:['#f7cd29','#fff197','#b6861a'], size:1.01, speed:.91, pattern:9 },
+  regal: { shape:[.37,.14,.31,.39,.32], palette:['#daa236','#b8dded','#353b79'], size:1.08, speed:.83, pattern:10 },
+  mandarin: { shape:[.26,.18,.35,.37,.35], palette:['#1b9a9c','#dfa636','#343b91'], size:.62, speed:.63, pattern:11 },
+  gramma: { shape:[.26,.128,.40,.27,.26], palette:['#aa379a','#f6be33','#3d195e'], size:.60, speed:.96, pattern:12 },
+  flame: { shape:[.41,.132,.33,.30,.31], palette:['#eb5b20','#f49b35','#302340'], size:.78, speed:.86, pattern:13 },
+  butterfly: { shape:[.45,.106,.29,.34,.29], palette:['#efeee1','#dc8d41','#292432'], size:.91, speed:.81, pattern:14, fins:'beak' },
+  moorish: { shape:[.43,.109,.31,.46,.35], palette:['#eceadc','#efcf59','#242631'], size:1.00, speed:.80, pattern:15, fins:'streamer' },
+  guppy: { shape:[.23,.11,.52,.20,.54], palette:['#437fba','#f9a247','#37316c'], size:.46, speed:.93, pattern:16, fins:'fan' },
+  betta: { shape:[.28,.13,.55,.35,.72], palette:['#4252c7','#d96093','#29306a'], size:.71, speed:.52, pattern:17, fins:'veil' },
+  rummy: { shape:[.19,.099,.39,.17,.25], palette:['#9bbab0','#db4b4a','#39454b'], size:.48, speed:1.21, pattern:18 },
+  goldfish: { shape:[.37,.20,.54,.33,.63], palette:['#ea6a29','#ffd3a2','#ae3828'], size:.91, speed:.72, pattern:19, fins:'veil' },
+  angel: { shape:[.58,.101,.33,.53,.40], palette:['#c9c9b1','#f2e0a6','#3b4140'], size:.86, speed:.64, pattern:20, fins:'filaments' },
+  koi: { shape:[.28,.19,.46,.215,.34], palette:['#eee1cd','#e95335','#5e5456'], size:1.27, speed:.71, pattern:21 },
 };
 
 function fishGeometry(species, detailed) {
@@ -110,6 +111,7 @@ function fishGeometry(species, detailed) {
   geometry.setAttribute('fishPart',new THREE.Float32BufferAttribute(pieces,1));
   geometry.setIndex(indices);
   geometry.computeVertexNormals();
+  geometry.computeBoundingBox();
   geometry.computeBoundingSphere();
   geometry.boundingSphere.radius += .25;
   return geometry;
@@ -229,6 +231,28 @@ const pigmentShader = /* glsl */`
   }
 `;
 
+const nightFishShader = /* glsl */`
+  uniform float tankNight;
+  vec3 nightMarkings(vec3 body, float region) {
+    if (region>.5 || tankNight<=.001) return vec3(0.);
+    float x=body.x, y=body.y, z=body.z;
+    float flank=smoothstep(.03,.11,abs(z)) * (1.-smoothstep(.35,.64,abs(x)));
+    float pulse=.84+.16*sin(tankTime*.87+x*5.+z*2.);
+    #if FISH_PATTERN == 2
+      float flecks=smoothstep(.58,.94,sin(x*48.+y*15.) * sin(y*57.-x*13.));
+      float stripeDistance=(y-.04-x*.11)*19.;
+      float ribbon=exp(-stripeDistance*stripeDistance);
+      return vec3(.82,.31,.16)*flank*(flecks*.19+ribbon*.13)*tankNight*pulse;
+    #elif FISH_PATTERN == 3 || FISH_PATTERN == 6 || FISH_PATTERN == 11
+      float stripeDistance=(y-.025-.025*sin(x*11.))*29.;
+      float ribbon=exp(-stripeDistance*stripeDistance);
+      return vec3(.12,.63,.76)*flank*ribbon*tankNight*pulse*.39;
+    #else
+      return vec3(0.);
+    #endif
+  }
+`;
+
 function fishMaterial(resources, species, uniforms) {
   const material=resources.keep(new THREE.MeshStandardMaterial({ color:'#fff', roughness:.43, metalness:.085, side:THREE.DoubleSide }));
   const [baseColor,paleColor,darkColor]=species.palette.map(color=>({ value:new THREE.Color(color) }));
@@ -251,9 +275,12 @@ function fishMaterial(resources, species, uniforms) {
       transformed.z += swing*(.14+tankLight*.085)*sin(tankTime*frequency - position.x*5.7 + modelMatrix[3].x*.67);
       if (fishPart>1.5 && fishPart<2.5) transformed.y -= .046*sin(tankTime*frequency + position.x*3.)*abs(position.z)*3.;
     `);
-    shader.fragmentShader = pigmentShader + shader.fragmentShader.replace('#include <color_fragment>', /* glsl */`
+    shader.fragmentShader = pigmentShader + nightFishShader + shader.fragmentShader.replace('#include <color_fragment>', /* glsl */`
       #include <color_fragment>
       diffuseColor.rgb *= paintFish(fishBody.x,fishBody.y,fishBody.z,fishRegion);
+    `).replace('#include <emissivemap_fragment>', /* glsl */`
+      #include <emissivemap_fragment>
+      totalEmissiveRadiance+=nightMarkings(fishBody,fishRegion);
     `).replace('#include <roughnessmap_fragment>', /* glsl */`
       #include <roughnessmap_fragment>
       float scaleFlash=abs(sin(fishBody.x*77. + sin(fishBody.y*56.)*.61));
@@ -264,107 +291,40 @@ function fishMaterial(resources, species, uniforms) {
   return material;
 }
 
-export function makeFish(scene, resources, uniforms, settings, random, width, landmarks, food,
-  visibleWidth = (z) => width*(1-z/17.5)) {
-  const fish=[];
-  const foreground=landmarks.filter(({plane})=>plane==='front');
+function swimClearance(geometry) {
+  const vertices=geometry.attributes.position;
+  let radius=0, height=0;
+  for (let i=0; i<vertices.count; i++) {
+    const x=vertices.getX(i), y=vertices.getY(i), z=Math.abs(vertices.getZ(i))+.225;
+    // Allow clearance for the deformed fins, bank and pitch while turning.
+    radius=Math.max(radius,Math.hypot(x,y,z));
+    height=Math.max(height,Math.abs(y)+Math.abs(x)*.423+z*.375);
+  }
+  const {min,max}=geometry.boundingBox;
+  const contact={center:(min.x+max.x)*.5,half:[(max.x-min.x)*.5,
+    Math.max(-min.y,max.y)+.08,Math.max(-min.z,max.z)+.225]};
+  return { radius:radius+.065, height, nose:.74, contact };
+}
+
+export function makeFish(scene, resources, uniforms, settings, random, width, landmarks, food, options) {
+  const movement = makeFishMotion(width,landmarks,food,options);
+  // Keep enough room to pass in a tall, narrow tank as well as in the panorama.
+  const tankScale=THREE.MathUtils.clamp(.57+width*.085,.66,1);
   for (const [id,species] of Object.entries(FISH)) {
     const count=settings.stock[id];
     if (!count) continue;
     const geometry=resources.keep(fishGeometry(species,settings.quality!=='eco'));
     const material=fishMaterial(resources,species,uniforms);
-    const schoolPhase=(settings.seed % 15)*.049 + (id==='sardine' ? .22 : -.53);
-    const schoolSize=Math.ceil(count/(count>=10 ? 3 : count>=7 ? 2 : 1));
-    for (let i=0; i<count; i++) {
-      const size=species.size*(.78+random()*.42);
-      const mesh=placeMesh(scene,geometry,material,0,0,0,size);
-      const school=species.route==='school';
-      const bank=(i===0 && count>=3 && foreground.length && foreground[species.pattern%foreground.length])
-        || landmarks[(i*3+species.pattern*2)%landmarks.length];
-      const track=Math.floor(i/schoolSize);
-      const phase = school ? schoolPhase+track*.88 : i/count*Math.PI*2 + (i===0 && species.route==='roam' ? .08 : .52)+random()*.44;
-      fish.push({ mesh, species, index:i, phase, track, slot:i%schoolSize,
-        drag:school ? .982+random()*.040 : .82+random()*.36, yaw:0, running:false,
-        homeX:bank.x + (random()-.5)*1.55, homeZ:bank.z + bank.size*.66+random()*1.65,
-        height:1.4+random()*3.64, timer:0, seed:random()*6.28,
-        seek:random()*.24, pause:0, bite:0, range:7.0+width*.17+random()*6.4, piece:null });
-    }
+    const meshes=Array.from({length:count},()=>placeMesh(scene,geometry,material,0,0,0,tankScale*species.size*(.78+random()*.42)));
+    movement.add(id,species,meshes,random,swimClearance(geometry));
   }
-  const target=new THREE.Vector3();
-  const towards=new THREE.Vector3();
-  const mouth=new THREE.Vector3();
-  return (delta,day) => {
-    const feeding = food.active();
-    for (const individual of fish) {
-      const { mesh, species, index, phase, track, slot, seed, height, homeX, homeZ } = individual;
-      individual.timer += delta*species.speed*(.35+day*.65)*individual.drag;
-      const t=individual.timer;
-      const school=species.route==='school';
-      const orbit=phase+t*(school ? .23 : .30);
-      if (school) {
-        const turn=orbit-slot*.044;
-        const row=slot%3-1, stagger=Math.floor(slot/3);
-        const z=-6.0+Math.cos(turn+.35)*8.8-track*3.7+stagger*.57+.42*Math.sin(seed+t*.62);
-        target.set(Math.sin(turn)*visibleWidth(z)*.91+row*.62,
-          3.58+height*.12-track*.38+.95*Math.sin(turn*1.7+phase)+row*.30+.22*Math.sin(seed+t*.73),z);
-      } else if (species.route==='reef') {
-        const daylight=.45+day*.55;
-        const z=homeZ+Math.cos(orbit)*2.32*daylight+(1-day)*-.64;
-        const x=THREE.MathUtils.clamp(homeX+Math.sin(orbit)*2.94*daylight,-visibleWidth(z)*1.04,visibleWidth(z)*1.04);
-        target.set(x,1.22+height*.46+Math.sin(t*.63+seed)*.86*daylight,z);
-      } else {
-        const bottom=species.route==='bottom';
-        const lane=[3.15,-6.3,-13.8,-2.6][index%4];
-        const z=lane+Math.cos(orbit)*(index%4===0 ? 4.6 : 6.6);
-        const spread=bottom ? .83 : .94;
-        target.set(Math.sin(orbit)*visibleWidth(z)*spread,height+.90*Math.sin(t*.31+phase),z);
-        if (bottom) target.y=floorAt(target.x,target.z)+.68+.092*Math.sin(t*2+seed);
-      }
-      individual.pause=Math.max(0,individual.pause-delta);
-      individual.bite=Math.max(0,individual.bite-delta);
-      individual.seek-=delta;
-      if (!feeding || individual.piece?.eaten || individual.piece?.age > 21) individual.piece=null;
-      if (feeding && individual.running && individual.seek <= 0 && !individual.pause) {
-        individual.seek=.13+individual.drag*.12;
-        individual.piece=food.find(mesh.position,species.route==='bottom' ? 'bed' : 'swimmer',
-          individual.range*(.74+day*.26),index+species.pattern);
-      }
-      const piece=individual.piece;
-      if (piece) target.set(piece.x,piece.y+(species.route==='bottom' ? .24 : 0),piece.z);
-      if (target.y < 3.7) for (const bank of landmarks) {
-        const dx=(target.x-bank.x)/(bank.size*1.5), dz=(target.z-bank.z)/(bank.size*1.11);
-        const clearance=1-dx*dx-dz*dz;
-        if (clearance>0) target.y=Math.max(target.y,floorAt(bank.x,bank.z)+bank.size*.98*Math.sqrt(clearance)+.42);
-      }
-      target.y=THREE.MathUtils.clamp(target.y,.28,piece ? 7.80 : 6.35);
-      towards.subVectors(target,mesh.position);
-      const distance=Math.hypot(towards.x,towards.z);
-      if (!individual.running) {
-        individual.yaw=-Math.atan2(Math.sin(orbit) * -.61, Math.cos(orbit));
-        mesh.position.copy(target);
-        individual.running=true;
-      } else if (delta>0) {
-        if (distance > .006) {
-          const bearing=-Math.atan2(towards.z,towards.x);
-          const turn=Math.atan2(Math.sin(bearing-individual.yaw),Math.cos(bearing-individual.yaw));
-          individual.yaw += turn*(1-Math.exp(-delta*(piece ? 6.1 : 4.1)));
-        }
-        const speed=piece ? Math.min(3.05, (.95+species.speed*1.46)*individual.drag) : 1.55;
-        mesh.position.lerp(target,1-Math.exp(-delta*speed));
-        mesh.rotation.z=THREE.MathUtils.clamp(towards.y*.36,-.46,.46);
-        if (piece) {
-          const nose=mesh.scale.x*.73;
-          mouth.set(mesh.position.x+Math.cos(individual.yaw)*nose,mesh.position.y-.09,mesh.position.z-Math.sin(individual.yaw)*nose);
-          if (food.consume(piece,mouth,.36+mesh.scale.x*.17) || food.consume(piece,mesh.position,.29)) {
-            individual.bite=.36;
-            individual.pause=.24+individual.drag*.26;
-            individual.piece=null;
-          }
-        }
-      }
-      mesh.rotation.y=individual.yaw;
-      mesh.rotation.x=.11*Math.sin(t*1.5+seed);
-      if (individual.bite) mesh.rotation.z += Math.sin(individual.bite*24.)*.24*individual.bite/.36;
-    }
+  const rays=makeRays(scene,resources,uniforms,random,settings.stock.ray);
+  if (!rays.length) return movement.draw;
+  for (const {node} of rays) node.scale.multiplyScalar(tankScale);
+  movement.add('ray',{pattern:22,speed:.64},rays.map(({node})=>node),random,
+    {radius:1.83,height:1.05,nose:.45,contact:{center:-.45,half:[1.31,.55,1.47]}});
+  return (delta,day)=>{
+    movement.draw(delta,day);
+    for (const {whip,phase} of rays) whip.rotation.y=.26*Math.sin(uniforms.tankTime.value*2.74+phase);
   };
 }

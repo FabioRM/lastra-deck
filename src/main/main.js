@@ -182,9 +182,14 @@ const BACKGROUND = '#171c21';
 const APP_ID = 'lastra.deck';
 const packageInfo = require('../../package.json');
 const PUBLIC_PROJECT = 'https://github.com/FabioRM/lastra-deck';
+const USAGE_NOTICE = path.join(ROOT, 'docs', 'usage-notice.html');
 const ABOUT_LINKS = Object.freeze({
+  usage: pathToFileURL(USAGE_NOTICE).href,
+  website: 'https://fabiorm.github.io/lastra-deck/',
+  guide: `${PUBLIC_PROJECT}#getting-started`,
   source: PUBLIC_PROJECT,
   releases: `${PUBLIC_PROJECT}/releases`,
+  changelog: `${PUBLIC_PROJECT}/blob/main/CHANGELOG.md`,
   issues: `${PUBLIC_PROJECT}/issues`,
   license: `${PUBLIC_PROJECT}/blob/main/LICENSE`,
   notices: `${PUBLIC_PROJECT}/blob/main/THIRD_PARTY_NOTICES.md`,
@@ -616,6 +621,7 @@ function changePanelPreview(command) {
     throw new Error('Connect and unlock the XENEON EDGE to show the draft preview.');
   }
   const view = panelDraftView(command.profile, command.page, command.sheet, { icon: lucideIcon, image: imageDataUrl });
+  setAquariumLightingPreview(null);
   const previous = panelPreviewWindow;
   panelPreviewFrame = { type: 'lastra:editor-preview', language: interfaceLanguage.language, appearance: appearance.current,
     view: { ...view, revision: ++panelPreviewRevision }, readings: previewReadings(sensorIds([...view.widgets, ...view.bar.widgets])) };
@@ -856,12 +862,13 @@ function revealDisplay() {
 }
 
 function syncWebEmbedSuspension() {
-  webEmbedHost?.setSuspended(viewOnly.enabled || deckReveal.active || deckSession.blocked);
+  webEmbedHost?.setSuspended(viewOnly.enabled || deckReveal.active || deckSession.blocked || Boolean(aquarium?.lightingPreview));
 }
 
 function revealDesktop() {
   if (deckSession.blocked || !win || win.isDestroyed() || !deckReveal.begin(revealDisplay())) return false;
   closePanelPreview();
+  setAquariumLightingPreview(null);
   agentChoices?.checkPending();
   agentActivitySwitch?.checkPending();
   agentAppAudio?.checkPending();
@@ -923,7 +930,7 @@ function openEditor(section = 'settings') {
   window.webContents.on('will-prevent-unload', (event) => {
     const choice = dialog.showMessageBoxSync(window, {
       type: 'question',
-      message: translate(interfaceLanguage.language, 'Discard changes to the profile?'),
+      message: translate(interfaceLanguage.language, 'Discard unsaved changes?'),
       buttons: ['Keep editing', 'Discard'].map((label) => translate(interfaceLanguage.language, label)),
       defaultId: 0,
       cancelId: 0,
@@ -933,8 +940,15 @@ function openEditor(section = 'settings') {
   });
   window.once('ready-to-show', () => window.show());
   window.webContents.once('did-finish-load', () => window.webContents.send('editor:section', section));
-  window.once('closed', () => { editor = editorProfile = null; closePanelPreview(); });
-  window.webContents.on('render-process-gone', closePanelPreview);
+  const closeEditorPreviews = () => {
+    closePanelPreview();
+    setAquariumLightingPreview(null);
+  };
+  window.once('closed', () => { editor = editorProfile = null; closeEditorPreviews(); });
+  window.on('hide', () => setAquariumLightingPreview(null));
+  window.on('minimize', () => setAquariumLightingPreview(null));
+  window.webContents.on('render-process-gone', closeEditorPreviews);
+  window.webContents.on('did-navigate', () => setAquariumLightingPreview(null));
   window.webContents.on('did-start-navigation', ({ isMainFrame, isSameDocument }) => {
     if (isMainFrame && !isSameDocument) closePanelPreview();
   });
@@ -1124,7 +1138,26 @@ function deckViewCycle() {
 }
 
 function sendDeckNavigation() {
-  send('deck:navigation', { view: navigation.current.view, statsTab: deckStatsTab, sheet: deckSheet, views: deckViewCycle() });
+  send('deck:navigation', { view: navigation.current.view, statsTab: deckStatsTab, sheet: deckSheet, views: deckViewCycle(),
+    aquariumPreview: Boolean(aquarium?.lightingPreview) });
+}
+
+function setAquariumLightingPreview(value) {
+  const before = aquarium?.lightingPreview;
+  if (value === null && !before) return false;
+  if (value !== null && (!edge || deckSession.blocked || deckReveal.active || !win || win.isDestroyed()
+    || !win.isVisible() || win.isMinimized() || !editor?.isVisible() || editor.isMinimized())) return false;
+  const current = aquarium.previewLighting(value);
+  if (current?.mode !== before?.mode || current?.nightBrightness !== before?.nightBrightness
+    || current?.glowIntensity !== before?.glowIntensity) {
+    send('deck:aquarium-lighting-preview', current);
+  }
+  if (Boolean(before) !== Boolean(current)) {
+    if (current) closePanelPreview();
+    syncWebEmbedSuspension();
+    sendDeckNavigation();
+  }
+  return Boolean(current);
 }
 
 function setDeckView(view) {
@@ -1132,6 +1165,7 @@ function setDeckView(view) {
   if (!deckViewAllowed(view)) throw new Error('That deck view is turned off.');
   const before = navigation.current.view;
   navigation.setView(view);
+  setAquariumLightingPreview(null);
   if (before === 'stats' && navigation.current.view !== 'stats') processTelemetry?.stop();
   if (before === 'apps' && navigation.current.view !== 'apps') kubernetesView?.stop();
   if (before !== navigation.current.view) productionModes?.interrupt();
@@ -1522,6 +1556,9 @@ function registerIpc() {
   deck('page:lock', () => setDeckPageLock());
   deck('activity:select', (id) => switchActivity(id));
   deck('view:set', setDeckView);
+  ipcMain.on('deck:aquarium-lighting-preview:close', (event) => {
+    if (fromWindow(event, win, RENDERER)) setAquariumLightingPreview(null);
+  });
   deck('desktop-reveal:begin', () => navigation.current.desktopRevealGesture && revealDesktop());
   deck('emoji:catalog', () => emojiUsage.catalog());
   deck('emoji:insert', (id) => {
@@ -1640,10 +1677,13 @@ function registerIpc() {
     return current.settings;
   });
   edit('editor:aquarium:get', () => aquarium.current);
+  edit('editor:aquarium:lighting-preview', setAquariumLightingPreview);
   edit('editor:aquarium:set', (settings) => {
     const wasEnabled = aquarium.current.enabled;
     const current = aquarium.configure(settings);
     send('deck:aquarium', current);
+    if (!current.enabled) setAquariumLightingPreview(null);
+    else if (aquarium.lightingPreview) send('deck:aquarium-lighting-preview', aquarium.lightingPreview);
     if (current.enabled !== wasEnabled) {
       if (!current.enabled && navigation.current.view === 'aquarium') setDeckView('keys');
       deckShortcuts?.sync();
@@ -1652,10 +1692,14 @@ function registerIpc() {
     return current;
   });
   edit('editor:about:get', () => ({
-    version: packageInfo.version, author: packageInfo.author, license: packageInfo.license, links: ABOUT_LINKS,
+    version: app.getVersion(), author: packageInfo.author, license: packageInfo.license, links: ABOUT_LINKS,
+    display: edge ? describeDisplay(edge) : opts.windowed ? 'Windowed mode' : 'XENEON EDGE not found',
   }));
   edit('editor:about:open', (id) => {
     if (typeof id !== 'string' || !Object.hasOwn(ABOUT_LINKS, id)) throw new Error('Invalid Lastra link.');
+    if (id === 'usage') return shell.openPath(USAGE_NOTICE).then((error) => {
+      if (error) throw new Error(error);
+    });
     return shell.openExternal(ABOUT_LINKS[id]);
   });
   edit('editor:feeds:get', () => feeds?.settings() ?? null);
@@ -2017,6 +2061,8 @@ function registerIpc() {
     send('deck:appearance', appearance.current);
     send('deck:pet', deckPet.current);
     send('deck:aquarium', aquarium.current);
+    send('deck:aquarium-lighting-preview', aquarium.lightingPreview);
+    sendDeckNavigation();
     if (feeds) {
       send('feeds', feeds.snapshot());
       send('weather', feeds.snapshot().weather ?? { line: '' });
@@ -2186,6 +2232,7 @@ function start() {
   function blockDeck(transition) {
     transition();
     closePanelPreview();
+    setAquariumLightingPreview(null);
     deckShortcuts.sync();
     agentActivitySwitch?.checkPending();
     agentSpotifyActions?.checkPending();
@@ -2711,7 +2758,7 @@ function start() {
         gestureFixtures: agentGestureFixtures, runs: agentRuns, apply: agentApply, projects: agentProjects } : null }),
     actions: {
       openEditor, switchActivity, setViewOnly, sendDashboardCalendar, exportDiagnostics, refreshPage,
-      showInfo: (where) => { void dialog.showMessageBox({ type: 'info', title: 'Lastra', message: `Lastra ${app.getVersion()}`, detail: where }); },
+      showInfo: () => openEditor('about'),
       setMonitoringInterval: (source, intervalMs) => resources.change({ action: 'refresh', source, intervalMs }),
       organizationItems: deckOrganizationItems,
       watchlistItems: () => {

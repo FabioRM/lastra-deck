@@ -58,9 +58,13 @@ function snail(node, parts, resources, uniforms, id) {
     eyesOn.push(antenna);
   }
   const phase=random()*6;
-  return (time) => {
-    body.scale.x=.41+.031*Math.sin(time*3.4+phase);
-    eyesOn.forEach((antenna,index)=>{ antenna.rotation.z=.23*Math.sin(time*2.+index); });
+  return (time,_day,bite,mode,speed=0) => {
+    body.scale.x=.41+(.015+.035*speed)*Math.sin(time*4.1+phase)+(bite?.034:0);
+    const extension=mode==='inspect' ? 1.15 : mode==='rest' ? .62 : .96;
+    eyesOn.forEach((antenna,index)=>{
+      antenna.rotation.z=.17*Math.sin(time*2.+index)+(mode==='inspect' ? .16 : 0);
+      antenna.scale.setScalar(antenna.scale.x+(extension-antenna.scale.x)*.14);
+    });
   };
 }
 
@@ -111,8 +115,9 @@ function bivalve(node, parts, resources, uniforms, id) {
   }
   placeInstances(lips,parts.hull,mantle,spots);
   const valve=(mussel||oyster?.21:.46)+parts.random()*.14;
-  return (time,_day,snack) => {
-    top.rotation.z=valve+Math.sin(time*1.15)*.08+(snack?.23:0);
+  return (time,_day,snack,mode) => {
+    top.rotation.z=mode==='hop' ? .08 + valve*(.45+.53*Math.sin(time*11.5))
+      : valve+Math.sin(time*1.15)*.08+(snack?.23:0);
     lips.scale.y=.89+.12*Math.sin(time*2.36);
   };
 }
@@ -163,7 +168,11 @@ function slug(node, parts, id) {
     const horn=placeMesh(node,hull,pigment('#e3aa45'),.31,.235,side*.091,.027,.113,.029);
     horn.rotation.z=-.29;
   }
-  return (time)=>{ body.scale.y=.131+.016*Math.sin(time*1.48); fringe.scale.y=1+.21*Math.sin(time*2.7); };
+  return (time,_day,bite,mode,speed=.5)=>{
+    body.scale.y=.131+(.010+.018*speed)*Math.sin(time*1.65);
+    body.scale.x=(cucumber?.69:.49)*(1+.065*speed*Math.sin(time*2.4));
+    fringe.scale.y=(mode==='inspect' || bite ? 1.27 : 1)+.21*Math.sin(time*2.7);
+  };
 }
 
 function featherStar(node, parts) {
@@ -191,7 +200,11 @@ function featherStar(node, parts) {
     }
   }
   placeInstances(crown,limb,pigment('#fff'),feathers);
-  return (time)=>{ crown.rotation.y=.19*Math.sin(time*1.2); crown.scale.y=.92+.10*Math.sin(time*1.63); };
+  return (time,_day,feeding,mode,speed=0)=>{
+    crown.rotation.y=.19*Math.sin(time*1.2);
+    const height=mode==='retreat' || mode==='shelter' ? .52 : mode==='roam' ? .68+.11*speed : feeding ? 1.08 : .92;
+    crown.scale.y+=(height+.10*Math.sin(time*1.63)-crown.scale.y)*.17;
+  };
 }
 
 function cephalopod(node, parts, resources, uniforms, id) {
@@ -250,13 +263,15 @@ function cephalopod(node, parts, resources, uniforms, id) {
     const blade=placeMesh(node,geometry,pigment('#d6b991'),-.20,.14,side*.30,.82,.042,.21);
     fins.push(blade);
   }
-  return (time,_day,bite) => {
+  return (time,_day,bite,mode,speed=0) => {
     head.scale.y=(octopus?.40:.24)*(1+.095*Math.sin(time*2.3));
+    const reaching=mode==='inspect' || mode==='feed';
     for(const {arm,angle,phase} of arms) {
-      arm.rotation.y=angle + .22*Math.sin(time*(octopus?1.68:3.5)+phase);
-      arm.rotation.z=.115*Math.cos(time*2.24+phase)+(bite?.18:0);
+      arm.rotation.y=angle + (.13+.20*speed)*Math.sin(time*(octopus?2.17:3.5)+phase);
+      arm.rotation.z=(.064+.13*speed)*Math.cos(time*2.24+phase)+(bite?.18:0)+(mode==='rest'?.18:0);
+      arm.scale.x+=((reaching?1.16:mode==='rest'?.78:1)-arm.scale.x)*.14;
     }
-    fins.forEach((fin,i)=>{ fin.rotation.x=Math.sin(time*5.7+i*Math.PI)*.28; });
+    fins.forEach((fin,i)=>{ fin.rotation.x=Math.sin(time*(5.1+speed*2.4)+i*Math.PI)*(.16+speed*.18); });
   };
 }
 

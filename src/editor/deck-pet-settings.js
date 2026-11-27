@@ -8,12 +8,8 @@
   const form = byId('pet-preferences');
   const { habitat, species, petName, motion } = form.elements;
   const status = byId('pet-settings-status');
-  const about = byId('about-settings');
-  const aboutStatus = byId('about-status');
   let preferences;
   let petMessage = '';
-  let aboutMessage = '';
-  let metadata;
 
   function renderOptions() {
     for (const [select, entries] of [[species, Object.entries(SPECIES).map(([id, pet]) => [id, pet.label])],
@@ -33,11 +29,6 @@
       motion.checked = preferences.motion;
     }
     status.textContent = t(petMessage);
-  }
-
-  function renderAbout() {
-    aboutStatus.textContent = t(aboutMessage);
-    if (metadata) byId('about-version').textContent = t('Version {version}', { version: metadata.version });
   }
 
   petName.maxLength = NAME_LIMIT;
@@ -75,32 +66,8 @@
     }
   });
 
-  api.getAbout().then((data) => {
-    metadata = data;
-    byId('about-author').textContent = data.author;
-    byId('about-license').textContent = data.license;
-    for (const link of about.querySelectorAll('[data-about-link]')) link.href = data.links[link.dataset.aboutLink];
-    renderAbout();
-  }).catch(() => {
-    aboutMessage = 'Could not load Lastra information.';
-    renderAbout();
-  });
-  async function openLink(event) {
-    const link = event.target.closest('a[data-about-link][href]');
-    if (!link || event.button > 1) return;
-    event.preventDefault();
-    aboutMessage = aboutStatus.textContent = '';
-    try { await api.openAboutLink(link.dataset.aboutLink); }
-    catch {
-      aboutMessage = 'Could not open the link.';
-      aboutStatus.textContent = t(aboutMessage);
-    }
-  }
-  about.addEventListener('click', openLink);
-  about.addEventListener('auxclick', openLink);
   document.addEventListener('lastra-language', () => {
     renderOptions();
     status.textContent = t(petMessage);
-    renderAbout();
   });
 }

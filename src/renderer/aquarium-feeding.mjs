@@ -54,7 +54,7 @@ export function createFoodSimulation({ random, floor, flow = .55 }) {
         }
       }
     },
-    find(origin, mode, radius, preference = 0) {
+    find(origin, mode, radius, preference = 0, available) {
       let closest;
       let score = radius * radius;
       for (const piece of particles) {
@@ -66,7 +66,7 @@ export function createFoodSimulation({ random, floor, flow = .55 }) {
         const dx = origin.x - piece.x, dy = origin.y - piece.y, dz = origin.z - piece.z;
         const distance = dx * dx + dy * dy * (mode === 'bed' ? .37 : 1) + dz * dz;
         const biased = distance * (.88 + ((piece.id + preference) % 7) * .038);
-        if (biased < score) {
+        if (biased < score && (!available || available(piece))) {
           closest = piece;
           score = biased;
         }

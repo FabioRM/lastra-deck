@@ -4,6 +4,14 @@ Completed items from the former TODO, grouped by the section that tracked them. 
 
 Entries grouped under **0.2.1** record the completed work through the first reviewed source release.
 
+## 1.5.1
+
+- Improve fish steering, give passing fish room at nearby depths, and make turns less abrupt near schools and decorations.
+- Make nighttime scenes easier to see. Adjust night brightness and animal glow independently, and preview Day or Night on the desktop and XENEON EDGE. Leaving Settings restores the saved light cycle.
+- Keep the 3D preview visible while changing settings. Place decorations in the scene or on the synchronized map, with camera rotation and zoom.
+- Improve desktop settings navigation and add an Information section with project resources, diagnostics, backups, and usage and warranty notices.
+- Refresh the website with the new Aquarium images and publish Windows x64 and Linux x86-64 packages.
+
 ## 1.5.0
 
 - Add a full-screen 3D Aquarium to the deck view switcher, with a clock, date, and the four corner controls. The scene follows local daylight or a custom dawn and dusk schedule.

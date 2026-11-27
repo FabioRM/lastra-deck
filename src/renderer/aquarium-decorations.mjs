@@ -4,8 +4,27 @@ import { makeAlgaePatch, makeSpongePatch } from './aquarium-growth.mjs';
 import { makeMusselBed } from './aquarium-molluscs.mjs';
 import { makeCoralThicket } from './aquarium-habitat.mjs';
 
-export function makeDecorations(scene, resources, uniforms, floorAt, width, decorations, random, quality) {
-  if (!decorations.length) return [];
+const HORIZONTAL_LIMIT = .88;
+const FRONT = 5.5;
+const DEPTH_STEP = .174;
+
+export function positionDecoration(group, item, floorAt, width) {
+  const x = item.x / 100 * width * HORIZONTAL_LIMIT, z = FRONT - item.depth * DEPTH_STEP;
+  group.position.set(x, floorAt(x, z), z);
+  group.rotation.y = item.rotation * Math.PI / 180;
+  group.scale.setScalar(item.size / 100);
+}
+
+export function decorationCoordinates(x, z, width) {
+  return {
+    x: THREE.MathUtils.clamp(Math.round(x / (width * HORIZONTAL_LIMIT) * 100), -100, 100),
+    depth: THREE.MathUtils.clamp(Math.round((FRONT - z) / DEPTH_STEP), 0, 100),
+  };
+}
+
+export function makeDecorations(scene, resources, uniforms, floorAt, width, decorations, random, quality, obstacles) {
+  const vents = [], nodes = [];
+  if (!decorations.length) return { vents, nodes };
   const stone = waterLit(resources,uniforms,{color:'#fff',roughness:.91},{grain:'rock'});
   const wood = waterLit(resources,uniforms,{color:'#725c48',roughness:.96,side:THREE.DoubleSide},{grain:'rock'});
   const iron = waterLit(resources,uniforms,{color:'#686953',roughness:.78,metalness:.32},{grain:'organic'});
@@ -126,14 +145,11 @@ export function makeDecorations(scene, resources, uniforms, floorAt, width, deco
     }
   }
 
-  const vents=[];
   for (const item of decorations) {
-    const x=item.x/100*width*.88, z=5.5-item.depth*.174;
     const group=new THREE.Group();
-    group.position.set(x,floorAt(x,z),z);
-    group.rotation.y=item.rotation*Math.PI/180;
-    group.scale.setScalar(item.size/100);
+    positionDecoration(group,item,floorAt,width);
     scene.add(group);
+    nodes.push(group);
     switch (item.type) {
       case 'arch': arch(group); break;
       case 'wreck': wreck(group); break;
@@ -146,14 +162,19 @@ export function makeDecorations(scene, resources, uniforms, floorAt, width, deco
       case 'tubeSponges': makeSpongePatch(group,resources,uniforms,random,'tube'); break;
       case 'fanSponge': makeSpongePatch(group,resources,uniforms,random,'fan'); break;
       case 'musselBed': makeMusselBed(group,resources,uniforms,random); break;
-      case 'coralThicket': makeCoralThicket(group,resources,uniforms,random,quality); break;
+      case 'coralThicket': makeCoralThicket(group,resources,uniforms,random,quality,obstacles); break;
       case 'jar': vase(group,false); break;
       case 'vent':
         placeMesh(group,pebble,iron,0,.08,0,.64,.15,.57);
-        vents.push({ x,z });
+        vents.push({ x: group.position.x, z: group.position.z });
         break;
     }
-    group.traverse((node)=>{ if (node.isMesh && node.material.isMeshStandardMaterial) node.castShadow=true; });
+    const solid = !['kelpPatch','redAlgae','coralThicket'].includes(item.type);
+    group.traverse((node)=>{
+      if (!node.isMesh) return;
+      if (node.material.isMeshStandardMaterial) node.castShadow=true;
+      if (solid) obstacles.add(node);
+    });
   }
-  return vents;
+  return { vents, nodes };
 }

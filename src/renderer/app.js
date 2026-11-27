@@ -98,6 +98,7 @@
   let deckWindowVisible = true;
   let stopTelemetry;
   let savedView;
+  let aquariumPreview = false;
   let pendingViewSave = false;
   let pendingNavigation;
 
@@ -165,7 +166,7 @@
   function updateViewSwitch() {
     const next = nextPrimaryView();
     viewSwitch.dataset.next = next;
-    viewSwitch.title = t('Show ' + VIEW_LABELS[next]);
+    viewSwitch.title = t(aquariumPreview ? 'End aquarium lighting preview' : 'Show ' + VIEW_LABELS[next]);
     viewSwitch.setAttribute('aria-label', viewSwitch.title);
   }
 
@@ -182,6 +183,7 @@
       pendingNavigation = next;
       return;
     }
+    aquariumPreview = next.aquariumPreview === true;
     if (Array.isArray(next.views) && next.views.length) {
       viewCycle = next.views;
       updateViewSwitch();
@@ -193,17 +195,19 @@
       quickSheet = next.sheet;
       fitStage();
     }
-    if ((VIEWS[activeView?.id] ?? 'keys') === savedView) return;
+    const displayView = aquariumPreview ? 'aquarium' : savedView;
+    if ((VIEWS[activeView?.id] ?? 'keys') === displayView) return;
     closeActiveView();
-    if (Object.hasOwn(VIEW_LABELS, savedView)) showPrimaryView(savedView);
-    else document.getElementById(VIEW_BUTTONS[savedView])?.click();
+    if (Object.hasOwn(VIEW_LABELS, displayView)) showPrimaryView(displayView);
+    else document.getElementById(VIEW_BUTTONS[displayView])?.click();
   }
 
   function rememberView() {
-    if (!api || !savedView || pendingViewSave) return;
+    if (!api || !savedView || aquariumPreview || pendingViewSave) return;
     pendingViewSave = true;
     queueMicrotask(() => {
       pendingViewSave = false;
+      if (aquariumPreview) return;
       const current = VIEWS[activeView?.id] ?? 'keys';
       if (current === savedView) return;
       savedView = current;
@@ -1252,7 +1256,10 @@
     selectPage(index < 0 ? fallback : profile.pages[index + offset]);
   }
 
-  home.addEventListener('click', () => selectPage(profile?.pages[0]));
+  home.addEventListener('click', () => {
+    if (aquariumPreview) api.closeAquariumLightingPreview();
+    else selectPage(profile?.pages[0]);
+  });
   previous.addEventListener('click', () => shiftPage(-1));
   next.addEventListener('click', () => shiftPage(1));
   lock.addEventListener('click', () => api.lockPage().catch((err) => showStatus(err.message, false)));
@@ -1642,7 +1649,10 @@
     profile = { ...profile, pageIcon: source, foregroundApp: app && { ...app, icon: foregroundIcon } };
     renderPageHeading();
   });
-  if (api) viewSwitch.addEventListener('click', () => showPrimaryView(nextPrimaryView()));
+  if (api) viewSwitch.addEventListener('click', () => {
+    if (aquariumPreview) api.closeAquariumLightingPreview();
+    else showPrimaryView(nextPrimaryView());
+  });
   updateTelemetryVisibility();
   viewSource.onAudio(renderAudio);
   viewSource.onObs?.((view) => {

@@ -45,7 +45,7 @@ export const waterColourShader = /* glsl */`
 export function makeWaterBackdrop(scene, resources, uniforms, profile) {
   const geometry = resources.keep(new THREE.PlaneGeometry(2, 2));
   const top = new THREE.Color(profile.top), deep = new THREE.Color(profile.deep);
-  const night = new THREE.Color(profile.night), dark = new THREE.Color(profile.dark);
+  const night = new THREE.Color(profile.night).lerp(top,.22), dark = new THREE.Color(profile.dark).lerp(deep,.27);
   const warm = new THREE.Color('#dc9a66');
   Object.assign(uniforms, { surfaceColor: { value: top.clone() }, deepColor: { value: deep.clone() },
     shaftColor: { value: new THREE.Color(profile.light) }, tankAspect: { value: 1 }, tankViewport: { value: new THREE.Vector2(1,1) } });
@@ -80,9 +80,9 @@ export function makeWaterBackdrop(scene, resources, uniforms, profile) {
       uniforms.tankAspect.value = aspect;
       uniforms.tankViewport.value.set(width,height);
     },
-    light(day, twilight) {
-      uniforms.surfaceColor.value.copy(night).lerp(top, day).lerp(warm, .24*twilight);
-      uniforms.deepColor.value.copy(dark).lerp(deep, day).lerp(warm, .045*twilight);
+    light(day, twilight, brightness) {
+      uniforms.surfaceColor.value.copy(night).lerp(top, day).lerp(warm, .24*twilight).multiplyScalar(brightness);
+      uniforms.deepColor.value.copy(dark).lerp(deep, day).lerp(warm, .045*twilight).multiplyScalar(brightness);
     },
   };
 }

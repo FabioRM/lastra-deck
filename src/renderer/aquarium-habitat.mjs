@@ -93,7 +93,7 @@ function shadowTexture(resources) {
   return resources.keep(new THREE.CanvasTexture(image));
 }
 
-export function makeHabitat(scene, resources, uniforms, settings, random, visibleWidth, textures) {
+export function makeHabitat(scene, resources, uniforms, settings, random, visibleWidth, textures, obstacles) {
   const bed = BEDS[settings.substrate];
   const ridges = landforms(settings, random, visibleWidth);
   const sand = resources.keep(new THREE.PlaneGeometry(Math.max(105,visibleWidth(-35)*2.45),87,183,127));
@@ -156,11 +156,15 @@ export function makeHabitat(scene, resources, uniforms, settings, random, visibl
     rockGroups.set(kind,group);
   }
   for (const [kind,group] of rockGroups) {
-    placeInstances(scene,resources.keep(makeStone(kind)),stoneMaterial,group).castShadow=true;
+    const rocks = placeInstances(scene,resources.keep(makeStone(kind)),stoneMaterial,group);
+    rocks.castShadow=true;
+    obstacles.add(rocks);
   }
   if (scanned.length) {
     const scannedMaterial=waterLit(resources,uniforms,{color:'#fff',map:textures.boulderMap,roughness:.94});
-    placeInstances(scene,textures.boulderGeometry,scannedMaterial,scanned).castShadow=true;
+    const rocks = placeInstances(scene,textures.boulderGeometry,scannedMaterial,scanned);
+    rocks.castShadow=true;
+    obstacles.add(rocks);
   }
   placeInstances(scene, smallStone, stoneMaterial, pebbles);
   if (settings.quality !== 'eco') {
@@ -177,7 +181,7 @@ export function makeHabitat(scene, resources, uniforms, settings, random, visibl
   placeInstances(scene, resources.keep(new THREE.PlaneGeometry(2,2)), resources.keep(new THREE.MeshBasicMaterial({
     color: '#9c9c9c', map: shadowTexture(resources), transparent: true, depthWrite: false, opacity: .68,
   })), shadows);
-  if (settings.rocks && (settings.layout === 'roots' || settings.layout === 'bank')) makeRoots(scene, resources, uniforms, ridges, random);
+  if (settings.rocks && (settings.layout === 'roots' || settings.layout === 'bank')) makeRoots(scene, resources, uniforms, ridges, random, obstacles);
   if (settings.coralDensity) {
       const density=settings.coralDensity;
       const coverage=settings.growth==='coralGarden' ? .46+density*.015 : density*.014;
@@ -189,7 +193,7 @@ export function makeHabitat(scene, resources, uniforms, settings, random, visibl
       const clusters=banks.slice(0,fill).map(({x,z,size,plane},i)=>({
         x:x+Math.sin(i*2.39996)*size*.83,z:z+size*.64+.31,size:size*(.41+(i%3)*.08),plane,
       }));
-      makeReef(scene,resources,uniforms,[...banks,...clusters],seededRandom(settings.seed^1447),settings.quality,settings.coralStyle,density);
+      makeReef(scene,resources,uniforms,[...banks,...clusters],seededRandom(settings.seed^1447),settings.quality,settings.coralStyle,density,obstacles);
   }
   if (settings.plants) {
     const reef=settings.growth==='corals'||settings.growth==='coralGarden';
@@ -201,7 +205,7 @@ export function makeHabitat(scene, resources, uniforms, settings, random, visibl
   return settings.rocks ? ridges : ridges.map(({ x,z })=>({x,z,size:.08}));
 }
 
-function makeRoots(scene, resources, uniforms, ridges, random) {
+function makeRoots(scene, resources, uniforms, ridges, random, obstacles) {
   const bark = waterLit(resources, uniforms, { color: '#6d5040', roughness: .97 }, { grain: 'rock' });
   for (const { x, z, size } of ridges.filter((_, index) => index%2===0)) {
     const base = floorAt(x,z);
@@ -225,7 +229,9 @@ function makeRoots(scene, resources, uniforms, ridges, random) {
         rings.setXYZ(i,point.x,point.y,point.z);
       }
       geometry.computeVertexNormals();
-      placeMesh(scene,resources.keep(geometry),bark,0,0,0).castShadow=true;
+      const root = placeMesh(scene,resources.keep(geometry),bark,0,0,0);
+      root.castShadow=true;
+      obstacles.add(root);
     }
   }
 }
@@ -236,8 +242,9 @@ function connect(parts, a, b, radius, color) {
     quaternion:new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0,1,0),delta.normalize()), color });
 }
 
-function makeReef(scene, resources, uniforms, ridges, random, quality, style, density) {
+function makeReef(scene, resources, uniforms, ridges, random, quality, style, density, obstacles) {
   const branches=[], polyps=[], shelves=[], colonies=[], brains=[];
+  const stems=[], tips=[], mounds=[];
   const colors=[['#a5644e','#d59c73'],['#a45a69','#dc9ba5'],['#6b638e','#bb9fd4'],['#9d8657','#dcc079'],
     ['#668173','#a5b686'],['#995c54','#dca196']];
   const coral=waterLit(resources,uniforms,{color:'#ffffff',roughness:.84},{grain:'coral'});
@@ -270,10 +277,13 @@ function makeReef(scene, resources, uniforms, ridges, random, quality, style, de
     const branchesPerColony=style==='plates' ? 2 : fan ? 7+Math.round(density*.035) :
       (style==='branching'?6:4)+Math.round(density*.041);
     for (let j=0; j<branchesPerColony; j++) {
+      const firstBranch=branches.length, firstPolyp=polyps.length;
       const d = j/(branchesPerColony-1)*2-1;
       const direction = new THREE.Vector3(d*(fan ? 1.03 : .67), .91-Math.abs(d)*.36, (random()-.5)*(fan ? .19 : .69));
       grow(start,direction.normalize(),primaryScale*(.68+random()*.26),
         size*(fan ? .021 : .050)*(foreground ? .82 : 1),fan && detailed ? 4 : 3);
+      stems.push([firstBranch,branches.length]);
+      if (detailed) tips.push([firstPolyp,polyps.length]);
     }
     const shelvesPerColony=style==='plates' ? 9 : style==='soft' ? 2 : 5+Math.round(density*.022);
     for (let j=0; j<shelvesPerColony; j++) {
@@ -284,6 +294,7 @@ function makeReef(scene, resources, uniforms, ridges, random, quality, style, de
     }
     const clusters=style==='soft' ? 2 : style==='branching' ? 3 : 3+Math.round(density*.022);
     for (let colony=0;colony<clusters;colony++) {
+      const first=colonies.length;
       const px=x+size*(.29+.38*colony), pz=z+size*(.66+.21*colony);
       const at=floorAt(px,pz)+size*(colony===0?.28:.14);
       const mound=size*(.37+random()*.16);
@@ -298,16 +309,18 @@ function makeReef(scene, resources, uniforms, ridges, random, quality, style, de
         colonies.push({position:[px+Math.cos(a)*radius*mound*ripple,at+(1-radius*radius*.78)*mound*.57,
           pz+Math.sin(a)*radius*mound*.79],scale:[s*1.3,s*.82,s*1.19],color:j%7===0 ? base : pink });
       }
+      mounds.push([first,colonies.length]);
     }
   }
   const cylinder = resources.keep(new THREE.CylinderGeometry(.61,1,1,6));
   const bulb = resources.keep(new THREE.IcosahedronGeometry(1,1));
   const skeletons=placeInstances(scene,cylinder,coral,branches);
   if (skeletons) skeletons.castShadow=true;
-  placeInstances(scene,bulb,coral,polyps);
-  placeInstances(scene,bulb,coral,colonies);
-  placeInstances(scene,resources.keep(new THREE.SphereGeometry(1,17,12)),coral,brains);
-  placeInstances(scene,resources.keep(shelfGeometry()),coral,shelves);
+  obstacles.add(skeletons,stems);
+  obstacles.add(placeInstances(scene,bulb,coral,polyps),tips);
+  obstacles.add(placeInstances(scene,bulb,coral,colonies),mounds);
+  obstacles.add(placeInstances(scene,resources.keep(new THREE.SphereGeometry(1,17,12)),coral,brains));
+  obstacles.add(placeInstances(scene,resources.keep(shelfGeometry()),coral,shelves));
   for (const [index, { x,z,size }] of ridges.entries()) {
     if (index%(style==='soft' ? 1:3)) continue;
     const px=x-size*.55, pz=z+size*1.27;
@@ -316,15 +329,15 @@ function makeReef(scene, resources, uniforms, ridges, random, quality, style, de
     anemone.position.set(px,base,pz);
     scene.add(anemone);
     const foot = waterLit(resources, uniforms, { color:'#947b58', roughness:.72 });
-    placeMesh(anemone, bulb,foot,0,.17,0,.61,.25,.61);
+    obstacles.add(placeMesh(anemone, bulb,foot,0,.17,0,.61,.25,.61));
     const material = waterLit(resources, uniforms, { color:'#ffffff', roughness:.65, side:THREE.DoubleSide,
       vertexColors:true }, { grain:'organic', sway:.055 });
     placeMesh(anemone, resources.keep(bladesGeometry(random, 45, 'anemone')), material, 0,.13,0);
   }
 }
 
-export function makeCoralThicket(scene,resources,uniforms,random,quality) {
-  makeReef(scene,resources,uniforms,[{x:0,z:0,size:1.32,plane:'middle'}],random,quality,'mixed',88);
+export function makeCoralThicket(scene,resources,uniforms,random,quality,obstacles) {
+  makeReef(scene,resources,uniforms,[{x:0,z:0,size:1.32,plane:'middle'}],random,quality,'mixed',88,obstacles);
 }
 
 function shelfGeometry() {

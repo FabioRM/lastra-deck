@@ -5,9 +5,11 @@ import { floorAt, makeHabitat } from './aquarium-habitat.mjs';
 import { makeFish } from './aquarium-fish.mjs';
 import { makeInhabitants } from './aquarium-inhabitants.mjs';
 import { createFoodSimulation, makeFood } from './aquarium-feeding.mjs';
-import { makeDecorations } from './aquarium-decorations.mjs';
+import { makeDecorations, positionDecoration } from './aquarium-decorations.mjs';
 import { loadAquariumTextures } from './aquarium-textures.mjs';
 import { makeTurtles } from './aquarium-turtles.mjs';
+import { aquariumObstacles } from './aquarium-obstacles.mjs';
+import { makeAquariumPreviewCamera } from './aquarium-preview-camera.mjs';
 
 const PIXEL_BUDGET = { eco: 670_000, balanced: 1_430_000, high: 2_350_000 };
 const CURRENTS = { calm: .21, gentle: .74, strong: 1.48 };
@@ -66,35 +68,37 @@ function surfaceRipple(scene, resources) {
   return { ripple, strength };
 }
 
-export async function createAquarium(canvas, settings, isCurrent = () => true) {
+export async function createAquarium(canvas, settings, isCurrent = () => true, { editable = false } = {}) {
   const resources = aquariumResources();
   const textures = await loadAquariumTextures(resources,settings.quality);
   if (!isCurrent()) {
     resources.dispose();
     return null;
   }
+  let renderer;
   try {
-    return buildAquarium(canvas,settings,resources,textures);
+    renderer = new THREE.WebGLRenderer({ canvas, powerPreference: 'low-power', alpha: false });
+    return buildAquarium(canvas,renderer,settings,resources,textures,editable);
   } catch (error) {
+    renderer?.dispose();
     resources.dispose();
     throw error;
   }
 }
 
-function buildAquarium(canvas, settings, resources, textures) {
-  const renderer = new THREE.WebGLRenderer({ canvas, powerPreference: 'low-power', alpha: false });
+function buildAquarium(canvas, renderer, settings, resources, textures, editable) {
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.NeutralToneMapping;
   renderer.toneMappingExposure = 1.10;
   const scene = new THREE.Scene();
   const flow = CURRENTS[settings.current];
   const depth = DEPTHS[settings.depth];
-  const uniforms = { tankTime: { value: 0 }, tankLight: { value: .76 }, tankFlow: { value: flow },
+  const uniforms = { tankTime: { value: 0 }, tankLight: { value: .76 }, tankNight: { value: 0 }, tankFlow: { value: flow },
     tankRockMap: { value: textures.rock }, tankSandMap: { value: textures.sand }, surfaceHeight: { value: depth.waterline } };
-  const daylight = new THREE.Color(LIGHT_TONES[settings.lightTone]), moonlight = new THREE.Color('#86afeb'), evening = new THREE.Color('#ffd29b');
-  const dayFloor = new THREE.Color('#92c2c6'), nightFloor = new THREE.Color('#567497');
+  const daylight = new THREE.Color(LIGHT_TONES[settings.lightTone]), moonlight = new THREE.Color('#b1d2f7'), evening = new THREE.Color('#ffd29b');
+  const dayFloor = new THREE.Color('#92c2c6'), nightFloor = new THREE.Color('#7299b6');
   const water = WATERS[settings.water];
-  const darkFog = new THREE.Color(water.dark), dayFog = new THREE.Color(water.deep);
+  const dayFog = new THREE.Color(water.deep), darkFog = new THREE.Color(water.dark).lerp(dayFog,.32);
   const backdrop = makeWaterBackdrop(scene,resources,uniforms,water);
   makeTankGlass(scene, resources, uniforms, settings.tank);
   makeWaterSurface(scene,resources,uniforms,depth.waterline);
@@ -117,12 +121,22 @@ function buildAquarium(canvas, settings, resources, textures) {
   const width = visibleWidth(0);
   const parallax = Math.min(.74,width*.052);
   configureShadows(renderer,sun,width,settings.quality);
-  const habitat = makeHabitat(scene,resources,uniforms,settings,seededRandom(settings.seed),visibleWidth,textures);
-  const vents = makeDecorations(scene,resources,uniforms,floorAt,width,settings.decorations,seededRandom(settings.seed ^ 72289),settings.quality);
+  const obstacles = aquariumObstacles();
+  const habitat = makeHabitat(scene,resources,uniforms,settings,seededRandom(settings.seed),visibleWidth,textures,obstacles);
+  const { vents, nodes: decorations } = makeDecorations(scene,resources,uniforms,floorAt,width,settings.decorations,
+    seededRandom(settings.seed ^ 72289),settings.quality,obstacles);
+  const previewCamera = editable ? makeAquariumPreviewCamera(canvas, camera, target, decorations, width, floorAt) : null;
   const food = createFoodSimulation({ random: seededRandom(settings.seed ^ 31071), floor: floorAt, flow });
-  const animateFish = makeFish(scene,resources,uniforms,settings,seededRandom(settings.seed ^ 82717),width,habitat,food,visibleWidth);
-  const animateInhabitants = makeInhabitants(scene,resources,uniforms,settings,seededRandom(settings.seed ^ 52773),width,habitat,food);
-  const animateTurtles = makeTurtles(scene,resources,uniforms,settings,seededRandom(settings.seed ^ 8139),visibleWidth);
+  const firstSwimmer=scene.children.length;
+  const visitors=[], swimmingContacts=new Map();
+  const animateFish = makeFish(scene,resources,uniforms,settings,seededRandom(settings.seed ^ 82717),width,habitat,food,
+    { visibleWidth, waterline:depth.waterline, obstacles, visitors, swimmingContacts });
+  const animateTurtles = makeTurtles(scene,resources,uniforms,settings,seededRandom(settings.seed ^ 8139),visibleWidth,
+    { visitors, swimmingContacts });
+  animateTurtles(0,1);
+  const swimmers=scene.children.slice(firstSwimmer);
+  const animateInhabitants = makeInhabitants(scene,resources,uniforms,settings,seededRandom(settings.seed ^ 52773),width,habitat,food,
+    { obstacles, visibleWidth, waterline:depth.waterline, swimmers, current:flow, visitors, swimmingContacts });
   const paintFood = makeFood(scene,resources,uniforms,food);
   const sizeParticles = makeWaterParticles(scene,resources,uniforms,seededRandom(settings.seed ^ 19753),settings,width,vents,floorAt);
   const { ripple, strength } = surfaceRipple(scene,resources);
@@ -139,17 +153,21 @@ function buildAquarium(canvas, settings, resources, textures) {
   let elapsed = 0;
   let light = 1;
   let appearance = settings;
+  let placementHalo;
+  let highlightedDecoration = null;
+  const decorationBounds = new THREE.Box3();
+  const decorationSize = new THREE.Vector3();
 
   function resize() {
     const w=canvas.clientWidth, h=canvas.clientHeight;
     if (!w || !h) return false;
-    const pixelWidth=window.innerWidth*window.devicePixelRatio;
+    const pixelWidth=Math.max(1,Math.round(canvas.getBoundingClientRect().width*window.devicePixelRatio));
     if (w!==lastWidth || h!==lastHeight || pixelWidth!==lastPixelWidth) {
       lastWidth=w;
       lastHeight=h;
       lastPixelWidth=pixelWidth;
       const resolution=Math.min(pixelWidth/w,1.6,Math.sqrt(PIXEL_BUDGET[settings.quality]/(w*h)));
-      const renderWidth=Math.round(w*resolution), renderHeight=Math.round(h*resolution);
+      const renderWidth=Math.max(1,Math.round(w*resolution)), renderHeight=Math.max(1,Math.round(h*resolution));
       renderer.setSize(renderWidth,renderHeight,false);
       camera.aspect=w/h;
       camera.updateProjectionMatrix();
@@ -159,23 +177,62 @@ function buildAquarium(canvas, settings, resources, textures) {
     return true;
   }
 
+  function highlightDecoration(index) {
+    highlightedDecoration = index;
+    const object = decorations[index];
+    if (!object) {
+      if (placementHalo) placementHalo.visible = false;
+      return;
+    }
+    if (!placementHalo) {
+      const geometry = resources.keep(new THREE.RingGeometry(.93, 1, 60).rotateX(-Math.PI / 2));
+      const material = resources.keep(new THREE.MeshBasicMaterial({
+        color: '#a6ffeb', transparent: true, opacity: .83, depthTest: false, depthWrite: false, fog: false, toneMapped: false,
+      }));
+      placementHalo = new THREE.Mesh(geometry, material);
+      placementHalo.renderOrder = 28;
+      scene.add(placementHalo);
+    }
+    const { x, z } = object.position;
+    const size = decorationBounds.setFromObject(object).getSize(decorationSize);
+    placementHalo.visible = true;
+    placementHalo.position.set(x, object.position.y + .17, z);
+    placementHalo.scale.set(Math.max(.82, size.x * .64), 1, Math.max(.66, size.z * .64));
+  }
+
   return {
     ratio,
     configure(value) { appearance = value; daylight.set(LIGHT_TONES[value.lightTone]); },
+    setCamera: previewCamera?.setView,
+    pickDecoration: previewCamera?.pick,
+    decorationPlacement: previewCamera?.placement,
+    highlightDecoration,
+    previewDecoration(index, item) {
+      const object = decorations[index];
+      if (!object || settings.decorations[index].type !== item.type) return;
+      // Placement edits move the same model until the committed scene recomputes its obstacles and vents.
+      positionDecoration(object,item,floorAt,width);
+      if (renderer.shadowMap.enabled) renderer.shadowMap.needsUpdate = true;
+      if (index === highlightedDecoration) highlightDecoration(index);
+    },
     isFeeding: food.active,
-    setLight({ day, twilight, moon = .6 }) {
-      const brightness = appearance.brightness / 100;
+    setLight({ day, twilight, moon = .6 }, lighting = appearance) {
+      const night = 1-THREE.MathUtils.smoothstep(day+twilight*.49,.09,.69);
+      const nightBrightness = lighting.nightBrightness / 100;
+      const brightness = THREE.MathUtils.lerp(appearance.brightness / 100, nightBrightness, night);
+      const waterBrightness = THREE.MathUtils.lerp(1, nightBrightness, night);
       light=day;
+      uniforms.tankNight.value=night*lighting.glowIntensity/100;
       uniforms.tankLight.value=.12+day*.88;
       sky.color.copy(moonlight).lerp(daylight,day).lerp(evening,twilight*.21);
       sky.groundColor.copy(nightFloor).lerp(dayFloor,day);
-      sky.intensity=(.37 + moon*.17*(1-day) + day*1.28 + twilight*.31) * brightness;
+      sky.intensity=(.37 + (.54+moon*.19)*(1-day) + day*1.28 + twilight*.31) * brightness;
       sun.color.copy(moonlight).lerp(daylight,day).lerp(evening,twilight*.70);
-      sun.intensity=(.17 + moon*.19*(1-day) + day*2.21 + twilight*.58) * brightness;
-      rim.intensity=.21+day*.41;
-      scene.fog.color.copy(darkFog).lerp(dayFog,day);
-      scene.fog.density=water.fog*(1.29-day*.12);
-      backdrop.light(day,twilight);
+      sun.intensity=(.17 + (.22+moon*.19)*(1-day) + day*2.21 + twilight*.58) * brightness;
+      rim.intensity=(.31+day*.31)*brightness;
+      scene.fog.color.copy(darkFog).lerp(dayFog,day).multiplyScalar(waterBrightness);
+      scene.fog.density=water.fog*(1.21-day*.04);
+      backdrop.light(day,twilight,waterBrightness);
     },
     feed(clientX, clientY) {
       const bounds=canvas.getBoundingClientRect();
@@ -194,20 +251,26 @@ function buildAquarium(canvas, settings, resources, textures) {
     },
     draw(delta) {
       if (!resize()) return;
-      elapsed+=delta;
-      uniforms.tankTime.value=elapsed;
+      const steps=Math.max(1,Math.ceil(delta/(1/40)));
+      const step=delta/steps;
+      for (let i=0; i<steps; i++) {
+        elapsed+=step;
+        uniforms.tankTime.value=elapsed;
+        if (food.active()) food.step(step);
+        animateTurtles(elapsed,light);
+        animateFish(step,light);
+        animateInhabitants(elapsed,step,light);
+      }
       tap.strength=Math.max(0,tap.strength-delta*1.26);
       ripple.visible=tap.strength>0;
       strength.value=tap.strength;
-      const sway=Math.sin(elapsed*.102);
-      camera.position.x=.22+sway*parallax;
-      camera.position.y=depth.eye+Math.sin(elapsed*.16)*.10;
-      target.x=.50+sway*parallax*.32;
-      camera.lookAt(target);
-      if (food.active()) food.step(delta);
-      animateFish(delta,light);
-      animateInhabitants(elapsed,delta,light);
-      animateTurtles(elapsed,light);
+      if (!editable) {
+        const sway=Math.sin(elapsed*.102);
+        camera.position.x=.22+sway*parallax;
+        camera.position.y=depth.eye+Math.sin(elapsed*.16)*.10;
+        target.x=.50+sway*parallax*.32;
+        camera.lookAt(target);
+      }
       paintFood();
       renderer.render(scene,camera);
     },
