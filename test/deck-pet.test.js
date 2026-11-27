@@ -76,3 +76,29 @@ test('play, cleaning and naps update separate needs and a nap keeps progressing 
   assert.equal(petIsSleeping(pet.current.care, now), false);
   assert.equal(petNeeds(pet.current.care, now).energy, 100);
 });
+
+test('touch and care actions cycle through distinct clips without repetition at shuffle boundaries', async () => {
+  const { clipLength, shuffleClips, sampleClip } = await import('../src/renderer/deck-pet-behavior.mjs');
+  const choose = shuffleClips(() => .34);
+  for (const [action, alternatives] of [['pet', 5], ['play', 4], ['feed', 3], ['wash', 4], ['sky', 3]]) {
+    const first = Array.from({ length: alternatives }, () => choose(action));
+    assert.equal(new Set(first).size, alternatives);
+    assert.notEqual(first.at(-1), choose(action));
+    assert.ok(first.every((clip) => clipLength(clip) > 1));
+  }
+  assert.ok(sampleClip('twirl', .74).turn > Math.PI / 2);
+  assert.ok(sampleClip('flop', .95).lean > .75);
+  assert.ok(sampleClip('gaze', .43).pitch < 0);
+  assert.deepEqual(sampleClip('gaze', clipLength('gaze')), {});
+});
+
+test('the most urgent need guides idle activity and consecutive choices vary', async () => {
+  const { chooseActivity } = await import('../src/renderer/deck-pet-behavior.mjs');
+  for (const [need, pair] of [['fullness', ['sniff', 'sip']], ['joy', ['wave', 'nuzzle']], ['play', ['pounce', 'dance']],
+    ['energy', ['yawn', 'rest']], ['hygiene', ['scrub', 'shake']]]) {
+    const needs = { fullness: 80, joy: 80, play: 80, energy: 80, hygiene: 80, [need]: 28 };
+    const first = chooseActivity(needs, null, () => 0);
+    assert.equal(first, pair[0]);
+    assert.equal(chooseActivity(needs, first, () => 0), pair[1]);
+  }
+});

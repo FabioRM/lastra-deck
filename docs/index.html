@@ -3,14 +3,14 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Lastra is a touchscreen macro deck for the CORSAIR XENEON EDGE with app-aware shortcuts, Windows audio and PC stats, and a touch-controlled 3D virtual pet in the latest source.">
+  <meta name="description" content="Lastra is a touchscreen macro deck for the CORSAIR XENEON EDGE with app-aware shortcuts, Windows audio and PC stats, and a touch-controlled 3D virtual pet. Available for Windows and Linux.">
   <meta property="og:title" content="Lastra · A touchscreen macro deck for XENEON EDGE">
   <meta property="og:description" content="App-aware shortcuts, live PC stats, and a 3D virtual pet you can care for on your deck.">
-  <meta property="og:image" content="https://fabiorm.github.io/lastra-deck/preview-pet-neon.webp">
+  <meta property="og:image" content="https://fabiorm.github.io/lastra-deck/preview-pet-neon.webp?v=1.3.0">
   <meta property="og:image:alt" content="K-9 in Neon Alley on the Lastra touchscreen deck.">
   <meta name="theme-color" content="#151b20">
   <title>Lastra · A touchscreen macro deck for XENEON EDGE</title>
-  <link rel="stylesheet" href="site.css?v=5">
+  <link rel="stylesheet" href="site.css?v=6">
   <link rel="icon" href="data:,">
 </head>
 <body>
@@ -32,11 +32,12 @@
         <p class="platform">CORSAIR XENEON EDGE <span aria-hidden="true">/</span> Windows and Linux</p>
         <h1 id="hero-title">Switch apps.<br>Your shortcuts follow.</h1>
         <p>When you switch to another app, Lastra automatically loads its shortcuts on your XENEON EDGE. Build your own macro pages and keep the Windows mixer and live PC stats within reach.</p>
-        <div class="hero-links">
-          <a class="button" href="https://github.com/FabioRM/lastra-deck/releases/latest">Download for Windows or Linux</a>
-          <a class="text-link" href="#deck-pet">Meet the deck pet</a>
+        <div class="hero-links" aria-label="Lastra 1.3.0 downloads">
+          <a class="button" href="https://github.com/FabioRM/lastra-deck/releases/download/v1.3.0/Lastra-Setup-1.3.0.exe">Windows installer</a>
+          <a class="button button-secondary" href="https://github.com/FabioRM/lastra-deck/releases/download/v1.3.0/Lastra-1.3.0-linux-amd64.deb">Linux .deb</a>
+          <a class="button button-secondary" href="https://github.com/FabioRM/lastra-deck/releases/download/v1.3.0/Lastra-1.3.0-linux-x86_64.AppImage">Linux AppImage</a>
         </div>
-        <p class="requirements">Windows 10 or 11 · Linux x86-64 · Open source under MIT · <a href="https://github.com/FabioRM/lastra-deck/releases/tag/v1.2.0">What’s new in v1.2.0</a></p>
+        <p class="requirements">Windows 10 or 11 · Linux x86-64 · MIT · <a href="https://github.com/FabioRM/lastra-deck/releases/tag/v1.3.0">Release notes and checksums for v1.3.0</a></p>
       </div>
       <figure class="deck">
         <a href="preview-home.png"><img src="preview-home.png" width="2560" height="720" alt="Lastra Home showing touchscreen shortcut keys, Windows audio controls, and CPU, RAM, and GPU readings."></a>
@@ -56,29 +57,29 @@
           </div>
           <div>
             <p>Open a Tamagotchi-style 3D habitat from Deck Keys. Choose from eight pets and eight habitats, from Mochi the fox in Lantern Grove to K-9 in the rain-soaked Neon Alley.</p>
-            <p class="pet-source">Deck pet is available when you run the current source. The latest published installer is v1.2.0.</p>
-            <a class="text-link" href="https://github.com/FabioRM/lastra-deck#deck-pet">See how to try the deck pet</a>
+            <p>The islands are wider in landscape. Pets roam, inspect objects, and change what they do as their needs change.</p>
+            <a class="text-link" href="https://github.com/FabioRM/lastra-deck#deck-pet">Read the deck pet guide</a>
           </div>
         </div>
         <figure class="pet-demo">
-          <video controls playsinline preload="none" width="1200" height="428" poster="preview-pet-neon.webp" aria-label="Deck pet demo with K-9 and Bip">
-            <source src="preview-pet.mp4" type="video/mp4">
-            <a href="preview-pet.mp4">Watch the deck pet demo</a>
+          <video controls playsinline preload="none" width="1200" height="428" poster="preview-pet-neon.webp?v=1.3.0" aria-label="Deck pet demo with Mochi, K-9, and Luna">
+            <source src="preview-pet.mp4?v=1.3.0" type="video/mp4">
+            <a href="preview-pet.mp4?v=1.3.0">Watch the deck pet demo</a>
           </video>
-          <figcaption>K-9 walks to the neon terminal and lights it up. Bip reacts to a cuddle in the Cybergreenhouse.</figcaption>
+          <figcaption>Mochi looks up at the sun, K-9 reacts to two cuddles, and Luna walks to the night blossoms.</figcaption>
         </figure>
         <ul class="pet-guide">
-          <li><h3>Care for your pet</h3><p>Watch hunger, happiness, playfulness, sleepiness, and hygiene. Feed, play, cuddle, wash, or let your pet nap. Rest continues while Lastra is closed.</p></li>
-          <li><h3>Explore by touch</h3><p>Tap your pet for a reaction, the ground to move, or an object to inspect it. Pets also wander and visit their habitat’s interactive object on their own.</p></li>
+          <li><h3>Care for your pet</h3><p>Watch hunger, happiness, playfulness, sleepiness, and hygiene. Pets choose from different reactions each time you feed, play, cuddle, or wash them. Rest continues while Lastra is closed.</p></li>
+          <li><h3>Explore by touch</h3><p>Tap the ground to move or one of the three objects to investigate it. Tap the sun, moon, or planet to make your pet look up and react.</p></li>
           <li><h3>Make the habitat yours</h3><p>Pick a pet, habitat, name, and motion preference under <strong>Settings → Deck pet</strong>. Your choices and progress are saved locally.</p></li>
         </ul>
         <div class="pet-gallery">
           <figure>
-            <a class="feature-image" href="preview-pet-grove.webp"><img src="preview-pet-grove.webp" width="1200" height="428" loading="lazy" alt="Mochi the fox among pine trees and glowing lanterns."></a>
+            <a class="feature-image" href="preview-pet-grove.webp?v=1.3.0"><img src="preview-pet-grove.webp?v=1.3.0" width="1200" height="428" loading="lazy" alt="Mochi the fox among pine trees and glowing lanterns on a wide island."></a>
             <figcaption><strong>Lantern Grove</strong> · Mochi the fox</figcaption>
           </figure>
           <figure>
-            <a class="feature-image" href="preview-pet-cyber.webp"><img src="preview-pet-cyber.webp" width="1200" height="428" loading="lazy" alt="Bip hovers among illuminated plants and a bio-reactor."></a>
+            <a class="feature-image" href="preview-pet-cyber.webp?v=1.3.0"><img src="preview-pet-cyber.webp?v=1.3.0" width="1200" height="428" loading="lazy" alt="Bip hovers among illuminated plants and a bio-reactor."></a>
             <figcaption><strong>Cybergreenhouse</strong> · Bip the companion drone</figcaption>
           </figure>
         </div>
@@ -211,7 +212,7 @@
     <section class="setup shell" id="linux" aria-labelledby="linux-title">
       <div>
         <h2 id="linux-title">Set up Lastra on Linux</h2>
-        <p>Install the x86-64 Debian package with <code>sudo apt install ./Lastra-1.2.0-linux-amd64.deb</code> or run the AppImage. The Deck follows the active application on X11 and supported Wayland desktops.</p>
+        <p>Install the x86-64 Debian package with <code>sudo apt install ./Lastra-1.3.0-linux-amd64.deb</code> or run the AppImage. The Deck follows the active application on X11 and supported Wayland desktops.</p>
       </div>
       <ol>
         <li><strong>GNOME.</strong> Install the Lastra GNOME extension ZIP from the release, enable it, and install the GNOME Remote Desktop portal.</li>

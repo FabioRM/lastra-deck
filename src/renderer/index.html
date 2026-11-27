@@ -234,10 +234,15 @@
           </div>
           <p id="pet-feedback" class="pet-feedback" role="status"></p>
         </div>
-        <button id="pet-feature" type="button" data-pet-action="explore">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2v4m0 12v4M2 12h4m12 0h4"/><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2"/></svg>
-          <span id="pet-feature-name"></span>
-        </button>
+        <div class="pet-world-actions">
+          <button id="pet-sky" type="button" data-pet-action="sky" title="Look up" aria-label="Look up" hidden>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.5 14.1 8.9 20.5 11l-6.4 2.1L12 19.5l-2.1-6.4L3.5 11l6.4-2.1L12 2.5Zm7 13.5v6m-3-3h6"/></svg>
+          </button>
+          <button id="pet-feature" type="button" data-pet-action="explore">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2v4m0 12v4M2 12h4m12 0h4"/><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2"/></svg>
+            <span id="pet-feature-name"></span>
+          </button>
+        </div>
       </section>
       <section id="obs-panel" aria-label="OBS control" hidden>
         <div id="obs-heading">

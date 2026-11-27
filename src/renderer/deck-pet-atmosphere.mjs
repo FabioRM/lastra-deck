@@ -204,11 +204,17 @@ function crescentShape() {
   return new THREE.ShapeGeometry(shape, 30);
 }
 
-export function makeAtmosphere(model, scene, id, theme, random) {
+export function makeAtmosphere(model, scene, id, theme, random, tall) {
   const { group, geometry, mesh, radial } = model;
-  const haloX = { orbit: -3.06, aurora: -3.28 }[id] ?? -3.45;
-  const halo = group(scene, haloX, 1.42, -1.55);
-  mesh(halo, 'disc', radial('sky glow', theme.light, .36, true), [0, 0, -.074], [1.48, 1.48, 1]);
+  const haloX = tall ? (id === 'orbit' ? -2.52 : -2.88) : (id === 'orbit' ? -3.73 : -4.17);
+  const halo = group(scene, haloX, 1.53, -1.55);
+  const radius = { orbit: .89, moon: .69, aurora: .35, oasis: .69 }[id] ?? .51;
+  const label = id === 'orbit' ? 'Planet' : id === 'grove' || id === 'oasis' ? 'Sun' : 'Moon';
+  const bounds = new THREE.Sphere(halo.position, radius);
+  const glow = mesh(halo, 'disc', radial('sky glow', theme.light, .36, true), [0, 0, -.074], [1.48, 1.48, 1]);
+  const lightRing = mesh(halo, 'ring', model.track(new THREE.MeshBasicMaterial({
+    color: theme.light, transparent: true, depthWrite: false, opacity: 0,
+  })), [0, 0, .12], [radius, radius, 1]);
   let skyMotion;
   if (id === 'orbit') {
     skyMotion = orbitalSky(model, scene, halo);
@@ -227,11 +233,18 @@ export function makeAtmosphere(model, scene, id, theme, random) {
   }
   const stars = particleField(model, scene, random, { count: 100, size: .092, drift: [0, 0], shape: 0, color: theme.sky }, true);
   const air = particleField(model, scene, random, AIR[theme.air], false);
-  return (time, camera, pixelsPerUnit, tall) => {
-    halo.position.x = haloX + (tall ? .55 : 0);
+  function paint(time, camera, pixelsPerUnit, signal) {
     halo.quaternion.copy(camera.quaternion);
+    glow.material.opacity = .36 + signal * .41;
+    glow.scale.set(1.48 + signal * .43, 1.48 + signal * .43, 1);
+    const breath = radius * (1.18 + (1 - signal) * .47);
+    lightRing.visible = signal > .04;
+    lightRing.scale.set(breath, breath, 1);
+    lightRing.material.opacity = signal * .48;
     stars(time, pixelsPerUnit);
     air(time, pixelsPerUnit);
     skyMotion?.(time);
-  };
+  }
+
+  return { bounds, label, paint };
 }

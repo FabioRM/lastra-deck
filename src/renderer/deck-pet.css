@@ -94,10 +94,10 @@
 
 .pet-scene {
   position: absolute;
-  inset: 0 0 0 235px;
+  inset: 0 0 0 278px;
 }
 
-#pet-canvas { display: block; width: 100%; height: 100%; cursor: pointer; }
+#pet-canvas { display: block; width: 100%; height: 100%; cursor: pointer; mask-image: linear-gradient(to right, transparent, #000 8%); }
 #pet-habitat[data-passive] #pet-canvas { cursor: default; pointer-events: none; }
 #pet-habitat[data-motion] #pet-canvas:not([hidden]) { animation: pet-scene-appear .52s ease-out both; }
 @keyframes pet-scene-appear {
@@ -187,7 +187,7 @@
 .pet-actions { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 7px; }
 .pet-actions button { grid-column: span 2; }
 .pet-actions button:nth-child(n + 4) { grid-column: span 3; }
-.pet-actions button, #pet-feature {
+.pet-actions button, .pet-world-actions button {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -205,15 +205,20 @@
   overflow-wrap: anywhere;
 }
 
-#pet-feature {
+.pet-world-actions {
   position: absolute;
   z-index: 1;
   inset-inline-end: 22px;
   inset-block-end: 20px;
+  display: flex;
+  gap: 7px;
+}
+.pet-world-actions button {
   padding-inline: 15px;
   min-height: 50px;
   background: color-mix(in srgb, var(--pet-night) 83%, transparent);
 }
+#pet-sky { inline-size: 50px; padding-inline: 0; }
 
 #pet-habitat button svg { width: 24px; height: 24px; flex: none; fill: none; stroke: var(--pet-accent); stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
 .pet-actions button { gap: 5px; padding-inline: 5px; }
@@ -228,9 +233,10 @@
   background: radial-gradient(ellipse at 50% 47%, var(--pet-glow), var(--pet-mid) 40%, transparent 72%);
 }
 .portrait .pet-scene { inset: 180px 0 246px; }
+.portrait #pet-canvas { mask-image: none; }
 .portrait :is(.pet-details, .pet-care) { margin-inline: 32px; }
 .portrait .pet-details { margin-block-start: 34px; }
 .portrait .pet-care { margin-block-end: 24px; }
 .portrait .pet-actions { grid-template-columns: repeat(5, minmax(0, 1fr)); }
 .portrait .pet-actions button { grid-column: span 1; min-height: 76px; }
-.portrait #pet-feature { inset-block: 155px auto; inset-inline-end: 32px; }
+.portrait .pet-world-actions { inset-block: 155px auto; inset-inline-end: 32px; }

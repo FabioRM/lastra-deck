@@ -41,6 +41,8 @@ h1 { margin-block: .65rem 1.25rem; font-size: clamp(2.65rem, 7vw, 5.5rem); lette
 .hero-links { display: flex; align-items: center; flex-wrap: wrap; gap: .85rem 1.4rem; margin-top: 1.75rem; }
 .button { display: inline-block; background: var(--accent); color: #12231f; padding: .75rem 1.15rem; border-radius: .45rem; font-weight: 700; text-decoration: none; }
 .button:hover { background: #d8f5e9; color: #12231f; }
+.button-secondary { background: var(--surface); color: var(--text); box-shadow: inset 0 0 0 1px var(--border); }
+.button-secondary:hover { background: #2e3d45; color: var(--text); }
 .text-link { font-weight: 620; }
 .requirements { margin-top: .9rem; font-size: .94rem; color: var(--muted); }
 .deck { margin-top: 2.6rem; }
@@ -57,7 +59,6 @@ h1 { margin-block: .65rem 1.25rem; font-size: clamp(2.65rem, 7vw, 5.5rem); lette
   padding-block: clamp(2.75rem, 5vw, 4.5rem);
 }
 .pet-showcase .platform { margin-bottom: .45rem; }
-.pet-showcase .pet-source { margin-block: .65rem; font-size: .94rem; }
 .pet-demo video {
   display: block;
   width: 100%;

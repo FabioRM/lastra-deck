@@ -15,6 +15,7 @@
     const mood = document.getElementById('pet-mood');
     const feedback = document.getElementById('pet-feedback');
     const feature = document.getElementById('pet-feature');
+    const sky = document.getElementById('pet-sky');
     const featureName = document.getElementById('pet-feature-name');
     const sleepLabel = document.getElementById('pet-sleep-label');
     const sleepButton = sleepLabel.closest('button');
@@ -37,15 +38,16 @@
     let needsTimer;
     let feedbackTimer;
     let reaction;
-    let feedbackMessage = '';
+    let feedbackMessage;
     let busy = false;
     let blocked = false;
     let lastFrame = 0;
     let sleeping = false;
+    let needs;
     const passive = () => blocked || stage.hasAttribute('data-view-only');
 
     function renderNeeds() {
-      const needs = petNeeds(state.care);
+      needs = petNeeds(state.care);
       const currentSleep = petIsSleeping(state.care);
       const changed = sleeping !== currentSleep;
       sleeping = currentSleep;
@@ -85,14 +87,14 @@
       feature.setAttribute('aria-label', t('Explore {feature}', { feature: featureName.textContent }));
       fallback.firstElementChild.textContent = pet.emoji;
       renderNeeds();
-      feedback.textContent = t(feedbackMessage);
+      renderFeedback();
     }
 
     function animate() { return state.settings.motion && !reducedMotion.matches; }
 
     function paint(now, motion = animate()) {
       if (!visible || !scene || lostContext) return;
-      scene.draw(now / 1000, motion, reaction, sleeping);
+      scene.draw(now / 1000, motion, reaction, sleeping, needs);
       lastFrame = now;
     }
 
@@ -109,6 +111,7 @@
     function showCanvas(show) {
       canvas.hidden = !show;
       fallback.hidden = show;
+      sky.hidden = !show;
     }
 
     function updateScene() {
@@ -119,12 +122,12 @@
       if (width < 1 || height < 1) return;
       const settings = state.settings;
       const nextWorld = `${settings.habitat}:${settings.species}`;
+      scene.resize(width, height);
       if (world !== nextWorld) {
         scene.setWorld(settings);
         world = nextWorld;
         reaction = undefined;
       }
-      scene.resize(width, height);
       lastFrame = -Infinity;
       draw(performance.now());
       showCanvas(true);
@@ -161,17 +164,25 @@
       if (restoreFocus) toggle.focus({ preventScroll: true });
       if (!open) {
         reaction = undefined;
-        feedbackMessage = '';
+        feedbackMessage = undefined;
         clearTimeout(feedbackTimer);
       }
       updateVisibility();
     }
 
-    function announce(message) {
-      feedbackMessage = message;
-      feedback.textContent = t(message);
+    function renderFeedback() {
+      const { message, object } = feedbackMessage ?? {};
+      feedback.textContent = t(message, object ? { object: t(object) } : undefined);
+    }
+
+    function announce(message, object) {
+      feedbackMessage = { message, object };
+      renderFeedback();
       clearTimeout(feedbackTimer);
-      feedbackTimer = setTimeout(() => { feedbackMessage = feedback.textContent = ''; }, 3600);
+      feedbackTimer = setTimeout(() => {
+        feedbackMessage = undefined;
+        renderFeedback();
+      }, 3600);
     }
 
     toggle.addEventListener('click', () => setOpen(panel.hidden));
@@ -182,10 +193,17 @@
     toggle.addEventListener('keydown', (event) => {
       if (event.key === 'Escape') setOpen(false);
     });
-    async function interact(action) {
+    async function interact(action, hit = {}) {
       if (!action || busy || !visible || passive()) return;
       const wasSleeping = sleeping;
       if (wasSleeping && action !== 'sleep' && action !== 'pet') return;
+      if (action === 'sky') {
+        if (!scene) return;
+        reaction = { action };
+        announce('Looking up at the {object}', hit.label ?? scene.skyLabel());
+        if (!animate()) paint(performance.now(), false);
+        return;
+      }
       busy = true;
       render();
       try {
@@ -193,8 +211,9 @@
         if (!visible) return;
         if (!result?.ok) throw new Error('Pet action unavailable.');
         const effect = wasSleeping && !result.sleeping ? 'wake' : action;
-        reaction = { action: effect, at: performance.now() / 1000 };
-        announce(messages[effect]);
+        reaction = { action: effect, target: hit.target };
+        if (hit.label && effect === 'explore') announce('Investigating {object}', hit.label);
+        else announce(messages[effect]);
         if (!animate()) paint(performance.now(), false);
       } catch {
         if (visible) announce('Could not care for your pet.');
@@ -212,9 +231,9 @@
       if (!scene || !visible || busy || passive()) return;
       const hit = scene.pick(event.clientX, event.clientY);
       if (hit?.point && !sleeping) {
-        scene.walk(hit.point, performance.now() / 1000, animate());
+        scene.walk(hit.point, animate(), needs);
         if (!animate()) paint(performance.now(), false);
-      } else if (hit?.action) void interact(hit.action);
+      } else if (hit?.action) void interact(hit.action, hit);
     });
     canvas.addEventListener('webglcontextlost', (event) => {
       event.preventDefault();

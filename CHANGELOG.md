@@ -4,12 +4,13 @@ Completed items from the former TODO, grouped by the section that tracked them. 
 
 Entries grouped under **0.2.1** record the completed work through the first reviewed source release.
 
-## Unreleased
+## 1.3.0
 
 - Add an interactive 3D Deck pet with eight animals and eight habitats, including two robots and two cyberpunk environments. The paw button opens it in the Deck Keys area.
 - Add five pet needs, care actions, touch interactions, and local progress. Choose the animal, habitat, name, and motion preference in **Settings → Deck pet**.
+- Widen the habitats in landscape. Pets roam and choose activities based on their needs. Direct touches and care actions alternate animations. Each habitat has three interactive objects and a sun, moon, or planet the pet can look at.
 - Add **Settings → About Lastra** with the creator, version, MIT license, and project links.
-- Add the Deck pet walkthrough and demo to the project website.
+- Update the project website with the new Deck pet demo and direct downloads for Windows and Linux.
 
 ## 1.2.0
 

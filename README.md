@@ -35,11 +35,11 @@ The deck comes with 14 themes and five quick looks. [Deck look](docs/deck-look.m
 
 ## Getting started
 
-Download the installer or browse the reviewed source on the public release page. [Lastra v1.2.0](https://github.com/FabioRM/lastra-deck/releases/tag/v1.2.0) · [Windows x64 installer](https://github.com/FabioRM/lastra-deck/releases/download/v1.2.0/Lastra-Setup-1.2.0.exe) · [SHA‑256 checksum](https://github.com/FabioRM/lastra-deck/releases/download/v1.2.0/Lastra-Setup-1.2.0.exe.sha256) · [Catalog redistribution review](docs/catalog-redistribution.md)
+Download Lastra 1.3.0 for your system. [Windows x64 installer](https://github.com/FabioRM/lastra-deck/releases/download/v1.3.0/Lastra-Setup-1.3.0.exe) · [Linux .deb](https://github.com/FabioRM/lastra-deck/releases/download/v1.3.0/Lastra-1.3.0-linux-amd64.deb) · [Linux AppImage](https://github.com/FabioRM/lastra-deck/releases/download/v1.3.0/Lastra-1.3.0-linux-x86_64.AppImage) · [Checksums and reviewed source](https://github.com/FabioRM/lastra-deck/releases/tag/v1.3.0)
 
 Set the XENEON EDGE to **Extend these displays** in Windows Display settings. The panel runs at 2560 × 720 in landscape and 720 × 2560 in portrait.
 
-**Install the app.** Download `Lastra-Setup-1.2.0.exe` and run it on Windows x64. It installs for the current user in `%LOCALAPPDATA%\Programs\Lastra` and adds Start menu and desktop shortcuts. The Windows installer is unsigned. Settings and profiles live in `%APPDATA%\Lastra` and survive updates and uninstalls. [Latest release](https://github.com/FabioRM/lastra-deck/releases/latest) · [Update behavior](https://github.com/FabioRM/lastra-deck/blob/main/docs/releasing.md#update-behavior)
+**Install the app.** Run `Lastra-Setup-1.3.0.exe` on Windows x64. It installs for the current user in `%LOCALAPPDATA%\Programs\Lastra` and adds Start menu and desktop shortcuts. The Windows installer is unsigned. Settings and profiles live in `%APPDATA%\Lastra` and survive updates and uninstalls. [Linux setup](docs/linux-deck.md) · [Windows update behavior](docs/releasing.md#update-behavior)
 
 **Run from source.** Install **Node.js 22.12.0 or later**, as required by the Electron installer, then run these commands from the project directory. Source runs never check for updates. To build the installer yourself, see [Releasing](docs/releasing.md).
 
@@ -73,11 +73,11 @@ Use **Export diagnostics…** under **Settings → System → Diagnostics** to s
 
 From **Deck Keys**, tap the paw immediately before the page lock. The pet's 3D habitat opens in the shortcut area. Tap the paw again to return to your keys.
 
-Tap your pet to cuddle or wake it, tap the ground to move it, and tap a habitat object to explore it. Each habitat has an interactive object the pet also visits on its own. Use the care buttons to feed, play, cuddle, wash, and nap, and watch the five indicators for hunger, happiness, playfulness, sleepiness, and hygiene.
+Tap your pet to cuddle or wake it, tap the ground to move it, and tap one of the three interactive objects in each habitat to explore it. Tap the sun, moon, or planet to draw its attention upward. Pets roam the wider islands and choose activities based on hunger, happiness, playfulness, sleepiness, and hygiene. Touches and care buttons cycle through different reactions.
 
 Under **Settings → Deck pet**, choose an animal, a habitat, a name, and whether the scene animates. The eight pets include K-9 the robot dog and Bip the companion drone. Habitats include Lantern Grove, Aurora Peak, Neon Alley, and the Cybergreenhouse. Progress stays on your computer and time spent napping counts while Lastra is closed.
 
-Deck pet is available on `main`. Use the **Run from source** steps above with the current source to try it. The latest published installer is v1.2.0. [Watch the deck pet demo](https://fabiorm.github.io/lastra-deck/#deck-pet)
+Deck pet is included in Lastra 1.3.0 for Windows and Linux. [Watch the deck pet demo](https://fabiorm.github.io/lastra-deck/#deck-pet)
 
 ![K-9 in the neon alley habitat with five care indicators](docs/preview-pet-neon.webp)
 

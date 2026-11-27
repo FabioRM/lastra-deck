@@ -1,12 +1,12 @@
 name: Release
 
-# A release tag builds the Windows installer from the audited public checkout.
+# A release tag builds both platforms from the audited public checkout.
 on:
   push:
     tags: ['v*', '!v0.2.1']
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: release-${{ github.ref }}
@@ -41,7 +41,7 @@ jobs:
           git archive --format=zip --prefix="$name/" --output="$archive" HEAD
           if ($LASTEXITCODE -ne 0) { throw 'Public source archive failed.' }
           $hash = (Get-FileHash -LiteralPath $archive -Algorithm SHA256).Hash.ToLowerInvariant()
-          "$hash  $name-source.zip" | Set-Content -LiteralPath "$archive.sha256" -Encoding ascii
+          [IO.File]::WriteAllText("$archive.sha256", "$hash  $name-source.zip" + [char]10, [Text.Encoding]::ASCII)
           Expand-Archive -LiteralPath $archive -DestinationPath $env:RUNNER_TEMP
           "directory=$(Join-Path $env:RUNNER_TEMP $name)" >> $env:GITHUB_OUTPUT
       - name: Install audited source dependencies
@@ -71,7 +71,7 @@ jobs:
           $installer = Join-Path $build $installerName
           $source = Join-Path $env:GITHUB_WORKSPACE "dist/lastra-$env:RELEASE_VERSION-source.zip"
           $hash = (Get-FileHash -LiteralPath $installer -Algorithm SHA256).Hash.ToLowerInvariant()
-          "$hash  $installerName" | Set-Content -LiteralPath "$installer.sha256" -Encoding ascii
+          [IO.File]::WriteAllText("$installer.sha256", "$hash  $installerName" + [char]10, [Text.Encoding]::ASCII)
           $files = @($installer, "$installer.blockmap", "$installer.sha256", (Join-Path $build 'latest.yml'), $source, "$source.sha256")
           $destination = New-Item -ItemType Directory -Path 'dist/release' -Force
           Copy-Item -LiteralPath $files -Destination $destination.FullName
@@ -81,17 +81,80 @@ jobs:
           name: lastra-windows-${{ github.ref_name }}
           path: dist/release/
           if-no-files-found: error
+
+  linux:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - name: Install packaging tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends libarchive-tools
+      - name: Install audited source dependencies
+        run: npm ci
+        env:
+          ELECTRON_SKIP_BINARY_DOWNLOAD: '1'
+      - name: Check audited source
+        run: npm run check
+      - name: Build and verify the Linux packages
+        run: |
+          sh scripts/release-linux.sh "$GITHUB_REF_NAME"
+          version="${GITHUB_REF_NAME#v}"
+          cd out
+          sha256sum --check --strict ./*.sha256
+          test "$(dpkg-deb -f "Lastra-$version-linux-amd64.deb" Version)" = "$version"
+          test "$(dpkg-deb -f "Lastra-$version-linux-amd64.deb" Architecture)" = amd64
+      - name: Keep the Linux release bundle as a workflow artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: lastra-linux-${{ github.ref_name }}
+          compression-level: 0
+          if-no-files-found: error
+          path: |
+            out/Lastra-*.deb
+            out/Lastra-*.deb.sha256
+            out/Lastra-*.AppImage
+            out/Lastra-*.AppImage.sha256
+            out/lastra-wayland@fabiorm.github.io.zip
+            out/lastra-wayland@fabiorm.github.io.zip.sha256
+
+  draft:
+    needs: [windows, linux]
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: lastra-*-${{ github.ref_name }}
+          path: release
+          merge-multiple: true
+      - name: Verify the combined release bundle
+        working-directory: release
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          for file in "Lastra-Setup-$version.exe" "Lastra-$version-linux-amd64.deb" \
+            "Lastra-$version-linux-x86_64.AppImage" "lastra-$version-source.zip" "lastra-wayland@fabiorm.github.io.zip"; do
+            test -s "$file"
+            sha256sum --check --strict "$file.sha256"
+          done
+          test -s "Lastra-Setup-$version.exe.blockmap"
+          grep -Fx "version: $version" latest.yml
       - name: Create the draft GitHub release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          $tag = $env:GITHUB_REF_NAME
-          $repo = $env:GITHUB_REPOSITORY
-          gh release view $tag --repo $repo --json isDraft 2>$null | Out-Null
-          if ($LASTEXITCODE -eq 0) {
-            Write-Output "Release $tag already exists. The workflow artifact contains this build."
+          tag="$GITHUB_REF_NAME"
+          repo="$GITHUB_REPOSITORY"
+          if gh release view "$tag" --repo "$repo" --json isDraft >/dev/null 2>&1; then
+            printf '%s\n' "Release $tag already exists. Both builds are available as workflow artifacts."
             exit 0
-          }
-          $files = @(Get-ChildItem -LiteralPath 'dist/release' -File | Select-Object -ExpandProperty FullName)
-          gh release create $tag --repo $repo --verify-tag --draft --title "Lastra $tag" --generate-notes @files
-          if ($LASTEXITCODE -ne 0) { throw 'Draft release creation failed.' }
+          fi
+          gh release create "$tag" --repo "$repo" --verify-tag --draft --title "Lastra $tag" --generate-notes release/*

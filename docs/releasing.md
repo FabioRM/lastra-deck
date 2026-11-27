@@ -30,7 +30,7 @@ The package contains `src/`, `profiles/`, `extensions/`, `assets/`, the license 
 
 ## Catalog redistribution
 
-This public repository mirrors source prepared with the catalog redistribution rules. The release workflow archives the tagged public tree and builds its Windows installer from the extracted files. [Catalog redistribution](catalog-redistribution.md)
+This public repository mirrors source prepared with the catalog redistribution rules. The release workflow archives the tagged public tree and builds the Windows installer and Linux packages from that revision. [Catalog redistribution](catalog-redistribution.md)
 
 For a local release build, run `npm ci`, `npm run check`, and `npm run dist` in the extracted source directory. The installer, blockmap and update metadata appear under `out/`. Run `sh scripts/release-linux.sh` from the same source on Linux for the `.deb`, AppImage, GNOME extension and their SHA-256 files.
 
@@ -38,8 +38,8 @@ For a local release build, run `npm ci`, `npm run check`, and `npm run dist` in 
 
 1. Update `version` in `package.json` and `package-lock.json`, for example with `npm version 0.2.2 --no-git-tag-version`. Commit the change.
 2. Tag the commit with the same version and push the tag: `git tag v0.2.2` then `git push origin v0.2.2`.
-3. The workflow checks that the tag matches `package.json`, then archives the public source and runs `npm run check` and `npm run dist` there. It retains the installer and its checksum, the blockmap, `latest.yml`, and the source ZIP and its checksum as a workflow artifact. If the release is new, it creates a **draft** with the same files. [Release workflow](../.github/workflows/release.yml)
-4. Build the Linux packages from the same source and attach them to the draft with their checksums. Review all files and add release notes.
+3. The Windows and Linux jobs verify the tag, run `npm run check` and package the tagged source. The workflow checks both bundles and creates one **draft** with the Windows installer and update metadata, the Linux .deb and AppImage, the GNOME extension, the source ZIP, and SHA-256 files. [Release workflow](../.github/workflows/release.yml)
+4. Review the files and add release notes. If the draft already exists, compare its assets with both workflow artifacts.
 5. Publish the draft. Installed copies find the update at their next check.
 
 electron-updater reads only published releases from `FabioRM/lastra-deck`, and the repository must be public for installed copies to read them. Leave `latest.yml` and the `.blockmap` attached to the release, since they let installed copies verify and download updates. Pre-releases are ignored.

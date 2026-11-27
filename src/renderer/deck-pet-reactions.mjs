@@ -1,7 +1,6 @@
 import * as THREE from '../../node_modules/three/build/three.module.js';
 import { arc, easeInOut, pulse } from './deck-pet-animals.mjs';
-
-const DURATIONS = { feed: 2.22, play: 2.10, pet: 2.34, wash: 2.42, explore: 2.65, wake: 1.21 };
+import { clipEffect } from './deck-pet-behavior.mjs';
 
 function heartShape() {
   const shape = new THREE.Shape();
@@ -26,12 +25,16 @@ function sleepShape() {
   return new THREE.ShapeGeometry(letter);
 }
 
-function movesFruit(apple, age) {
+function movesFruit(apple, age, effect) {
   const travel = easeInOut(age, .13, .91);
   const munch = easeInOut(age, .79, .95);
   apple.visible = age < .96;
-  apple.position.set(1.06 - travel * .79, .17 + .94 * travel + .15 * arc(age, .14, .89), 1.24 + .07 * travel);
-  apple.rotation.set(.10 - travel * .23, travel * 3.3, .17 - travel * .71);
+  const toss = effect === 'toss';
+  const sniff = effect === 'sniff';
+  const rise = toss ? 1.18 : sniff ? .06 : .19;
+  const height = .17 + (sniff ? .82 : 1.00) * travel + rise * arc(age, .14, .89);
+  apple.position.set(1.06 - travel * .79, height, 1.24 + .07 * travel);
+  apple.rotation.set(.10 - travel * .23, travel * (toss ? 9.75 : 3.30), .17 - travel * .71);
   apple.scale.setScalar(Math.max(.001, easeInOut(age, .02, .23) * (1 - munch)));
 }
 
@@ -124,15 +127,15 @@ export function makeReactions(model, scene, theme) {
     }
   }
 
-  function updateHearts(age, camera) {
+  function updateHearts(age, camera, flop) {
     hearts.forEach((love, index) => {
       const rise = age - (.22 + index * .106);
       const spread = index % 2 ? -1 : 1;
       love.visible = rise > 0 && rise < 1.24;
       if (!love.visible) return;
       const float = rise / 1.24;
-      love.position.set(.27 + spread * (.24 + index * .073) * (float + .58) + Math.sin(float * 5 + index) * .115,
-        1.43 + index * .028 + float * 1.44, 1.32 + index * .03);
+      love.position.set(.27 + (flop ? .34 : 0) + spread * (.24 + index * .073) * (float + .58) + Math.sin(float * 5 + index) * .115,
+        (flop ? .98 : 1.43) + index * .028 + float * 1.44, 1.32 + index * .03);
       const scale = (.24 - index * .015) * easeInOut(rise, 0, .24) * (1 - easeInOut(float, .67, 1));
       love.scale.setScalar(scale * (1 + .12 * Math.sin(float * 16)));
       love.quaternion.copy(camera.quaternion);
@@ -140,34 +143,40 @@ export function makeReactions(model, scene, theme) {
     });
   }
 
-  function updateSparks(action, age) {
-    const play = action === 'play';
-    const time = age - (play ? age >= 1.72 ? 1.72 : 1.02 : .79);
+  function updateSparks(effect, age) {
+    const play = effect === 'ball';
+    const fruit = effect === 'snack' || effect === 'toss';
+    const ground = effect === 'dust' || play;
+    const orbit = effect === 'ribbon';
+    const glints = effect === 'glints' || effect === 'sniff';
+    const time = age - (play ? age >= 1.72 ? 1.72 : 1.02 : fruit ? .79 : .21);
     const sourceX = play ? age >= 1.72 ? 1.29 : .38 : .28;
-    const sourceZ = play ? 1.36 : 1.44;
+    const sourceZ = ground ? 1.36 : 1.04;
     sparks.forEach((flash, index) => {
-      const burst = time - (index % 4) * .025;
-      flash.visible = (play || action === 'feed') && burst > 0 && burst < .69;
+      const burst = time - (orbit ? index * .038 : (index % 4) * .025);
+      flash.visible = (ground || fruit || orbit || glints || effect === 'stars') && burst > 0 && burst < (orbit ? 1.12 : .73);
       if (!flash.visible) return;
-      const angle = index * 2.399;
-      const distance = Math.sqrt(burst) * (.40 + index % 4 * .14);
-      const up = play ? .16 + 1.5 * burst - 1.58 * burst ** 2 : 1.24 + 1.44 * burst - 1.09 * burst ** 2;
+      const angle = index * 2.399 + (orbit ? burst * 7.5 : 0);
+      const distance = orbit ? .67 + burst * .31 : Math.sqrt(burst) * (.40 + index % 4 * .14);
+      const up = ground ? .10 + 1.5 * burst - 1.58 * burst ** 2 : 1.20 + (glints ? .65 : 1.46) * burst - .79 * burst ** 2;
       flash.position.set(sourceX + Math.cos(angle) * distance, up + .24 * distance * Math.sin(angle),
-        sourceZ + Math.sin(angle) * distance * .30);
+        sourceZ + Math.sin(angle) * distance * (orbit ? .66 : .30));
       flash.rotation.set(index, time * 4, angle + time * 3);
-      flash.scale.setScalar((.045 + index % 3 * .023) * pulse(burst, 0, .19, .69));
+      flash.scale.setScalar((.055 + index % 3 * .026) * pulse(burst, 0, .19, orbit ? 1.12 : .73));
     });
   }
 
-  function updateWash(action, age, camera) {
+  function updateWash(effect, age, camera) {
+    const spray = effect === 'splash';
     bubbles.forEach((bubble, index) => {
-      const rise = age - .06 - index * .072;
-      bubble.visible = action === 'wash' && rise >= 0 && rise < 1.13;
+      const rise = age - .06 - index * (spray ? .038 : .072);
+      bubble.visible = (effect === 'bubbles' || spray) && rise >= 0 && rise < 1.13;
       if (!bubble.visible) return;
       const angle = index * 2.399 + rise * 4;
       const size = (.074 + index % 4 * .024) * pulse(rise, 0, .32, 1.13);
-      const radius = .32 + rise * .44;
-      bubble.position.set(.25 + Math.cos(angle) * radius, .37 + rise * 1.45 + (index % 3) * .13,
+      const radius = .32 + rise * (spray ? 1.20 : .44);
+      const height = spray ? .29 + 2.83 * rise - 2.45 * rise * rise : .37 + rise * 1.45;
+      bubble.position.set(.25 + Math.cos(angle) * radius, height + (index % 3) * .13,
         .86 + Math.sin(angle) * radius * .54);
       bubble.scale.setScalar(size);
       bubble.quaternion.copy(camera.quaternion);
@@ -186,20 +195,16 @@ export function makeReactions(model, scene, theme) {
     });
   }
 
-  return (action, age, camera, sleeping, time) => {
-    if (action === 'feed') movesFruit(apple, age);
+  return (clip, age, camera, sleeping, time, action) => {
+    const effect = clipEffect(clip);
+    if (effect === 'snack' || effect === 'toss' || (effect === 'sniff' && action === 'feed')) movesFruit(apple, age, effect);
     else apple.visible = false;
-    if (action === 'play') updateToy(age, camera);
+    if (effect === 'ball') updateToy(age, camera);
     else for (const part of [toy, ring, ...echoes]) part.visible = false;
-    if (action === 'pet') updateHearts(age, camera);
+    if (effect === 'hearts') updateHearts(age, camera, clip === 'flop');
     else for (const love of hearts) love.visible = false;
-    updateSparks(action, age);
-    updateWash(action, age, camera);
+    updateSparks(effect, age);
+    updateWash(effect, age, camera);
     updateSleep(sleeping, time, camera);
   };
-}
-
-export function activeReaction(reaction, seconds, motion) {
-  const age = reaction ? Math.max(0, seconds - reaction.at) : 0;
-  return motion && age < (DURATIONS[reaction?.action] ?? 0) ? { action: reaction.action, age } : { age: 0 };
 }

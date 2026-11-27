@@ -1,5 +1,6 @@
 import * as THREE from '../../node_modules/three/build/three.module.js';
 import { makeRobot } from './deck-pet-cyber.mjs';
+import { sampleClip } from './deck-pet-behavior.mjs';
 
 const ANIMALS = {
   fox: { coat: '#ee9553', cream: '#ffe5bb', paws: '#82534a', ears: 'pointed' },
@@ -77,8 +78,7 @@ function makeTail(model, body, species, { coat, cream, paws }) {
   return tail;
 }
 
-export function makeCompanion(model, scene, species) {
-  if (species === 'robodog' || species === 'drone') return makeRobot(model, scene, species);
+function makeAnimal(model, scene, species) {
   const { group, mesh, link } = model;
   const palette = ANIMALS[species];
   const { coat, cream, paws } = palette;
@@ -152,6 +152,18 @@ export function makeCompanion(model, scene, species) {
   return { root, body, head, eyes, ears, limbs, tail, mouth, blush, species };
 }
 
+export function makeCompanion(model, scene, species) {
+  const mechanical = species === 'robodog' || species === 'drone';
+  const pet = mechanical ? makeRobot(model, scene, species) : makeAnimal(model, scene, species);
+  const stains = model.group(pet.body);
+  const dirt = model.track(new THREE.MeshBasicMaterial({ color: mechanical ? '#5c535b' : '#624d46', transparent: true, depthWrite: false }));
+  for (const [x, y, z, size] of [[-.24, .53, .358, .075], [-.18, .46, .411, .047], [.23, .51, .381, .059], [.19, .69, .37, .036]]) {
+    const spot = model.mesh(stains, 'ball', dirt, [x, y, z], [size, size * .64, .028]);
+    spot.rotation.set(-.14, x * 1.25, x * 3.15);
+  }
+  return { ...pet, stains, dirt };
+}
+
 const clamp = (number) => Math.min(1, Math.max(0, number));
 const smooth = (number) => {
   const value = clamp(number);
@@ -163,50 +175,67 @@ export function arc(age, start, end) {
   return age > start && age < end ? Math.sin((age - start) / (end - start) * Math.PI) : 0;
 }
 
-export function poseCompanion(pet, time, motion, action, age, { sleeping, walking, arriving }) {
-  const playing = action === 'play';
-  const feeding = action === 'feed';
-  const cuddling = action === 'pet';
-  const jump = playing ? arc(age, .35, .97) * .55 + arc(age, 1.12, 1.70) * .34 : 0;
-  const squish = playing ? pulse(age, .04, .26, .42) + pulse(age, .88, 1.0, 1.15) * .72
-    + pulse(age, 1.56, 1.73, 1.92) * .57 : 0;
-  const nuzzle = cuddling ? easeInOut(age, .06, .46) * (1 - easeInOut(age, 1.38, 2.28)) : 0;
-  const interest = feeding ? pulse(age, .12, .55, .97) : playing ? pulse(age, .04, .69, 1.8) : 0;
-  const chewing = feeding ? pulse(age, .76, 1.11, 1.87) * (.5 + .5 * Math.cos((age - .79) * 23)) : 0;
-  const idle = motion ? Math.sin(time * 2.6) : 0;
-  const attention = motion ? pulse(time % 12.6, 4.8, 5.7, 7.3) - pulse(time % 12.6, 8.5, 9.4, 10.4) : 0;
-  const blinkTime = time % 5.35;
-  const blink = motion ? Math.max(pulse(blinkTime, 3.72, 3.83, 3.97), .9 * pulse(blinkTime, 4.2, 4.29, 4.4)) : 0;
-  const swing = motion ? Math.sin(time * 2.15) : 0;
-  const step = motion ? Math.sin(time * 15) * walking : 0;
-  const rinse = action === 'wash' ? pulse(age, .08, .58, 1.98) : 0;
-  const stretch = action === 'wake' ? pulse(age, .02, .40, 1.08) : 0;
-  const hover = pet.hover ? pet.hover + (motion ? Math.sin(time * 3.2) * .045 : 0) : 0;
+export function poseCompanion(pet, time, motion, clip, age, movement, needs) {
+  const { sleeping, walking, turn, gaze, x, z } = movement;
+  const { lift = 0, shift = 0, lean = 0, turn: spin = 0, squash = 0, pitch = 0, yaw = 0, tilt = 0,
+    chew = 0, open = 0, eyes = 0, wag = 0, paw = 0, paws = 0, arms = 0, shake = 0 } = sampleClip(clip, age);
+  const tired = clamp((59 - (needs?.energy ?? 80)) / 45);
+  const lowMood = clamp((51 - (needs?.joy ?? 88)) / 38);
+  const hungry = clamp((53 - (needs?.fullness ?? 84)) / 38);
+  const dirty = clamp((52 - (needs?.hygiene ?? 90)) / 36);
+  const relaxed = 1 - tired * .47;
+  const idle = motion ? Math.sin(time * (2.6 - tired * 1.1)) : 0;
+  const tailWag = motion ? Math.sin(time * (2.15 + 4 * wag) + shift) : 0;
+  const blinkTime = time % (5.35 - tired * 1.1);
+  const blink = motion ? pulse(blinkTime, 2.34, 2.42, 2.57 + tired * .24) : 0;
+  const stride = pet.hover ? 9 : pet.species === 'rabbit' ? 12 : 15;
+  const step = motion ? Math.sin(time * stride * relaxed) * walking : 0;
+  const bob = pet.hover ? .038 : pet.species === 'rabbit' ? .17 : .098;
+  const hover = pet.hover ? pet.hover + idle * .041 : 0;
+  const vibration = motion ? Math.sin(age * 29) * shake : 0;
+  const sniff = motion && !clip ? Math.sin(time * 9) * pulse(time % 4.5, 1.93, 2.23, 2.55) * hungry : 0;
+  const mouth = Math.max(open, chew * (.56 + Math.sin(age * 23) * .44));
+  const direction = turn ?? 0;
+  let faceAngle = .33 + direction;
+  let gazeYaw = 0;
+  let gazePitch = 0;
+  if (gaze) {
+    const dx = gaze.x - x;
+    const dz = gaze.z - z;
+    const offset = THREE.MathUtils.euclideanModulo(Math.atan2(dx, dz) - faceAngle + Math.PI, Math.PI * 2) - Math.PI;
+    const turnTo = THREE.MathUtils.clamp(offset, -.91, .91);
+    faceAngle += turnTo * gaze.weight;
+    gazeYaw = THREE.MathUtils.clamp(offset - turnTo, -.62, .62) * gaze.weight;
+    const angle = Math.atan2(gaze.y - 1.22, Math.max(.2, Math.hypot(dx, dz)));
+    gazePitch = THREE.MathUtils.clamp(-angle - (gaze.sky ? .31 : 0), -.60, .39) * gaze.weight;
+  }
 
-  pet.root.position.set(.25 + (playing ? Math.sin(age * 5.2) * interest * .23 : 0),
-    jump + hover + Math.abs(step) * .10 + arriving * .13, .57);
-  pet.root.rotation.set(0, .33 + attention * .11 + (playing ? interest * Math.sin(age * 4) * .27 : 0), .055 * nuzzle);
-  pet.body.scale.set(1 + squish * .135 - jump * .11, 1 + idle * .033 - .19 * squish + jump * .18 + .15 * stretch, 1 + squish * .115);
-  pet.head.rotation.set(interest * (feeding ? .20 : -.18) + chewing * .105, attention * .22 - interest * .12,
-    .042 * swing + nuzzle * (.28 + .035 * Math.sin(age * 6)) - squish * .085 + rinse * Math.sin(age * 16) * .13 - arriving * .18);
-  pet.tail.rotation.set(swing * .065, swing * (.14 + nuzzle * .13) + jump * .42, .13 * nuzzle + .19 * jump);
-  pet.mouth.scale.set(1 + chewing * .22, 1 + chewing * 1.7, 1);
-  for (const eye of pet.eyes) eye.scale.y = 1 - Math.max(nuzzle * .86, blink * .93, chewing * .24);
-  for (const cheek of pet.blush) cheek.scale.set(.087 + nuzzle * .028, .045 + nuzzle * .017, .025);
-  for (const { rig, side, tilt } of pet.ears) {
-    rig.rotation.x = .08 * swing + squish * .22 - jump * .5 + side * attention * .10;
-    rig.rotation.z = tilt + side * (.036 * idle + jump * .22 + nuzzle * .12);
+  pet.root.position.set(x + shift * .67, lift + hover + Math.abs(step) * bob + Math.abs(lean) * .11, z - Math.abs(shift) * .12);
+  pet.root.rotation.set(0, faceAngle + spin, lean + step * .047);
+  pet.body.scale.set(1 + squash * .29 - lift * .08, 1 + idle * .028 - squash + lift * .13 - tired * .075, 1 + squash * .22);
+  pet.head.rotation.set(pitch + gazePitch + (tired * .14 + lowMood * .09) + step * .053 + sniff * .13,
+    yaw + gazeYaw + vibration * .24, tilt + .032 * tailWag + vibration * .16);
+  pet.tail.rotation.set(tailWag * .055 - lowMood * .16, tailWag * (.14 + wag * .42) * relaxed + lift * .42, lean * .27 + lift * .20);
+  pet.mouth.scale.set(1 + mouth * .11, 1 + mouth * 2.3, 1);
+  pet.stains.visible = dirty > .03;
+  pet.dirt.opacity = dirty * .49;
+  for (const eye of pet.eyes) eye.scale.y = Math.max(.065, 1 - Math.max(eyes, blink * .94, tired * .37 + lowMood * .15));
+  for (const cheek of pet.blush) cheek.scale.set(.087 + wag * .024, .045 + wag * .016, .025);
+  for (const ear of pet.ears) {
+    ear.rig.rotation.x = .12 * step + squash * .41 - lift * .43 + tired * .21 + vibration * .28;
+    ear.rig.rotation.z = ear.tilt + ear.side * (.039 * idle + lift * .23 + tired * .125);
   }
   for (const { rig, side } of pet.limbs) {
-    const flutter = playing ? Math.sin(age * (pet.species === 'penguin' ? 17 : 9) + side * .8) * jump * .28 : 0;
-    rig.rotation.z = side * (.23 + jump * (pet.species === 'penguin' ? 1.95 : 1.45) + flutter - nuzzle * .12 + stretch * 1.05);
-    rig.rotation.x = -.083 * idle - .53 * interest - .19 * chewing + side * step * .52;
+    const wave = Math.max(0, paw * side);
+    rig.rotation.z = side * (.23 + (lift * (pet.species === 'penguin' ? 1.4 : 1.1)) + arms * .83 + wave * .53);
+    rig.rotation.x = side * step * .56 - wave * .95 - paws * .57 - arms * .44;
   }
   if (sleeping) {
-    pet.root.position.y = hover * .25;
-    pet.root.rotation.z = .17;
-    pet.body.scale.set(1.08, .72 + idle * .025, 1.07);
-    pet.head.rotation.set(.29, -.10, .13);
-    for (const eye of pet.eyes) eye.scale.y = .095;
+    const settled = clip === 'loaf' || clip === 'curl' ? easeInOut(age, .07, clip === 'curl' ? .83 : 1.03) : 1;
+    pet.root.position.y *= 1 - settled * .75;
+    pet.root.rotation.z += (.17 - lean) * settled;
+    pet.body.scale.y += (.72 + idle * .025 - pet.body.scale.y) * settled;
+    pet.head.rotation.x += (.29 - pet.head.rotation.x) * settled;
+    for (const eye of pet.eyes) eye.scale.y += (.095 - eye.scale.y) * settled;
   }
 }

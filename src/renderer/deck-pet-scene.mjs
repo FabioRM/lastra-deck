@@ -1,11 +1,15 @@
 import * as THREE from '../../node_modules/three/build/three.module.js';
 import { makeCompanion, poseCompanion } from './deck-pet-animals.mjs';
 import { makeAtmosphere } from './deck-pet-atmosphere.mjs';
-import { activeReaction, makeReactions } from './deck-pet-reactions.mjs';
+import { makeReactions } from './deck-pet-reactions.mjs';
 import { addWorldDetails, surfaceDetail, WORLDS } from './deck-pet-worlds.mjs';
 import { makeWorldInteraction } from './deck-pet-interaction.mjs';
 
 const RIPPLE_RADII = [2.96, 3.29, 3.88, 4.48];
+const LAYOUTS = {
+  wide: { width: 1.62, scenery: 1.30, rx: 4.22, rz: 2.05, water: 1.42 },
+  tall: { width: 1.09, scenery: 1.03, rx: 2.81, rz: 1.98, water: 1.04 },
+};
 
 function sculpt(scene) {
   const shapes = new Map();
@@ -189,24 +193,28 @@ function lantern(model, island, x, z, size, color) {
   }
 }
 
-function terrain(model, scene, id, theme, random) {
+function terrain(model, scene, id, theme, random, layout) {
   const { geometry, mesh, group, radial } = model;
   const island = group(scene);
+  const shell = group(island);
+  shell.scale.x = layout.width;
+  const scenery = group(island);
+  scenery.scale.x = layout.scenery;
   const foundation = geometry('foundation', () => new THREE.LatheGeometry([
     [0, -.91], [1.44, -.91], [2.07, -.64], [2.55, -.39], [2.72, -.16], [2.62, -.07], [0, -.07],
   ].map(([x, y]) => new THREE.Vector2(x, y)), 14));
   const surface = geometry('surface', () => new THREE.LatheGeometry([
     [2.55, -.23], [2.73, -.14], [2.69, -.045], [2.55, 0], [0, 0],
   ].map(([x, y]) => new THREE.Vector2(x, y)), 28));
-  mesh(island, foundation, theme.soil, [0, 0, 0], [1, 1, .78], 'facet');
-  mesh(island, surface, theme.grass, [0, 0, 0], [1, 1, .78], 'facet');
-  surfaceDetail(model, island, id, theme);
+  mesh(shell, foundation, theme.soil, [0, 0, 0], [1, 1, .78], 'facet');
+  mesh(shell, surface, theme.grass, [0, 0, 0], [1, 1, .78], 'facet');
+  surfaceDetail(model, shell, id, theme);
   const shelf = geometry('stone strata', () => new THREE.LatheGeometry([
     [2.36, -.49], [2.45, -.45], [2.46, -.41], [2.42, -.395],
   ].map(([x, y]) => new THREE.Vector2(x, y)), 14));
-  mesh(island, shelf, theme.rim, [0, 0, 0], [1, 1, .78], 'facet');
-  mesh(island, 'disc', radial('reflection', theme.accent, .35, true), [0, -.93, 0], [4.55, 3.05, 1]).rotation.x = -Math.PI / 2;
-  mesh(island, 'disc', radial('island shadow', '#050710', .83), [0, -.925, 0], [2.92, 2.0, 1]).rotation.x = -Math.PI / 2;
+  mesh(shell, shelf, theme.rim, [0, 0, 0], [1, 1, .78], 'facet');
+  mesh(island, 'disc', radial('reflection', theme.accent, .35, true), [0, -.93, 0], [4.55 * layout.water, 3.05, 1]).rotation.x = -Math.PI / 2;
+  mesh(shell, 'disc', radial('island shadow', '#050710', .83), [0, -.925, 0], [2.92, 2.0, 1]).rotation.x = -Math.PI / 2;
   const rings = RIPPLE_RADII.map((radius, index) => {
     const ring = mesh(island, 'ring', theme.accent, [0, -.92 - index * .007, 0], [radius, radius * .67, 1], 'glow');
     ring.material = model.track(ring.material.clone());
@@ -216,12 +224,13 @@ function terrain(model, scene, id, theme, random) {
     ring.rotation.x = -Math.PI / 2;
     return ring;
   });
-  for (let index = 0; index < 26; index++) {
-    const angle = index * Math.PI * 2 / 26;
+  const fragments = layout.width > 1.2 ? 38 : 26;
+  for (let index = 0; index < fragments; index++) {
+    const angle = index * Math.PI * 2 / fragments;
     const size = .055 + random() * .17;
     const radius = 2.36 + random() * .18;
     mesh(island, 'facet', index % 3 ? theme.rim : theme.stone,
-      [Math.cos(angle) * radius, -.17 - random() * .27, Math.sin(angle) * radius * .78], [size * 1.6, size, size], 'facet');
+      [Math.cos(angle) * radius * layout.width, -.17 - random() * .27, Math.sin(angle) * radius * .78], [size * 1.6, size, size], 'facet');
   }
   for (let index = 0; index < 57; index++) {
     const x = (random() - .5) * 4.7;
@@ -240,9 +249,9 @@ function terrain(model, scene, id, theme, random) {
   if (id === 'tide') {
     for (const [x, z, size, shade] of [[-1.75, -.61, 1.3, 2], [-.95, -1.23, .91, 0], [.48, -1.36, 1.18, 2],
       [1.32, -1.02, 1.65, 1], [1.88, -.45, .85, 2], [-1.67, .81, .46, 1]]) {
-      coral(model, island, x, z, size, theme.plants[shade]);
+      coral(model, scenery, x, z, size, theme.plants[shade]);
     }
-    const star = group(island, 1.15, .045, 1.08);
+    const star = group(scenery, 1.15, .045, 1.08);
     for (let point = 0; point < 5; point++) {
       const angle = point * Math.PI * 2 / 5;
       mesh(star, 'ball', '#e78d91', [.14 * Math.sin(angle), 0, .14 * Math.cos(angle)], [.055, .045, .15]).rotation.y = angle;
@@ -250,24 +259,35 @@ function terrain(model, scene, id, theme, random) {
   } else if (id === 'grove' || id === 'moon') {
     for (const [x, z, size] of [[-2.02, -.38, .93], [-1.54, -.96, 1.24], [-.72, -1.42, .82],
       [.48, -1.36, .92], [1.36, -.98, 1.33], [1.92, -.41, .82]]) {
-      tree(model, island, x, z, size, theme.plants, id === 'moon');
+      tree(model, scenery, x, z, size, theme.plants, id === 'moon');
     }
     if (id === 'moon') {
-      crystal(model, island, -1.75, .55, .85, '#d1a7ff');
-      crystal(model, island, 1.71, .54, 1.05, '#e8aadc');
-      crystal(model, island, .92, -1.3, .66, '#d3c2ff');
+      crystal(model, scenery, -1.75, .55, .85, '#d1a7ff');
+      crystal(model, scenery, 1.71, .54, 1.05, '#e8aadc');
+      crystal(model, scenery, .92, -1.3, .66, '#d3c2ff');
     } else {
-      lantern(model, island, -1.32, .66, .91, theme.light);
-      lantern(model, island, 1.50, -.05, 1.08, theme.light);
+      lantern(model, scenery, -1.32, .66, .91, theme.light);
+      lantern(model, scenery, 1.50, -.05, 1.08, theme.light);
       for (const [x, z, size] of [[-1.77, .40, .82], [-1.64, .52, .50], [1.37, .94, 1], [1.57, .79, .63], [.86, -.88, .76]]) {
-        mesh(island, 'column', '#ffe0b0', [x, .105 * size, z], [.038 * size, .21 * size, .038 * size]);
-        mesh(island, 'ball', '#e78972', [x, .205 * size, z], [.14 * size, .069 * size, .14 * size]);
-        mesh(island, 'ball', '#ffefce', [x + .047 * size, .257 * size, z], [.024 * size, .016 * size, .025 * size]);
+        mesh(scenery, 'column', '#ffe0b0', [x, .105 * size, z], [.038 * size, .21 * size, .038 * size]);
+        mesh(scenery, 'ball', '#e78972', [x, .205 * size, z], [.14 * size, .069 * size, .14 * size]);
+        mesh(scenery, 'ball', '#ffefce', [x + .047 * size, .257 * size, z], [.024 * size, .016 * size, .025 * size]);
       }
     }
   }
 
-  const animateDetails = addWorldDetails(model, island, id, theme);
+  for (const side of [-1, 1]) {
+    for (let index = 0; index < (layout.width > 1.2 ? 14 : 5); index++) {
+      const angle = -.59 + index * .084;
+      const distance = .78 + random() * .16;
+      const x = side * layout.rx * Math.cos(angle) * distance;
+      const z = layout.rz * Math.sin(angle) * distance;
+      const size = .055 + random() * .11;
+      mesh(island, 'foliage', index % 3 ? theme.plants[index % 3] : theme.stone,
+        [x, .027, z], [size * 1.32, size * .58, size], 'facet');
+    }
+  }
+  const animateDetails = addWorldDetails(model, scenery, id, theme);
   const shadow = mesh(island, 'disc', radial('pet shadow', '#192630', .72), [.25, .057, .55], [.84, .58, 1]);
   shadow.rotation.x = -Math.PI / 2;
   model.batch(island);
@@ -292,8 +312,10 @@ export function createPetScene(canvas) {
   let ambientTime = 0;
   let visibleHeight = 5.1;
   let tall = false;
+  let currentSettings;
 
-  function setWorld(settings) {
+  function setWorld(settings, retainReaction = false) {
+    currentSettings = settings;
     model?.dispose();
     scene = new THREE.Scene();
     model = sculpt(scene);
@@ -307,21 +329,23 @@ export function createPetScene(canvas) {
     scene.add(new THREE.HemisphereLight(theme.sky, '#60526f', 1.85), sun, rim, fill);
     let seed = theme.seed;
     const random = () => ((seed = (Math.imul(1664525, seed) + 1013904223) >>> 0) / 2 ** 32);
-    ground = terrain(model, scene, settings.habitat, theme, random);
-    atmosphere = makeAtmosphere(model, scene, settings.habitat, theme, random);
+    const layout = tall ? LAYOUTS.tall : LAYOUTS.wide;
+    ground = terrain(model, scene, settings.habitat, theme, random, layout);
+    atmosphere = makeAtmosphere(model, scene, settings.habitat, theme, random, tall);
     pet = makeCompanion(model, scene, settings.species);
     propLayer = model.group(scene);
     props = makeReactions(model, propLayer, theme);
-    interaction = makeWorldInteraction(model, scene, settings.habitat, theme);
-    previousReaction = undefined;
+    interaction = makeWorldInteraction(model, scene, settings.habitat, theme, layout);
+    if (!retainReaction) previousReaction = undefined;
     previousTime = undefined;
     ambientTime = 0;
   }
 
   function resize(width, height) {
     const aspect = width / height;
+    const changed = tall !== (aspect < .82);
     tall = aspect < .82;
-    const halfHeight = Math.max(2.25, (tall ? 3.02 : 3.52) / aspect);
+    const halfHeight = Math.max(2.25, (tall ? 3.15 : 4.75) / aspect);
     visibleHeight = halfHeight * 2;
     const halfWidth = halfHeight * aspect;
     camera.left = -halfWidth;
@@ -331,49 +355,45 @@ export function createPetScene(canvas) {
     camera.updateProjectionMatrix();
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, Math.sqrt(1_500_000 / (width * height))));
     renderer.setSize(width, height, false);
+    if (changed && currentSettings) setWorld(currentSettings, true);
   }
 
-  function draw(seconds, motion, reaction, sleeping = false) {
+  function draw(seconds, motion, reaction, sleeping = false, needs) {
     if (!scene) return;
     if (motion && previousTime !== undefined) ambientTime += Math.min(.08, Math.max(0, seconds - previousTime));
     previousTime = seconds;
     const time = motion ? ambientTime : 0;
-    const { action, age } = activeReaction(reaction, seconds, motion);
-    camera.position.set(3.20 + Math.sin(time * .23) * .36, 4.07 + Math.sin(time * .29) * .11, 9.6);
+    camera.position.set((tall ? 2.55 : 2.40) + Math.sin(time * .23) * .31, 4.07 + Math.sin(time * .29) * .11, 9.6);
     camera.lookAt(0, .79, 0);
-    if (reaction && reaction !== previousReaction) {
-      if (reaction.action === 'explore') interaction.explore(seconds, motion);
-      else interaction.stop();
-    }
+    if (reaction && reaction !== previousReaction) interaction.react(reaction, time, motion, needs);
     previousReaction = reaction;
-    const movement = interaction.update(seconds, time, Boolean(action), sleeping, motion, camera);
-    poseCompanion(pet, time, motion, action, age, movement);
-    pet.root.position.x += movement.x - .25;
-    pet.root.position.z += movement.z - .57;
-    pet.root.rotation.y += movement.turn;
+    const movement = interaction.update(time, motion, sleeping, needs, camera, atmosphere);
+    const { clip, age, action } = movement;
+    poseCompanion(pet, time, motion, clip, age, movement, needs);
     ground.shadow.material.opacity = .77 - pet.root.position.y * .62;
     ground.shadow.position.x = pet.root.position.x;
     ground.shadow.position.z = pet.root.position.z;
     ground.rings.forEach((ring, index) => {
       const wave = Math.sin(time * 1.05 - index * 1.06);
       const radius = RIPPLE_RADII[index] * (1 + wave * .027);
-      ring.scale.set(radius, radius * .67, 1);
+      ring.scale.set(radius * (tall ? LAYOUTS.tall.water : LAYOUTS.wide.water), radius * .67, 1);
       ring.material.opacity = [.32, .21, .15, .074][index] * (.79 + wave * .21);
     });
     ground.animateDetails(time);
-    atmosphere(time, camera, canvas.height / visibleHeight, tall);
+    atmosphere.paint(time, camera, canvas.height / visibleHeight, movement.skyPulse);
     propLayer.position.set(movement.x - .25, 0, movement.z - .57);
-    props(action, age, camera, sleeping, motion ? time : 0);
+    props(motion ? clip : undefined, age, camera, sleeping, time, action);
     renderer.render(scene, camera);
   }
 
   function pick(clientX, clientY) {
     if (!interaction) return null;
     const { left, top, width, height } = canvas.getBoundingClientRect();
-    return interaction.pick((clientX - left) / width, (clientY - top) / height, camera, pet);
+    if (width < 1 || height < 1) return null;
+    return interaction.pick((clientX - left) / width, (clientY - top) / height, camera, pet, atmosphere);
   }
 
-  function walk(point, seconds, motion) { interaction.walk(point, seconds, motion); }
+  function walk(point, motion, needs) { interaction.walk(point, ambientTime, motion, { marker: true, needs }); }
 
-  return { setWorld, resize, draw, pick, walk };
+  return { setWorld, resize, draw, pick, walk, skyLabel: () => atmosphere.label };
 }
