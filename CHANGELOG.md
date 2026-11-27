@@ -4,6 +4,15 @@ Completed items from the former TODO, grouped by the section that tracked them. 
 
 Entries grouped under **0.2.1** record the completed work through the first reviewed source release.
 
+## 1.4.0
+
+- Give Deck pet a full-screen view with a red exit button, a larger clock, the date, and a shaded weather panel. Keep the active app’s name and icon visible in the compact view.
+- Follow the configured Weather location in both habitat views, with effects for clear skies, clouds, fog, rain, thunderstorms, snow, hail, squalls, and tornadoes.
+- Add Health and Medicine. All six care indicators are at their best at 100%, activities affect the related needs, and naps end once energy is full.
+- Add more facial expressions, wildlife, and reactions to the habitat. Play alternates eight animations, including different ball games and a song with animated notes.
+- Stop Deck pet’s rendering and care timers when the habitat is hidden, update the idle scene at a lower frame rate, and keep care labels on one line in English and Italian.
+- Update the project website with new screenshots and video from the XENEON EDGE, and publish Windows x64 and Linux x86-64 packages.
+
 ## 1.3.0
 
 - Add an interactive 3D Deck pet with eight animals and eight habitats, including two robots and two cyberpunk environments. The paw button opens it in the Deck Keys area.

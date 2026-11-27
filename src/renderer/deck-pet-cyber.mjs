@@ -8,6 +8,7 @@ export function makeRobot(model, scene, species) {
   }));
   const trim = drone ? '#574d86' : '#324760';
   const light = drone ? '#a5fcd9' : '#8bf0ff';
+  const faceLight = model.custom('robot emotion display', () => new THREE.MeshBasicMaterial({ color: light }));
   const root = group(scene, .25, 0, .57);
   const body = group(root);
   mesh(body, 'ball', metal, [0, drone ? .64 : .47, -.07], drone ? [.56, .48, .43] : [.47, .47, .41]);
@@ -27,7 +28,7 @@ export function makeRobot(model, scene, species) {
     mesh(rig, drone ? 'ball' : 'cone', light, [0, .149, .096], [.071, drone ? .121 : .26, .042], 'glow');
     ears.push({ rig, side, tilt });
     const eye = group(head, side * .206, .265, .512);
-    mesh(eye, 'ball', light, [0, 0, 0], [.088, drone ? .087 : .111, .021], 'glow');
+    mesh(eye, 'ball', faceLight, [0, 0, 0], [.088, drone ? .087 : .111, .021]);
     mesh(eye, 'ball', '#efffff', [-.022, .033, .018], [.022, .020, .009], 'glow');
     eyes.push(eye);
     const arm = group(body, side * .406, .64, -.019);
@@ -39,7 +40,7 @@ export function makeRobot(model, scene, species) {
     limbs.push({ rig: arm, side });
   }
   const mouth = group(head, 0, .14, .548);
-  mesh(mouth, 'ball', light, [0, 0, 0], [.069, .019, .010], 'glow');
+  mesh(mouth, 'ball', faceLight, [0, 0, 0], [.069, .019, .010]);
   const tail = group(body, .29, drone ? .65 : .25, -.31);
   if (!drone) {
     link(tail, 'column', trim, [0, 0, 0], [.25, .14, -.13], .050);
@@ -51,7 +52,7 @@ export function makeRobot(model, scene, species) {
     mesh(body, 'disc', radial('thruster', light, .51, true), [0, .152, 0], [.32, .19, 1]);
     mesh(body, 'ball', light, [0, .193, -.05], [.187, .041, .18], 'glow');
   }
-  return { root, body, head, eyes, ears, limbs, tail, mouth, blush: [], species, hover: drone ? .27 : 0 };
+  return { root, body, head, eyes, ears, limbs, tail, mouth, blush: [], faceLight, faceColor: light, species, hover: drone ? .27 : 0 };
 }
 
 function lightStrip(model, parent, color, from, to, width = .025) {

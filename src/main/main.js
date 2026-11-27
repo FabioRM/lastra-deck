@@ -34,7 +34,7 @@ const { sensorIds } = require('../shared/sensor-binding');
 const { decodeEditorClipboard, encodeEditorClipboard } = require('./editor-clipboard');
 const { encodeExchange, prepareExchange, suggestedName, readExchangeFile, writeExchangeFile } = require('./profile-exchange');
 const { readStreamDeckProfile } = require('./stream-deck-import');
-const { Pages, runPageAction } = require('./pages');
+const { Pages, displayName, runPageAction } = require('./pages');
 const { packFor, previewPacks } = require('./shortcut-packs');
 const { normalizeOverrideChord } = require('./shortcut-overrides');
 const { actionNeedsShortcutTarget, hasShortcutRule, sameShortcutWindow, shortcutUnavailable } = require('./shortcut-guards');
@@ -249,6 +249,7 @@ let deckShortcuts;
 let recentDeckPages = [];
 let deckStatsTab = 'overview';
 let deckHeaderIcon;
+let deckForegroundApp;
 let readWindowIcons;
 let navigation = null;
 let pomodoro = null;
@@ -361,6 +362,7 @@ function currentView() {
     pageName: page.name,
     pageMatch: { reason, priority: page.priority ?? 0 },
     pageIcon: deckHeaderIcon?.revision === pages.revision ? deckHeaderIcon.source : null,
+    foregroundApp: deckForegroundApp ? { name: deckForegroundApp.name, icon: deckForegroundApp.icon } : null,
     generatedPage: Boolean(page.generated),
     targetUnavailable: !active,
     manualPage: pages.manualPage(store.current).id,
@@ -413,17 +415,34 @@ function refreshPage(force = false) {
     keyConfirmation.clear();
     deckContext = next;
     pages.revision++;
+    // The habitat shows the foreground app independently of the selected shortcut page.
+    // A shell or Lastra window can briefly take focus during a touch.
+    const foreground = pages.foreground;
+    if (foreground) {
+      const name = packFor(foreground, store.current.webApps)?.name ?? displayName(foreground);
+      const icon = deckForegroundApp?.target.identity === foreground.identity ? deckForegroundApp.icon : null;
+      deckForegroundApp = { target: foreground, name, icon };
+    }
+    const pageTarget = page.pack && target?.id ? target : null;
+    if (pageTarget && deckHeaderIcon?.target.id === pageTarget.id && deckHeaderIcon.target.path === pageTarget.path) {
+      deckHeaderIcon.revision = pages.revision;
+    }
     choicePrompts.check();
     agentActions?.checkPending();
     send('profile', currentView());
     publishAgentPage(selection);
     if (foregroundChanged) publishAgentEvent('foreground', { present: Boolean(next.present), targetAvailable: active, revision: pages.revision });
-    if (page.pack && target?.id && readWindowIcons) {
+    const foregroundTarget = deckForegroundApp?.target;
+    const iconTargets = new Map([pageTarget, foregroundTarget].filter((item) => item?.id).map((item) => [item.id, item]));
+    if (iconTargets.size && readWindowIcons) {
       const revision = pages.revision;
-      void readWindowIcons([target]).then((icons) => {
+      void readWindowIcons([...iconTargets.values()]).then((icons) => {
         if (pages.revision !== revision) return;
-        deckHeaderIcon = { revision, source: icons.get(target.id) ?? null };
-        send('deck:page-icon', deckHeaderIcon);
+        const source = icons.get(pageTarget?.id) ?? null;
+        if (pageTarget) deckHeaderIcon = { revision, target: pageTarget, source };
+        const foregroundIcon = icons.get(foregroundTarget?.id);
+        if (foregroundIcon) deckForegroundApp.icon = foregroundIcon;
+        send('deck:page-icon', { revision, source, foregroundIcon: deckForegroundApp?.icon ?? null });
       }).catch(() => {});
     }
   }
@@ -746,9 +765,13 @@ function createDeckWindow(display = deckDisplay()) {
     resetDeckPage();
   });
   contents.on('render-process-gone', () => resetDeckPage());
+  const publishVisibility = () => {
+    if (win === deck) send('deck:window-visibility', deck.isVisible() && !deck.isMinimized());
+  };
   deck.on('blur', cancelDeckActions);
   deck.on('hide', cancelDeckActions);
   deck.on('hide', () => {
+    publishVisibility();
     processTelemetry?.stop();
     agentChoices?.checkPending();
     if (win === deck) kubernetesView?.stop();
@@ -757,13 +780,18 @@ function createDeckWindow(display = deckDisplay()) {
     agentSpotifyActions?.checkPending();
   });
   deck.on('minimize', () => {
+    publishVisibility();
     if (win === deck) kubernetesView?.stop();
     agentChoices?.checkPending();
     agentActivitySwitch?.checkPending();
     agentAppAudio?.checkPending();
     agentSpotifyActions?.checkPending();
   });
-  deck.on('show', () => { if (win === deck) send('display:backlight:widgets:update', 'visible'); });
+  deck.on('show', () => {
+    publishVisibility();
+    if (win === deck) send('display:backlight:widgets:update', 'visible');
+  });
+  deck.on('restore', publishVisibility);
   deck.on('query-session-end', cancelDeckActions);
   deck.on('session-end', cancelDeckActions);
   deck.on('closed', () => {
@@ -1458,10 +1486,9 @@ function registerIpc() {
     send('monitoring', monitoring.intervals);
     return currentView();
   });
-  deck('pet:interact', (action) => {
-    const current = deckPet.care(action);
-    send('deck:pet', current);
-    return { ok: true, sleeping: current.care.sleepUntil > current.care.at };
+  deck('pet:interact', (action, automatic) => {
+    const current = deckPet.care(action, automatic);
+    return { ok: true, care: current.care };
   });
   const requireCurrentActivity = (activity) => {
     if (activity !== (opts.profile ? null : activities.current.id)) throw new Error('The activity profile changed.');
@@ -1955,6 +1982,7 @@ function registerIpc() {
 
   ipcMain.on('renderer:ready', (event) => {
     if (!fromWindow(event, win, RENDERER)) return;
+    send('deck:window-visibility', win.isVisible() && !win.isMinimized());
     send('deck:appearance', appearance.current);
     send('deck:pet', deckPet.current);
     if (feeds) {

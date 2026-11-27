@@ -47,12 +47,39 @@ function inspectToolbar() {
   const geometry = () => JSON.stringify(['deck', 'page-nav', 'panel', 'widget-bar'].map((id) =>
     document.getElementById(id).getBoundingClientRect().toJSON()));
   const before = geometry();
+  const heading = document.getElementById('page-name');
+  const icon = document.getElementById('page-app-icon');
+  const habitat = document.getElementById('pet-habitat');
+  const expand = document.getElementById('pet-expand');
+  const shortcutHeading = heading.textContent;
+  const shortcutIcon = icon.getAttribute('src');
   pet.click();
-  if (!grid.hidden || document.getElementById('pet-habitat').hidden || geometry() !== before) {
+  if (!grid.hidden || habitat.hidden || geometry() !== before) {
     throw new Error('The pet habitat must replace the keys without moving the deck layout.');
   }
+  if (heading.textContent !== 'Sample foreground app' || icon.hidden || !icon.getBoundingClientRect().width) {
+    throw new Error('The pet habitat must keep the foreground app name and icon visible in the toolbar.');
+  }
+  expand.click();
+  const bounds = habitat.getBoundingClientRect();
+  const exit = expand.getBoundingClientRect();
+  if (Math.abs(bounds.left) > 1 || Math.abs(bounds.top) > 1 || Math.abs(bounds.right - innerWidth) > 1
+    || Math.abs(bounds.bottom - innerHeight) > 1 || heading.getClientRects().length
+    || getComputedStyle(habitat).borderRadius !== '0px') {
+    throw new Error('The full-screen habitat must cover the display and hide the app heading.');
+  }
+  if (exit.top > 32 || innerWidth - exit.right > 32 || !expand.querySelector('.pet-exit-icon')?.getClientRects().length
+    || document.getElementById('pet-environment').hidden) {
+    throw new Error('The full-screen habitat must keep its exit control and weather visible.');
+  }
+  expand.click();
+  if (habitat.hidden || habitat.hasAttribute('data-expanded') || geometry() !== before) {
+    throw new Error('Exiting full screen must restore the compact habitat in place.');
+  }
   pet.click();
-  if (grid.hidden || geometry() !== before) throw new Error('Closing the pet habitat must restore the keys in place.');
+  if (grid.hidden || geometry() !== before || heading.textContent !== shortcutHeading || icon.getAttribute('src') !== shortcutIcon) {
+    throw new Error('Closing the pet habitat must restore the keys and shortcut heading in place.');
+  }
   const actions = buttons[0].parentElement.getBoundingClientRect();
   const aligned = Number.isFinite(inset) && Math.abs(nav.left - (gridBounds.left + inset)) < 2
     && Math.abs(nav.right - (gridBounds.right - inset)) < 2 && Math.abs(actions.right - nav.right) < 2;
@@ -368,7 +395,12 @@ async function startPreview({ opts, ipcMain, BrowserWindow, quit, fail, log, ren
   const store = loadPreviewProfile({ opts, defaultProfile, pages });
   deck.setStore(store);
   let previewSheet = 0;
-  const previewView = () => ({ ...deck.currentView(), followsApps: true, deckSheet: previewSheet });
+  const toolbarApp = opts.previewToolbar ? {
+    name: 'Sample foreground app',
+    icon: 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="32" height="32"%3E%3Ccircle cx="16" cy="16" r="13" fill="%236daaf2"/%3E%3C/svg%3E',
+  } : null;
+  const previewView = () => ({ ...deck.currentView(), followsApps: true, deckSheet: previewSheet,
+    ...(toolbarApp ? { foregroundApp: toolbarApp } : {}) });
   function publishPreview() {
     pages.revision++;
     send('profile', previewView());
@@ -457,6 +489,8 @@ async function startPreview({ opts, ipcMain, BrowserWindow, quit, fail, log, ren
       },
       currencies: { rows: [{ pair: 'EURUSD', rate: 1.0864 }] },
     }));
+  } else if (opts.previewToolbar) {
+    ipcMain.handle('feeds:read', () => ({ weather: null }));
   }
   if (opts.previewToolView) {
     let breakStartedAt = null;

@@ -38,17 +38,34 @@ function movesFruit(apple, age, effect) {
   apple.scale.setScalar(Math.max(.001, easeInOut(age, .02, .23) * (1 - munch)));
 }
 
-function ballPosition(age) {
-  if (age < .36) {
-    const release = easeInOut(age, 0, .36);
-    return [-1.04 + release * .37, .16, 1.30];
-  }
-  if (age < 1.02) {
-    const fraction = (age - .36) / .66;
-    return [-.67 + fraction * 1.05, .16 + 1.07 * arc(age, .36, 1.02), 1.30 + fraction * .06];
-  }
-  const fraction = Math.min(1, (age - 1.02) / .70);
-  return [.38 + fraction * .91, .16 + .49 * arc(age, 1.02, 1.72), 1.36 - fraction * .13];
+const FLOOR = .19;
+// [Time, x, y, z, lift above the straight path, ground contact]
+const BALL_PATHS = {
+  fetch: [[0, -1.04, FLOOR, 1.30], [.36, -.67, FLOOR, 1.30], [1.02, .38, FLOOR, 1.36, 1.07, true],
+    [1.72, 1.29, FLOOR, 1.23, .49, true], [2.13, 1.44, FLOOR, 1.22]],
+  dribble: [[0, 1.22, .44, 1.19], [.28, .83, .91, 1.18], [.64, .70, FLOOR, 1.23, 0, true],
+    [.93, .65, .94, 1.23], [1.24, .19, FLOOR, 1.27, .16, true], [1.52, -.27, .89, 1.22],
+    [1.85, -.69, FLOOR, 1.26, .12, true], [2.21, -.94, FLOOR, 1.24, .36, true], [2.62, -1.18, FLOOR, 1.18]],
+  volley: [[0, -1.22, FLOOR, 1.26], [.31, -.78, FLOOR, 1.22, .38, true], [.65, -.42, 1.35, 1.19],
+    [1.31, .66, 1.46, 1.17, .56], [1.86, 1.37, FLOOR, 1.31, .72, true],
+    [2.24, 1.22, FLOOR, 1.23, .39, true], [2.61, 1.01, FLOOR, 1.21]],
+  leapfrog: [[0, -1.24, FLOOR, 1.08], [.24, -.88, FLOOR, 1.09], [.60, -.35, FLOOR, 1.11],
+    [.94, .49, FLOOR, 1.16], [1.29, 1.27, FLOOR, 1.27, .16, true], [1.59, .63, FLOOR, 1.29, .25, true],
+    [1.87, .09, .57, 1.30], [2.16, -.61, FLOOR, 1.27, .14, true], [2.34, -.88, FLOOR, 1.25]],
+};
+
+export function playBallPosition(clip, age) {
+  const path = BALL_PATHS[clip];
+  if (!path || age < 0 || age > path.at(-1)[0]) return undefined;
+  const next = Math.max(1, path.findIndex(([at]) => at >= age));
+  const [start, x, y, z] = path[next - 1];
+  const [end, nextX, nextY, nextZ, lift = 0] = path[next];
+  const progress = (age - start) / (end - start);
+  return [
+    THREE.MathUtils.lerp(x, nextX, progress),
+    THREE.MathUtils.lerp(y, nextY, progress) + lift * 4 * progress * (1 - progress),
+    THREE.MathUtils.lerp(z, nextZ, progress),
+  ];
 }
 
 export function makeReactions(model, scene, theme) {
@@ -60,13 +77,48 @@ export function makeReactions(model, scene, theme) {
   mesh(apple, 'column', '#926452', [0, .14, 0], [.015, .068, .015]).rotation.z = -.23;
   mesh(apple, 'ball', '#85ad75', [.056, .157, 0], [.079, .025, .049]).rotation.z = .39;
 
-  const toy = group(scene);
-  mesh(toy, 'ball', '#f5b876', [0, 0, 0], [.159, .159, .159]);
-  mesh(toy, 'ball', '#ef869d', [0, 0, 0], [.145, .165, .145]);
-  for (const rotation of [0, 1.19]) {
-    mesh(toy, 'ring', '#fff3b2', [0, 0, 0], [.160, .160, .25], 'glow').rotation.x = rotation;
+  const bottle = group(scene);
+  mesh(bottle, 'ball', '#a6f4cd', [0, 0, 0], [.105, .142, .082]);
+  mesh(bottle, 'column', '#fee8ad', [0, .145, 0], [.056, .047, .056]);
+  mesh(bottle, 'box', '#fff4de', [0, .015, .074], [.138, .084, .016]);
+  const recovery = Array.from({ length: 6 }, () => {
+    const mark = group(scene);
+    mesh(mark, 'box', '#bdffe0', [0, 0, 0], [.35, .10, .053], 'glow');
+    mesh(mark, 'box', '#bdffe0', [0, 0, 0], [.10, .35, .053], 'glow');
+    return mark;
+  });
+
+  function updateMedicine(effect, clip, age, camera) {
+    bottle.visible = effect === 'medicine' && age < 1.16;
+    if (bottle.visible) {
+      const sip = easeInOut(age, .18, .86);
+      const side = clip === 'remedy' ? -1 : 1;
+      bottle.position.set(.25 + side * (.70 - sip * .54), .24 + sip * 1.02, 1.16);
+      bottle.rotation.z = side * (sip * 1.14);
+      bottle.scale.setScalar(pulse(age, 0, .25, 1.17));
+    }
+    for (const [index, mark] of recovery.entries()) {
+      const rise = age - .73 - index * .092;
+      mark.visible = effect === 'medicine' && rise > 0 && rise < 1.02;
+      if (!mark.visible) continue;
+      const angle = index * 2.399 + rise * 2;
+      mark.position.set(.25 + Math.sin(angle) * (.35 + rise * .63), .87 + rise * 1.19, .75 + Math.cos(angle) * .42);
+      mark.quaternion.copy(camera.quaternion);
+      mark.rotateZ(Math.sin(angle) * .29);
+      mark.scale.setScalar(.41 * pulse(rise, 0, .33, 1.02));
+    }
   }
-  const echoes = Array.from({ length: 5 }, () => mesh(scene, 'disc', radial('toy glint', theme.accent, .69, true),
+
+  const toy = group(scene);
+  mesh(toy, 'ball', '#ff956a', [0, 0, 0], [.189, .189, .189]);
+  const stitching = geometry('toy stitching', () => new THREE.TorusGeometry(1, .029, 6, 40));
+  for (const [color, roll] of [['#ffe9b9', 0], ['#ffdc89', 1.18]]) {
+    mesh(toy, stitching, color, [0, 0, 0], [.189, .189, .162], 'glow').rotation.x = roll;
+  }
+  mesh(toy, 'ball', '#a0ece2', [0, .10, .131], [.072, .072, .041]).rotation.x = -.54;
+  mesh(toy, 'ball', '#a0ece2', [0, -.10, -.131], [.072, .072, .041]).rotation.x = -.54;
+  const trail = radial('toy glint', '#ffdb9d', .63, true);
+  const echoes = Array.from({ length: 5 }, () => mesh(scene, 'disc', trail,
     [0, 0, 0], [.11, .11, 1]));
   const ring = mesh(scene, 'ring', model.custom('impact', () => new THREE.MeshBasicMaterial({
     color: theme.accent, transparent: true, depthWrite: false,
@@ -97,33 +149,60 @@ export function makeReactions(model, scene, theme) {
   const letter = geometry('sleep glyph', sleepShape);
   const sleep = Array.from({ length: 3 }, () =>
     mesh(scene, letter, '#c8d9ff', [0, 0, 0], [1, 1, 1], 'glow'));
+  const notes = [.36, .80, 1.24, 1.68, 2.02].map((at, index) => {
+    const root = group(scene);
+    const color = ['#ffe19c', '#a6f3e4', '#f4b5eb'][index % 3];
+    mesh(root, 'disc', trail, [0, .07, -.03], [.76, .76, 1]);
+    mesh(root, 'ball', color, [-.12, -.17, 0], [.22, .13, .06], 'glow').rotation.z = .28;
+    mesh(root, 'box', color, [.06, .102, 0], [.086, .57, .074], 'glow');
+    mesh(root, 'ball', color, [.20, .313, 0], [.19, .074, .049], 'glow').rotation.z = -.36;
+    return { root, at };
+  });
 
-  function updateToy(age, camera) {
-    const visible = age < 2.02;
-    const [x, y, z] = ballPosition(age);
-    toy.visible = visible;
-    toy.position.set(x, y, z);
-    const radius = easeInOut(age, 0, .17) * (1 - easeInOut(age, 1.81, 2.03));
-    const squash = pulse(age, .95, 1.02, 1.10) + pulse(age, 1.65, 1.72, 1.82);
+  function updateToy(clip, age, camera) {
+    const path = BALL_PATHS[clip];
+    const end = path.at(-1)[0];
+    toy.visible = age < end;
+    const position = playBallPosition(clip, age);
+    if (position) toy.position.set(...position);
+    const radius = easeInOut(age, 0, .18) * (1 - easeInOut(age, end - .27, end));
+    const contact = path.find(([at, , , , , ground]) => ground && Math.abs(age - at) < .12);
+    const squash = contact ? pulse(age, contact[0] - .07, contact[0], contact[0] + .12) : 0;
     toy.scale.set(radius * (1 + squash * .15), radius * (1 - squash * .21), radius * (1 + squash * .15));
     toy.rotation.set(age * 5.8, age * 7.6, age * -5.5);
     echoes.forEach((echo, index) => {
       const previous = age - (index + 1) * .046;
-      echo.visible = visible && previous > .36;
+      echo.visible = toy.visible && previous > .16 && (clip !== 'leapfrog' || age > 1.22);
       if (!echo.visible) return;
-      echo.position.set(...ballPosition(previous));
+      echo.position.set(...playBallPosition(clip, previous));
       const size = (.155 - index * .022) * radius;
       echo.scale.set(size, size, 1);
       echo.quaternion.copy(camera.quaternion);
     });
-    const second = age >= 1.72;
-    const impactAge = age - (second ? 1.72 : 1.02);
-    ring.visible = impactAge >= 0 && impactAge < .34;
-    if (ring.visible) {
-      ring.position.set(second ? 1.29 : .38, .030, second ? 1.23 : 1.36);
+    const impact = path.findLast(([at, , , , , ground]) => ground && age >= at && age - at < .34);
+    ring.visible = Boolean(impact);
+    if (impact) {
+      const [at, x, , z] = impact;
+      const impactAge = age - at;
+      ring.position.set(x, .035, z);
       const size = .14 + impactAge * 1.75;
       ring.scale.set(size, size * .87, .42);
       ring.material.opacity = .58 * (1 - impactAge / .34);
+    }
+    return impact;
+  }
+
+  function updateSong(effect, age, camera) {
+    for (const [index, { root, at }] of notes.entries()) {
+      const drift = age - at;
+      root.visible = effect === 'music' && drift >= 0 && drift < .82;
+      if (!root.visible) continue;
+      const side = index % 2 ? -1 : 1;
+      root.position.set(.25 + side * (.11 + drift * .74) + Math.sin(drift * 5 + index) * .08,
+        1.60 + drift * 1.48, 1.10 + drift * .25);
+      root.scale.setScalar((.42 - index * .025) * pulse(drift, 0, .21, .82));
+      root.quaternion.copy(camera.quaternion);
+      root.rotateZ(side * (.18 + drift * .36));
     }
   }
 
@@ -143,15 +222,14 @@ export function makeReactions(model, scene, theme) {
     });
   }
 
-  function updateSparks(effect, age) {
-    const play = effect === 'ball';
+  function updateSparks(effect, age, impact) {
     const fruit = effect === 'snack' || effect === 'toss';
-    const ground = effect === 'dust' || play;
+    const ground = effect === 'dust' || Boolean(impact);
     const orbit = effect === 'ribbon';
     const glints = effect === 'glints' || effect === 'sniff';
-    const time = age - (play ? age >= 1.72 ? 1.72 : 1.02 : fruit ? .79 : .21);
-    const sourceX = play ? age >= 1.72 ? 1.29 : .38 : .28;
-    const sourceZ = ground ? 1.36 : 1.04;
+    const time = age - (impact?.[0] ?? (fruit ? .79 : .21));
+    const sourceX = impact?.[1] ?? .28;
+    const sourceZ = impact?.[3] ?? (ground ? 1.36 : 1.04);
     sparks.forEach((flash, index) => {
       const burst = time - (orbit ? index * .038 : (index % 4) * .025);
       flash.visible = (ground || fruit || orbit || glints || effect === 'stars') && burst > 0 && burst < (orbit ? 1.12 : .73);
@@ -197,13 +275,16 @@ export function makeReactions(model, scene, theme) {
 
   return (clip, age, camera, sleeping, time, action) => {
     const effect = clipEffect(clip);
+    updateMedicine(effect, clip, age, camera);
     if (effect === 'snack' || effect === 'toss' || (effect === 'sniff' && action === 'feed')) movesFruit(apple, age, effect);
     else apple.visible = false;
-    if (effect === 'ball') updateToy(age, camera);
+    let impact;
+    if (effect === 'ball') impact = updateToy(clip, age, camera);
     else for (const part of [toy, ring, ...echoes]) part.visible = false;
+    updateSong(effect, age, camera);
     if (effect === 'hearts') updateHearts(age, camera, clip === 'flop');
     else for (const love of hearts) love.visible = false;
-    updateSparks(effect, age);
+    updateSparks(effect, age, impact);
     updateWash(effect, age, camera);
     updateSleep(sleeping, time, camera);
   };

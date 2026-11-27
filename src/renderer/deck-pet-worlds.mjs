@@ -111,6 +111,7 @@ function pool(model, island, id, x, z, rx, rz) {
   groundLight(model, basin, 'pool sheen', '#9bf8d2', [0, .055, 0], rx, rz, .34);
   const material = model.track(new THREE.MeshBasicMaterial({ color: '#b6f8d7', opacity: .6, transparent: true, depthWrite: false }));
   const waves = [0, 1, 2].map(() => ringsAround(model, basin, 0, .055, 0, material, 1));
+  for (const wave of waves) wave.userData.moving = true;
   return (time) => {
     for (const [index, wave] of waves.entries()) {
       const fraction = (index * .30 + time * .32) % 1;

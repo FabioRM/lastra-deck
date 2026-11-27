@@ -63,7 +63,7 @@ h1 { margin-block: .65rem 1.25rem; font-size: clamp(2.65rem, 7vw, 5.5rem); lette
   display: block;
   width: 100%;
   height: auto;
-  aspect-ratio: 1200 / 428;
+  aspect-ratio: 32 / 9;
   background: #171323;
   border: 1px solid #6a556e;
   border-radius: .75rem;

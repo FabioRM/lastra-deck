@@ -10,7 +10,7 @@ const AIR = {
   rain: { count: 47, size: .13, drift: [-.22, -1.26], shape: 4, color: '#b4e6ff' },
 };
 
-function particleField(model, scene, random, settings, distant) {
+export function particleField(model, scene, random, settings, distant = false) {
   const { count, size, drift, shape, color } = settings;
   const origins = [];
   const seeds = [];
@@ -28,6 +28,7 @@ function particleField(model, scene, random, settings, distant) {
     uniforms: {
       seconds: { value: 0 }, pixelsPerUnit: { value: 100 }, drift: { value: new THREE.Vector2(...drift) },
       tint: { value: new THREE.Color(color) }, shape: { value: shape }, isDistant: { value: distant ? 1 : 0 },
+      density: { value: 1 },
     },
     vertexShader: `
       uniform float seconds;
@@ -54,6 +55,7 @@ function particleField(model, scene, random, settings, distant) {
       uniform vec3 tint;
       uniform float shape;
       uniform float isDistant;
+      uniform float density;
       varying float shine;
       varying float spin;
       void main() {
@@ -77,16 +79,18 @@ function particleField(model, scene, random, settings, distant) {
           alpha = rim * 0.55 + gleam * 0.57 + glow * 0.11;
         }
         gl_FragColor = vec4(mix(tint, vec3(1.0), clamp(core * 0.46, 0.0, 0.7)),
-          max(0.0, alpha) * shine * mix(0.91, 0.68, isDistant));
+          max(0.0, alpha) * shine * mix(0.91, 0.68, isDistant) * density);
         #include <colorspace_fragment>
       }`,
   }));
   const field = new THREE.Points(geometry, material);
   field.frustumCulled = false;
   scene.add(field);
-  return (time, scale) => {
+  return (time, scale, density = 1) => {
+    field.visible = density > 0;
     material.uniforms.seconds.value = time;
     material.uniforms.pixelsPerUnit.value = scale;
+    material.uniforms.density.value = density;
   };
 }
 
@@ -209,22 +213,28 @@ export function makeAtmosphere(model, scene, id, theme, random, tall) {
   const haloX = tall ? (id === 'orbit' ? -2.52 : -2.88) : (id === 'orbit' ? -3.73 : -4.17);
   const halo = group(scene, haloX, 1.53, -1.55);
   const radius = { orbit: .89, moon: .69, aurora: .35, oasis: .69 }[id] ?? .51;
-  const label = id === 'orbit' ? 'Planet' : id === 'grove' || id === 'oasis' ? 'Sun' : 'Moon';
+  const nativeLabel = id === 'orbit' ? 'Planet' : id === 'grove' || id === 'oasis' ? 'Sun' : 'Moon';
+  let label = nativeLabel;
   const bounds = new THREE.Sphere(halo.position, radius);
   const glow = mesh(halo, 'disc', radial('sky glow', theme.light, .36, true), [0, 0, -.074], [1.48, 1.48, 1]);
   const lightRing = mesh(halo, 'ring', model.track(new THREE.MeshBasicMaterial({
     color: theme.light, transparent: true, depthWrite: false, opacity: 0,
   })), [0, 0, .12], [radius, radius, 1]);
+  const nativeBody = group(halo);
+  const skyInk = (color) => model.track(new THREE.MeshBasicMaterial({ color, transparent: true, depthWrite: false }));
+  const liveSun = id === 'orbit' ? null : mesh(halo, 'ball', skyInk('#ffdfa0'), [0, 0, 0], [.50, .50, .092]);
+  const liveMoon = id === 'orbit' ? null : mesh(halo, geometry('crescent', crescentShape), skyInk('#dce6ff'), [0, 0, 0], [.65, .65, 1]);
+  if (liveMoon) liveMoon.rotation.z = -.20;
   let skyMotion;
   if (id === 'orbit') {
-    skyMotion = orbitalSky(model, scene, halo);
+    skyMotion = orbitalSky(model, scene, nativeBody);
   } else if (id === 'aurora') {
-    mesh(halo, 'ball', '#bcddf0', [0, 0, 0], [.257, .257, .060], 'glow');
+    mesh(nativeBody, 'ball', '#bcddf0', [0, 0, 0], [.257, .257, .060], 'glow');
     skyMotion = aurora(model, scene);
   } else if (id === 'moon') {
-    mesh(halo, geometry('crescent', crescentShape), theme.light, [0, 0, 0], [.83, .83, 1], 'glow').rotation.z = -.20;
+    mesh(nativeBody, geometry('crescent', crescentShape), theme.light, [0, 0, 0], [.83, .83, 1], 'glow').rotation.z = -.20;
   } else {
-    const disc = mesh(halo, 'ball', theme.light, [0, 0, 0], [id === 'oasis' ? .64 : .45, id === 'oasis' ? .64 : .45, .11], 'glow');
+    const disc = mesh(nativeBody, 'ball', theme.light, [0, 0, 0], [id === 'oasis' ? .64 : .45, id === 'oasis' ? .64 : .45, .11], 'glow');
     if (id === 'oasis') {
       for (const [y, width] of [[-.29, .53], [-.40, .465], [-.47, .40]]) {
         mesh(disc, 'box', '#cf887e', [0, y / .64, .76], [2 * width / .64, .051, .037], 'glow');
@@ -233,18 +243,32 @@ export function makeAtmosphere(model, scene, id, theme, random, tall) {
   }
   const stars = particleField(model, scene, random, { count: 100, size: .092, drift: [0, 0], shape: 0, color: theme.sky }, true);
   const air = particleField(model, scene, random, AIR[theme.air], false);
-  function paint(time, camera, pixelsPerUnit, signal) {
+  function paint(time, camera, pixelsPerUnit, signal, climate, cloud = 0) {
+    const live = Boolean(climate && liveSun);
+    const night = climate?.phase === 'night';
+    const twilight = climate?.phase === 'dawn' || climate?.phase === 'dusk';
+    const dimmed = Math.max(.24, 1 - cloud * .73);
+    nativeBody.visible = !live;
+    if (liveSun) {
+      liveSun.visible = live && !night;
+      liveMoon.visible = live && night;
+      liveSun.material.opacity = liveMoon.material.opacity = dimmed;
+    }
+    label = live ? night ? 'Moon' : 'Sun' : nativeLabel;
+    halo.position.y = twilight ? 1.05 : 1.53;
+    bounds.radius = live ? .54 : radius;
     halo.quaternion.copy(camera.quaternion);
-    glow.material.opacity = .36 + signal * .41;
+    glow.material.opacity = (.36 + signal * .41) * dimmed;
     glow.scale.set(1.48 + signal * .43, 1.48 + signal * .43, 1);
     const breath = radius * (1.18 + (1 - signal) * .47);
     lightRing.visible = signal > .04;
     lightRing.scale.set(breath, breath, 1);
     lightRing.material.opacity = signal * .48;
-    stars(time, pixelsPerUnit);
-    air(time, pixelsPerUnit);
+    stars(time, pixelsPerUnit, climate ? (night ? dimmed : .13 * dimmed) : 1);
+    const nativeWeather = ['snow', 'sand', 'rain'].includes(theme.air);
+    air(time, pixelsPerUnit, climate && nativeWeather ? 0 : climate ? .68 : 1);
     skyMotion?.(time);
   }
 
-  return { bounds, label, paint };
+  return { bounds, get label() { return label; }, paint };
 }

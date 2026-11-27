@@ -217,7 +217,7 @@ body:has(> #deck-idle-screen:not([hidden]), > #windows-session-cover[open]) #sta
   gap: 18px;
   padding: 5px 6px;
   flex: 1;
-  min-width: 0;
+  min-width: min(100%, 176px);
   min-block-size: var(--dashboard-control-size);
   white-space: nowrap;
 }
@@ -883,7 +883,7 @@ button:focus-visible, input:focus-visible { outline: 3px solid var(--app); outli
 .portrait #deck { grid-row: 2; margin-block-start: 26px; }
 #stage.portrait #page-nav { gap: 8px; }
 .portrait #page-nav > button, .portrait .page-actions > button { white-space: nowrap; }
-.portrait .page-current { order: -1; flex-basis: 100%; gap: 8px; min-block-size: 0; padding-block: 0; }
+.portrait .page-current { order: -1; flex-basis: 100%; gap: 8px; min-block-size: 42px; padding-block: 0; }
 .portrait #page-name { font-size: calc(34px * var(--text-scale)); }
 
 @media (prefers-reduced-motion: reduce) {

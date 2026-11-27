@@ -9,6 +9,43 @@ export const CLIPS = {
   flop: { effect: 'hearts', frames: [[0], [.28, { tilt: -.22, paw: .76 }], [.70, { lean: .89, squash: .39, eyes: .86, arms: .64, shift: .19 }], [1.36, { lean: .89, squash: .34, eyes: .88, arms: .4, shift: .19 }], [2.05]] },
   boing: { effect: 'stars', frames: [[0], [.17, { squash: .26 }], [.52, { lift: .61, arms: .87, pitch: -.24 }], [.83, { squash: .18 }], [1.08, { lift: .23, tilt: .22 }], [1.44]] },
   fetch: { effect: 'ball', frames: [[0], [.26, { squash: .16, yaw: -.38 }], [.64, { lift: .54, shift: -.32, arms: .70, turn: -.48 }], [1.02, { squash: .26 }], [1.36, { lift: .40, shift: .43, arms: .72, turn: .58 }], [1.71, { squash: .22 }], [2.13]] },
+  dribble: { effect: 'ball', frames: [
+    [0], [.28, { yaw: .42, pitch: .18, paw: 1.10, shift: .14 }],
+    [.64, { yaw: .38, pitch: .34, paw: .36, squash: .16 }],
+    [.93, { pitch: .11, tilt: -.27, paw: 1.39, shift: .21 }],
+    [1.24, { yaw: -.39, pitch: .31, paw: -.61, squash: .14, shift: -.19 }],
+    [1.52, { yaw: -.41, lift: .10, paw: -1.38, shift: -.26, wag: .42 }],
+    [1.85, { pitch: .26, squash: .15, paw: -.52, shift: -.10 }],
+    [2.21, { pitch: -.11, arms: .52, eyes: .37, wag: .68 }], [2.62],
+  ] },
+  volley: { effect: 'ball', frames: [
+    [0], [.31, { yaw: -.48, pitch: -.12, squash: .22, shift: -.29 }],
+    [.65, { lift: .48, arms: .75, paw: -.76, pitch: -.26, turn: -.45 }],
+    [.94, { squash: .26, shift: -.10 }],
+    [1.31, { yaw: .54, shift: .37, lift: .68, paw: 1.38, turn: .46, open: .32 }],
+    [1.69, { squash: .28, shift: .24, pitch: -.27 }],
+    [2.10, { tilt: .29, paw: .58, wag: .69 }], [2.61],
+  ] },
+  leapfrog: { effect: 'ball', frames: [
+    [0], [.24, { shift: -.42, squash: .27, yaw: .21 }],
+    [.60, { shift: -.12, lift: .72, arms: .82, tilt: -.20 }],
+    [.94, { shift: .39, squash: .31, turn: -.28 }],
+    [1.27, { shift: .52, lift: .61, arms: .93, turn: .44 }],
+    [1.58, { shift: .05, squash: .22, tilt: .15 }],
+    [1.87, { shift: -.32, lift: .32, paw: -.83, eyes: .36 }], [2.34],
+  ] },
+  sing: { effect: 'music', frames: [
+    [0], [.21, { pitch: .14, squash: .17, eyes: .47 }],
+    [.43, { pitch: -.20, tilt: -.24, open: .75, paw: .52, eyes: .46 }],
+    [.65, { open: .18, tilt: -.12 }],
+    [.87, { open: .61, pitch: -.16, tilt: .28, paw: -.65, eyes: .63 }],
+    [1.07, { open: .11, tilt: .13, squash: .09 }],
+    [1.30, { open: .81, pitch: -.25, tilt: -.16, arms: .57, lift: .16 }],
+    [1.54, { open: .19, tilt: .17, squash: .12 }],
+    [1.76, { open: .67, pitch: -.30, tilt: .21, paw: 1.10, eyes: .63 }],
+    [2.11, { open: .83, pitch: -.28, arms: .63, eyes: .73, wag: .66 }],
+    [2.37, { pitch: .25, tilt: -.15, eyes: .72, paw: .41 }], [2.88],
+  ] },
   pounce: { effect: 'dust', frames: [[0], [.36, { squash: .35, pitch: .24, shift: -.11, wag: .32 }], [.71, { lift: .46, shift: .43, arms: .83, pitch: -.22 }], [1.09, { shift: .60, pitch: .40, squash: .28 }], [1.55, { tilt: -.17 }], [1.92]] },
   dance: { effect: 'ribbon', frames: [[0], [.26, { lean: -.25, paw: 1.09, shift: -.28, lift: .12 }], [.55, { lean: .25, paw: -1.27, shift: .29, lift: .15 }], [.83, { lean: -.24, paw: 1.18, shift: -.27 }], [1.15, { lean: .27, paw: -1.44, shift: .28, lift: .26 }], [1.47, { arms: .88, lift: .42 }], [1.91]] },
   nibble: { effect: 'snack', frames: [[0], [.31, { pitch: .25, yaw: .24, paw: .53 }], [.84, { pitch: .33, chew: .67, eyes: .28, arms: .42 }], [1.4, { chew: 1, wag: .31 }], [2]] },
@@ -32,16 +69,27 @@ export const CLIPS = {
   yawn: { effect: 'none', frames: [[0], [.32, { squash: .13, eyes: .61 }], [.73, { pitch: -.30, open: .96, eyes: .90, arms: .21 }], [1.15, { squash: .21, eyes: .72 }], [1.79]] },
   rest: { effect: 'none', frames: [[0], [.47, { squash: .30, lean: .18, eyes: .80 }], [2.37, { squash: .36, lean: .23, eyes: .91 }], [3.02]] },
   listen: { effect: 'glints', frames: [[0], [.33, { tilt: -.34, yaw: .21 }], [.84, { tilt: .35, yaw: -.12 }], [1.17, { tilt: .29, pitch: -.12 }], [1.82]] },
+  wonder: { effect: 'glints', frames: [[0], [.26, { tilt: -.28, pitch: -.16 }], [.65, { tilt: .24, open: .52, paw: .72 }], [1.45, { tilt: .21, open: .27 }], [2.14]] },
+  startled: { effect: 'stars', frames: [[0], [.19, { lift: .44, arms: .92, open: .80, pitch: -.21 }], [.49, { squash: .23, paws: .68, open: .57 }], [.96, { tilt: -.31, paws: .54 }], [1.81]] },
+  glee: { effect: 'hearts', frames: [[0], [.22, { squash: .17, eyes: .25 }], [.57, { lift: .34, paw: -.94, wag: .64, open: .43 }], [.96, { tilt: -.29, paw: .98, eyes: .53 }], [1.36, { wag: .79, open: .34 }], [1.94]] },
+  droop: { effect: 'none', frames: [[0], [.43, { pitch: .29, squash: .16, eyes: .41 }], [.87, { pitch: .36, tilt: -.21, eyes: .67 }], [1.31, { tilt: -.13, eyes: .51, paws: .56 }], [2.28]] },
+  grumble: { effect: 'none', frames: [[0], [.37, { pitch: .29, paws: .45, eyes: .27 }], [.73, { pitch: .40, paws: .91, squash: .14, open: .21 }], [1.28, { tilt: .21, paws: .74 }], [1.91]] },
+  sigh: { effect: 'glints', frames: [[0], [.43, { squash: -.14, eyes: .38, pitch: -.16 }], [.95, { squash: .19, open: .42, eyes: .77, pitch: .21 }], [1.64, { tilt: .22, eyes: .45 }], [2.38]] },
+  tonic: { effect: 'medicine', frames: [[0], [.34, { pitch: .18, paw: .85 }], [.80, { pitch: -.31, open: .57, paws: .81 }], [1.19, { eyes: .63, squash: .11 }], [1.56, { lift: .22, wag: .71 }], [2.15]] },
+  remedy: { effect: 'medicine', frames: [[0], [.37, { tilt: -.25, paw: -.80 }], [.81, { pitch: .24, chew: .89, eyes: .52 }], [1.29, { tilt: .31, eyes: .57, wag: .48 }], [1.70, { paw: 1.1, pitch: -.10 }], [2.13]] },
+  recover: { effect: 'medicine', frames: [[0], [.32, { tilt: .22, paws: .58, pitch: .22 }], [.76, { open: .48, pitch: -.24 }], [1.08, { eyes: .77, squash: .22 }], [1.46, { lift: .39, arms: .86, wag: .63 }], [2.16]] },
 };
 
 const BUTTONS = {
   pet: ['nuzzle', 'wave', 'twirl', 'flop', 'boing'],
-  play: ['fetch', 'pounce', 'dance', 'boing'],
+  play: ['fetch', 'dribble', 'volley', 'leapfrog', 'sing', 'pounce', 'dance', 'boing'],
   feed: ['nibble', 'toss', 'sniff'],
   wash: ['rinse', 'shake', 'scrub', 'splash'],
+  medicine: ['tonic', 'remedy', 'recover'],
   sleep: ['curl', 'loaf'],
   wake: ['stretch', 'wakeHop', 'wave'],
   sky: ['gaze', 'shade', 'skyHop'],
+  wildlife: ['wonder', 'startled', 'listen'],
 };
 
 export const FEATURE_CLIPS = {
@@ -57,6 +105,41 @@ export const FEATURE_CLIPS = {
 
 export const clipLength = (name) => CLIPS[name]?.frames.at(-1)[0] ?? 0;
 export const clipEffect = (name) => CLIPS[name]?.effect;
+
+const EMOTION_POSES = {
+  joyful: { wag: .36, cheeks: .34, lid: .17, smile: .31, perk: .13, bounce: .042 },
+  affectionate: { wag: .45, cheeks: .67, lid: .42, smile: .43, tilt: .17, bounce: .014 },
+  curious: { lid: -.16, brow: .18, perk: .30, pitch: -.085, tilt: .18, smile: -.19 },
+  surprised: { lid: -.29, brow: .25, perk: .43, pitch: -.13, smile: -.24, open: .33 },
+  relaxed: { lid: .34, cheeks: .26, smile: .32, tilt: -.13, pitch: .06 },
+  hungry: { brow: -.18, droop: .13, pitch: .16, smile: -.21, open: .12 },
+  lonely: { lid: .21, brow: -.25, droop: .39, pitch: .25, tilt: -.10, smile: -.31 },
+  bored: { lid: .34, brow: .12, droop: .24, pitch: .12, tilt: .14, smile: -.25 },
+  sleepy: { lid: .40, droop: .38, pitch: .22, tilt: .072 },
+  uncomfortable: { lid: .22, brow: .29, droop: .18, pitch: .15, tilt: -.071, smile: -.26 },
+  unwell: { lid: .37, brow: -.30, droop: .53, pitch: .21, tilt: -.09, smile: -.31, cheeks: -.29 },
+};
+
+const CLIP_EMOTIONS = {
+  nuzzle: 'affectionate', flop: 'affectionate', glee: 'joyful', dance: 'joyful', fetch: 'joyful', boing: 'joyful',
+  dribble: 'joyful', volley: 'joyful', leapfrog: 'joyful', sing: 'joyful',
+  twirl: 'joyful', wakeHop: 'joyful', splash: 'joyful', rinse: 'relaxed', sigh: 'relaxed', rest: 'relaxed',
+  wonder: 'curious', listen: 'curious', inspect: 'curious', gaze: 'curious', shade: 'curious', skyHop: 'curious',
+  startled: 'surprised', droop: 'lonely', grumble: 'hungry', yawn: 'sleepy',
+  tonic: 'relaxed', remedy: 'relaxed', recover: 'joyful',
+};
+
+export function emotionPose(emotion, clip, age, time) {
+  const idle = EMOTION_POSES[emotion] ?? {};
+  const expression = EMOTION_POSES[CLIP_EMOTIONS[clip]];
+  const gain = clipLength(clip) ? Math.sin(Math.PI * Math.min(1, Math.max(0, age / clipLength(clip)))) : 0;
+  const fields = { ...idle };
+  if (expression) {
+    for (const [key, value] of Object.entries(expression)) fields[key] = (idle[key] ?? 0) * (1 - gain) + value * gain;
+  }
+  fields.tilt = (fields.tilt ?? 0) * (.76 + Math.sin(time * 2.3) * .24);
+  return fields;
+}
 
 export function sampleClip(name, age) {
   const frames = CLIPS[name]?.frames;
@@ -101,6 +184,7 @@ const NEED_ACTIVITIES = {
   play: ['pounce', 'dance'],
   energy: ['yawn', 'rest'],
   hygiene: ['scrub', 'shake'],
+  health: ['rest', 'sigh'],
 };
 
 export function chooseActivity(needs, previous, random = Math.random) {
@@ -110,8 +194,9 @@ export function chooseActivity(needs, previous, random = Math.random) {
   const highest = urgent[0];
   const closeNeeds = highest ? urgent.filter((key) => needs[key] <= needs[highest] + 9) : [];
   const candidates = highest
-    ? [...NEED_ACTIVITIES[highest], ...closeNeeds.flatMap((key) => NEED_ACTIVITIES[key]), 'visit', 'wander']
-    : ['visit', 'visit', 'wander', 'pace', 'listen', 'stretch', 'boing'];
+    ? [...NEED_ACTIVITIES[highest], ...closeNeeds.flatMap((key) => NEED_ACTIVITIES[key]), 'visit', 'wander',
+      ...(highest === 'joy' ? ['droop'] : highest === 'fullness' ? ['grumble'] : [])]
+    : ['visit', 'visit', 'wander', 'pace', 'listen', 'stretch', 'boing', 'glee', 'sigh'];
   const fresh = candidates.filter((value) => value !== previous);
   return fresh[Math.floor(random() * fresh.length)];
 }

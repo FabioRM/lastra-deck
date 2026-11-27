@@ -2,7 +2,7 @@
 
 const { readJsonSettings, writeJsonSettings } = require('./json-settings-file');
 const { openSecret, sealSecrets } = require('./sealed-secret');
-const { normalizeLocation, readForecast, readSun } = require('./weather');
+const { normalizeLocation, readForecast, readSun, rounded, sunTimes } = require('./weather');
 
 const WEATHER = ['open-meteo', 'openweather'];
 const QUOTES = ['yahoo', 'stooq', 'finnhub'];
@@ -155,6 +155,7 @@ class Feeds {
   }
 
   setSettings(value = {}) {
+    const oldWeather = this.settings().weather;
     const weather = { provider: provider(value.weather?.provider ?? this.raw.weather?.provider, WEATHER, 'open-meteo') };
     const quotes = { provider: provider(value.quotes?.provider ?? this.raw.quotes?.provider, QUOTES, 'yahoo') };
     const location = value.weather ? normalizeLocation(value.weather) : normalizeLocation(this.raw.weather);
@@ -189,6 +190,8 @@ class Feeds {
     writeJsonSettings(this.file, next, { space: 2, failure: 'Could not save Feeds settings.' });
     sealSecrets(this.file, next, ['weatherApiKey', 'quotesApiKey'], this.log);
     this.raw = readRaw(this.file);
+    if (weather.provider !== oldWeather.provider || (weather.latitude ?? null) !== oldWeather.latitude
+      || (weather.longitude ?? null) !== oldWeather.longitude) this.readings.weather = null;
     this.onChange(this.snapshot());
     return this.snapshot();
   }
@@ -270,10 +273,10 @@ class Feeds {
     try {
       const reading = weather.provider === 'openweather'
         ? await this.#openWeather(weather)
-        : await this.#openMeteo(weather);
+        : await readForecast(weather, this.fetch);
       reading.latitude = weather.latitude;
       try { reading.sun = await readSun(weather, this.fetch); }
-      catch { /* Daylight keeps the last successful sunrise and sunset. */ }
+      catch { /* Keep the sunrise and sunset supplied by the forecast, when available. */ }
       return reading;
     } catch (error) {
       this.log('Could not read the weather feed.');
@@ -291,22 +294,18 @@ class Feeds {
     const response = await this.fetch(url, { signal: AbortSignal.timeout(8_000) });
     if (!response.ok) throw new Error('OpenWeather is unavailable.');
     const body = await response.json();
-    const temperature = Math.round(body?.main?.temp);
-    const label = body?.weather?.[0]?.main || 'Weather';
-    const low = body?.main?.temp_min;
-    const high = body?.main?.temp_max;
-    if (!Number.isFinite(temperature)) throw new Error('OpenWeather did not return a temperature.');
+    const temperature = rounded(body?.main?.temp);
+    const condition = body?.weather?.[0];
+    const label = condition?.main || 'Weather';
+    if (temperature === null) throw new Error('OpenWeather did not return a temperature.');
     return {
       temperature, label, line: `${temperature}° · ${label}`,
-      low: Number.isFinite(low) ? Math.round(low) : null,
-      high: Number.isFinite(high) ? Math.round(high) : null,
+      code: condition?.id, isDay: typeof condition?.icon === 'string' ? condition.icon.endsWith('d') : undefined,
+      low: rounded(body.main.temp_min), high: rounded(body.main.temp_max), feelsLike: rounded(body.main.feels_like),
+      humidity: rounded(body.main.humidity), wind: rounded(body.wind?.speed * 3.6), windDirection: rounded(body.wind?.deg),
+      pressure: rounded(body.main.pressure), cloudCover: rounded(body.clouds?.all),
+      sun: sunTimes(body.sys?.sunrise, body.sys?.sunset), timezoneOffset: rounded(body.timezone),
     };
-  }
-
-  async #openMeteo(weather) {
-    const forecast = await readForecast(weather, this.fetch);
-    const [temperature, label] = forecast.line.split(' · ');
-    return { temperature: Number.parseInt(temperature, 10), label, line: forecast.line, low: forecast.low, high: forecast.high };
   }
 
   async #quotes(quotes) {

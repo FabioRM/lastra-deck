@@ -1,6 +1,6 @@
 import * as THREE from '../../node_modules/three/build/three.module.js';
 import { makeRobot } from './deck-pet-cyber.mjs';
-import { sampleClip } from './deck-pet-behavior.mjs';
+import { emotionPose, sampleClip } from './deck-pet-behavior.mjs';
 
 const ANIMALS = {
   fox: { coat: '#ee9553', cream: '#ffe5bb', paws: '#82534a', ears: 'pointed' },
@@ -91,6 +91,7 @@ function makeAnimal(model, scene, species) {
   const head = group(body, 0, axolotl ? .93 : 1.03, .152);
   mesh(head, 'ball', coat, [0, .25, 0], [axolotl ? .68 : .631, .49, .531]);
   const eyes = [];
+  const brows = [];
   const ears = [];
   const limbs = [];
   const blush = [];
@@ -120,6 +121,8 @@ function makeAnimal(model, scene, species) {
     mesh(eye, 'ball', '#fff8e9', [-.035, .046, .047], [.032, .035, .015], 'glow');
     mesh(eye, 'ball', '#e3c9f0', [.030, -.049, .042], [.015, .016, .01], 'glow');
     eyes.push(eye);
+    brows.push(mesh(head, 'ball', paws, [side * (axolotl ? .28 : .263), .487, penguin ? .49 : .463],
+      [.061, .015, .019]));
     const cheek = mesh(head, 'ball', '#e88b9c', [side * .39, .146, penguin ? .483 : .441], [.087, .045, .025]);
     cheek.rotation.y = side * .35;
     blush.push(cheek);
@@ -149,7 +152,7 @@ function makeAnimal(model, scene, species) {
     }
   }
   const tail = makeTail(model, body, species, palette);
-  return { root, body, head, eyes, ears, limbs, tail, mouth, blush, species };
+  return { root, body, head, eyes, brows, ears, limbs, tail, mouth, blush, species };
 }
 
 export function makeCompanion(model, scene, species) {
@@ -175,17 +178,19 @@ export function arc(age, start, end) {
   return age > start && age < end ? Math.sin((age - start) / (end - start) * Math.PI) : 0;
 }
 
-export function poseCompanion(pet, time, motion, clip, age, movement, needs) {
+export function poseCompanion(pet, time, motion, clip, age, movement, needs, emotion) {
   const { sleeping, walking, turn, gaze, x, z } = movement;
   const { lift = 0, shift = 0, lean = 0, turn: spin = 0, squash = 0, pitch = 0, yaw = 0, tilt = 0,
     chew = 0, open = 0, eyes = 0, wag = 0, paw = 0, paws = 0, arms = 0, shake = 0 } = sampleClip(clip, age);
-  const tired = clamp((59 - (needs?.energy ?? 80)) / 45);
+  const { wag: feelingWag = 0, cheeks = 0, lid = 0, smile = 0, perk = 0, droop = 0, bounce = 0,
+    brow = 0, pitch: feelingPitch = 0, tilt: feelingTilt = 0, open: feelingOpen = 0 } = emotionPose(emotion, clip, age, time);
+  const tired = Math.max(clamp((59 - (needs?.energy ?? 80)) / 45), clamp((53 - (needs?.health ?? 100)) / 53));
   const lowMood = clamp((51 - (needs?.joy ?? 88)) / 38);
   const hungry = clamp((53 - (needs?.fullness ?? 84)) / 38);
   const dirty = clamp((52 - (needs?.hygiene ?? 90)) / 36);
   const relaxed = 1 - tired * .47;
   const idle = motion ? Math.sin(time * (2.6 - tired * 1.1)) : 0;
-  const tailWag = motion ? Math.sin(time * (2.15 + 4 * wag) + shift) : 0;
+  const tailWag = motion ? Math.sin(time * (2.15 + 4 * (wag + feelingWag)) + shift) : 0;
   const blinkTime = time % (5.35 - tired * 1.1);
   const blink = motion ? pulse(blinkTime, 2.34, 2.42, 2.57 + tired * .24) : 0;
   const stride = pet.hover ? 9 : pet.species === 'rabbit' ? 12 : 15;
@@ -194,7 +199,7 @@ export function poseCompanion(pet, time, motion, clip, age, movement, needs) {
   const hover = pet.hover ? pet.hover + idle * .041 : 0;
   const vibration = motion ? Math.sin(age * 29) * shake : 0;
   const sniff = motion && !clip ? Math.sin(time * 9) * pulse(time % 4.5, 1.93, 2.23, 2.55) * hungry : 0;
-  const mouth = Math.max(open, chew * (.56 + Math.sin(age * 23) * .44));
+  const mouth = Math.max(open, feelingOpen, chew * (.56 + Math.sin(age * 23) * .44));
   const direction = turn ?? 0;
   let faceAngle = .33 + direction;
   let gazeYaw = 0;
@@ -210,20 +215,30 @@ export function poseCompanion(pet, time, motion, clip, age, movement, needs) {
     gazePitch = THREE.MathUtils.clamp(-angle - (gaze.sky ? .31 : 0), -.60, .39) * gaze.weight;
   }
 
-  pet.root.position.set(x + shift * .67, lift + hover + Math.abs(step) * bob + Math.abs(lean) * .11, z - Math.abs(shift) * .12);
+  pet.root.position.set(x + shift * .67, lift + hover + Math.abs(step) * bob + Math.abs(lean) * .11
+    + Math.max(0, idle) * bounce * (1 - walking), z - Math.abs(shift) * .12);
   pet.root.rotation.set(0, faceAngle + spin, lean + step * .047);
   pet.body.scale.set(1 + squash * .29 - lift * .08, 1 + idle * .028 - squash + lift * .13 - tired * .075, 1 + squash * .22);
-  pet.head.rotation.set(pitch + gazePitch + (tired * .14 + lowMood * .09) + step * .053 + sniff * .13,
-    yaw + gazeYaw + vibration * .24, tilt + .032 * tailWag + vibration * .16);
-  pet.tail.rotation.set(tailWag * .055 - lowMood * .16, tailWag * (.14 + wag * .42) * relaxed + lift * .42, lean * .27 + lift * .20);
-  pet.mouth.scale.set(1 + mouth * .11, 1 + mouth * 2.3, 1);
+  pet.head.rotation.set(pitch + gazePitch + feelingPitch + (tired * .10 + lowMood * .06) + step * .053 + sniff * .13,
+    yaw + gazeYaw + vibration * .24, tilt + feelingTilt + .032 * tailWag + vibration * .16);
+  pet.tail.rotation.set(tailWag * .055 - lowMood * .16, tailWag * (.14 + (wag + feelingWag) * .42) * relaxed + lift * .42, lean * .27 + lift * .20);
+  pet.mouth.scale.set(1 + mouth * .11 + smile, 1 + mouth * 2.3 - smile * .50, 1);
   pet.stains.visible = dirty > .03;
   pet.dirt.opacity = dirty * .49;
-  for (const eye of pet.eyes) eye.scale.y = Math.max(.065, 1 - Math.max(eyes, blink * .94, tired * .37 + lowMood * .15));
-  for (const cheek of pet.blush) cheek.scale.set(.087 + wag * .024, .045 + wag * .016, .025);
+  for (const [index, eye] of pet.eyes.entries()) {
+    const side = index === 0 ? -1 : 1;
+    eye.scale.y = Math.max(.065, 1 - Math.max(eyes, blink * .94, lid + tired * .15 + lowMood * .07));
+    eye.rotation.z = side * (brow * .43 + (sleeping ? .08 : 0));
+    if (pet.brows) {
+      pet.brows[index].rotation.z = side * brow;
+      pet.brows[index].position.y = .474 + perk * .15 - droop * .045;
+    }
+  }
+  pet.faceLight?.color.set(ROBOT_EMOTION_INK[emotion] ?? pet.faceColor);
+  for (const cheek of pet.blush) cheek.scale.set(.087 + (wag + cheeks) * .033, .045 + (wag + cheeks) * .023, .025);
   for (const ear of pet.ears) {
-    ear.rig.rotation.x = .12 * step + squash * .41 - lift * .43 + tired * .21 + vibration * .28;
-    ear.rig.rotation.z = ear.tilt + ear.side * (.039 * idle + lift * .23 + tired * .125);
+    ear.rig.rotation.x = .12 * step + squash * .41 - lift * .43 + tired * .16 + droop * .39 - perk * .34 + vibration * .28;
+    ear.rig.rotation.z = ear.tilt + ear.side * (.039 * idle + lift * .23 + tired * .125 + droop * .35 - perk * .29);
   }
   for (const { rig, side } of pet.limbs) {
     const wave = Math.max(0, paw * side);
@@ -239,3 +254,9 @@ export function poseCompanion(pet, time, motion, clip, age, movement, needs) {
     for (const eye of pet.eyes) eye.scale.y += (.095 - eye.scale.y) * settled;
   }
 }
+
+const ROBOT_EMOTION_INK = {
+  affectionate: '#ff9fda', joyful: '#a6fff4', curious: '#b9a6ff', surprised: '#b6ecff',
+  sleepy: '#9ba9ec', sleeping: '#889bdb', lonely: '#91b8fc', hungry: '#ffd58f',
+  bored: '#baacda', uncomfortable: '#f6a795', unwell: '#e2b0a2', relaxed: '#a2ffc7',
+};

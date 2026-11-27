@@ -252,4 +252,4 @@ class Pages {
   }
 }
 
-module.exports = { Pages, runPageAction };
+module.exports = { Pages, displayName, runPageAction };

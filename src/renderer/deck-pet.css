@@ -6,8 +6,10 @@
   --pet-mid: #213f38;
   --pet-glow: #4a7561;
   --pet-border: #49675d;
+  --weather-sky: transparent;
+  --pet-care-width: calc(374px + (var(--text-scale) - 1) * 160px);
   display: grid;
-  grid-template-columns: 374px minmax(0, 1fr);
+  grid-template-columns: var(--pet-care-width) minmax(0, 1fr);
   grid-template-rows: auto 1fr auto;
   align-self: stretch;
   position: relative;
@@ -17,6 +19,7 @@
   border-radius: 34px;
   background: var(--pet-night);
   color: var(--pet-ink);
+  container: pet-habitat / size;
 }
 
 #pet-habitat[data-habitat='moon'] {
@@ -88,13 +91,20 @@
   z-index: -2;
   inset: 0;
   background:
+    linear-gradient(165deg, var(--weather-sky), transparent 68%),
     radial-gradient(ellipse at 70% 39%, var(--pet-glow), var(--pet-mid) 40%, transparent 70%),
     radial-gradient(ellipse at 90% 91%, var(--pet-mid), transparent 57%);
 }
 
+#pet-habitat[data-phase='night'] { --weather-sky: rgb(11 16 57 / 66%); }
+#pet-habitat:is([data-phase='dawn'], [data-phase='dusk']) { --weather-sky: rgb(139 77 105 / 45%); }
+#pet-habitat:is([data-climate='storm'], [data-climate='hail'], [data-climate='tornado']) { --weather-sky: rgb(40 49 80 / 77%); }
+#pet-habitat:is([data-climate='fog'], [data-climate='frost'], [data-climate='snow']) { --weather-sky: rgb(158 189 211 / 41%); }
+#pet-habitat:is([data-climate='dust'], [data-climate='haze']) { --weather-sky: rgb(147 96 55 / 52%); }
+
 .pet-scene {
   position: absolute;
-  inset: 0 0 0 278px;
+  inset: 0 0 0 calc(var(--pet-care-width) - 96px);
 }
 
 #pet-canvas { display: block; width: 100%; height: 100%; cursor: pointer; mask-image: linear-gradient(to right, transparent, #000 8%); }
@@ -161,7 +171,19 @@
 }
 
 .pet-mood, .pet-feedback { color: var(--pet-muted); font-size: calc(23px * var(--text-scale)); }
-.pet-feedback { min-height: 1.25em; margin-block-start: 8px; }
+.pet-status { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.pet-mood { color: var(--pet-accent); }
+#pet-habitat:is([data-emotion='lonely'], [data-emotion='sleepy'], [data-emotion='sleeping']) .pet-mood { color: #b4d1ff; }
+#pet-habitat[data-emotion='affectionate'] .pet-mood { color: #ffb1dc; }
+.pet-feedback {
+  min-height: 1.25em;
+  margin-block-start: 4px;
+  padding-inline-end: 3px;
+  font-size: calc(20px * var(--text-scale));
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 .pet-needs { display: grid; gap: 5px; margin-block-end: 14px; }
 .pet-needs label {
   --need-ink: var(--pet-accent);
@@ -173,23 +195,30 @@
   font-size: calc(20px * var(--text-scale));
 }
 .pet-needs label [aria-hidden] { text-align: end; font-variant-numeric: tabular-nums; }
+.pet-needs label[data-change='up'] [aria-hidden] { color: #b7fcd1; font-weight: 700; }
+.pet-needs label[data-change='down'] [aria-hidden] { color: #ffbf9f; font-weight: 700; }
+.pet-needs label[data-change] progress { filter: brightness(1.23); }
+#pet-habitat[data-motion] .pet-needs label[data-change] progress { animation: pet-need-pulse .84s ease-out both; }
+@keyframes pet-need-pulse {
+  0% { filter: brightness(1); }
+  36% { filter: brightness(1.62); }
+  100% { filter: brightness(1.08); }
+}
 .pet-needs label[data-attention] { color: var(--pet-ink); }
 .pet-needs label[data-pet-need='fullness'] { --need-ink: #ffcc83; }
 .pet-needs label[data-pet-need='joy'] { --need-ink: #f3abc4; }
 .pet-needs label[data-pet-need='play'] { --need-ink: #b9bcfd; }
 .pet-needs label[data-pet-need='energy'] { --need-ink: #8bc5ff; }
 .pet-needs label[data-pet-need='hygiene'] { --need-ink: #a0ebd2; }
+.pet-needs label[data-pet-need='health'] { --need-ink: #fcad9a; }
 
 .pet-needs progress { appearance: none; width: 100%; height: 8px; }
 .pet-needs progress::-webkit-progress-bar { border-radius: 99px; background: color-mix(in srgb, var(--pet-muted) 24%, transparent); }
 .pet-needs progress::-webkit-progress-value { border-radius: 99px; background: var(--need-ink); }
 
-.pet-actions { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 7px; }
-.pet-actions button { grid-column: span 2; }
-.pet-actions button:nth-child(n + 4) { grid-column: span 3; }
-.pet-actions button, .pet-world-actions button {
+.pet-actions { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 7px; }
+.pet-actions button, .pet-world-actions button, #pet-expand {
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
   justify-content: center;
   gap: 7px;
@@ -202,27 +231,42 @@
   font: inherit;
   font-size: calc(21px * var(--text-scale));
   font-weight: 600;
-  overflow-wrap: anywhere;
+  white-space: nowrap;
 }
 
 .pet-world-actions {
-  position: absolute;
-  z-index: 1;
-  inset-inline-end: 22px;
-  inset-block-end: 20px;
   display: flex;
-  gap: 7px;
+  align-items: center;
+  flex: none;
+  gap: 6px;
 }
 .pet-world-actions button {
-  padding-inline: 15px;
-  min-height: 50px;
+  pointer-events: auto;
+  min-block-size: 42px;
+  inline-size: 42px;
+  padding: 0;
+  border-radius: 12px;
   background: color-mix(in srgb, var(--pet-night) 83%, transparent);
 }
-#pet-sky { inline-size: 50px; padding-inline: 0; }
+
+#pet-expand {
+  position: absolute;
+  z-index: 3;
+  inset-block-start: 18px;
+  inset-inline-end: 19px;
+  inline-size: 56px;
+  min-block-size: 56px;
+  padding: 0;
+  background: color-mix(in srgb, var(--pet-night) 83%, transparent);
+}
+#pet-expand[aria-pressed='false'] .pet-exit-icon,
+#pet-expand[aria-pressed='true'] .pet-expand-icon { display: none; }
+#pet-habitat[data-emotion='unwell'] [data-pet-action='medicine'] { border-color: #fcad9a; }
 
 #pet-habitat button svg { width: 24px; height: 24px; flex: none; fill: none; stroke: var(--pet-accent); stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
-.pet-actions button { gap: 5px; padding-inline: 5px; }
-.pet-actions button svg { width: 20px; height: 20px; }
+.pet-actions button { gap: 4px; padding-inline: 4px; font-size: calc(19px * var(--text-scale)); }
+#pet-habitat .pet-actions button svg { width: 18px; height: 18px; }
+.pet-actions button span { flex: none; }
 #pet-habitat button:focus-visible { outline: 2px solid var(--pet-accent); outline-offset: 2px; }
 #pet-habitat button:not(:disabled):is(:hover, :focus-visible, [aria-pressed='true']) { border-color: var(--pet-accent); }
 #pet-habitat button:not(:disabled):active { background: var(--pet-glow); }
@@ -230,13 +274,125 @@
 
 .portrait #pet-habitat { grid-template-columns: minmax(0, 1fr); }
 .portrait #pet-habitat::before {
-  background: radial-gradient(ellipse at 50% 47%, var(--pet-glow), var(--pet-mid) 40%, transparent 72%);
+  background: linear-gradient(165deg, var(--weather-sky), transparent 62%),
+    radial-gradient(ellipse at 50% 47%, var(--pet-glow), var(--pet-mid) 40%, transparent 72%);
 }
-.portrait .pet-scene { inset: 180px 0 246px; }
+.portrait .pet-scene { inset: 215px 0 350px; }
 .portrait #pet-canvas { mask-image: none; }
 .portrait :is(.pet-details, .pet-care) { margin-inline: 32px; }
 .portrait .pet-details { margin-block-start: 34px; }
 .portrait .pet-care { margin-block-end: 24px; }
-.portrait .pet-actions { grid-template-columns: repeat(5, minmax(0, 1fr)); }
-.portrait .pet-actions button { grid-column: span 1; min-height: 76px; }
-.portrait .pet-world-actions { inset-block: 155px auto; inset-inline-end: 32px; }
+.portrait .pet-actions button { min-height: 68px; }
+.portrait #pet-habitat:not([data-expanded]) .pet-details { margin-inline-end: 94px; }
+
+@container pet-habitat (max-height: 480px) {
+  .pet-details { margin-block-start: 16px; }
+  #pet-name { font-size: calc(53px * var(--text-scale)); }
+  .pet-needs { gap: 3px; margin-block-end: 9px; }
+  .pet-needs label { font-size: calc(17px * var(--text-scale)); }
+  .pet-actions button { min-height: 49px; }
+}
+
+#stage[data-pet-expanded] {
+  width: var(--pet-screen-width, 100vw);
+  height: var(--pet-screen-height, 100vh);
+  padding: 0;
+}
+#stage[data-pet-expanded][data-view-only] { padding: 0; }
+#stage[data-pet-expanded] #view-only-status { z-index: 3; inset: 16px auto auto 30px; }
+#stage[data-pet-expanded] > :is(#panel, #deck-audio-controls, #home-page, #dashboard-switch, #widget-bar) { display: none; }
+#stage[data-pet-expanded] #deck {
+  grid-area: 1 / 1 / -1 / -1;
+  grid-template-rows: minmax(0, 1fr);
+  margin: 0;
+}
+#stage[data-pet-expanded] #page-nav { display: none; }
+#pet-habitat[data-expanded] {
+  --pet-weather-side: 510px;
+  --pet-weather-fade: 220px;
+  grid-template-columns: calc(var(--pet-care-width) - 6px) minmax(0, 1fr) var(--pet-weather-side);
+  border: 0;
+  border-radius: 0;
+}
+#pet-habitat[data-expanded]::after {
+  content: '';
+  position: absolute;
+  z-index: 1;
+  inset: 0 0 0 auto;
+  width: calc(var(--pet-weather-side) + var(--pet-weather-fade));
+  background: linear-gradient(90deg, transparent, rgb(7 12 21 / 72%) calc(var(--pet-weather-fade) * .66),
+    #0c1421 var(--pet-weather-fade), #070c15 100%);
+  pointer-events: none;
+}
+#pet-habitat[data-expanded] .pet-scene {
+  inset-inline: calc(var(--pet-care-width) - 88px) calc(var(--pet-weather-side) - var(--pet-weather-fade));
+}
+#pet-habitat[data-expanded] .pet-care { margin-block-end: 28px; }
+#pet-habitat[data-expanded] .pet-details { margin-block-start: calc(29px + var(--view-only-space, 0px)); }
+#pet-habitat[data-expanded] #pet-expand {
+  inset-block-start: 23px;
+  inset-inline-end: 25px;
+  inline-size: 60px;
+  min-block-size: 60px;
+  border-color: #fa7888;
+  background: #b72338;
+}
+#pet-habitat[data-expanded] #pet-expand:is(:hover, :focus-visible) { background: #cf2d44; }
+#pet-habitat[data-expanded] #pet-expand:active { background: #951b2c; }
+#pet-habitat[data-expanded] #pet-expand:focus-visible { outline-color: #ffd7dd; }
+#pet-habitat[data-expanded] #pet-expand svg { width: 29px; height: 29px; stroke: #fff7fa; stroke-width: 2; }
+
+#pet-environment {
+  --weather-ink: #f4f7fc;
+  --weather-muted: #b8c8d8;
+  --weather-divider: #2a394a;
+  grid-area: 1 / 3 / -1;
+  align-self: stretch;
+  z-index: 2;
+  min-width: 0;
+  min-height: 0;
+  padding: 76px 32px 20px 27px;
+  color: var(--weather-ink);
+  overflow-x: hidden;
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+.pet-calendar { container-type: inline-size; padding-block-end: 12px; border-block-end: 1px solid var(--weather-divider); }
+#pet-time {
+  --pet-clock-size: 196px;
+  --pet-clock-fit: 41.5cqi;
+  display: block;
+  font: 400 min(calc(var(--pet-clock-size) * var(--text-scale)), var(--pet-clock-fit))/.91 'Barlow Condensed', 'Arial Narrow', sans-serif;
+  letter-spacing: -.018em;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+#pet-time:has(.clock-period) { --pet-clock-fit: 38cqi; }
+#pet-time .clock-seconds { color: var(--weather-muted); font-size: .28em; }
+#pet-time .clock-period { color: var(--weather-muted); font-size: .25em; }
+#pet-date { display: block; margin-block-start: 6px; color: var(--weather-muted); font-size: calc(21px * var(--text-scale)); }
+.pet-weather { padding-block-start: 12px; }
+#pet-weather-place { color: var(--weather-ink); font-size: calc(22px * var(--text-scale)); font-weight: 600; overflow-wrap: anywhere; }
+.pet-weather-summary { display: flex; align-items: baseline; flex-wrap: wrap; gap: 2px 12px; margin-block: 3px 8px; }
+#pet-weather-temperature { font: 400 calc(54px * var(--text-scale))/.94 'Barlow Condensed', sans-serif; white-space: nowrap; }
+#pet-weather-condition { color: var(--weather-muted); font-size: calc(21px * var(--text-scale)); }
+.pet-weather-values { display: grid; gap: 4px; }
+.pet-weather-values > div { display: grid; grid-template-columns: 1fr auto; gap: 5px; font-size: calc(19px * var(--text-scale)); line-height: 1.12; }
+.pet-weather-values dt { color: var(--weather-muted); }
+.pet-weather-values dd { text-align: end; font-variant-numeric: tabular-nums; }
+
+.portrait #pet-habitat[data-expanded] { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.portrait #pet-habitat[data-expanded]::after { display: none; }
+.portrait #pet-habitat[data-expanded] .pet-scene { inset: 560px 0 365px; }
+.portrait #pet-habitat[data-expanded] .pet-care { grid-column: 1 / -1; }
+.portrait #pet-habitat[data-expanded] #pet-environment {
+  grid-area: 1 / 2;
+  padding: 84px 26px 16px 18px;
+  border-block-end: 1px solid var(--weather-divider);
+  border-end-start-radius: 20px;
+  background: linear-gradient(135deg, #141e2e, #070c15 85%);
+}
+.portrait #pet-time { --pet-clock-size: 136px; }
+.portrait #pet-date { font-size: calc(18px * var(--text-scale)); }
+.portrait #pet-weather-temperature { font-size: calc(48px * var(--text-scale)); }
+.portrait .pet-weather-values > div { font-size: calc(17px * var(--text-scale)); }

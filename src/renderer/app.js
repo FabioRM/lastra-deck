@@ -94,6 +94,7 @@
   let pendingConfirmation = null;
   let inspectedFeedback = null;
   let activeView = null;
+  let deckWindowVisible = true;
   let stopTelemetry;
   let savedView;
   let pendingViewSave = false;
@@ -207,6 +208,13 @@
 
   window.LastraDeckViews = {
     get active() { return activeView; },
+    setPetExpanded(expanded) {
+      stage.toggleAttribute('data-pet-expanded', expanded);
+      fitStage();
+      updateTelemetryVisibility();
+      updateWidgetVisibility();
+      updateClock();
+    },
     setPanel(panel, open, { remember = true } = {}) {
       closeKeyFeedback();
       if (open) {
@@ -226,6 +234,10 @@
       if (isFullPanel && !wasFullPanel) sidePanel.dispatchEvent(new Event('lastra:close-view'));
       deck.hidden = sidePanel.hidden = isFullPanel;
       keysEl.hidden = Boolean(activeView);
+      if (profile) {
+        renderPageHeading();
+        updatePageNavigation();
+      }
       updateViewSwitch();
       renderQuickTools();
       const toolsButton = document.getElementById('quick-tools-open');
@@ -241,18 +253,29 @@
     },
   };
 
+  function deckIsVisible() {
+    return deckWindowVisible && !document.hidden && !stage.inert && !sessionCover.open
+      && !stage.hasAttribute('data-desktop-revealed');
+  }
+
+  function barIsVisible() { return !widgetBar.hidden && !stage.hasAttribute('data-pet-expanded'); }
+
   function updateWidgetVisibility() {
     if (keysEl.hidden) closeConfirmation();
-    pageWidgets?.setVisible(!keysEl.hidden);
-    barWidgets?.setVisible(!widgetBar.hidden);
+    const visible = deckIsVisible();
+    pageWidgets?.setVisible(visible && !keysEl.hidden);
+    barWidgets?.setVisible(visible && barIsVisible());
     updateLiveKeyVisibility();
   }
 
   function renderLiveKeys() {
+    const showBar = barIsVisible();
+    if (!deckIsVisible() || (keysEl.hidden && !showBar)) return;
+    const root = keysEl.hidden ? widgetBar : showBar ? stage : keysEl;
     const { keyLiveState, keyLiveAppearance, keyReading, timerKeyState, soundKeyState } = window.LastraKeyLiveState;
     const { lastReading } = window.LastraReadingTime;
     const now = Date.now();
-    for (const key of stage.querySelectorAll('.key:is([data-live-source], [data-readout])')) {
+    for (const key of root.querySelectorAll('.key:is([data-live-source], [data-readout])')) {
       const parts = liveKeyParts.get(key);
       const source = key.dataset.liveSource;
       const live = parts.sceneTarget ? obsSceneState(obsState, parts.sceneTarget)
@@ -304,8 +327,10 @@
   }
 
   function updateLiveKeyVisibility() {
-    const visible = (selector) => !document.hidden && ((!keysEl.hidden && keysEl.querySelector(selector))
-      || (!widgetBar.hidden && widgetBar.querySelector(selector)));
+    const showing = deckIsVisible();
+    const showBar = showing && barIsVisible();
+    const visible = (selector) => showing && ((!keysEl.hidden && keysEl.querySelector(selector))
+      || (showBar && widgetBar.querySelector(selector)));
     const needsSpotify = visible('.key:is([data-live-source="spotify"], [data-readout="spotify-remaining"])');
     if (needsSpotify && !stopSpotifyFeedback) {
       stopSpotifyFeedback = window.LastraWidgetProviders.spotify.subscribe((state) => {
@@ -365,8 +390,6 @@
     }
     renderLiveKeys();
   }
-
-  document.addEventListener('visibilitychange', updateLiveKeyVisibility);
 
   function renderPageGrid() {
     const layout = quickLayout.sheets[quickSheet];
@@ -438,14 +461,23 @@
   // ------------------------------------------------------------ scaling
 
   function fitStage() {
-    const portrait = window.innerHeight > window.innerWidth;
+    const { innerWidth: viewWidth, innerHeight: viewHeight } = window;
+    const portrait = viewHeight > viewWidth;
     stage.classList.toggle('portrait', portrait);
     const width = portrait ? STAGE_H : STAGE_W;
     const height = portrait ? STAGE_W : STAGE_H;
-    const scale = Math.min(window.innerWidth / width, window.innerHeight / height);
+    const scale = Math.min(viewWidth / width, viewHeight / height) || 1;
     stageScale = scale;
-    const x = (window.innerWidth - width * scale) / 2;
-    const y = (window.innerHeight - height * scale) / 2;
+    if (stage.hasAttribute('data-pet-expanded')) {
+      stage.style.setProperty('--pet-screen-width', `${viewWidth / scale}px`);
+      stage.style.setProperty('--pet-screen-height', `${viewHeight / scale}px`);
+      stage.style.transform = `scale(${scale})`;
+      return;
+    }
+    stage.style.removeProperty('--pet-screen-width');
+    stage.style.removeProperty('--pet-screen-height');
+    const x = (viewWidth - width * scale) / 2;
+    const y = (viewHeight - height * scale) / 2;
     stage.style.transform = `translate(${x}px, ${y}px) scale(${scale})`;
     if (!profile || deck.hidden) return;
 
@@ -1031,6 +1063,17 @@
     } else pageIcon.removeAttribute('src');
   }
 
+  function renderPageHeading() {
+    const app = activeView?.id === 'pet-habitat' ? profile.foregroundApp : null;
+    const page = profile.pages.find(({ id }) => id === profile.page);
+    pageName.textContent = app?.name ?? profile.pageName ?? page?.name ?? t('Deck');
+    pageFolder.textContent = app ? '' : (page?.folder ?? []).join(' / ');
+    pageFolder.hidden = pageFolder.textContent === '';
+    pageFolder.title = pageFolder.textContent;
+    pageName.title = pageFolder.hidden ? pageName.textContent : `${pageFolder.textContent} / ${pageName.textContent}`;
+    renderPageIcon(app ? app.icon : profile.pageIcon);
+  }
+
   function selectPage(destination) {
     if (!destination) return;
     closeActiveView();
@@ -1279,7 +1322,7 @@
     pageCount.textContent = profile.targetUnavailable ? [t('Target inactive'), part].filter(Boolean).join(' · ')
       : part || (automatic ? t('Auto') : profile.pages.length > 1 ? `${index + 1} / ${profile.pages.length}`
         : ['title', 'app-id', 'executable'].includes(profile.pageMatch?.reason) ? 'Rule' : '');
-    pageCount.hidden = !pageCount.textContent;
+    pageCount.hidden = !pageCount.textContent || activeView?.id === 'pet-habitat';
     pageCount.title = pageCount.textContent;
     previous.disabled = !api || !(quickSheet > 0 || (useProfilePages && (automatic || index > 0)));
     next.disabled = !api || !(quickSheet + 1 < count || (useProfilePages && (automatic || index < profile.pages.length - 1)));
@@ -1321,13 +1364,7 @@
     stage.style.setProperty('--hold-ms', `${gestures.holdMs}ms`);
     stage.style.setProperty('--confirm-ms', `${gestures.confirmMs}ms`);
     renderWidgetBar(view, gestures);
-    const index = view.pages.findIndex(({ id }) => id === view.page);
-    pageName.textContent = view.pageName ?? view.pages[index]?.name ?? window.LastraI18n.t('Deck');
-    pageFolder.textContent = (view.pages[index]?.folder ?? []).join(' / ');
-    pageFolder.hidden = pageFolder.textContent === '';
-    pageFolder.title = pageFolder.textContent;
-    pageName.title = pageFolder.hidden ? pageName.textContent : `${pageFolder.textContent} / ${pageName.textContent}`;
-    renderPageIcon(view.pageIcon);
+    renderPageHeading();
     if (view.pageMatch) {
       const { reason, priority } = view.pageMatch;
       const detail = t(view.targetUnavailable ? 'The target window is inactive.' : matchLabels[reason]);
@@ -1473,6 +1510,7 @@
   }
 
   function updateClock() {
+    if (!deckIsVisible()) return;
     const now = new Date(viewSource?.fixtureTime ?? Date.now());
     const locale = profile?.locale || 'en-GB';
     if (!clockFormatter || clockLocale !== locale) {
@@ -1482,6 +1520,14 @@
       });
     }
     const parts = clockFormatter.formatToParts(now);
+    if (stage.hasAttribute('data-pet-expanded')) {
+      renderClockTime(document.getElementById('pet-time'), parts, true);
+      const date = document.getElementById('pet-date');
+      const dateLocale = window.LastraI18n.language === 'it' ? 'it-IT' : locale;
+      const text = now.toLocaleDateString(dateLocale, { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+      if (date.textContent !== text) date.textContent = text;
+      return;
+    }
     const inStats = activeView === stats;
     const inDashboard = activeView === dashboard;
     const inFeeds = activeView === feedsPanel;
@@ -1506,25 +1552,20 @@
 
   let clockTimer;
 
-  // Ticks on each second boundary while the window is visible; a hidden window stops ticking and
-  // refreshes as soon as it is shown again.
+  // Match the tick to the clock's visible precision.
   function tickClock() {
     clearTimeout(clockTimer);
     clockTimer = undefined;
-    if (document.hidden) return;
+    if (!deckIsVisible()) return;
     updateClock();
-    clockTimer = setTimeout(tickClock, 1000 - (Date.now() % 1000));
-  }
-
-  function startClock() {
-    tickClock();
-    document.addEventListener('visibilitychange', tickClock);
+    const interval = showClockSeconds ? 1_000 : 60_000;
+    clockTimer = setTimeout(tickClock, interval - Date.now() % interval);
   }
 
   const renderSensors = window.createTelemetry();
 
   function updateTelemetryVisibility() {
-    if (sidePanel.hidden || document.hidden) {
+    if (sidePanel.hidden || !deckIsVisible() || stage.hasAttribute('data-pet-expanded')) {
       stopTelemetry?.();
       stopTelemetry = undefined;
     } else {
@@ -1532,7 +1573,15 @@
     }
   }
 
-  document.addEventListener('visibilitychange', updateTelemetryVisibility);
+  function updateDeckVisibility() {
+    updateWidgetVisibility();
+    updateTelemetryVisibility();
+    tickClock();
+  }
+
+  document.addEventListener('visibilitychange', updateDeckVisibility);
+  document.addEventListener('lastra:session-blocked', updateDeckVisibility);
+  new MutationObserver(updateDeckVisibility).observe(stage, { attributeFilter: ['inert', 'data-desktop-revealed'] });
 
   // ------------------------------------------------------------ preview
 
@@ -1567,8 +1616,15 @@
   }
 
   viewSource.onProfile(renderProfile);
-  api?.onDeckPageIcon?.(({ revision, source }) => {
-    if (profile?.revision === revision) renderPageIcon(source);
+  api?.onDeckWindowVisibility?.((shown) => {
+    deckWindowVisible = shown;
+    updateDeckVisibility();
+  });
+  api?.onDeckPageIcon?.(({ revision, source, foregroundIcon }) => {
+    if (profile?.revision !== revision) return;
+    const app = profile.foregroundApp;
+    profile = { ...profile, pageIcon: source, foregroundApp: app && { ...app, icon: foregroundIcon } };
+    renderPageHeading();
   });
   if (api) viewSwitch.addEventListener('click', () => showPrimaryView(nextPrimaryView()));
   updateTelemetryVisibility();
@@ -1603,7 +1659,7 @@
     if (showClockSeconds === appearance.showClockSeconds) return;
     showClockSeconds = appearance.showClockSeconds;
     clockFormatter = undefined;
-    updateClock();
+    tickClock();
   });
   api?.onStatus((s) => showStatus(s.message, s.ok));
   api?.onDeckNavigation?.(applyDeckNavigation);
@@ -1626,7 +1682,7 @@
       applyDeckNavigation(pendingNavigation ?? { view: initial.deckView, statsTab: initial.deckStatsTab, sheet: initial.deckSheet });
       pendingNavigation = undefined;
     }
-    startClock();
+    tickClock();
     await document.fonts.ready;
     if (demo) applyDemoStates();
     api?.ready();

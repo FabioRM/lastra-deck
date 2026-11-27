@@ -4,6 +4,7 @@
   const api = window.lastra ?? window.LastraDeckPreview?.panels;
   if (!api?.readFeeds) return;
   const { t } = window.LastraI18n;
+  const { moonCycle, moonPhase: moonName, moonLabel } = window.LastraWeather;
   const panel = document.getElementById('feeds-panel');
   const status = document.getElementById('feeds-panel-status');
   const weather = document.getElementById('feeds-weather');
@@ -29,24 +30,6 @@
   function arc(progress) {
     const angle = Math.PI * (1 - Math.min(1, Math.max(0, progress)));
     return { x: 50 + Math.cos(angle) * 36, y: 72 - Math.sin(angle) * 54 };
-  }
-
-  function moonCycle(date) {
-    const synodic = 29.530588853;
-    const knownNew = Date.UTC(2000, 0, 6, 18, 14);
-    const age = ((date.getTime() - knownNew) / 86_400_000) % synodic;
-    return ((age + synodic) % synodic) / synodic;
-  }
-
-  function moonName(cycle) {
-    if (cycle < 0.03 || cycle > 0.97) return 'new';
-    if (cycle < 0.22) return 'waxing-crescent';
-    if (cycle < 0.28) return 'first-quarter';
-    if (cycle < 0.47) return 'waxing-gibbous';
-    if (cycle < 0.53) return 'full';
-    if (cycle < 0.72) return 'waning-gibbous';
-    if (cycle < 0.78) return 'last-quarter';
-    return 'waning-crescent';
   }
 
   function moonPath(cycle, northern) {
@@ -243,7 +226,7 @@
       place.textContent = reading.place || '';
       temp.textContent = `${reading.temperature}°`;
       condition.textContent = t(reading.label);
-      moonState.textContent = t(moonName(moonCycle(new Date())));
+      moonState.textContent = t(moonLabel(moonName(moonCycle(new Date()))));
       range.textContent = reading.low == null || reading.high == null ? '' : `${t('Min')} ${reading.low}° · ${t('Max')} ${reading.high}°`;
     } else {
       weather.dataset.scene = 'clear';

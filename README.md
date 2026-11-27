@@ -35,11 +35,11 @@ The deck comes with 14 themes and five quick looks. [Deck look](docs/deck-look.m
 
 ## Getting started
 
-Download Lastra 1.3.0 for your system. [Windows x64 installer](https://github.com/FabioRM/lastra-deck/releases/download/v1.3.0/Lastra-Setup-1.3.0.exe) · [Linux .deb](https://github.com/FabioRM/lastra-deck/releases/download/v1.3.0/Lastra-1.3.0-linux-amd64.deb) · [Linux AppImage](https://github.com/FabioRM/lastra-deck/releases/download/v1.3.0/Lastra-1.3.0-linux-x86_64.AppImage) · [Checksums and reviewed source](https://github.com/FabioRM/lastra-deck/releases/tag/v1.3.0)
+Download Lastra 1.4.0 for your system. [Windows x64 installer](https://github.com/FabioRM/lastra-deck/releases/download/v1.4.0/Lastra-Setup-1.4.0.exe) · [Linux .deb](https://github.com/FabioRM/lastra-deck/releases/download/v1.4.0/Lastra-1.4.0-linux-amd64.deb) · [Linux AppImage](https://github.com/FabioRM/lastra-deck/releases/download/v1.4.0/Lastra-1.4.0-linux-x86_64.AppImage) · [Checksums and reviewed source](https://github.com/FabioRM/lastra-deck/releases/tag/v1.4.0)
 
 Set the XENEON EDGE to **Extend these displays** in Windows Display settings. The panel runs at 2560 × 720 in landscape and 720 × 2560 in portrait.
 
-**Install the app.** Run `Lastra-Setup-1.3.0.exe` on Windows x64. It installs for the current user in `%LOCALAPPDATA%\Programs\Lastra` and adds Start menu and desktop shortcuts. The Windows installer is unsigned. Settings and profiles live in `%APPDATA%\Lastra` and survive updates and uninstalls. [Linux setup](docs/linux-deck.md) · [Windows update behavior](docs/releasing.md#update-behavior)
+**Install the app.** Run `Lastra-Setup-1.4.0.exe` on Windows x64. It installs for the current user in `%LOCALAPPDATA%\Programs\Lastra` and adds Start menu and desktop shortcuts. The Windows installer is unsigned. Settings and profiles live in `%APPDATA%\Lastra` and survive updates and uninstalls. [Linux setup](docs/linux-deck.md) · [Windows update behavior](docs/releasing.md#update-behavior)
 
 **Run from source.** Install **Node.js 22.12.0 or later**, as required by the Electron installer, then run these commands from the project directory. Source runs never check for updates. To build the installer yourself, see [Releasing](docs/releasing.md).
 
@@ -73,13 +73,15 @@ Use **Export diagnostics…** under **Settings → System → Diagnostics** to s
 
 From **Deck Keys**, tap the paw immediately before the page lock. The pet's 3D habitat opens in the shortcut area. Tap the paw again to return to your keys.
 
-Tap your pet to cuddle or wake it, tap the ground to move it, and tap one of the three interactive objects in each habitat to explore it. Tap the sun, moon, or planet to draw its attention upward. Pets roam the wider islands and choose activities based on hunger, happiness, playfulness, sleepiness, and hygiene. Touches and care buttons cycle through different reactions.
+Tap your pet to cuddle or wake it, tap the ground to move it, and tap one of the three interactive objects in each habitat to explore it. Tap the sun, moon, or planet to draw its attention upward. All six care bars are at their best at 100%. Playing uses energy, naps end when energy is full, and medicine restores health lost when basic needs stay low.
+
+Use the expand button in the habitat’s upper-right corner for an edge-to-edge view with a large clock, the date, and current weather readings. Tap the red **×** to return. Both habitat sizes follow the weather location configured in **Settings → Feeds**, and the 3D scene pauses when you hide it.
 
 Under **Settings → Deck pet**, choose an animal, a habitat, a name, and whether the scene animates. The eight pets include K-9 the robot dog and Bip the companion drone. Habitats include Lantern Grove, Aurora Peak, Neon Alley, and the Cybergreenhouse. Progress stays on your computer and time spent napping counts while Lastra is closed.
 
-Deck pet is included in Lastra 1.3.0 for Windows and Linux. [Watch the deck pet demo](https://fabiorm.github.io/lastra-deck/#deck-pet)
+See the compact and full-screen views and watch the new play and care animations, captured on a 2560 × 720 XENEON EDGE with sample weather. [Watch the deck pet demo](https://fabiorm.github.io/lastra-deck/#deck-pet)
 
-![K-9 in the neon alley habitat with five care indicators](docs/preview-pet-neon.webp)
+![Mochi in full-screen Lantern Grove with six care indicators, a large clock, and a weather panel](docs/preview-pet-full.webp)
 
 ## Tools and Pomodoro
 

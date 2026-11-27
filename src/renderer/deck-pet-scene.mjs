@@ -4,6 +4,8 @@ import { makeAtmosphere } from './deck-pet-atmosphere.mjs';
 import { makeReactions } from './deck-pet-reactions.mjs';
 import { addWorldDetails, surfaceDetail, WORLDS } from './deck-pet-worlds.mjs';
 import { makeWorldInteraction } from './deck-pet-interaction.mjs';
+import { makeWildlife } from './deck-pet-wildlife.mjs';
+import { makePetWeather } from './deck-pet-weather.mjs';
 
 const RIPPLE_RADII = [2.96, 3.29, 3.88, 4.48];
 const LAYOUTS = {
@@ -131,6 +133,13 @@ function connect({ mesh }, parent, shape, color, from, to, width) {
   return part;
 }
 
+function freezeIslandTransforms(node, movingParent = false) {
+  const moving = node.userData.moving === true;
+  if (!moving) node.matrixAutoUpdate = false;
+  if (!moving && !movingParent) node.matrixWorldAutoUpdate = false;
+  for (const child of node.children) freezeIslandTransforms(child, moving || movingParent);
+}
+
 function tree(model, island, x, z, size, colors, blossom) {
   const { group, mesh } = model;
   const crown = group(island, x, 0, z);
@@ -148,6 +157,9 @@ function tree(model, island, x, z, size, colors, blossom) {
       mesh(crown, 'cone', colors[tier], [.04, .57 + tier * .34, 0], [width, .78 - tier * .1, width], 'facet');
     }
   }
+  model.batch(crown);
+  crown.userData.moving = true;
+  return crown;
 }
 
 function crystal(model, parent, x, z, size, color) {
@@ -199,6 +211,7 @@ function terrain(model, scene, id, theme, random, layout) {
   const shell = group(island);
   shell.scale.x = layout.width;
   const scenery = group(island);
+  const trees = [];
   scenery.scale.x = layout.scenery;
   const foundation = geometry('foundation', () => new THREE.LatheGeometry([
     [0, -.91], [1.44, -.91], [2.07, -.64], [2.55, -.39], [2.72, -.16], [2.62, -.07], [0, -.07],
@@ -222,6 +235,7 @@ function terrain(model, scene, id, theme, random, layout) {
     ring.material.depthWrite = false;
     ring.material.opacity = [.38, .23, .16, .08][index];
     ring.rotation.x = -Math.PI / 2;
+    ring.userData.moving = true;
     return ring;
   });
   const fragments = layout.width > 1.2 ? 38 : 26;
@@ -259,7 +273,7 @@ function terrain(model, scene, id, theme, random, layout) {
   } else if (id === 'grove' || id === 'moon') {
     for (const [x, z, size] of [[-2.02, -.38, .93], [-1.54, -.96, 1.24], [-.72, -1.42, .82],
       [.48, -1.36, .92], [1.36, -.98, 1.33], [1.92, -.41, .82]]) {
-      tree(model, scenery, x, z, size, theme.plants, id === 'moon');
+      trees.push(tree(model, scenery, x, z, size, theme.plants, id === 'moon'));
     }
     if (id === 'moon') {
       crystal(model, scenery, -1.75, .55, .85, '#d1a7ff');
@@ -290,8 +304,16 @@ function terrain(model, scene, id, theme, random, layout) {
   const animateDetails = addWorldDetails(model, scenery, id, theme);
   const shadow = mesh(island, 'disc', radial('pet shadow', '#192630', .72), [.25, .057, .55], [.84, .58, 1]);
   shadow.rotation.x = -Math.PI / 2;
+  shadow.userData.moving = true;
   model.batch(island);
-  return { rings, shadow, animateDetails };
+  island.updateWorldMatrix(true, true);
+  freezeIslandTransforms(island);
+  return { rings, shadow, animate(time, wind) {
+    animateDetails(time);
+    for (const [index, crown] of trees.entries()) {
+      crown.rotation.z = Math.sin(time * (1.16 + wind * .96) + index * .73) * (.027 + wind * .086) + wind * .065;
+    }
+  } };
 }
 
 export function createPetScene(canvas) {
@@ -304,15 +326,21 @@ export function createPetScene(canvas) {
   let pet;
   let ground;
   let atmosphere;
+  let paintWeather;
+  let lights;
   let props;
   let propLayer;
   let interaction;
+  let wildlife;
   let previousReaction;
   let previousTime;
   let ambientTime = 0;
   let visibleHeight = 5.1;
   let tall = false;
   let currentSettings;
+  let lastWidth;
+  let lastHeight;
+  let pixelRatio = 1;
 
   function setWorld(settings, retainReaction = false) {
     currentSettings = settings;
@@ -326,7 +354,9 @@ export function createPetScene(canvas) {
     rim.position.set(3, 4, -5);
     const fill = new THREE.DirectionalLight(theme.sky, .55);
     fill.position.set(5, 1.4, 6);
-    scene.add(new THREE.HemisphereLight(theme.sky, '#60526f', 1.85), sun, rim, fill);
+    const ambient = new THREE.HemisphereLight(theme.sky, '#60526f', 1.85);
+    scene.add(ambient, sun, rim, fill);
+    lights = { sun, ambient, rim };
     let seed = theme.seed;
     const random = () => ((seed = (Math.imul(1664525, seed) + 1013904223) >>> 0) / 2 ** 32);
     const layout = tall ? LAYOUTS.tall : LAYOUTS.wide;
@@ -336,12 +366,18 @@ export function createPetScene(canvas) {
     propLayer = model.group(scene);
     props = makeReactions(model, propLayer, theme);
     interaction = makeWorldInteraction(model, scene, settings.habitat, theme, layout);
+    wildlife = makeWildlife(model, scene, settings.habitat, theme, layout, interaction.features);
+    paintWeather = makePetWeather(model, scene, random, layout);
     if (!retainReaction) previousReaction = undefined;
     previousTime = undefined;
     ambientTime = 0;
   }
 
   function resize(width, height) {
+    const ratio = Math.min(window.devicePixelRatio, Math.sqrt(1_500_000 / (width * height)));
+    if (width === lastWidth && height === lastHeight && ratio === pixelRatio) return;
+    lastWidth = width;
+    lastHeight = height;
     const aspect = width / height;
     const changed = tall !== (aspect < .82);
     tall = aspect < .82;
@@ -353,23 +389,35 @@ export function createPetScene(canvas) {
     camera.top = halfHeight;
     camera.bottom = -halfHeight;
     camera.updateProjectionMatrix();
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, Math.sqrt(1_500_000 / (width * height))));
+    if (ratio !== pixelRatio) {
+      pixelRatio = ratio;
+      renderer.setPixelRatio(ratio);
+    }
     renderer.setSize(width, height, false);
     if (changed && currentSettings) setWorld(currentSettings, true);
   }
 
-  function draw(seconds, motion, reaction, sleeping = false, needs) {
+  function pause() { previousTime = undefined; }
+
+  function draw(seconds, motion, reaction, sleeping = false, needs, emotion, climate) {
     if (!scene) return;
     if (motion && previousTime !== undefined) ambientTime += Math.min(.08, Math.max(0, seconds - previousTime));
     previousTime = seconds;
     const time = motion ? ambientTime : 0;
     camera.position.set((tall ? 2.55 : 2.40) + Math.sin(time * .23) * .31, 4.07 + Math.sin(time * .29) * .11, 9.6);
     camera.lookAt(0, .79, 0);
+    const pixelsPerUnit = canvas.height / visibleHeight;
+    const { cloud, wind, flash, haze } = paintWeather(climate, time, motion, camera, pixelsPerUnit);
+    const night = climate?.phase === 'night';
+    const twilight = climate?.phase === 'dawn' || climate?.phase === 'dusk';
+    lights.sun.intensity = (night ? 1.27 : twilight ? 1.92 : 2.55) * (1 - cloud * .36) + flash * .75;
+    lights.ambient.intensity = (night ? 1.48 : 1.85) * (1 - haze * .17);
+    lights.rim.intensity = (night ? 2.60 : 2.30) + flash * .45;
     if (reaction && reaction !== previousReaction) interaction.react(reaction, time, motion, needs);
     previousReaction = reaction;
-    const movement = interaction.update(time, motion, sleeping, needs, camera, atmosphere);
+    const movement = interaction.update(time, motion, sleeping, needs, camera, atmosphere, wildlife);
     const { clip, age, action } = movement;
-    poseCompanion(pet, time, motion, clip, age, movement, needs);
+    poseCompanion(pet, time, motion, clip, age, movement, needs, emotion);
     ground.shadow.material.opacity = .77 - pet.root.position.y * .62;
     ground.shadow.position.x = pet.root.position.x;
     ground.shadow.position.z = pet.root.position.z;
@@ -379,21 +427,25 @@ export function createPetScene(canvas) {
       ring.scale.set(radius * (tall ? LAYOUTS.tall.water : LAYOUTS.wide.water), radius * .67, 1);
       ring.material.opacity = [.32, .21, .15, .074][index] * (.79 + wave * .21);
     });
-    ground.animateDetails(time);
-    atmosphere.paint(time, camera, canvas.height / visibleHeight, movement.skyPulse);
+    ground.animate(time, wind);
+    wildlife.paint(time, motion, movement);
+    atmosphere.paint(time, camera, pixelsPerUnit, movement.skyPulse, climate, cloud);
     propLayer.position.set(movement.x - .25, 0, movement.z - .57);
     props(motion ? clip : undefined, age, camera, sleeping, time, action);
     renderer.render(scene, camera);
+    return movement.effect;
   }
 
   function pick(clientX, clientY) {
     if (!interaction) return null;
     const { left, top, width, height } = canvas.getBoundingClientRect();
     if (width < 1 || height < 1) return null;
-    return interaction.pick((clientX - left) / width, (clientY - top) / height, camera, pet, atmosphere);
+    return interaction.pick((clientX - left) / width, (clientY - top) / height, camera, pet, atmosphere, wildlife);
   }
 
-  function walk(point, motion, needs) { interaction.walk(point, ambientTime, motion, { marker: true, needs }); }
+  function walk(point, motion, needs) {
+    interaction.walk(point, ambientTime, motion, { marker: true, needs, care: 'explore', automatic: false });
+  }
 
-  return { setWorld, resize, draw, pick, walk, skyLabel: () => atmosphere.label };
+  return { setWorld, resize, draw, pause, pick, walk, skyLabel: () => atmosphere.label };
 }

@@ -23,6 +23,11 @@ const LANDMARKS = {
   neon: ['Hologram', 'scan', '#7bf4ff'],
   cyber: ['Luminous sprout', 'flower', '#9fffbc'],
 };
+const CLIP_CARE = {
+  sip: 'drink', splash: 'splash', scrub: 'groom', shake: 'groom', rest: 'rest', yawn: 'rest',
+  nibble: 'forage', pounce: 'frolic', dance: 'frolic', boing: 'frolic', glee: 'frolic', dig: 'frolic',
+  inspect: 'observe', listen: 'observe', wonder: 'observe', startled: 'observe', sniff: 'observe',
+};
 
 function featureLayout(habitat, layout) {
   const [px, z, height, width, form] = PRIMARY[habitat];
@@ -89,10 +94,10 @@ function makeFeatureEffects(model, scene, feature, theme) {
   const sparks = Array.from({ length: 12 }, (_, index) => mesh(scene, drops ? 'ball' : 'facet',
     index % 2 ? color : theme.light, [0, 0, 0], [1, 1, 1], 'glow'));
 
-  return (time, age, camera, clip) => {
+  return (time, age, camera, clip, visitor = false) => {
     const ping = .5 + Math.sin(time * 2.13 + feature.x) * .50;
     const burst = age >= 0 && age < 1.52;
-    const intensity = burst ? pulse(age, 0, .31, 1.52) : 0;
+    const intensity = burst ? pulse(age, 0, .31, 1.52) * (visitor ? .46 : 1) : 0;
     const radius = feature.width * (1.09 + ping * .10);
     target.scale.set(radius, radius * .87, 1.05);
     target.material.opacity = .38 + .19 * ping + intensity * .31;
@@ -104,11 +109,11 @@ function makeFeatureEffects(model, scene, feature, theme) {
       const spread = feature.width + age * .59;
       wave.position.set(feature.x, feature.form === 'scan' ? .17 + age * .64 : .078, feature.z);
       wave.scale.set(spread, spread * .85, .75);
-      wave.material.opacity = (1 - age / 1.52) * .71;
+      wave.material.opacity = (1 - age / 1.52) * (visitor ? .36 : .71);
     }
     for (const [index, spark] of sparks.entries()) {
       const rise = age - (index % 4) * .073;
-      spark.visible = burst && rise > 0 && rise < 1.10;
+      spark.visible = burst && (!visitor || index % 2 === 0) && rise > 0 && rise < 1.10;
       if (!spark.visible) continue;
       const angle = index * 2.399 + rise * (clip === 'dance' ? 7.3 : 2.6);
       const width = feature.form === 'scan' ? .34 : .11 + rise * .49;
@@ -146,7 +151,7 @@ export function makeWorldInteraction(model, scene, habitat, theme, layout, rando
   let lastChoice;
   let lastFeature;
 
-  function pick(relativeX, relativeY, camera, pet, celestial) {
+  function pick(relativeX, relativeY, camera, pet, celestial, wildlife) {
     pointer.set(relativeX * 2 - 1, 1 - relativeY * 2);
     raycaster.setFromCamera(pointer, camera);
     const { ray } = raycaster;
@@ -162,7 +167,12 @@ export function makeWorldInteraction(model, scene, habitat, theme, layout, rando
       hit = { action: 'explore', target: feature.id, label: feature.label };
     }
     const sky = ray.intersectSphere(celestial.bounds, intersection);
-    if (sky && ray.origin.distanceTo(sky) < closest) hit = { action: 'sky', label: celestial.label };
+    if (sky && ray.origin.distanceTo(sky) < closest) {
+      closest = ray.origin.distanceTo(sky);
+      hit = { action: 'sky', label: celestial.label };
+    }
+    const critter = wildlife.pick(ray, closest);
+    if (critter) return { action: 'wildlife', target: critter, label: critter.label };
     if (hit) return hit;
     const ground = ray.intersectPlane(terrainPlane, intersection);
     return ground && Math.hypot(ground.x / layout.rx, ground.z / layout.rz) < 1 ? { point: { x: ground.x, z: ground.z } } : null;
@@ -174,29 +184,34 @@ export function makeWorldInteraction(model, scene, habitat, theme, layout, rando
     return { x: THREE.MathUtils.clamp(point.x, -edge, edge), z: safeZ };
   }
 
-  function walk(point, time, motion, { feature, clip, marker: mark = false, needs } = {}) {
+  function walk(point, time, motion, { marker: mark = false, needs, ...arrival } = {}) {
     const to = safePoint(point);
     const distance = Math.hypot(to.x - x, to.z - z);
-    const tired = (needs?.energy ?? 80) < 38;
+    const tired = (needs?.energy ?? 80) < 38 || (needs?.health ?? 100) < 42;
     const duration = THREE.MathUtils.clamp(distance * (tired ? .76 : .56), .32, 3.42);
-    trip = motion ? { from: { x, z }, to, at: time, duration, feature, clip, mark } : undefined;
+    trip = { from: { x, z }, to, at: time, duration, arrival, mark };
     activity = undefined;
-    if (!motion || distance < .13) {
-      ({ x, z } = to);
-      trip = undefined;
-      if (clip) arrive(clip, time, feature);
-    }
+    if (!motion || distance < .13) finishTrip(time);
   }
 
-  function visit(feature, time, motion, needs, clip = chooseClip(feature.id, FEATURE_CLIPS[feature.form])) {
+  function finishTrip(time) {
+    const { to, arrival } = trip;
+    ({ x, z } = to);
+    if (arrival.clip || arrival.care) arrive(time, arrival);
+    trip = undefined;
+    nextAutonomous = Math.max(nextAutonomous, time + 2.2);
+  }
+
+  function visit(feature, time, motion, needs, automatic = true, clip = chooseClip(feature.id, FEATURE_CLIPS[feature.form])) {
     const direction = Math.sign(feature.x) || 1;
     const point = { x: feature.x - direction * Math.max(.57, feature.width + .25), z: Math.max(.06, feature.z + .31) };
     lastFeature = feature.id;
-    walk(point, time, motion, { feature, clip, needs });
+    const care = CLIP_CARE[clip] ?? (feature.form === 'rest' ? 'rest' : 'explore');
+    walk(point, time, motion, { feature, clip, care, needs, automatic });
   }
 
-  function arrive(clip, time, feature) {
-    activity = { clip, at: time, feature };
+  function arrive(time, { clip, feature, care, automatic = true, action, critter }) {
+    activity = { clip, at: time, feature, care, automatic, action, critter };
     if (feature) signal = { feature, at: time + .24, clip };
   }
 
@@ -208,44 +223,49 @@ export function makeWorldInteraction(model, scene, habitat, theme, layout, rando
     nextAutonomous = Math.max(nextAutonomous, time + 4.8);
     if (action === 'explore') {
       const feature = features.find(({ id }) => id === target) ?? features[0];
-      visit(feature, time, motion, needs);
+      visit(feature, time, motion, needs, false);
     } else {
-      activity = { action, clip: chooseClip(action), at: time };
+      const care = action === 'sky' || action === 'wildlife' ? 'observe' : undefined;
+      arrive(time, { action, clip: chooseClip(action), care, automatic: false,
+        critter: action === 'wildlife' ? target : undefined });
     }
   }
 
-  function act(time, needs) {
+  function act(time, needs, wildlife) {
     const earlyVisit = lastChoice === undefined && (!needs || Object.values(needs).every((value) => value >= 49));
-    const choice = earlyVisit ? 'visit' : chooseActivity(needs, lastChoice, random);
+    const critter = !earlyVisit && lastChoice !== 'wildlife' && random() < .34 ? wildlife.nearby(x, z) : undefined;
+    const choice = earlyVisit ? 'visit' : critter ? 'wildlife' : chooseActivity(needs, lastChoice, random);
     lastChoice = choice;
     nextAutonomous = time + 4.65 + random() * 3.20;
-    if (choice === 'visit') {
+    if (critter) {
+      arrive(time, { clip: chooseClip('wildlife'), action: 'wildlife', critter, care: 'observe' });
+    } else if (choice === 'visit') {
       const available = features.filter(({ id }) => id !== lastFeature);
       visit(available[Math.floor(random() * available.length)], time, true, needs);
     } else if (choice === 'wander' || choice === 'pace') {
       const direction = x > 0 ? -1 : 1;
       walk({ x: direction * layout.rx * (.37 + random() * .23), z: .47 + random() * .68 }, time, true,
-        { clip: choice === 'pace' ? 'listen' : 'stretch', needs });
+        { clip: choice === 'pace' ? 'listen' : 'stretch', care: 'explore', needs });
     } else if (choice === 'rest' || choice === 'yawn') {
-      visit(features[2], time, true, needs, choice);
+      visit(features[2], time, true, needs, true, choice);
     } else if (choice === 'sniff' || choice === 'sip') {
       const feature = features.find(({ form }) => form === 'water') ?? features[1];
-      visit(feature, time, true, needs, choice === 'sip' && feature.form !== 'water' ? 'sniff' : choice);
+      visit(feature, time, true, needs, true, feature.form === 'water' && choice === 'sip' ? 'sip' : 'nibble');
     } else if (choice === 'pounce' || choice === 'dance') {
       const direction = x > 0 ? -1 : 1;
-      walk({ x: direction * layout.rx * .32, z: .94 }, time, true, { clip: choice, needs });
+      walk({ x: direction * layout.rx * .32, z: .94 }, time, true, { clip: choice, care: 'frolic', needs });
     } else {
-      arrive(choice, time);
+      arrive(time, { clip: choice, care: CLIP_CARE[choice] });
     }
   }
 
-  function update(time, motion, sleeping, needs, camera, celestial) {
-    if (activity && motion && time - activity.at >= clipLength(activity.clip)) activity = undefined;
+  function update(time, motion, sleeping, needs, camera, celestial, wildlife) {
+    if (activity && motion && !activity.care && time - activity.at >= clipLength(activity.clip)) activity = undefined;
     if (sleeping && activity?.action !== 'sleep') {
       activity = undefined;
       trip = undefined;
     }
-    if (!sleeping && motion && !trip && !activity && time >= nextAutonomous) act(time, needs);
+    if (!sleeping && motion && !trip && !activity && time >= nextAutonomous) act(time, needs, wildlife);
 
     let walking = 0;
     let turn = 0;
@@ -264,28 +284,34 @@ export function makeWorldInteraction(model, scene, habitat, theme, layout, rando
         marker.scale.set(size, size, .65);
         marker.material.opacity = .61 * (1 - age / .62);
       }
-      if (age >= trip.duration) {
-        if (trip.clip) arrive(trip.clip, time, trip.feature);
-        trip = undefined;
-        nextAutonomous = Math.max(nextAutonomous, time + 2.2);
-      }
-    }
+      if (age >= trip.duration) finishTrip(time);
+    } else if (trip && !sleeping) finishTrip(time);
     for (const feature of features) {
-      const fired = motion && signal?.feature === feature;
-      feature.paint(time, fired ? time - signal.at : -1, camera, signal?.clip);
+      const fired = motion && signal?.feature === feature && time >= signal.at && time - signal.at < 1.52;
+      feature.paint(time, fired ? time - signal.at : wildlife.contact(feature), camera, signal?.clip, !fired);
     }
     const age = activity ? motion ? time - activity.at : .65 : 0;
-    const weight = activity ? motion ? pulse(age, 0, .42, clipLength(activity.clip)) : 1 : 0;
+    const length = clipLength(activity?.clip);
+    const weight = length ? motion ? pulse(age, 0, .42, length) : 1 : 0;
+    let effect;
+    if (activity?.care && (!motion || age >= Math.min(.82, length * .45))) {
+      effect = { action: activity.care, automatic: activity.automatic };
+      activity.care = undefined;
+    }
     let gaze;
     if (activity?.action === 'sky') {
       const { x, y, z } = celestial.bounds.center;
       gaze = { x, y, z, weight, sky: true };
+    } else if (activity?.critter) {
+      const { x, y, z } = activity.critter.root.position;
+      gaze = { x, y, z, weight };
     } else if (activity?.feature) {
       const { x, height, z } = activity.feature;
       gaze = { x, y: height * .83, z, weight };
     }
-    return { x, z, walking, turn, gaze, sleeping, clip: activity?.clip, action: activity?.action, age, skyPulse: gaze?.sky ? weight : 0 };
+    return { x, z, walking, turn, gaze, sleeping, clip: activity?.clip, action: activity?.action, age,
+      skyPulse: gaze?.sky ? weight : 0, effect };
   }
 
-  return { pick, walk, react, update };
+  return { features, pick, walk, react, update };
 }
